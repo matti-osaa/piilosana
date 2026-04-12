@@ -217,8 +217,13 @@ io.on('connection', (socket) => {
           room.timer = null;
           room.gameState = 'finished';
 
-          const rankings = formatScores(room);
-          io.to(roomCode).emit('game_over', { rankings });
+         const rankings = formatScores(room);
+          // Collect all found words per player and the full valid word list
+          const allFoundWords = {};
+          for (const [pid, s] of room.scores.entries()) {
+            allFoundWords[pid] = [...s.wordsFound];
+          }
+          io.to(roomCode).emit('game_over', { rankings, validWords: room.validWords, allFoundWords });
 
           console.log(`Game over in room ${roomCode}`);
         }
