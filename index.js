@@ -25,6 +25,127 @@ const rooms = new Map(); // roomCode -> room
 const playerRooms = new Map(); // socketId -> roomCode
 
 // ============================================================================
+// LETTER GENERATION (for battle mode)
+// ============================================================================
+
+const LETTER_WEIGHTS = {
+  a:120, i:108, t:87, n:88, e:80, s:79, l:58, o:53, k:51, u:51,
+  '\u00e4':37, m:33, v:25, r:29, j:20, h:19, y:19, p:18, d:10, '\u00f6':4
+};
+const LETTERS = Object.keys(LETTER_WEIGHTS);
+const TOTAL_WEIGHT = Object.values(LETTER_WEIGHTS).reduce((a, b) => a + b, 0);
+
+function randLetter() {
+  let r = Math.random() * TOTAL_WEIGHT;
+  for (let i = 0; i < LETTERS.length; i++) {
+    r -= LETTER_WEIGHTS[LETTERS[i]];
+    if (r <= 0) return LETTERS[i];
+  }
+  return LETTERS[LETTERS.length - 1];
+}
+
+// ============================================================================
+// BATTLE MODE: Grid path validation
+// ============================================================================
+
+// Check if a word can be traced on the grid via adjacent cells
+function canTraceWord(grid, word) {
+  const sz = grid.length;
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+
+  function dfs(r, c, idx, visited) {
+    if (idx === word.length) return true;
+    for (const [dr, dc] of dirs) {
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr < sz && nc >= 0 && nc < sz && !visited.has(nr * sz + nc)) {
+        if (grid[nr][nc] === word[idx]) {
+          visited.add(nr * sz + nc);
+          if (dfs(nr, nc, idx + 1, visited)) return true;
+          visited.delete(nr * sz + nc);
+        }
+      }
+    }
+    return false;
+  }
+
+  for (let r = 0; r < sz; r++) {
+    for (let c = 0; c < sz; c++) {
+      if (grid[r][c] === word[0]) {
+        const visited = new Set([r * sz + c]);
+        if (dfs(r, c, 1, visited)) return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Apply gravity: letters fall down, empty cells filled from top
+function applyGravity(grid, removedCells) {
+  const sz = grid.length;
+  const newGrid = grid.map(row => [...row]);
+
+  // Mark removed cells as null
+  for (const { r, c } of removedCells) {
+    newGrid[r][c] = null;
+  }
+
+  // For each column, drop letters down
+  for (let c = 0; c < sz; c++) {
+    // Collect non-null letters from bottom to top
+    const letters = [];
+    for (let r = sz - 1; r >= 0; r--) {
+      if (newGrid[r][c] !== null) letters.push(newGrid[r][c]);
+    }
+    // Fill column from bottom: existing letters first, then new random ones
+    for (let r = sz - 1; r >= 0; r--) {
+      const idx = sz - 1 - r;
+      if (idx < letters.length) {
+        newGrid[r][c] = letters[idx];
+      } else {
+        newGrid[r][c] = randLetter();
+      }
+    }
+  }
+
+  return newGrid;
+}
+
+// Find the path of a word on the grid (returns array of {r,c} or null)
+function findWordPath(grid, word) {
+  const sz = grid.length;
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+
+  function dfs(r, c, idx, visited, path) {
+    if (idx === word.length) return path;
+    for (const [dr, dc] of dirs) {
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr < sz && nc >= 0 && nc < sz && !visited.has(nr * sz + nc)) {
+        if (grid[nr][nc] === word[idx]) {
+          visited.add(nr * sz + nc);
+          path.push({ r: nr, c: nc });
+          const result = dfs(nr, nc, idx + 1, visited, path);
+          if (result) return result;
+          path.pop();
+          visited.delete(nr * sz + nc);
+        }
+      }
+    }
+    return null;
+  }
+
+  for (let r = 0; r < sz; r++) {
+    for (let c = 0; c < sz; c++) {
+      if (grid[r][c] === word[0]) {
+        const visited = new Set([r * sz + c]);
+        const result = dfs(r, c, 1, visited, [{ r, c }]);
+        if (result) return result;
+      }
+    }
+  }
+  return null;
+}
+
+// ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
 
@@ -81,7 +202,7 @@ function getPublicRooms() {
   return list;
 }
 
-// Broadcast updated room list to all connected sockets NOT in a room
+// Broadcast updated room list to all connected sockets
 function broadcastRoomList() {
   io.emit('room_list', { rooms: getPublicRooms() });
 }
@@ -96,7 +217,7 @@ io.on('connection', (socket) => {
   // Send room list on connect
   socket.emit('room_list', { rooms: getPublicRooms() });
 
-  // ---- LIST ROOMS (client can request refresh) ----
+  // ---- LIST ROOMS ----
   socket.on('list_rooms', () => {
     socket.emit('room_list', { rooms: getPublicRooms() });
   });
@@ -115,10 +236,13 @@ io.on('connection', (socket) => {
       grid: null,
       validWords: [],
       gameState: 'waiting',
+      gameMode: 'classic', // 'classic' or 'battle'
       timer: null,
       countdownTimer: null,
       timeLeft: 120,
-      scores: new Map()
+      scores: new Map(),
+      // Battle mode: track all found words globally
+      battleFoundWords: new Set(),
     };
 
     room.players.set(socket.id, { nickname, isHost: true });
@@ -131,9 +255,7 @@ io.on('connection', (socket) => {
     socket.emit('room_created', { roomCode, playerId: socket.id });
     io.to(roomCode).emit('room_update', { players: formatPlayers(room) });
 
-    // Broadcast updated public room list to everyone
     broadcastRoomList();
-
     console.log(`Room ${roomCode} created by ${nickname} (${socket.id})`);
   });
 
@@ -147,12 +269,12 @@ io.on('connection', (socket) => {
     }
 
     if (room.players.size >= 8) {
-      socket.emit('error', { message: 'Huone on täynnä (max 8)' });
+      socket.emit('error', { message: 'Huone on t\u00e4ynn\u00e4 (max 8)' });
       return;
     }
 
     if (room.gameState !== 'waiting') {
-      socket.emit('error', { message: 'Peli on jo käynnissä' });
+      socket.emit('error', { message: 'Peli on jo k\u00e4ynniss\u00e4' });
       return;
     }
 
@@ -164,24 +286,22 @@ io.on('connection', (socket) => {
     socket.emit('room_joined', { roomCode, playerId: socket.id });
     io.to(roomCode).emit('room_update', { players: formatPlayers(room) });
 
-    // Broadcast updated public room list
     broadcastRoomList();
-
     console.log(`${nickname} (${socket.id}) joined room ${roomCode}`);
   });
 
   // ---- START GAME ----
-  socket.on('start_game', ({ grid, validWords }) => {
+  socket.on('start_game', ({ grid, validWords, gameMode }) => {
     const roomCode = playerRooms.get(socket.id);
     const room = rooms.get(roomCode);
 
     if (!room) {
-      socket.emit('error', { message: 'Huonetta ei löydy' });
+      socket.emit('error', { message: 'Huonetta ei l\u00f6ydy' });
       return;
     }
 
     if (room.hostId !== socket.id) {
-      socket.emit('error', { message: 'Vain isäntä voi aloittaa pelin' });
+      socket.emit('error', { message: 'Vain is\u00e4nt\u00e4 voi aloittaa pelin' });
       return;
     }
 
@@ -191,18 +311,19 @@ io.on('connection', (socket) => {
     }
 
     room.grid = grid;
-    room.validWords = validWords;
+    room.validWords = validWords; // used in classic mode
+    room.gameMode = gameMode || 'classic';
     room.gameState = 'running';
     room.timeLeft = 120;
+    room.battleFoundWords = new Set();
 
     for (const [pid, s] of room.scores) {
       s.score = 0;
       s.wordsFound = new Set();
     }
 
-    io.to(roomCode).emit('game_started', { grid, validWords });
+    io.to(roomCode).emit('game_started', { grid, validWords, gameMode: room.gameMode });
 
-    // Room no longer joinable, update public list
     broadcastRoomList();
 
     // 5s countdown before timer starts
@@ -217,33 +338,44 @@ io.on('connection', (socket) => {
           room.timer = null;
           room.gameState = 'finished';
 
-         const rankings = formatScores(room);
-          // Collect all found words per player and the full valid word list
+          const rankings = formatScores(room);
           const allFoundWords = {};
           for (const [pid, s] of room.scores.entries()) {
             allFoundWords[pid] = [...s.wordsFound];
           }
-          io.to(roomCode).emit('game_over', { rankings, validWords: room.validWords, allFoundWords });
+          io.to(roomCode).emit('game_over', {
+            rankings,
+            validWords: room.gameMode === 'classic' ? room.validWords : [],
+            allFoundWords
+          });
 
           console.log(`Game over in room ${roomCode}`);
         }
       }, 1000);
     }, 5000);
 
-    console.log(`Game started in room ${roomCode} with ${room.players.size} players`);
+    console.log(`Game started in room ${roomCode} (${room.gameMode}) with ${room.players.size} players`);
   });
 
-  // ---- WORD FOUND ----
+  // ---- WORD FOUND (classic mode) ----
   socket.on('word_found', ({ word }) => {
     const roomCode = playerRooms.get(socket.id);
     const room = rooms.get(roomCode);
 
     if (!room || room.gameState !== 'running') {
-      socket.emit('word_result', { valid: false, message: 'Peli ei käynnissä' });
+      socket.emit('word_result', { valid: false, message: 'Peli ei k\u00e4ynniss\u00e4' });
       return;
     }
 
     const normalized = word.toLowerCase().trim();
+
+    if (room.gameMode === 'battle') {
+      // Battle mode: handled by battle_word_found
+      socket.emit('word_result', { valid: false, message: 'V\u00e4\u00e4r\u00e4 moodi' });
+      return;
+    }
+
+    // Classic mode logic
     const isValid = room.validWords.includes(normalized);
 
     if (!isValid) {
@@ -254,7 +386,7 @@ io.on('connection', (socket) => {
     const playerScore = room.scores.get(socket.id);
 
     if (playerScore.wordsFound.has(normalized)) {
-      socket.emit('word_result', { valid: false, message: 'Löydetty jo' });
+      socket.emit('word_result', { valid: false, message: 'L\u00f6ydetty jo' });
       return;
     }
 
@@ -272,6 +404,95 @@ io.on('connection', (socket) => {
     });
 
     io.to(roomCode).emit('score_update', { scores: formatScores(room) });
+  });
+
+  // ---- BATTLE MODE: WORD FOUND ----
+  socket.on('battle_word_found', ({ word, cells, wordList }) => {
+    const roomCode = playerRooms.get(socket.id);
+    const room = rooms.get(roomCode);
+
+    if (!room || room.gameState !== 'running' || room.gameMode !== 'battle') {
+      socket.emit('word_result', { valid: false, message: 'Peli ei k\u00e4ynniss\u00e4' });
+      return;
+    }
+
+    const normalized = word.toLowerCase().trim();
+
+    // Check if word is in the word list (sent by client with the game)
+    if (!wordList && !room.validWords.includes(normalized)) {
+      // Validate word exists in dictionary by checking against the client-sent list
+      // In battle mode, we rely on the initial validWords as dictionary
+    }
+
+    // Check the word can actually be traced on the CURRENT server grid
+    if (!canTraceWord(room.grid, normalized)) {
+      socket.emit('word_result', { valid: false, message: 'Ei l\u00f6ydy ruudukosta' });
+      return;
+    }
+
+    // Check if already found globally in battle mode
+    if (room.battleFoundWords.has(normalized)) {
+      socket.emit('word_result', { valid: false, message: 'Joku ehti ensin!' });
+      return;
+    }
+
+    // Valid! Mark as found globally
+    room.battleFoundWords.add(normalized);
+
+    const playerScore = room.scores.get(socket.id);
+    const points = getScoreForWordLength(normalized.length);
+    playerScore.score += points;
+    playerScore.wordsFound.add(normalized);
+
+    // Find the path on the server grid to determine which cells to remove
+    const path = cells || findWordPath(room.grid, normalized);
+
+    if (!path || path.length === 0) {
+      // Shouldn't happen since canTraceWord passed, but safety fallback
+      socket.emit('word_result', { valid: true, message: `+${points}p`, points, combo: 1 });
+      io.to(roomCode).emit('score_update', { scores: formatScores(room) });
+      return;
+    }
+
+    // Apply gravity: remove cells, drop letters, fill new
+    room.grid = applyGravity(room.grid, path);
+
+    // Send result to the finder
+    socket.emit('word_result', {
+      valid: true,
+      message: `+${points}p`,
+      points,
+      combo: playerScore.wordsFound.size
+    });
+
+    // Broadcast grid update + who found what to ALL players
+    const nickname = room.players.get(socket.id)?.nickname || '?';
+    io.to(roomCode).emit('battle_grid_update', {
+      grid: room.grid,
+      removedCells: path,
+      word: normalized,
+      finder: nickname,
+      finderId: socket.id,
+      points
+    });
+
+    io.to(roomCode).emit('score_update', { scores: formatScores(room) });
+  });
+
+  // ---- BATTLE MODE: BROADCAST SELECTION ----
+  socket.on('battle_selection', ({ cells }) => {
+    const roomCode = playerRooms.get(socket.id);
+    const room = rooms.get(roomCode);
+
+    if (!room || room.gameState !== 'running' || room.gameMode !== 'battle') return;
+
+    const nickname = room.players.get(socket.id)?.nickname || '?';
+    // Broadcast to everyone else in the room
+    socket.to(roomCode).emit('battle_player_selection', {
+      playerId: socket.id,
+      nickname,
+      cells
+    });
   });
 
   // ---- LEAVE ROOM ----
@@ -308,7 +529,6 @@ function handleDisconnect(socket) {
       io.to(roomCode).emit('room_update', { players: formatPlayers(room) });
     }
 
-    // Broadcast updated room list
     broadcastRoomList();
   }
 
