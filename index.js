@@ -81,7 +81,7 @@ function getPublicRooms() {
   return list;
 }
 
-// Broadcast updated room list to all connected sockets
+// Broadcast updated room list to all connected sockets NOT in a room
 function broadcastRoomList() {
   io.emit('room_list', { rooms: getPublicRooms() });
 }
@@ -116,6 +116,7 @@ io.on('connection', (socket) => {
       validWords: [],
       gameState: 'waiting',
       timer: null,
+      countdownTimer: null,
       timeLeft: 120,
       scores: new Map()
     };
@@ -146,12 +147,12 @@ io.on('connection', (socket) => {
     }
 
     if (room.players.size >= 8) {
-      socket.emit('error', { message: 'Huone on t\u00e4ynn\u00e4 (max 8)' });
+      socket.emit('error', { message: 'Huone on täynnä (max 8)' });
       return;
     }
 
     if (room.gameState !== 'waiting') {
-      socket.emit('error', { message: 'Peli on jo k\u00e4ynniss\u00e4' });
+      socket.emit('error', { message: 'Peli on jo käynnissä' });
       return;
     }
 
@@ -175,12 +176,12 @@ io.on('connection', (socket) => {
     const room = rooms.get(roomCode);
 
     if (!room) {
-      socket.emit('error', { message: 'Huonetta ei l\u00f6ydy' });
+      socket.emit('error', { message: 'Huonetta ei löydy' });
       return;
     }
 
     if (room.hostId !== socket.id) {
-      socket.emit('error', { message: 'Vain is\u00e4nt\u00e4 voi aloittaa pelin' });
+      socket.emit('error', { message: 'Vain isäntä voi aloittaa pelin' });
       return;
     }
 
@@ -204,21 +205,25 @@ io.on('connection', (socket) => {
     // Room no longer joinable, update public list
     broadcastRoomList();
 
-    room.timer = setInterval(() => {
-      room.timeLeft--;
-      io.to(roomCode).emit('timer_tick', { remaining: room.timeLeft });
+    // 5s countdown before timer starts
+    room.countdownTimer = setTimeout(() => {
+      room.countdownTimer = null;
+      room.timer = setInterval(() => {
+        room.timeLeft--;
+        io.to(roomCode).emit('timer_tick', { remaining: room.timeLeft });
 
-      if (room.timeLeft <= 0) {
-        clearInterval(room.timer);
-        room.timer = null;
-        room.gameState = 'finished';
+        if (room.timeLeft <= 0) {
+          clearInterval(room.timer);
+          room.timer = null;
+          room.gameState = 'finished';
 
-        const rankings = formatScores(room);
-        io.to(roomCode).emit('game_over', { rankings });
+          const rankings = formatScores(room);
+          io.to(roomCode).emit('game_over', { rankings });
 
-        console.log(`Game over in room ${roomCode}`);
-      }
-    }, 1000);
+          console.log(`Game over in room ${roomCode}`);
+        }
+      }, 1000);
+    }, 5000);
 
     console.log(`Game started in room ${roomCode} with ${room.players.size} players`);
   });
@@ -229,7 +234,7 @@ io.on('connection', (socket) => {
     const room = rooms.get(roomCode);
 
     if (!room || room.gameState !== 'running') {
-      socket.emit('word_result', { valid: false, message: 'Peli ei k\u00e4ynniss\u00e4' });
+      socket.emit('word_result', { valid: false, message: 'Peli ei käynnissä' });
       return;
     }
 
@@ -244,7 +249,7 @@ io.on('connection', (socket) => {
     const playerScore = room.scores.get(socket.id);
 
     if (playerScore.wordsFound.has(normalized)) {
-      socket.emit('word_result', { valid: false, message: 'L\u00f6ydetty jo' });
+      socket.emit('word_result', { valid: false, message: 'Löydetty jo' });
       return;
     }
 
@@ -286,6 +291,7 @@ function handleDisconnect(socket) {
 
     if (room.players.size === 0) {
       if (room.timer) clearInterval(room.timer);
+      if (room.countdownTimer) clearTimeout(room.countdownTimer);
       rooms.delete(roomCode);
       console.log(`Room ${roomCode} destroyed (empty)`);
     } else {
