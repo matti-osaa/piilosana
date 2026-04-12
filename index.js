@@ -21,9 +21,8 @@ const PORT = process.env.PORT || 3001;
 // DATA STRUCTURES
 // ============================================================================
 
-const rooms = new Map(); // roomCode -> { hostId, players, grid, validWords, gameState, timer, scores }
-const playerRooms = new Map(); // playerId -> roomCode
-const playerNicknames = new Map(); // playerId -> nickname
+const rooms = new Map();
+const playerRooms = new Map();
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -44,126 +43,26 @@ function getScoreForWordLength(length) {
   if (length === 5) return 4;
   if (length === 6) return 6;
   if (length === 7) return 10;
-  return 14; // 8+ letters
+  return 14;
 }
 
-function createRoom(hostId, nickname) {
-  let roomCode;
-  do {
-    roomCode = generateRoomCode();
-  } while (rooms.has(roomCode));
-
-  const room = {
-    roomCode,
-    hostId,
-    players: new Map(), // playerId -> { nickname, isHost, socketId }
-    grid: null,
-    validWords: [],
-    gameState: 'waiting', // 'waiting' | 'running' | 'finished'
-    timer: null,
-    timeLeft: 120,
-    scores: new Map(), // playerId -> { nickname, score, wordsFound: Set }
-    gameStartTime: null
-  };
-
-  room.players.set(hostId, { nickname, isHost: true, socketId: null });
-  room.scores.set(hostId, { nickname, score: 0, wordsFound: new Set() });
-
-  rooms.set(roomCode, room);
-  playerRooms.set(hostId, roomCode);
-  playerNicknames.set(hostId, nickname);
-
-  return roomCode;
-}
-
-function formatRoomPlayers(room) {
-  return Array.from(room.players.entries()).map(([playerId, player]) => ({
-    id: playerId,
-    nickname: player.nickname,
-    isHost: player.isHost
+function formatPlayers(room) {
+  return Array.from(room.players.entries()).map(([pid, p]) => ({
+    playerId: pid,
+    nickname: p.nickname,
+    isHost: p.isHost
   }));
 }
 
-function formatScoreboard(room) {
-  return Array.from(room.scores.entries()).map(([playerId, score]) => ({
-    nickname: score.nickname,
-    score: score.score,
-    wordsFound: score.wordsFound.size
-  }));
-}
-
-function broadcastRoomUpdate(roomCode) {
-  const room = rooms.get(roomCode);
-  if (!room) return;
-
-  io.to(roomCode).emit('room_update', {
-    players: formatRoomPlayers(room)
-  });
-}
-
-function broadcastScoreUpdate(roomCode) {
-  const room = rooms.get(roomCode);
-  if (!room) return;
-
-  io.to(roomCode).emit('score_update', {
-    scores: formatScoreboard(room)
-  });
-}
-
-function deleteRoomIfEmpty(roomCode) {
-  const room = rooms.get(roomCode);
-  if (room && room.players.size === 0) {
-    if (room.timer) clearInterval(room.timer);
-    rooms.delete(roomCode);
-  }
-}
-
-function startGameTimer(roomCode) {
-  const room = rooms.get(roomCode);
-  if (!room) return;
-
-  room.gameState = 'running';
-  room.gameStartTime = Date.now();
-  room.timeLeft = 120;
-
-  // Send initial grid
-  io.to(roomCode).emit('game_started', {
-    grid: room.grid,
-    timeLeft: room.timeLeft
-  });
-
-  // Send timer ticks every second
-  room.timer = setInterval(() => {
-    room.timeLeft--;
-
-    io.to(roomCode).emit('timer_tick', {
-      timeLeft: room.timeLeft
-    });
-
-    if (room.timeLeft <= 0) {
-      endGame(roomCode);
-    }
-  }, 1000);
-}
-
-function endGame(roomCode) {
-  const room = rooms.get(roomCode);
-  if (!room) return;
-
-  if (room.timer) clearInterval(room.timer);
-  room.gameState = 'finished';
-
-  // Create rankings
-  const rankings = Array.from(room.scores.entries())
-    .map(([, score]) => ({
-      nickname: score.nickname,
-      score: score.score,
-      wordsFound: score.wordsFound.size,
-      words: Array.from(score.wordsFound)
+function formatScores(room) {
+  return Array.from(room.scores.entries())
+    .map(([pid, s]) => ({
+      playerId: pid,
+      nickname: s.nickname,
+      score: s.score,
+      wordsFound: s.wordsFound.size
     }))
     .sort((a, b) => b.score - a.score);
-
-  io.to(roomCode).emit('game_over', { rankings });
 }
 
 // ============================================================================
@@ -171,239 +70,203 @@ function endGame(roomCode) {
 // ============================================================================
 
 io.on('connection', (socket) => {
-  const playerId = socket.id;
+  console.log(`Player connected: ${socket.id}`);
 
-  socket.on('create_room', ({ nickname }, callback) => {
-    try {
-      const roomCode = createRoom(playerId, nickname);
-      socket.join(roomCode);
+  socket.on('create_room', ({ nickname }) => {
+    let roomCode;
+    do {
+      roomCode = generateRoomCode();
+    } while (rooms.has(roomCode));
 
-      const room = rooms.get(roomCode);
-      room.players.get(playerId).socketId = socket.id;
+    const room = {
+      roomCode,
+      hostId: socket.id,
+      players: new Map(),
+      grid: null,
+      validWords: [],
+      gameState: 'waiting',
+      timer: null,
+      timeLeft: 120,
+      scores: new Map()
+    };
 
-      callback({
-        success: true,
-        roomCode,
-        playerId
-      });
+    room.players.set(socket.id, { nickname, isHost: true });
+    room.scores.set(socket.id, { nickname, score: 0, wordsFound: new Set() });
 
-      broadcastRoomUpdate(roomCode);
-    } catch (error) {
-      callback({
-        success: false,
-        error: error.message
-      });
-    }
+    rooms.set(roomCode, room);
+    playerRooms.set(socket.id, roomCode);
+    socket.join(roomCode);
+
+    socket.emit('room_created', { roomCode, playerId: socket.id });
+    io.to(roomCode).emit('room_update', { players: formatPlayers(room) });
+
+    console.log(`Room ${roomCode} created by ${nickname} (${socket.id})`);
   });
 
-  socket.on('join_room', ({ roomCode, nickname }, callback) => {
-    try {
-      const room = rooms.get(roomCode);
+  socket.on('join_room', ({ roomCode, nickname }) => {
+    const room = rooms.get(roomCode);
 
-      if (!room) {
-        return callback({
-          success: false,
-          error: 'Room not found'
-        });
-      }
-
-      if (room.players.size >= 8) {
-        return callback({
-          success: false,
-          error: 'Room is full'
-        });
-      }
-
-      if (room.gameState !== 'waiting') {
-        return callback({
-          success: false,
-          error: 'Game has already started'
-        });
-      }
-
-      room.players.set(playerId, { nickname, isHost: false, socketId: socket.id });
-      room.scores.set(playerId, { nickname, score: 0, wordsFound: new Set() });
-
-      playerRooms.set(playerId, roomCode);
-      playerNicknames.set(playerId, nickname);
-
-      socket.join(roomCode);
-
-      callback({
-        success: true,
-        players: formatRoomPlayers(room),
-        playerId
-      });
-
-      broadcastRoomUpdate(roomCode);
-    } catch (error) {
-      callback({
-        success: false,
-        error: error.message
-      });
+    if (!room) {
+      socket.emit('room_not_found');
+      return;
     }
+
+    if (room.players.size >= 8) {
+      socket.emit('error', { message: 'Huone on t\u00e4ynn\u00e4 (max 8)' });
+      return;
+    }
+
+    if (room.gameState !== 'waiting') {
+      socket.emit('error', { message: 'Peli on jo k\u00e4ynniss\u00e4' });
+      return;
+    }
+
+    room.players.set(socket.id, { nickname, isHost: false });
+    room.scores.set(socket.id, { nickname, score: 0, wordsFound: new Set() });
+    playerRooms.set(socket.id, roomCode);
+    socket.join(roomCode);
+
+    socket.emit('room_joined', { roomCode, playerId: socket.id });
+    io.to(roomCode).emit('room_update', { players: formatPlayers(room) });
+
+    console.log(`${nickname} (${socket.id}) joined room ${roomCode}`);
   });
 
-  socket.on('start_game', ({ grid, validWords }, callback) => {
-    try {
-      const roomCode = playerRooms.get(playerId);
-      const room = rooms.get(roomCode);
+  socket.on('start_game', ({ grid, validWords }) => {
+    const roomCode = playerRooms.get(socket.id);
+    const room = rooms.get(roomCode);
 
-      if (!room) {
-        return callback({ success: false, error: 'Room not found' });
-      }
-
-      if (room.hostId !== playerId) {
-        return callback({ success: false, error: 'Only host can start the game' });
-      }
-
-      if (room.gameState !== 'waiting') {
-        return callback({ success: false, error: 'Game already started' });
-      }
-
-      room.grid = grid;
-      room.validWords = validWords;
-
-      startGameTimer(roomCode);
-
-      callback({ success: true });
-    } catch (error) {
-      callback({ success: false, error: error.message });
+    if (!room) {
+      socket.emit('error', { message: 'Huonetta ei l\u00f6ydy' });
+      return;
     }
+
+    if (room.hostId !== socket.id) {
+      socket.emit('error', { message: 'Vain is\u00e4nt\u00e4 voi aloittaa pelin' });
+      return;
+    }
+
+    if (room.gameState !== 'waiting') {
+      socket.emit('error', { message: 'Peli on jo aloitettu' });
+      return;
+    }
+
+    room.grid = grid;
+    room.validWords = validWords;
+    room.gameState = 'running';
+    room.timeLeft = 120;
+
+    for (const [pid, s] of room.scores) {
+      s.score = 0;
+      s.wordsFound = new Set();
+    }
+
+    io.to(roomCode).emit('game_started', { grid, validWords });
+
+    room.timer = setInterval(() => {
+      room.timeLeft--;
+      io.to(roomCode).emit('timer_tick', { remaining: room.timeLeft });
+
+      if (room.timeLeft <= 0) {
+        clearInterval(room.timer);
+        room.timer = null;
+        room.gameState = 'finished';
+
+        const rankings = formatScores(room);
+        io.to(roomCode).emit('game_over', { rankings });
+        console.log(`Game over in room ${roomCode}`);
+      }
+    }, 1000);
+
+    console.log(`Game started in room ${roomCode} with ${room.players.size} players`);
   });
 
-  socket.on('word_found', ({ word }, callback) => {
-    try {
-      const roomCode = playerRooms.get(playerId);
-      const room = rooms.get(roomCode);
+  socket.on('word_found', ({ word }) => {
+    const roomCode = playerRooms.get(socket.id);
+    const room = rooms.get(roomCode);
 
-      if (!room) {
-        callback({ valid: false, error: 'Room not found' });
-        return;
-      }
-
-      if (room.gameState !== 'running') {
-        callback({ valid: false, error: 'Game is not running' });
-        return;
-      }
-
-      const normalizedWord = word.toLowerCase().trim();
-
-      // Check if valid word
-      const isValid = room.validWords.includes(normalizedWord);
-
-      if (!isValid) {
-        callback({ valid: false, word, message: 'Word not in valid list' });
-        return;
-      }
-
-      const playerScore = room.scores.get(playerId);
-
-      // Check if already found
-      if (playerScore.wordsFound.has(normalizedWord)) {
-        callback({ valid: false, word, alreadyFound: true, message: 'Already found' });
-        return;
-      }
-
-      // Award points
-      const points = getScoreForWordLength(normalizedWord.length);
-      playerScore.score += points;
-      playerScore.wordsFound.add(normalizedWord);
-
-      callback({
-        valid: true,
-        word,
-        score: points,
-        alreadyFound: false
-      });
-
-      broadcastScoreUpdate(roomCode);
-    } catch (error) {
-      callback({ valid: false, error: error.message });
+    if (!room || room.gameState !== 'running') {
+      socket.emit('word_result', { valid: false, message: 'Peli ei k\u00e4ynniss\u00e4' });
+      return;
     }
+
+    const normalized = word.toLowerCase().trim();
+    const isValid = room.validWords.includes(normalized);
+
+    if (!isValid) {
+      socket.emit('word_result', { valid: false, message: 'Ei kelpaa' });
+      return;
+    }
+
+    const playerScore = room.scores.get(socket.id);
+
+    if (playerScore.wordsFound.has(normalized)) {
+      socket.emit('word_result', { valid: false, message: 'L\u00f6ydetty jo' });
+      return;
+    }
+
+    const points = getScoreForWordLength(normalized.length);
+    playerScore.score += points;
+    playerScore.wordsFound.add(normalized);
+
+    const combo = playerScore.wordsFound.size;
+
+    socket.emit('word_result', {
+      valid: true,
+      message: `+${points}p`,
+      points,
+      combo: Math.min(combo, 2)
+    });
+
+    io.to(roomCode).emit('score_update', { scores: formatScores(room) });
   });
 
   socket.on('leave_room', () => {
-    const roomCode = playerRooms.get(playerId);
-    const room = rooms.get(roomCode);
-
-    if (room) {
-      room.players.delete(playerId);
-      room.scores.delete(playerId);
-
-      if (room.players.size === 0) {
-        if (room.timer) clearInterval(room.timer);
-        rooms.delete(roomCode);
-      } else {
-        // If host leaves, assign new host
-        if (room.hostId === playerId) {
-          const remainingPlayerIds = Array.from(room.players.keys());
-          if (remainingPlayerIds.length > 0) {
-            const newHostId = remainingPlayerIds[0];
-            room.hostId = newHostId;
-            room.players.get(newHostId).isHost = true;
-          }
-        }
-
-        broadcastRoomUpdate(roomCode);
-      }
-    }
-
-    playerRooms.delete(playerId);
-    playerNicknames.delete(playerId);
-    socket.leave(roomCode);
+    handleDisconnect(socket);
   });
 
   socket.on('disconnect', () => {
-    const roomCode = playerRooms.get(playerId);
-    const room = rooms.get(roomCode);
-
-    if (room) {
-      room.players.delete(playerId);
-      room.scores.delete(playerId);
-
-      if (room.players.size === 0) {
-        if (room.timer) clearInterval(room.timer);
-        rooms.delete(roomCode);
-      } else {
-        // If host disconnects, assign new host
-        if (room.hostId === playerId) {
-          const remainingPlayerIds = Array.from(room.players.keys());
-          if (remainingPlayerIds.length > 0) {
-            const newHostId = remainingPlayerIds[0];
-            room.hostId = newHostId;
-            room.players.get(newHostId).isHost = true;
-          }
-        }
-
-        io.to(roomCode).emit('room_update', {
-          players: formatRoomPlayers(room)
-        });
-      }
-    }
-
-    playerRooms.delete(playerId);
-    playerNicknames.delete(playerId);
+    console.log(`Player disconnected: ${socket.id}`);
+    handleDisconnect(socket);
   });
 });
+
+function handleDisconnect(socket) {
+  const roomCode = playerRooms.get(socket.id);
+  const room = rooms.get(roomCode);
+
+  if (room) {
+    room.players.delete(socket.id);
+    room.scores.delete(socket.id);
+
+    if (room.players.size === 0) {
+      if (room.timer) clearInterval(room.timer);
+      rooms.delete(roomCode);
+      console.log(`Room ${roomCode} destroyed (empty)`);
+    } else {
+      if (room.hostId === socket.id) {
+        const newHostId = Array.from(room.players.keys())[0];
+        room.hostId = newHostId;
+        room.players.get(newHostId).isHost = true;
+      }
+      io.to(roomCode).emit('room_update', { players: formatPlayers(room) });
+    }
+  }
+
+  playerRooms.delete(socket.id);
+  socket.leave(roomCode);
+}
 
 // ============================================================================
 // HTTP ROUTES
 // ============================================================================
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Piilosana multiplayer server' });
 });
 
-app.get('/rooms', (req, res) => {
-  const roomList = Array.from(rooms.entries()).map(([code, room]) => ({
-    code,
-    hostId: room.hostId,
-    playerCount: room.players.size,
-    gameState: room.gameState
-  }));
-
-  res.json({ rooms: roomList });
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', rooms: rooms.size });
 });
 
 // ============================================================================
