@@ -21,8 +21,8 @@ const PORT = process.env.PORT || 3001;
 // DATA STRUCTURES
 // ============================================================================
 
-const rooms = new Map();
-const playerRooms = new Map();
+const rooms = new Map(); // roomCode -> room
+const playerRooms = new Map(); // socketId -> roomCode
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -65,6 +65,27 @@ function formatScores(room) {
     .sort((a, b) => b.score - a.score);
 }
 
+// Returns list of public rooms available to join
+function getPublicRooms() {
+  const list = [];
+  for (const [code, room] of rooms) {
+    if (room.gameState === 'waiting') {
+      list.push({
+        roomCode: code,
+        hostNickname: room.players.get(room.hostId)?.nickname || '?',
+        playerCount: room.players.size,
+        maxPlayers: 8
+      });
+    }
+  }
+  return list;
+}
+
+// Broadcast updated room list to all connected sockets
+function broadcastRoomList() {
+  io.emit('room_list', { rooms: getPublicRooms() });
+}
+
 // ============================================================================
 // SOCKET.IO EVENT HANDLERS
 // ============================================================================
@@ -72,6 +93,15 @@ function formatScores(room) {
 io.on('connection', (socket) => {
   console.log(`Player connected: ${socket.id}`);
 
+  // Send room list on connect
+  socket.emit('room_list', { rooms: getPublicRooms() });
+
+  // ---- LIST ROOMS (client can request refresh) ----
+  socket.on('list_rooms', () => {
+    socket.emit('room_list', { rooms: getPublicRooms() });
+  });
+
+  // ---- CREATE ROOM ----
   socket.on('create_room', ({ nickname }) => {
     let roomCode;
     do {
@@ -100,9 +130,13 @@ io.on('connection', (socket) => {
     socket.emit('room_created', { roomCode, playerId: socket.id });
     io.to(roomCode).emit('room_update', { players: formatPlayers(room) });
 
+    // Broadcast updated public room list to everyone
+    broadcastRoomList();
+
     console.log(`Room ${roomCode} created by ${nickname} (${socket.id})`);
   });
 
+  // ---- JOIN ROOM ----
   socket.on('join_room', ({ roomCode, nickname }) => {
     const room = rooms.get(roomCode);
 
@@ -129,9 +163,13 @@ io.on('connection', (socket) => {
     socket.emit('room_joined', { roomCode, playerId: socket.id });
     io.to(roomCode).emit('room_update', { players: formatPlayers(room) });
 
+    // Broadcast updated public room list
+    broadcastRoomList();
+
     console.log(`${nickname} (${socket.id}) joined room ${roomCode}`);
   });
 
+  // ---- START GAME ----
   socket.on('start_game', ({ grid, validWords }) => {
     const roomCode = playerRooms.get(socket.id);
     const room = rooms.get(roomCode);
@@ -163,6 +201,9 @@ io.on('connection', (socket) => {
 
     io.to(roomCode).emit('game_started', { grid, validWords });
 
+    // Room no longer joinable, update public list
+    broadcastRoomList();
+
     room.timer = setInterval(() => {
       room.timeLeft--;
       io.to(roomCode).emit('timer_tick', { remaining: room.timeLeft });
@@ -174,6 +215,7 @@ io.on('connection', (socket) => {
 
         const rankings = formatScores(room);
         io.to(roomCode).emit('game_over', { rankings });
+
         console.log(`Game over in room ${roomCode}`);
       }
     }, 1000);
@@ -181,6 +223,7 @@ io.on('connection', (socket) => {
     console.log(`Game started in room ${roomCode} with ${room.players.size} players`);
   });
 
+  // ---- WORD FOUND ----
   socket.on('word_found', ({ word }) => {
     const roomCode = playerRooms.get(socket.id);
     const room = rooms.get(roomCode);
@@ -221,10 +264,12 @@ io.on('connection', (socket) => {
     io.to(roomCode).emit('score_update', { scores: formatScores(room) });
   });
 
+  // ---- LEAVE ROOM ----
   socket.on('leave_room', () => {
     handleDisconnect(socket);
   });
 
+  // ---- DISCONNECT ----
   socket.on('disconnect', () => {
     console.log(`Player disconnected: ${socket.id}`);
     handleDisconnect(socket);
@@ -251,6 +296,9 @@ function handleDisconnect(socket) {
       }
       io.to(roomCode).emit('room_update', { players: formatPlayers(room) });
     }
+
+    // Broadcast updated room list
+    broadcastRoomList();
   }
 
   playerRooms.delete(socket.id);
