@@ -291,7 +291,7 @@ io.on('connection', (socket) => {
   });
 
   // ---- START GAME ----
-  socket.on('start_game', ({ grid, validWords, gameMode }) => {
+  socket.on('start_game', ({ grid, validWords, gameMode, gameTime }) => {
     const roomCode = playerRooms.get(socket.id);
     const room = rooms.get(roomCode);
 
@@ -314,7 +314,7 @@ io.on('connection', (socket) => {
     room.validWords = validWords; // used in classic mode
     room.gameMode = gameMode || 'classic';
     room.gameState = 'running';
-    room.timeLeft = 120;
+    room.timeLeft = gameTime || 120;
     room.battleFoundWords = new Set();
 
     for (const [pid, s] of room.scores) {
