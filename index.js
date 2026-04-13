@@ -354,7 +354,7 @@ io.on('connection', (socket) => {
       }, 1000);
     }, 5000);
 
-    console.log(`Game started in room ${roomCode} (${room.gameMode}) with ${room.players.size} players`);
+    console.log(`Game started in room ${roomCode} mode=${room.gameMode} (received: ${gameMode}) with ${room.players.size} players`);
   });
 
   // ---- WORD FOUND (classic mode) ----
@@ -411,17 +411,25 @@ io.on('connection', (socket) => {
     const roomCode = playerRooms.get(socket.id);
     const room = rooms.get(roomCode);
 
-    if (!room || room.gameState !== 'running' || room.gameMode !== 'battle') {
-      socket.emit('word_result', { valid: false, message: 'Peli ei k\u00e4ynniss\u00e4' });
+    if (!room) {
+      socket.emit('word_result', { valid: false, message: 'Huonetta ei löydy' });
+      return;
+    }
+    if (room.gameState !== 'running') {
+      socket.emit('word_result', { valid: false, message: 'Peli ei käynnissä' });
+      return;
+    }
+    if (room.gameMode !== 'battle') {
+      socket.emit('word_result', { valid: false, message: 'Väärä pelimoodi: ' + room.gameMode });
       return;
     }
 
     const normalized = word.toLowerCase().trim();
 
-    // Check if word is in the word list (sent by client with the game)
-    if (!wordList && !room.validWords.includes(normalized)) {
-      // Validate word exists in dictionary by checking against the client-sent list
-      // In battle mode, we rely on the initial validWords as dictionary
+    // Word length check
+    if (normalized.length < 3) {
+      socket.emit('word_result', { valid: false, message: 'Liian lyhyt' });
+      return;
     }
 
     // Check the word can actually be traced on the CURRENT server grid
