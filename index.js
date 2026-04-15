@@ -91,6 +91,182 @@ function getAllHallOfFame() {
 }
 
 // ============================================================================
+// WORD LIST + TRIE (for server-side grid generation & validation)
+// ============================================================================
+
+import WORDS_RAW from './words.js';
+const WORDS_SET = new Set(WORDS_RAW.split('|'));
+
+class TrieNode { constructor() { this.c = {}; this.w = false; } }
+function buildTrie(words) {
+  const root = new TrieNode();
+  for (const word of words) {
+    let n = root;
+    for (const ch of word) { if (!n.c[ch]) n.c[ch] = new TrieNode(); n = n.c[ch]; }
+    n.w = true;
+  }
+  return root;
+}
+const TRIE = buildTrie(WORDS_SET);
+
+const GRID_SIZE = 5;
+
+function makeGrid() {
+  return Array.from({ length: GRID_SIZE }, () =>
+    Array.from({ length: GRID_SIZE }, () => randLetter())
+  );
+}
+
+function findWords(grid, trie) {
+  const sz = grid.length, found = new Set();
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+  function dfs(r, c, node, path, vis) {
+    const ch = grid[r][c], nx = node.c[ch];
+    if (!nx) return;
+    const np = path + ch;
+    if (nx.w && np.length >= 3) found.add(np);
+    vis.add(r * sz + c);
+    for (const [dr, dc] of dirs) {
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr < sz && nc >= 0 && nc < sz && !vis.has(nr * sz + nc))
+        dfs(nr, nc, nx, np, vis);
+    }
+    vis.delete(r * sz + c);
+  }
+  for (let r = 0; r < sz; r++)
+    for (let c = 0; c < sz; c++)
+      dfs(r, c, trie, '', new Set());
+  return found;
+}
+
+function generateGoodGrid() {
+  let bestGrid = null, bestWords = new Set();
+  for (let i = 0; i < 30; i++) {
+    const g = makeGrid();
+    const w = findWords(g, TRIE);
+    if (w.size > bestWords.size) { bestGrid = g; bestWords = w; }
+    if (w.size >= 15) break;
+  }
+  return { grid: bestGrid, validWords: bestWords };
+}
+
+function getScoreForWord(word) {
+  const len = word.length;
+  if (len === 3) return 1;
+  if (len === 4) return 2;
+  if (len === 5) return 4;
+  if (len === 6) return 6;
+  if (len === 7) return 10;
+  return 14;
+}
+
+// ============================================================================
+// ALWAYS-ON PUBLIC GAME
+// ============================================================================
+
+const PUBLIC_GAME_TIME = 120; // 2 minutes
+
+const publicGame = {
+  grid: null,
+  validWords: new Set(),
+  validWordsList: [],
+  players: new Map(), // socketId -> { nickname, score, wordsFound: Set }
+  state: 'waiting', // 'waiting' | 'countdown' | 'playing'
+  timeLeft: PUBLIC_GAME_TIME,
+  timer: null,
+  countdownTimer: null,
+  roundNumber: 0,
+};
+
+function startPublicRound() {
+  const { grid, validWords } = generateGoodGrid();
+  publicGame.grid = grid;
+  publicGame.validWords = validWords;
+  publicGame.validWordsList = [...validWords];
+  publicGame.state = 'countdown';
+  publicGame.timeLeft = PUBLIC_GAME_TIME;
+  publicGame.roundNumber++;
+
+  // Reset scores for all current players
+  for (const [, p] of publicGame.players) {
+    p.score = 0;
+    p.wordsFound = new Set();
+  }
+
+  // Send countdown to all players
+  io.to('public_game').emit('public_countdown', {
+    grid,
+    validWords: publicGame.validWordsList,
+    roundNumber: publicGame.roundNumber,
+  });
+
+  // 5 second countdown, then start
+  publicGame.countdownTimer = setTimeout(() => {
+    publicGame.state = 'playing';
+    io.to('public_game').emit('public_game_start');
+
+    publicGame.timer = setInterval(() => {
+      publicGame.timeLeft--;
+      io.to('public_game').emit('public_timer_tick', { remaining: publicGame.timeLeft });
+
+      if (publicGame.timeLeft <= 0) {
+        clearInterval(publicGame.timer);
+        publicGame.timer = null;
+        endPublicRound();
+      }
+    }, 1000);
+  }, 5000);
+}
+
+function endPublicRound() {
+  publicGame.state = 'waiting';
+
+  const rankings = Array.from(publicGame.players.entries())
+    .map(([sid, p]) => ({
+      nickname: p.nickname,
+      score: p.score,
+      wordsFound: p.wordsFound.size,
+      percentage: publicGame.validWords.size > 0
+        ? Math.round((p.wordsFound.size / publicGame.validWords.size) * 100) : 0,
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  // Save to hall of fame
+  for (const r of rankings) {
+    if (r.score > 0) {
+      submitScore({
+        nickname: r.nickname,
+        score: r.score,
+        wordsFound: r.wordsFound,
+        wordsTotal: publicGame.validWords.size,
+        gameMode: 'normal',
+        gameTime: PUBLIC_GAME_TIME,
+        isMulti: true,
+      });
+    }
+  }
+
+  io.to('public_game').emit('public_game_over', {
+    rankings,
+    validWords: publicGame.validWordsList,
+  });
+
+  // Start next round after 10 seconds
+  setTimeout(() => {
+    if (publicGame.players.size > 0) {
+      startPublicRound();
+    }
+  }, 10000);
+}
+
+function publicScoreUpdate() {
+  const scores = Array.from(publicGame.players.entries())
+    .map(([, p]) => ({ nickname: p.nickname, score: p.score, wordsFound: p.wordsFound.size }))
+    .sort((a, b) => b.score - a.score);
+  io.to('public_game').emit('public_score_update', { scores });
+}
+
+// ============================================================================
 // DATA STRUCTURES
 // ============================================================================
 
@@ -289,6 +465,93 @@ io.on('connection', (socket) => {
 
   // Send room list on connect
   socket.emit('room_list', { rooms: getPublicRooms() });
+
+  // ---- JOIN PUBLIC GAME (PIILOSAUNA) ----
+  socket.on('join_public', ({ nickname }) => {
+    if (!nickname || nickname.length > 12) {
+      socket.emit('error', { message: 'Virheellinen nimimerkki' });
+      return;
+    }
+    if (publicGame.players.size >= 64) {
+      socket.emit('error', { message: 'Piilosauna on täynnä (max 64)' });
+      return;
+    }
+
+    socket.join('public_game');
+    publicGame.players.set(socket.id, {
+      nickname,
+      score: 0,
+      wordsFound: new Set(),
+    });
+
+    // Tell the player the current state
+    if (publicGame.state === 'playing') {
+      // Join mid-game
+      socket.emit('public_join_midgame', {
+        grid: publicGame.grid,
+        validWords: publicGame.validWordsList,
+        timeLeft: publicGame.timeLeft,
+        roundNumber: publicGame.roundNumber,
+      });
+    } else if (publicGame.state === 'countdown') {
+      socket.emit('public_countdown', {
+        grid: publicGame.grid,
+        validWords: publicGame.validWordsList,
+        roundNumber: publicGame.roundNumber,
+      });
+    } else {
+      socket.emit('public_waiting', { playerCount: publicGame.players.size });
+    }
+
+    publicScoreUpdate();
+    io.to('public_game').emit('public_player_count', { count: publicGame.players.size });
+
+    // Start a round if this is the first player and game is waiting
+    if (publicGame.state === 'waiting' && publicGame.players.size >= 1) {
+      startPublicRound();
+    }
+
+    console.log(`${nickname} joined Piilosauna (${publicGame.players.size} players)`);
+  });
+
+  // ---- PUBLIC GAME: WORD FOUND ----
+  socket.on('public_word_found', ({ word }) => {
+    if (publicGame.state !== 'playing') return;
+    const player = publicGame.players.get(socket.id);
+    if (!player) return;
+
+    const normalized = word.toLowerCase().trim();
+    if (normalized.length < 3) return;
+    if (!publicGame.validWords.has(normalized)) {
+      socket.emit('public_word_result', { valid: false, message: 'Ei kelpaa' });
+      return;
+    }
+    if (player.wordsFound.has(normalized)) {
+      socket.emit('public_word_result', { valid: false, message: 'Jo löydetty' });
+      return;
+    }
+
+    const points = getScoreForWord(normalized);
+    player.score += points;
+    player.wordsFound.add(normalized);
+
+    socket.emit('public_word_result', {
+      valid: true,
+      message: `+${points}p`,
+      points,
+      wordsFound: player.wordsFound.size,
+    });
+
+    publicScoreUpdate();
+  });
+
+  // ---- LEAVE PUBLIC GAME ----
+  socket.on('leave_public', () => {
+    socket.leave('public_game');
+    publicGame.players.delete(socket.id);
+    io.to('public_game').emit('public_player_count', { count: publicGame.players.size });
+    console.log(`Player left Piilosauna (${publicGame.players.size} remaining)`);
+  });
 
   // ---- LIST ROOMS ----
   socket.on('list_rooms', () => {
@@ -606,6 +869,13 @@ io.on('connection', (socket) => {
 });
 
 function handleDisconnect(socket) {
+  // Remove from public game if present
+  if (publicGame.players.has(socket.id)) {
+    publicGame.players.delete(socket.id);
+    socket.leave('public_game');
+    io.to('public_game').emit('public_player_count', { count: publicGame.players.size });
+  }
+
   const roomCode = playerRooms.get(socket.id);
   const room = rooms.get(roomCode);
 
@@ -655,6 +925,16 @@ app.get('/api/hall-of-fame', (req, res) => {
 app.get('/api/hall-of-fame/:gameMode/:gameTime', (req, res) => {
   const { gameMode, gameTime } = req.params;
   res.json(getHallOfFame(gameMode, Number(gameTime)));
+});
+
+// Public game status
+app.get('/api/public-game', (req, res) => {
+  res.json({
+    state: publicGame.state,
+    playerCount: publicGame.players.size,
+    timeLeft: publicGame.timeLeft,
+    roundNumber: publicGame.roundNumber,
+  });
 });
 
 // Hall of Fame: submit score (for solo games)
