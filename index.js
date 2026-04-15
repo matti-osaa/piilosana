@@ -21,6 +21,9 @@ const io = new Server(httpServer, {
 app.use(cors());
 app.use(express.json());
 
+// Serve static frontend (built by Vite into /dist)
+app.use(express.static(join(__dirname, 'dist')));
+
 const PORT = process.env.PORT || 3001;
 
 // ============================================================================
@@ -948,6 +951,11 @@ app.post('/api/hall-of-fame', (req, res) => {
   // Return updated top 10 for this category
   const top = getHallOfFame(gameMode, gameTime);
   res.json({ id, top });
+});
+
+// SPA catch-all: serve index.html for any non-API route
+app.get('*', (req, res) => {
+  res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
 
 // ============================================================================
