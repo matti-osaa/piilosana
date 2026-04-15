@@ -195,10 +195,16 @@ const publicGame = {
   timeLeft: PUBLIC_GAME_TIME,
   timer: null,
   countdownTimer: null,
+  nextRoundInterval: null, // countdown between rounds
   roundNumber: 0,
 };
 
 function startPublicRound() {
+  // Clear any existing between-round countdown
+  if (publicGame.nextRoundInterval) {
+    clearInterval(publicGame.nextRoundInterval);
+    publicGame.nextRoundInterval = null;
+  }
   const { grid, validWords } = generateGoodGrid();
   publicGame.grid = grid;
   publicGame.validWords = validWords;
@@ -280,11 +286,12 @@ function endPublicRound() {
 
   // Countdown to next round (60 seconds)
   let nextRoundCountdown = 60;
-  const countdownInterval = setInterval(() => {
+  publicGame.nextRoundInterval = setInterval(() => {
     nextRoundCountdown--;
     io.to('public_game').emit('public_next_round_countdown', { seconds: nextRoundCountdown });
     if (nextRoundCountdown <= 0) {
-      clearInterval(countdownInterval);
+      clearInterval(publicGame.nextRoundInterval);
+      publicGame.nextRoundInterval = null;
       if (publicGame.players.size > 0) {
         startPublicRound();
       }
@@ -533,14 +540,14 @@ io.on('connection', (socket) => {
         roundNumber: publicGame.roundNumber,
       });
     } else {
-      socket.emit('public_waiting', { playerCount: publicGame.players.size });
+      socket.emit('public_waiting', { playerCount: publicGame.players.size, nextRoundActive: !!publicGame.nextRoundInterval });
     }
 
     publicScoreUpdate();
     io.to('public_game').emit('public_player_count', { count: publicGame.players.size });
 
-    // Start a round if this is the first player and game is waiting
-    if (publicGame.state === 'waiting' && publicGame.players.size >= 1) {
+    // Start a round if this is the first player and no round/countdown is active
+    if (publicGame.state === 'waiting' && publicGame.players.size >= 1 && !publicGame.nextRoundInterval) {
       startPublicRound();
     }
 
