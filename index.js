@@ -2,6 +2,12 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import Database from 'better-sqlite3';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const httpServer = createServer(app);
@@ -16,6 +22,73 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
+
+// ============================================================================
+// DATABASE (Hall of Fame)
+// ============================================================================
+
+const db = new Database(join(__dirname, 'piilosana.db'));
+db.pragma('journal_mode = WAL');
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS hall_of_fame (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nickname TEXT NOT NULL,
+    score INTEGER NOT NULL,
+    words_found INTEGER NOT NULL,
+    words_total INTEGER NOT NULL,
+    percentage REAL NOT NULL,
+    game_mode TEXT NOT NULL,
+    game_time INTEGER NOT NULL,
+    is_multi INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )
+`);
+
+// Prepared statements for performance
+const insertScore = db.prepare(`
+  INSERT INTO hall_of_fame (nickname, score, words_found, words_total, percentage, game_mode, game_time, is_multi)
+  VALUES (@nickname, @score, @wordsFound, @wordsTotal, @percentage, @gameMode, @gameTime, @isMulti)
+`);
+
+const getTopScores = db.prepare(`
+  SELECT nickname, score, words_found, words_total, percentage, created_at
+  FROM hall_of_fame
+  WHERE game_mode = @gameMode AND game_time = @gameTime
+  ORDER BY score DESC
+  LIMIT 10
+`);
+
+// Categories: normal-120, normal-402, tetris-120, tetris-402
+const HOF_CATEGORIES = [
+  { gameMode: 'normal', gameTime: 120, label: 'Normaali 2 min' },
+  { gameMode: 'normal', gameTime: 402, label: 'Normaali 6,7 min' },
+  { gameMode: 'tetris', gameTime: 120, label: 'Tetris 2 min' },
+  { gameMode: 'tetris', gameTime: 402, label: 'Tetris 6,7 min' },
+];
+
+function submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti }) {
+  if (!nickname || score < 0 || !gameMode || !gameTime) return null;
+  if (gameTime === 0) return null; // no hall of fame for unlimited
+  const percentage = wordsTotal > 0 ? Math.round((wordsFound / wordsTotal) * 100) : 0;
+  const result = insertScore.run({ nickname, score, wordsFound, wordsTotal, percentage, gameMode, gameTime: Number(gameTime), isMulti: isMulti ? 1 : 0 });
+  return result.lastInsertRowid;
+}
+
+function getHallOfFame(gameMode, gameTime) {
+  return getTopScores.all({ gameMode, gameTime: Number(gameTime) });
+}
+
+function getAllHallOfFame() {
+  const result = {};
+  for (const cat of HOF_CATEGORIES) {
+    result[`${cat.gameMode}-${cat.gameTime}`] = {
+      label: cat.label,
+      scores: getTopScores.all({ gameMode: cat.gameMode, gameTime: cat.gameTime })
+    };
+  }
+  return result;
+}
 
 // ============================================================================
 // DATA STRUCTURES
@@ -315,6 +388,7 @@ io.on('connection', (socket) => {
     room.gameMode = gameMode || 'classic';
     room.gameState = 'running';
     room.timeLeft = gameTime || 120;
+    room.originalGameTime = gameTime || 120;
     room.battleFoundWords = new Set();
 
     for (const [pid, s] of room.scores) {
@@ -343,6 +417,22 @@ io.on('connection', (socket) => {
           for (const [pid, s] of room.scores.entries()) {
             allFoundWords[pid] = [...s.wordsFound];
           }
+          // Save scores to hall of fame for multi games
+          for (const [pid, s] of room.scores.entries()) {
+            const p = room.players.get(pid);
+            if (p && s.score > 0) {
+              submitScore({
+                nickname: p.nickname,
+                score: s.score,
+                wordsFound: s.wordsFound.size,
+                wordsTotal: room.validWords.length || s.wordsFound.size,
+                gameMode: room.gameMode === 'battle' ? 'tetris' : 'normal',
+                gameTime: room.timeLeft > 0 ? 120 : (room.originalGameTime || 120),
+                isMulti: true
+              });
+            }
+          }
+
           io.to(roomCode).emit('game_over', {
             rankings,
             validWords: room.gameMode === 'classic' ? room.validWords : [],
@@ -554,6 +644,30 @@ app.get('/', (req, res) => {
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', rooms: rooms.size });
+});
+
+// Hall of Fame: get all categories
+app.get('/api/hall-of-fame', (req, res) => {
+  res.json(getAllHallOfFame());
+});
+
+// Hall of Fame: get specific category
+app.get('/api/hall-of-fame/:gameMode/:gameTime', (req, res) => {
+  const { gameMode, gameTime } = req.params;
+  res.json(getHallOfFame(gameMode, Number(gameTime)));
+});
+
+// Hall of Fame: submit score (for solo games)
+app.post('/api/hall-of-fame', (req, res) => {
+  const { nickname, score, wordsFound, wordsTotal, gameMode, gameTime } = req.body;
+  if (!nickname || nickname.length > 12) {
+    return res.status(400).json({ error: 'Virheellinen nimimerkki' });
+  }
+  const id = submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti: false });
+  if (!id) return res.status(400).json({ error: 'Tulosta ei voitu tallentaa' });
+  // Return updated top 10 for this category
+  const top = getHallOfFame(gameMode, gameTime);
+  res.json({ id, top });
 });
 
 // ============================================================================
