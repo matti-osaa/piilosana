@@ -384,8 +384,8 @@ function HallOfFame({gameMode,gameTime,currentScore,S}){
     setLoading(true);
     fetch(`${SERVER_URL}/api/hall-of-fame/${gameMode}/${gameTime}`)
       .then(r=>r.json()).then(data=>{setScores(data);setLoading(false);})
-      .catch(()=>setLoading(false));
-  },[gameMode,gameTime]);
+      .catch(()=>{setScores([]);setLoading(false);});
+  },[gameMode,gameTime,currentScore]);
   if(!gameMode||!gameTime||gameTime===0)return null;
   const label=gameMode==="tetris"?"Tetris":"Normaali";
   const timeLabel=gameTime===120?"2 min":"6,7 min";
@@ -492,7 +492,10 @@ export default function Piilosana(){
   const[publicPlayerCount,setPublicPlayerCount]=useState(0);
   const[publicRankings,setPublicRankings]=useState(null);
   const[publicRound,setPublicRound]=useState(0);
+  const[publicAllFound,setPublicAllFound]=useState([]);
   const[publicCountdown,setPublicCountdown]=useState(5);
+  const[publicNextCountdown,setPublicNextCountdown]=useState(0);
+  const[publicOnlineCount,setPublicOnlineCount]=useState(0);
 
   const gRef=useRef(null);
   const tRef=useRef(null);
@@ -503,6 +506,15 @@ export default function Piilosana(){
 
   // Keep foundRef in sync with found state (avoids stale closure in socket handlers)
   useEffect(()=>{foundRef.current=found;},[found]);
+
+  // Fetch online player count for Piilosauna button
+  useEffect(()=>{
+    if(mode!==null)return;
+    const fetchCount=()=>fetch(`${SERVER_URL}/api/public-game`).then(r=>r.json()).then(d=>setPublicOnlineCount(d.playerCount||0)).catch(()=>{});
+    fetchCount();
+    const t=setInterval(fetchCount,10000);
+    return()=>clearInterval(t);
+  },[mode]);
 
   // Global button sound — plays on any <button> tap
   useEffect(()=>{
@@ -923,9 +935,10 @@ export default function Piilosana(){
         soundsRef.current.playWrong();
       }
     });
-    newSocket.on("public_game_over",({rankings,validWords:vw})=>{
+    newSocket.on("public_game_over",({rankings,validWords:vw,allFoundWords:afw})=>{
       setPublicState("end");setPublicRankings(rankings);setState("end");
       setValid(new Set(vw));
+      setPublicAllFound(afw||[]);
       const e=ENDINGS[Math.floor(Math.random()*ENDINGS.length)];
       setEnding(e);soundsRef.current.playEnding();
     });
@@ -934,6 +947,9 @@ export default function Piilosana(){
     });
     newSocket.on("public_waiting",({playerCount:c})=>{
       setPublicState("waiting");setPublicPlayerCount(c);
+    });
+    newSocket.on("public_next_round_countdown",({seconds})=>{
+      setPublicNextCountdown(seconds);
     });
 
     setSocket(newSocket);
@@ -1095,7 +1111,9 @@ export default function Piilosana(){
         <p style={{fontSize:"11px",lineHeight:"2",marginBottom:"16px",color:S.green}}>VALITSE PELIMUOTO</p>
         <div style={{display:"flex",flexDirection:"column",gap:"12px",marginBottom:"24px"}}>
           <button onClick={async()=>{await sounds.init();setMode("solo");setState("menu");}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"16px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844"}}>YKSINPELI</button>
-          <button onClick={async()=>{await sounds.init();setMode("public");setPublicState("nickname");}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:"#ff6644",border:"none",padding:"16px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311"}}>PIILOSAUNA 🧖</button>
+          <button onClick={async()=>{await sounds.init();setMode("public");setPublicState("nickname");}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:"#ff6644",border:"none",padding:"16px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311"}}>
+            PIILOSAUNA 🍃🪣{publicOnlineCount>0&&<span style={{fontSize:"11px",display:"block",marginTop:"4px"}}>{publicOnlineCount} online</span>}
+          </button>
           <button onClick={async()=>{await sounds.init();setMode("multi");setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.yellow,border:"none",padding:"16px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc8800"}}>MONINPELI</button>
         </div>
         <p style={{fontSize:"14px",lineHeight:"1.8",marginBottom:"12px"}}>Etsi sanoja ruudukosta!</p>
@@ -1348,7 +1366,7 @@ export default function Piilosana(){
       {mode==="public"&&publicState==="nickname"&&(
         <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
           <div style={{border:"3px solid #ff6644",padding:"24px",boxShadow:"0 0 20px #ff664444",maxWidth:"600px"}}>
-            <p style={{fontSize:"18px",color:"#ff6644",marginBottom:"8px"}}>🧖 PIILOSAUNA</p>
+            <p style={{fontSize:"18px",color:"#ff6644",marginBottom:"8px"}}>🍃 PIILOSAUNA</p>
             <p style={{fontSize:"11px",color:"#88ccaa",marginBottom:"16px",lineHeight:"1.8"}}>Jatkuva peli kaikille! Liity mukaan ja etsi sanoja. Kierros kestää 2 min.</p>
             <p style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>NIMIMERKKI</p>
             <input type="text" maxLength="12" value={soloNickname} onChange={e=>setSoloNickname(e.target.value.toUpperCase())}
@@ -1380,7 +1398,7 @@ export default function Piilosana(){
       {/* PIILOSAUNA - waiting for round */}
       {mode==="public"&&publicState==="waiting"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
-          <p style={{fontSize:"18px",color:"#ff6644"}}>🧖 PIILOSAUNA</p>
+          <p style={{fontSize:"18px",color:"#ff6644"}}>🍃 PIILOSAUNA</p>
           <p style={{fontSize:"13px",color:"#556",marginTop:"12px"}}>Odotetaan seuraavaa kierrosta...</p>
           <p style={{fontSize:"11px",color:"#88ccaa",marginTop:"8px"}}>{publicPlayerCount} pelaajaa saunassa</p>
         </div>
@@ -1389,45 +1407,88 @@ export default function Piilosana(){
       {/* PIILOSAUNA - countdown */}
       {mode==="public"&&publicState==="countdown"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{fontSize:"11px",color:"#ff6644",marginBottom:"24px"}}>🧖 PIILOSAUNA — KIERROS {publicRound}</div>
+          <div style={{fontSize:"11px",color:"#ff6644",marginBottom:"24px"}}>🍃 PIILOSAUNA — KIERROS {publicRound}</div>
           <div style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>{publicPlayerCount} pelaajaa</div>
           <div style={{fontSize:"18px",color:S.green}}>VALMISTAUDU</div>
         </div>
       )}
 
       {/* PIILOSAUNA - end of round */}
-      {mode==="public"&&publicState==="end"&&(
+      {mode==="public"&&publicState==="end"&&(()=>{
+        const MEDALS=["🥇","🥈","🥉"];
+        const publicMissed=valid.size>0?[...valid].filter(w=>!publicAllFound.includes(w)).sort((a,b)=>b.length-a.length):[];
+        const publicFoundSorted=[...publicAllFound].sort((a,b)=>b.length-a.length);
+        return(
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease"}}>
+          {/* Your score */}
           <div style={{border:"3px solid #ff6644",padding:"20px",marginBottom:"12px",boxShadow:"0 0 30px #ff664433",background:S.dark}}>
-            <div style={{fontSize:"13px",color:"#ff6644",marginBottom:"4px"}}>🧖 PIILOSAUNA — KIERROS {publicRound} PÄÄTTYI</div>
+            <div style={{fontSize:"13px",color:"#ff6644",marginBottom:"4px"}}>🍃 PIILOSAUNA — KIERROS {publicRound} PÄÄTTYI</div>
             <div style={{fontSize:"13px",color:"#556",marginBottom:"10px"}}>PISTEESI</div>
             <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",animation:"pop 0.3s ease"}}>{score}</div>
             <div style={{fontSize:"13px",color:"#88ccaa",marginTop:"6px"}}>{found.length} / {valid.size} sanaa ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>
+            <div style={{fontSize:"13px",color:publicNextCountdown<=10?S.yellow:"#88ccaa",marginTop:"12px"}}>
+              Seuraava kierros: {publicNextCountdown>0?`${publicNextCountdown}s`:"alkaa!"}
+            </div>
+            <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",marginTop:"10px"}}>POISTU</button>
+          </div>
 
-            {publicRankings&&publicRankings.length>0&&(
-              <div style={{marginTop:"12px",textAlign:"left"}}>
-                <div style={{fontSize:"11px",color:S.yellow,marginBottom:"6px",textAlign:"center"}}>TULOKSET</div>
+          {/* Rankings with medals */}
+          {publicRankings&&publicRankings.length>0&&(
+            <div style={{border:`2px solid ${S.border}`,padding:"8px",background:S.dark,marginBottom:"10px",animation:"fadeIn 0.8s ease"}}>
+              <div style={{fontSize:"13px",color:S.yellow,marginBottom:"8px"}}>KIERROKSEN TULOKSET</div>
+              <div style={{display:"flex",flexDirection:"column",gap:"2px",textAlign:"left"}}>
                 {publicRankings.slice(0,10).map((r,i)=>(
-                  <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"3px 6px",
-                    background:i===0?"#ffcc0011":"transparent",border:i===0?`1px solid ${S.yellow}33`:"1px solid transparent"}}>
-                    <div style={{display:"flex",gap:"8px"}}>
-                      <span style={{fontSize:"11px",color:i===0?S.yellow:i<3?"#cccccc":"#556",minWidth:"20px"}}>{i+1}.</span>
-                      <span style={{fontSize:"13px",color:r.nickname===soloNickname?S.green:i===0?S.yellow:"#aaa"}}>{r.nickname}</span>
+                  <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 8px",
+                    background:i<3?["#ffcc0015","#cccccc10","#cc884410"][i]:"transparent",
+                    border:i<3?`1px solid ${["#ffcc0033","#cccccc33","#cc884433"][i]}`:"1px solid transparent",
+                    borderRadius:"2px"}}>
+                    <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
+                      <span style={{fontSize:"16px",minWidth:"24px"}}>{i<3?MEDALS[i]:<span style={{fontSize:"11px",color:"#556"}}>{i+1}.</span>}</span>
+                      <span style={{fontSize:"13px",color:r.nickname===soloNickname?S.green:i===0?S.yellow:i<3?"#cccccc":"#aaa",fontWeight:r.nickname===soloNickname?"bold":"normal"}}>{r.nickname}</span>
                     </div>
-                    <div style={{display:"flex",gap:"12px"}}>
+                    <div style={{display:"flex",gap:"12px",alignItems:"center"}}>
                       <span style={{fontSize:"13px",color:S.yellow}}>{r.score}p</span>
                       <span style={{fontSize:"11px",color:"#88ccaa"}}>{r.percentage}%</span>
+                      <span style={{fontSize:"11px",color:"#556"}}>{r.wordsFound} sanaa</span>
                     </div>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
+          )}
 
-            <div style={{fontSize:"11px",color:"#88ccaa",marginTop:"12px"}}>Seuraava kierros alkaa pian...</div>
-          </div>
+          {/* All found words (collective) */}
+          {publicFoundSorted.length>0&&(
+            <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"10px",textAlign:"left",animation:"fadeIn 0.8s ease"}}>
+              <div style={{fontSize:"13px",color:S.green,marginBottom:"6px"}}>LÖYDETYT SANAT ({publicFoundSorted.length})</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
+                {publicFoundSorted.map((w,i)=>(
+                  <span key={i} style={{fontSize:"14px",background:found.includes(w)?"#1a3a2a":"#1a1a2a",padding:"2px 4px",
+                    border:`1px solid ${found.includes(w)?wordColor(w.length)+"44":"#33333366"}`,
+                    color:found.includes(w)?wordColor(w.length):"#667"}}>{w.toUpperCase()}</span>
+                ))}
+              </div>
+              <div style={{fontSize:"11px",color:"#556",marginTop:"4px"}}>Omat sanasi korostettu väreillä</div>
+            </div>
+          )}
+
+          {/* Missed words */}
+          {publicMissed.length>0&&(
+            <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"10px",textAlign:"left",maxHeight:"200px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
+              <div style={{fontSize:"13px",color:"#ff6666",marginBottom:"6px"}}>JÄIVÄT LÖYTÄMÄTTÄ ({publicMissed.length})</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
+                {publicMissed.map((w,i)=>(
+                  <span key={i} style={{fontSize:"14px",background:"#2a1a1a",padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666"}}>{w.toUpperCase()}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Hall of Fame */}
           <HallOfFame gameMode="normal" gameTime={120} currentScore={score} S={S}/>
         </div>
-      )}
+        );
+      })()}
 
       {/* SOLO MENU - just play button */}
       {mode==="solo"&&state==="menu"&&(
@@ -1491,7 +1552,7 @@ export default function Piilosana(){
         <div style={{width:"100%",maxWidth:"600px",position:"relative"}}>
           {/* HUD */}
           <div style={{marginBottom:"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
-            {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>🧖 PIILOSAUNA — {publicPlayerCount} pelaajaa</div>}
+            {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>🍃 PIILOSAUNA — {publicPlayerCount} pelaajaa</div>}
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`}}>⚔️ TAISTELU</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`}}>⬇️ TETRIS</div>}
             {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`}}>∞ RAJATON</div>}

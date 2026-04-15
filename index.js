@@ -251,6 +251,12 @@ function endPublicRound() {
     }))
     .sort((a, b) => b.score - a.score);
 
+  // Collect all words found by all players
+  const allFoundWords = new Set();
+  for (const [, p] of publicGame.players) {
+    for (const w of p.wordsFound) allFoundWords.add(w);
+  }
+
   // Save to hall of fame
   for (const r of rankings) {
     if (r.score > 0) {
@@ -269,14 +275,21 @@ function endPublicRound() {
   io.to('public_game').emit('public_game_over', {
     rankings,
     validWords: publicGame.validWordsList,
+    allFoundWords: [...allFoundWords],
   });
 
-  // Start next round after 10 seconds
-  setTimeout(() => {
-    if (publicGame.players.size > 0) {
-      startPublicRound();
+  // Countdown to next round (60 seconds)
+  let nextRoundCountdown = 60;
+  const countdownInterval = setInterval(() => {
+    nextRoundCountdown--;
+    io.to('public_game').emit('public_next_round_countdown', { seconds: nextRoundCountdown });
+    if (nextRoundCountdown <= 0) {
+      clearInterval(countdownInterval);
+      if (publicGame.players.size > 0) {
+        startPublicRound();
+      }
     }
-  }, 10000);
+  }, 1000);
 }
 
 function publicScoreUpdate() {
