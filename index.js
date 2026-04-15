@@ -2,7 +2,8 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import Database from 'better-sqlite3';
+import initSqlJs from 'sql.js';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -27,40 +28,42 @@ app.use(express.static(join(__dirname, 'dist')));
 const PORT = process.env.PORT || 3001;
 
 // ============================================================================
-// DATABASE (Hall of Fame)
+// DATABASE (Hall of Fame) - using sql.js (pure JS, no native binaries)
 // ============================================================================
 
-const db = new Database(join(__dirname, 'piilosana.db'));
-db.pragma('journal_mode = WAL');
+const DB_PATH = join(__dirname, 'piilosana.db');
+let db;
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS hall_of_fame (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nickname TEXT NOT NULL,
-    score INTEGER NOT NULL,
-    words_found INTEGER NOT NULL,
-    words_total INTEGER NOT NULL,
-    percentage REAL NOT NULL,
-    game_mode TEXT NOT NULL,
-    game_time INTEGER NOT NULL,
-    is_multi INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  )
-`);
+async function initDb() {
+  const SQL = await initSqlJs();
+  if (existsSync(DB_PATH)) {
+    const fileBuffer = readFileSync(DB_PATH);
+    db = new SQL.Database(fileBuffer);
+  } else {
+    db = new SQL.Database();
+  }
+  db.run(`
+    CREATE TABLE IF NOT EXISTS hall_of_fame (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nickname TEXT NOT NULL,
+      score INTEGER NOT NULL,
+      words_found INTEGER NOT NULL,
+      words_total INTEGER NOT NULL,
+      percentage REAL NOT NULL,
+      game_mode TEXT NOT NULL,
+      game_time INTEGER NOT NULL,
+      is_multi INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+  saveDb();
+}
 
-// Prepared statements for performance
-const insertScore = db.prepare(`
-  INSERT INTO hall_of_fame (nickname, score, words_found, words_total, percentage, game_mode, game_time, is_multi)
-  VALUES (@nickname, @score, @wordsFound, @wordsTotal, @percentage, @gameMode, @gameTime, @isMulti)
-`);
-
-const getTopScores = db.prepare(`
-  SELECT nickname, score, words_found, words_total, percentage, created_at
-  FROM hall_of_fame
-  WHERE game_mode = @gameMode AND game_time = @gameTime
-  ORDER BY score DESC
-  LIMIT 10
-`);
+function saveDb() {
+  if (!db) return;
+  const data = db.export();
+  writeFileSync(DB_PATH, Buffer.from(data));
+}
 
 // Categories: normal-120, normal-402, tetris-120, tetris-402
 const HOF_CATEGORIES = [
@@ -71,15 +74,29 @@ const HOF_CATEGORIES = [
 ];
 
 function submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti }) {
-  if (!nickname || score < 0 || !gameMode || !gameTime) return null;
-  if (gameTime === 0) return null; // no hall of fame for unlimited
+  if (!db || !nickname || score < 0 || !gameMode || !gameTime) return null;
+  if (gameTime === 0) return null;
   const percentage = wordsTotal > 0 ? Math.round((wordsFound / wordsTotal) * 100) : 0;
-  const result = insertScore.run({ nickname, score, wordsFound, wordsTotal, percentage, gameMode, gameTime: Number(gameTime), isMulti: isMulti ? 1 : 0 });
-  return result.lastInsertRowid;
+  db.run(
+    `INSERT INTO hall_of_fame (nickname, score, words_found, words_total, percentage, game_mode, game_time, is_multi)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [nickname, score, wordsFound, wordsTotal, percentage, gameMode, Number(gameTime), isMulti ? 1 : 0]
+  );
+  saveDb();
+  return true;
 }
 
 function getHallOfFame(gameMode, gameTime) {
-  return getTopScores.all({ gameMode, gameTime: Number(gameTime) });
+  if (!db) return [];
+  const stmt = db.prepare(
+    `SELECT nickname, score, words_found, words_total, percentage, created_at
+     FROM hall_of_fame WHERE game_mode = ? AND game_time = ? ORDER BY score DESC LIMIT 10`
+  );
+  stmt.bind([gameMode, Number(gameTime)]);
+  const results = [];
+  while (stmt.step()) results.push(stmt.getAsObject());
+  stmt.free();
+  return results;
 }
 
 function getAllHallOfFame() {
@@ -87,7 +104,7 @@ function getAllHallOfFame() {
   for (const cat of HOF_CATEGORIES) {
     result[`${cat.gameMode}-${cat.gameTime}`] = {
       label: cat.label,
-      scores: getTopScores.all({ gameMode: cat.gameMode, gameTime: cat.gameTime })
+      scores: getHallOfFame(cat.gameMode, cat.gameTime)
     };
   }
   return result;
@@ -962,6 +979,11 @@ app.get('*', (req, res) => {
 // SERVER START
 // ============================================================================
 
-httpServer.listen(PORT, () => {
-  console.log(`Piilosana server listening on port ${PORT}`);
+initDb().then(() => {
+  httpServer.listen(PORT, () => {
+    console.log(`Piilosana server listening on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error('Failed to init database:', err);
+  process.exit(1);
 });
