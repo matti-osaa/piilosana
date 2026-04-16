@@ -442,6 +442,43 @@ const DEMO_WORDS=[
   {word:"PIILO",indices:[0,1,2,3,4],color:"#ffcc00"},
   {word:"PIILOSANA",indices:[0,1,2,3,4,5,6,7,8],color:"#ff6644"},
 ];
+
+// Pixel art flags (7x5 grids)
+const FLAG_PIXELS={
+  fi:[
+    "WWWBWWW",
+    "WWWBWWW",
+    "BBBBBBB",
+    "WWWBWWW",
+    "WWWBWWW",
+  ],
+  en:[
+    "RWBWBWR",
+    "WRBWBRW",
+    "BBBRBBB",
+    "WRBWBRW",
+    "RWBWBWR",
+  ],
+  sv:[
+    "BBYBBBB",
+    "BBYBBBB",
+    "YYYYYYY",
+    "BBYBBBB",
+    "BBYBBBB",
+  ],
+};
+const FLAG_COLORS={W:"#ffffff",B:"#003580",R:"#cc2244",Y:"#ffcc00"};
+function PixelFlag({lang,size=3}){
+  const rows=FLAG_PIXELS[lang]||FLAG_PIXELS.fi;
+  return(
+    <div style={{display:"inline-grid",gridTemplateColumns:`repeat(7,${size}px)`,gridTemplateRows:`repeat(5,${size}px)`,gap:0,imageRendering:"pixelated",border:"1px solid #556",flexShrink:0}}>
+      {rows.map((row,r)=>Array.from(row).map((ch,c)=>(
+        <div key={r*7+c} style={{width:size,height:size,background:FLAG_COLORS[ch]||"#000"}}/>
+      )))}
+    </div>
+  );
+}
+
 function TitleDemo({active}){
   const[wordIdx,setWordIdx]=useState(0);
   const[charStep,setCharStep]=useState(-1); // -1=pause, 0..n-1=highlighting, n=hold
@@ -1379,7 +1416,7 @@ export default function Piilosana(){
               padding:"4px 8px",cursor:"pointer",color:lang===code?S.green:"#556",
               boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
               transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px"}}>
-            <span style={{fontSize:"14px",lineHeight:1}}>{lc.flag}</span>{lc.name}
+            <PixelFlag lang={code} size={3}/>{lc.name}
           </button>
         ))}
       </div>
@@ -1463,7 +1500,7 @@ export default function Piilosana(){
               {publicRooms.map((r,i)=>(
                 <div key={r.roomCode} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px",borderBottom:i<publicRooms.length-1?`1px solid ${S.border}`:"none"}}>
                   <div>
-                    <span style={{fontSize:"14px",marginRight:"6px"}}>{LANG_CONFIG[r.lang]?.flag||"🇫🇮"}</span>
+                    <span style={{marginRight:"6px",display:"inline-flex",verticalAlign:"middle"}}><PixelFlag lang={r.lang||"fi"} size={3}/></span>
                     <span style={{fontSize:"11px",color:S.yellow}}>{r.hostNickname}</span>
                     <span style={{fontSize:"18px",color:"#888",marginLeft:"8px"}}>{r.playerCount}/{r.maxPlayers}</span>
                   </div>
