@@ -646,9 +646,9 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
             textShadow:isLit
               ?`3px 3px 0 #335566, 0 0 20px ${dw.color}cc, 0 0 40px ${dw.color}66`
               :"3px 3px 0 #335566, 0 0 20px #88aacc66",
-            cursor:"pointer",fontSize:"28px",lineHeight:1,
+            cursor:"pointer",fontSize:"48px",lineHeight:"28px",
             display:"inline-flex",alignItems:"center",justifyContent:"center",
-            width:"28px",height:"28px",
+            width:"28px",height:"28px",overflow:"hidden",
           }}>⚙</span>;
         }
         return <span key={i} style={baseStyle}>{ch}</span>;
@@ -1628,8 +1628,8 @@ export default function Piilosana(){
             if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
               color:"#88aacc",textShadow:"3px 3px 0 #335566, 0 0 20px #88aacc66",
               fontFamily:"'Press Start 2P',monospace",cursor:"pointer",
-              fontSize:"28px",lineHeight:1,display:"inline-flex",alignItems:"center",justifyContent:"center",
-              width:"28px",height:"28px"}}>⚙</span>;
+              fontSize:"48px",lineHeight:"28px",display:"inline-flex",alignItems:"center",justifyContent:"center",
+              width:"28px",height:"28px",overflow:"hidden"}}>⚙</span>;
             return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>;
           });})()}
         </h1>
