@@ -752,9 +752,11 @@ export default function Piilosana(){
     for(const el of gRef.current.querySelectorAll("[data-c]")){
       const rect=el.getBoundingClientRect();
       const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-      const dist=Math.sqrt((x-cx)**2+(y-cy)**2);
-      const coreRadius=rect.width*0.55;
-      if(dist<coreRadius&&dist<bestDist){const[row,col]=el.dataset.c.split(",").map(Number);best={r:row,c:col};bestDist=dist;}
+      // Diamond hitbox (square rotated 45°): Manhattan distance
+      // Maximizes diagonal hit area so all 8 directions feel equal
+      const dist=Math.abs(x-cx)+Math.abs(y-cy);
+      const hitSize=rect.width*0.75;
+      if(dist<hitSize&&dist<bestDist){const[row,col]=el.dataset.c.split(",").map(Number);best={r:row,c:col};bestDist=dist;}
     }
     return best;
   },[]);
@@ -1369,12 +1371,15 @@ export default function Piilosana(){
     <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflow:"hidden"}}
       onMouseMove={e=>onDragMove(e.clientX,e.clientY)} onMouseUp={onDragEnd} onTouchEnd={onDragEnd}>
       {/* Language selector */}
-      <div style={{position:"fixed",top:"8px",right:"8px",zIndex:300,display:"flex",gap:"4px"}}>
+      <div style={{display:"flex",gap:"6px",marginBottom:"4px"}}>
         {Object.entries(LANG_CONFIG).map(([code,lc])=>(
           <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);}}
-            style={{fontSize:"20px",background:lang===code?"#ffffff22":"transparent",border:lang===code?"2px solid #ffffff44":"2px solid transparent",
-              borderRadius:"6px",padding:"2px 6px",cursor:"pointer",opacity:lang===code?1:0.5,transition:"all 0.2s",lineHeight:1}}>
-            {lc.flag}
+            style={{fontFamily:S.font,fontSize:"9px",background:lang===code?S.dark:"transparent",
+              border:lang===code?`2px solid ${S.green}`:`2px solid ${S.border}`,
+              padding:"4px 8px",cursor:"pointer",color:lang===code?S.green:"#556",
+              boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
+              transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px"}}>
+            <span style={{fontSize:"14px",lineHeight:1}}>{lc.flag}</span>{lc.name}
           </button>
         ))}
       </div>
