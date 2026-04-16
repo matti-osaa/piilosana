@@ -289,10 +289,12 @@ function endPublicRound() {
     allFoundWords: [...allFoundWords],
   });
 
-  // Countdown to next round (60 seconds)
-  let nextRoundCountdown = 60;
+  // Countdown to next round (40 seconds)
+  publicGame.nextRoundCountdown = 40;
+  let nextRoundCountdown = 40;
   publicGame.nextRoundInterval = setInterval(() => {
     nextRoundCountdown--;
+    publicGame.nextRoundCountdown = nextRoundCountdown;
     io.to('public_game').emit('public_next_round_countdown', { seconds: nextRoundCountdown });
     if (nextRoundCountdown <= 0) {
       clearInterval(publicGame.nextRoundInterval);
@@ -543,7 +545,7 @@ io.on('connection', (socket) => {
         roundNumber: publicGame.roundNumber,
       });
     } else {
-      socket.emit('public_waiting', { playerCount: publicGame.players.size, nextRoundActive: !!publicGame.nextRoundInterval });
+      socket.emit('public_waiting', { playerCount: publicGame.players.size, nextRoundCountdown: publicGame.nextRoundCountdown || 0 });
     }
 
     publicScoreUpdate();

@@ -949,8 +949,9 @@ export default function Piilosana(){
     newSocket.on("public_player_count",({count})=>{
       setPublicPlayerCount(count);
     });
-    newSocket.on("public_waiting",({playerCount:c})=>{
+    newSocket.on("public_waiting",({playerCount:c,nextRoundCountdown:nrc})=>{
       setPublicState("waiting");setPublicPlayerCount(c);
+      if(nrc)setPublicNextCountdown(nrc);
     });
     newSocket.on("public_next_round_countdown",({seconds})=>{
       setPublicNextCountdown(seconds);
@@ -1407,12 +1408,13 @@ export default function Piilosana(){
         </div>
       )}
 
-      {/* PIILOSAUNA - waiting for round */}
+      {/* AREENA - waiting for round */}
       {mode==="public"&&publicState==="waiting"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
           <p style={{fontSize:"18px",color:"#ff6644"}}>AREENA</p>
-          <p style={{fontSize:"13px",color:"#556",marginTop:"12px"}}>Odotetaan seuraavaa kierrosta...</p>
-          <p style={{fontSize:"11px",color:"#88ccaa",marginTop:"8px"}}>{publicPlayerCount} pelaajaa saunassa</p>
+          <p style={{fontSize:"13px",color:"#556",marginTop:"12px"}}>Seuraava kierros alkaa</p>
+          {publicNextCountdown>0&&<p style={{fontSize:"28px",color:S.green,marginTop:"8px"}}>{publicNextCountdown}s</p>}
+          <p style={{fontSize:"11px",color:"#88ccaa",marginTop:"8px"}}>{publicPlayerCount} pelaajaa areenalla</p>
         </div>
       )}
 
