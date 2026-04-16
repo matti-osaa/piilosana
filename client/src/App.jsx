@@ -578,7 +578,7 @@ const ICON_PIXELS={
       ".........B.........",
       "...................",
     ],
-    colors:{B:"#445566",W:"#ffffff",h:"#c8d8e8",l:"#a0b0c4",d:"#7888a0"},
+    colors:{B:"outline",W:"highlight",h:"light",l:"mid",d:"dark"},
   },
   swords:{ // 13x13 crossed swords with guards and handles
     cols:13,
@@ -662,16 +662,29 @@ const ICON_PIXELS={
   },
 };
 
+const SHADE_MAP={outline:0.4,dark:0.55,mid:0.7,light:0.85,highlight:1.0};
 function PixelIcon({icon,color="currentColor",size=2,style={}}){
   const data=ICON_PIXELS[icon];
   if(!data)return null;
   const {cols,rows,colors}=data;
+  const resolveColor=(ch)=>{
+    if(ch===".")return"transparent";
+    const v=colors[ch];
+    if(v==="currentColor")return color;
+    if(SHADE_MAP[v]!==undefined)return color;// shade handled via opacity
+    return v;
+  };
+  const resolveOpacity=(ch)=>{
+    if(ch===".")return 1;
+    const v=colors[ch];
+    return SHADE_MAP[v]!==undefined?SHADE_MAP[v]:1;
+  };
   return(
     <div style={{display:"inline-grid",gridTemplateColumns:`repeat(${cols},${size}px)`,gridTemplateRows:`repeat(${rows.length},${size}px)`,
-      gap:0,imageRendering:"pixelated",flexShrink:0,verticalAlign:"middle",...style}}>
+      gap:0,imageRendering:"pixelated",flexShrink:0,verticalAlign:"middle",transition:"filter 2s ease",...style}}>
       {rows.map((row,r)=>Array.from(row).map((ch,c)=>(
         <div key={r*cols+c} style={{width:size,height:size,
-          background:ch==="."?"transparent":(colors[ch]==="currentColor"?color:colors[ch])}}/>
+          background:resolveColor(ch),opacity:resolveOpacity(ch)}}/>
       )))}
     </div>
   );
@@ -691,6 +704,8 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
   const charStepRef=useRef(charStep);
   charStepRef.current=charStep;
   const prevLangRef=useRef(lang);
+  const[gearBlend,setGearBlend]=useState(false);
+  useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
 
   // Scramble animation on language change
   useEffect(()=>{
@@ -811,7 +826,7 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
   },[gameMode,gameTime,currentScore,lang]);
   if(!gameMode||!gameTime||gameTime===0)return null;
   const label=gameMode==="tetris"?"Tetris":"Normaali";
-  const timeLabel=gameTime===120?"2 min":"6,7 min";
+  const timeLabel=gameTime===120?"2 min":lang==="en"?"6.7 min":"6,7 min";
   const langName=LANG_CONFIG[lang]?.name||"Suomi";
   return(
     <div style={{border:`2px solid ${S.border}`,padding:"8px",background:S.dark,marginTop:"10px",animation:"fadeIn 0.8s ease"}}>
@@ -1837,7 +1852,10 @@ export default function Piilosana(){
               autoFocus placeholder={t.nickname} onKeyDown={e=>{if(e.key==="Enter"&&nickname)setLobbyState("choose");}}
               style={{fontFamily:S.font,fontSize:"18px",padding:"8px 12px",width:"100%",maxWidth:"500px",background:S.dark,color:S.green,border:`2px solid ${S.green}`,boxSizing:"border-box",marginBottom:"16px"}}/>
             <br/>
-            <button onClick={()=>nickname&&setLobbyState("choose")} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:nickname?S.green:"#333",border:"none",padding:"12px 28px",cursor:nickname?"pointer":"default",boxShadow:"4px 4px 0 #008844"}}>{lang==="en"?"CONTINUE":"JATKA"}</button>
+            <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
+              <button onClick={()=>nickname&&setLobbyState("choose")} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:nickname?S.green:"#333",border:"none",padding:"12px 28px",cursor:nickname?"pointer":"default",boxShadow:"4px 4px 0 #008844"}}>{lang==="en"?"CONTINUE":"JATKA"}</button>
+              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer"}}>{t.back}</button>
+            </div>
           </div>
         </div>
       )}
@@ -1901,7 +1919,7 @@ export default function Piilosana(){
                   <p style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>{t.time}</p>
                   <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
                     <button onClick={()=>setGameTime(120)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===120?S.bg:S.green,background:gameTime===120?S.green:"transparent",border:`2px solid ${S.green}`,padding:"8px 16px",cursor:"pointer"}}>2 MIN</button>
-                    <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"8px 16px",cursor:"pointer"}}>6,7 MIN</button>
+                    <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"8px 16px",cursor:"pointer"}}>{lang==="en"?"6.7":"6,7"} MIN</button>
                   </div>
                 </div>
                 {gameMode!=="battle"&&(
@@ -2067,7 +2085,7 @@ export default function Piilosana(){
             <p style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>{t.time}</p>
             <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
               <button onClick={()=>setGameTime(120)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===120?S.bg:S.green,background:gameTime===120?S.green:"transparent",border:`2px solid ${S.green}`,padding:"8px 16px",cursor:"pointer"}}>2 MIN</button>
-              <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"8px 16px",cursor:"pointer"}}>6.7 MIN</button>
+              <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"8px 16px",cursor:"pointer"}}>{lang==="en"?"6.7":"6,7"} MIN</button>
               <button onClick={()=>setGameTime(0)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===0?S.bg:"#44ddff",background:gameTime===0?"#44ddff":"transparent",border:"2px solid #44ddff",padding:"8px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px"}}><PixelIcon icon="infinity" color={gameTime===0?S.bg:"#44ddff"} size={2}/>{t.unlimited}</button>
             </div>
             {gameTime===0&&<p style={{fontSize:"11px",color:"#44ddff",marginTop:"8px",lineHeight:"1.8"}}>{t.unlimitedDesc}</p>}
@@ -2090,11 +2108,14 @@ export default function Piilosana(){
             {soloNickname.trim()&&<p style={{fontSize:"11px",color:"#88ccaa",marginTop:"4px"}}>{t.scoresSaved} {soloNickname.trim()}</p>}
           </div>
           )}
-          <button onClick={start} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"14px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844"}}
-            onMouseEnter={e=>{e.target.style.transform="translate(-2px,-2px)";e.target.style.boxShadow="6px 6px 0 #008844"}}
-            onMouseLeave={e=>{e.target.style.transform="none";e.target.style.boxShadow="4px 4px 0 #008844"}}>
-            {t.play}
-          </button>
+          <div style={{display:"flex",gap:"12px",justifyContent:"center",alignItems:"center"}}>
+            <button onClick={start} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"14px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844"}}
+              onMouseEnter={e=>{e.target.style.transform="translate(-2px,-2px)";e.target.style.boxShadow="6px 6px 0 #008844"}}
+              onMouseLeave={e=>{e.target.style.transform="none";e.target.style.boxShadow="4px 4px 0 #008844"}}>
+              {t.play}
+            </button>
+            <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer"}}>{t.back}</button>
+          </div>
         </div>
       )}
 
