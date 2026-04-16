@@ -432,16 +432,40 @@ function ScorePopup({text,color,x,y}){
 // ============================================
 // TITLE DEMO COMPONENT - shows word-finding animation in menu
 // ============================================
-const TITLE_CHARS="PIILOSANA".split("");
-// Words to demo-find, with their letter indices in "PIILOSANA"
-const DEMO_WORDS=[
-  {word:"PII",indices:[0,1,2],color:"#44ff88"},
-  {word:"ILO",indices:[2,3,4],color:"#4488ff"},
-  {word:"OSA",indices:[4,5,6],color:"#ff8844"},
-  {word:"SANA",indices:[5,6,7,8],color:"#ff44cc"},
-  {word:"PIILO",indices:[0,1,2,3,4],color:"#ffcc00"},
-  {word:"PIILOSANA",indices:[0,1,2,3,4,5,6,7,8],color:"#ff6644"},
-];
+// Per-language titles and demo words (subsequences to highlight)
+const TITLE_CONFIG={
+  fi:{
+    title:"PIILOSANA",
+    demos:[
+      {word:"PII",indices:[0,1,2],color:"#44ff88"},
+      {word:"ILO",indices:[2,3,4],color:"#4488ff"},
+      {word:"OSA",indices:[4,5,6],color:"#ff8844"},
+      {word:"SANA",indices:[5,6,7,8],color:"#ff44cc"},
+      {word:"PIILO",indices:[0,1,2,3,4],color:"#ffcc00"},
+      {word:"PIILOSANA",indices:[0,1,2,3,4,5,6,7,8],color:"#ff6644"},
+    ]
+  },
+  en:{
+    title:"WORDHUNT",
+    demos:[
+      {word:"WORD",indices:[0,1,2,3],color:"#44ff88"},
+      {word:"HUNT",indices:[4,5,6,7],color:"#4488ff"},
+      {word:"NORD",indices:[5,1,2,3],color:"#ff8844"},
+      {word:"WORTH",indices:[0,1,2,7,4],color:"#ff44cc"},
+      {word:"WORDHUNT",indices:[0,1,2,3,4,5,6,7],color:"#ff6644"},
+    ]
+  },
+  sv:{
+    title:"ORDGÖMMA",
+    demos:[
+      {word:"ORD",indices:[0,1,2],color:"#44ff88"},
+      {word:"GÖM",indices:[3,4,5],color:"#4488ff"},
+      {word:"GÖMMA",indices:[3,4,5,6,7],color:"#ff8844"},
+      {word:"MORD",indices:[6,0,1,2],color:"#ff44cc"},
+      {word:"ORDGÖMMA",indices:[0,1,2,3,4,5,6,7],color:"#ff6644"},
+    ]
+  },
+};
 
 // Pixel art flags (7x5 grids)
 const FLAG_PIXELS={
@@ -479,59 +503,88 @@ function PixelFlag({lang,size=3}){
   );
 }
 
-function TitleDemo({active}){
+function TitleDemo({active,lang}){
+  const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;
+  const titleChars=tc.title.split("");
+  const demoWords=tc.demos;
   const[wordIdx,setWordIdx]=useState(0);
   const[charStep,setCharStep]=useState(-1); // -1=pause, 0..n-1=highlighting, n=hold
+  const[scramble,setScramble]=useState(false);
+  const[displayChars,setDisplayChars]=useState(titleChars);
   const timerRef=useRef(null);
   const wordIdxRef=useRef(wordIdx);
   wordIdxRef.current=wordIdx;
   const charStepRef=useRef(charStep);
   charStepRef.current=charStep;
+  const prevLangRef=useRef(lang);
+
+  // Scramble animation on language change
   useEffect(()=>{
-    if(!active){setWordIdx(0);setCharStep(-1);return;}
+    if(prevLangRef.current===lang){setDisplayChars(titleChars);return;}
+    prevLangRef.current=lang;
+    setScramble(true);setWordIdx(0);setCharStep(-1);
+    clearTimeout(timerRef.current);
+    const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖ";
+    let step=0;const maxSteps=8;
+    const prevTitle=(TITLE_CONFIG[prevLangRef.current]||TITLE_CONFIG.fi).title;
+    const maxLen=Math.max(titleChars.length,prevTitle.length);
+    function scrambleTick(){
+      step++;
+      const chars=[];
+      for(let i=0;i<titleChars.length;i++){
+        if(step>maxSteps-3&&i<step-(maxSteps-3)){chars.push(titleChars[i]);}
+        else{chars.push(letters[Math.floor(Math.random()*letters.length)]);}
+      }
+      setDisplayChars(chars);
+      if(step<maxSteps){setTimeout(scrambleTick,70);}
+      else{setDisplayChars(titleChars);setScramble(false);}
+    }
+    scrambleTick();
+  },[lang]);
+
+  useEffect(()=>{
+    if(!active||scramble){return;}
     function tick(){
       const wi=wordIdxRef.current;
       const cs=charStepRef.current;
-      const dw=DEMO_WORDS[wi];
+      const dw=demoWords[wi%demoWords.length];
       if(cs===-1){
-        // Start highlighting first char
         setCharStep(0);
         timerRef.current=setTimeout(tick,220);
       }else if(cs<dw.indices.length-1){
-        // Highlight next char
         setCharStep(cs+1);
         timerRef.current=setTimeout(tick,220);
       }else if(cs===dw.indices.length-1){
-        // All chars lit, hold
         setCharStep(cs+1);
         timerRef.current=setTimeout(tick,1400);
       }else{
-        // Move to next word
-        setWordIdx((wi+1)%DEMO_WORDS.length);
+        setWordIdx((wi+1)%demoWords.length);
         setCharStep(-1);
         timerRef.current=setTimeout(tick,800);
       }
     }
     timerRef.current=setTimeout(tick,1500);
     return()=>clearTimeout(timerRef.current);
-  },[active]);
-  // Compute which indices are currently highlighted
-  const dw=DEMO_WORDS[wordIdx];
+  },[active,scramble,lang]);
+
+  const dw=demoWords[wordIdx%demoWords.length];
   const lit=new Set();
-  if(active&&charStep>=0){
+  if(active&&!scramble&&charStep>=0){
     for(let i=0;i<=Math.min(charStep,dw.indices.length-1);i++)lit.add(dw.indices[i]);
   }
   return(
     <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",gap:"2px"}}>
-      {TITLE_CHARS.map((ch,i)=>{
+      {displayChars.map((ch,i)=>{
         const isLit=lit.has(i);
         return <span key={i} style={{
-          color:"#ffcc00",
-          textShadow:isLit
+          color:scramble?"#ffcc0088":"#ffcc00",
+          textShadow:scramble
+            ?"3px 3px 0 #cc6600, 0 0 10px #ffcc0044"
+            :isLit
             ?`3px 3px 0 #cc6600, 0 0 20px ${dw.color}cc, 0 0 40px ${dw.color}66`
             :"3px 3px 0 #cc6600, 0 0 20px #ffcc0066",
-          transition:"text-shadow 0.25s ease, transform 0.25s ease",
-          transform:isLit?"translateY(-2px)":"none",
+          transition:scramble?"none":"text-shadow 0.25s ease, transform 0.25s ease",
+          transform:scramble?`translateY(${Math.random()>0.5?-2:2}px)`:isLit?"translateY(-2px)":"none",
           fontFamily:"'Press Start 2P',monospace"
         }}>{ch}</span>;
       })}
@@ -1463,11 +1516,11 @@ export default function Piilosana(){
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
 
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
-        <TitleDemo active={true}/>
+        <TitleDemo active={true} lang={lang}/>
       ):(
         <h1 style={{fontSize:"28px",color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,letterSpacing:"4px",margin:"10px 0",
           animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
-          PIILOSANA
+          {(TITLE_CONFIG[lang]||TITLE_CONFIG.fi).title}
         </h1>
       )}
 
