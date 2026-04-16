@@ -555,26 +555,30 @@ function PixelFlag({lang,size=2}){
 
 // Pixel art icons (each row is a string, . = transparent, letter = color key)
 const ICON_PIXELS={
-  gear:{ // 15x15 high-res gear
-    cols:15,
+  gear:{ // 19x19 multi-shaded pixel art gear (8 teeth, center hole)
+    cols:19,
     rows:[
-      "......GGG......",
-      ".....GGGGG.....",
-      "..GGG.....GGG..",
-      "..GG.......GG..",
-      ".GG..GGGGG..GG.",
-      "GGG.GG...GG.GGG",
-      "GG..G.....G..GG",
-      "GGG.G..G..G.GGG",
-      "GG..G.....G..GG",
-      "GGG.GG...GG.GGG",
-      ".GG..GGGGG..GG.",
-      "..GG.......GG..",
-      "..GGG.....GGG..",
-      ".....GGGGG.....",
-      "......GGG......",
+      "...................",
+      ".........W.........",
+      "........WWW........",
+      "....WW..WhB..BB....",
+      "...WWBW.WhB.BBBB...",
+      "...WBhBWWhBBBlBB...",
+      "....WBhhBBBllBB....",
+      ".....WhBB.BBlB.....",
+      "..WWWWBB...BBBBBB..",
+      ".WWhhhB.....BdddBB.",
+      "..WBBBBB...BBBBBB..",
+      ".....BlBB.BBdB.....",
+      "....BBllBBBddBB....",
+      "...BBlBBBdBBBdBB...",
+      "...BBBB.BdB.BBBB...",
+      "....BB..BdB..BB....",
+      "........BBB........",
+      ".........B.........",
+      "...................",
     ],
-    colors:{G:"currentColor"},
+    colors:{B:"#222",W:"#ffffff",h:"#a8bcd0",l:"#8a9bb0",d:"#5a6a7a"},
   },
   swords:{ // 11x11 crossed swords
     cols:11,
@@ -761,7 +765,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
             cursor:"pointer",
             display:"inline-flex",alignItems:"center",justifyContent:"center",
             marginRight:"4px",
-          }}><PixelIcon icon="gear" color={isLit?dw.color:"#88aacc"} size={2}/></span>;
+          }}><PixelIcon icon="gear" color={isLit?dw.color:"#88aacc"} size={1.5}/></span>;
         }
         return <span key={i} style={baseStyle}>{ch}</span>;
       })}
@@ -1132,9 +1136,14 @@ export default function Piilosana(){
       sounds.playByLength(currentWord.length);
       if(newCombo>=3)setTimeout(()=>sounds.playCombo(newCombo),200);
       {
-        const bar=wordBarRef.current||gRef.current;
-        const rect=bar.getBoundingClientRect();
-        const popX=rect.left+rect.width/2,popY=rect.top+rect.height/2;
+        // Position popup at the center of selected cells on the grid
+        let popX,popY;
+        if(gRef.current&&currentSel.length>0){
+          const mid=currentSel[Math.floor(currentSel.length/2)];
+          const cellEl=gRef.current.querySelector(`[data-c="${mid.r},${mid.c}"]`);
+          if(cellEl){const cr=cellEl.getBoundingClientRect();popX=cr.left+cr.width/2;popY=cr.top+cr.height/2;}
+          else{const rect=gRef.current.getBoundingClientRect();popX=rect.left+rect.width/2;popY=rect.top+rect.height/2;}
+        }else{const rect=(gRef.current||wordBarRef.current).getBoundingClientRect();popX=rect.left+rect.width/2;popY=rect.top+rect.height/2;}
         const color=currentWord.length>=6?"#ff66ff":currentWord.length>=5?"#ffcc00":"#00ff88";
         let text=`+${totalPts}`;
         if(newCombo>=3)text+=` x${comboMult}`;
@@ -1299,8 +1308,7 @@ export default function Piilosana(){
           if(c>=3)setTimeout(()=>sounds.playCombo(c),200);
           setMsg({t:w,ok:true,p:points,combo:c});
           {
-            const bar=wordBarRef.current||gRef.current;
-            const rect=bar.getBoundingClientRect();
+            const rect=(gRef.current||wordBarRef.current).getBoundingClientRect();
             const popX=rect.left+rect.width/2,popY=rect.top+rect.height/2;
             const color=w.length>=6?"#ff66ff":w.length>=5?"#ffcc00":"#00ff88";
             let text=`+${points}`;
@@ -1745,7 +1753,7 @@ export default function Piilosana(){
             if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
               cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",
               marginRight:"4px"}}>
-              <PixelIcon icon="gear" color="#88aacc" size={2}/></span>;
+              <PixelIcon icon="gear" color="#88aacc" size={1.5}/></span>;
             return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>;
           });})()}
         </h1>
