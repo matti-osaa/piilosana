@@ -467,37 +467,43 @@ const TITLE_CONFIG={
   },
 };
 
-// Pixel art flags (7x5 grids)
+// Pixel art flags (9x6 grids)
 const FLAG_PIXELS={
   fi:[
-    "WWBWWWW",
-    "WWBWWWW",
-    "BBBBBBB",
-    "WWBWWWW",
-    "WWBWWWW",
+    "WWWBWWWWW",
+    "WWWBWWWWW",
+    "BBBBBBBBB",
+    "WWWBWWWWW",
+    "WWWBWWWWW",
+    "WWWBWWWWW",
   ],
   en:[
-    "BBBWRWR",
-    "BBBWRWR",
-    "RWRWRWR",
-    "WRWRWRW",
-    "RWRWRWR",
+    "BBBBRRRRRR",
+    "BBBBWWWWWW",
+    "BBBBRRRRRR",
+    "WWWWWWWWWW",
+    "RRRRRRRRRR",
+    "WWWWWWWWWW",
   ],
   sv:[
-    "BBYBBBB",
-    "BBYBBBB",
-    "YYYYYYY",
-    "BBYBBBB",
-    "BBYBBBB",
+    "BBBYBBBBB",
+    "BBBYBBBBB",
+    "YYYYYYYYY",
+    "BBBYBBBBB",
+    "BBBYBBBBB",
+    "BBBYBBBBB",
   ],
 };
+const FLAG_COLS={fi:9,en:10,sv:9};
 const FLAG_COLORS={W:"#ffffff",B:"#003580",R:"#cc2244",Y:"#ffcc00"};
-function PixelFlag({lang,size=3}){
+function PixelFlag({lang,size=2}){
   const rows=FLAG_PIXELS[lang]||FLAG_PIXELS.fi;
+  const cols=FLAG_COLS[lang]||9;
+  const numRows=rows.length;
   return(
-    <div style={{display:"inline-grid",gridTemplateColumns:`repeat(7,${size}px)`,gridTemplateRows:`repeat(5,${size}px)`,gap:0,imageRendering:"pixelated",border:"1px solid #556",flexShrink:0}}>
+    <div style={{display:"inline-grid",gridTemplateColumns:`repeat(${cols},${size}px)`,gridTemplateRows:`repeat(${numRows},${size}px)`,gap:0,imageRendering:"pixelated",border:"1px solid #556",flexShrink:0}}>
       {rows.map((row,r)=>Array.from(row).map((ch,c)=>(
-        <div key={r*7+c} style={{width:size,height:size,background:FLAG_COLORS[ch]||"#000"}}/>
+        <div key={r*cols+c} style={{width:size,height:size,background:FLAG_COLORS[ch]||"#000"}}/>
       )))}
     </div>
   );
@@ -1482,7 +1488,7 @@ export default function Piilosana(){
               padding:"4px 8px",cursor:"pointer",color:lang===code?S.green:"#556",
               boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
               transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px"}}>
-            <PixelFlag lang={code} size={3}/>{lc.name}
+            <PixelFlag lang={code} size={2}/>{lc.name}
           </button>
         ))}
       </div>}
@@ -1566,7 +1572,7 @@ export default function Piilosana(){
               {publicRooms.map((r,i)=>(
                 <div key={r.roomCode} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px",borderBottom:i<publicRooms.length-1?`1px solid ${S.border}`:"none"}}>
                   <div>
-                    <span style={{marginRight:"6px",display:"inline-flex",verticalAlign:"middle"}}><PixelFlag lang={r.lang||"fi"} size={3}/></span>
+                    <span style={{marginRight:"6px",display:"inline-flex",verticalAlign:"middle"}}><PixelFlag lang={r.lang||"fi"} size={2}/></span>
                     <span style={{fontSize:"11px",color:S.yellow}}>{r.hostNickname}</span>
                     <span style={{fontSize:"18px",color:"#888",marginLeft:"8px"}}>{r.playerCount}/{r.maxPlayers}</span>
                   </div>
