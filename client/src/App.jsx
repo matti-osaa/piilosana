@@ -1340,7 +1340,7 @@ export default function Piilosana(){
             <p style={{fontSize:"18px",lineHeight:"2",marginBottom:"12px",color:S.yellow}}>ODOTETAAN PELAAJIA</p>
             <p style={{fontSize:"11px",lineHeight:"2",color:S.green,marginBottom:"12px"}}>PELAAJAT ({players.length})</p>
             <div style={{background:S.dark,padding:"8px",border:`1px solid ${S.border}`,marginBottom:"16px",minHeight:"60px"}}>
-              {players.map((p,i)=><div key={i} style={{fontSize:"11px",color:p.playerId===playerId?S.yellow:S.green,padding:"4px"}}>{i+1}. {p.nickname}{p.playerId===playerId?" (SÄ)":""}</div>)}
+              {players.map((p,i)=><div key={i} style={{fontSize:"11px",color:p.playerId===playerId?S.yellow:S.green,padding:"4px"}}>{i+1}. {p.nickname}{p.playerId===playerId?" (SINÄ)":""}</div>)}
             </div>
             {isHost&&(
               <div style={{marginBottom:"12px"}}>
@@ -1359,6 +1359,7 @@ export default function Piilosana(){
                 </div>
                 {gameMode!=="battle"&&(
                   <div style={{marginTop:"12px"}}>
+                    <p style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>KIRJAINKERROIN</p>
                     <button onClick={()=>setLetterMult(v=>!v)} style={{fontFamily:S.font,fontSize:"11px",color:letterMult?S.bg:S.yellow,background:letterMult?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"8px 16px",cursor:"pointer"}}>
                       {letterMult?"✓ ":""}KIRJAINKERTOIMET
                     </button>
