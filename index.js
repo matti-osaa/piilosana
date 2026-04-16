@@ -31,7 +31,10 @@ const PORT = process.env.PORT || 3001;
 // DATABASE (Hall of Fame) - using sql.js (pure JS, no native binaries)
 // ============================================================================
 
-const DB_PATH = join(__dirname, 'piilosana.db');
+// Use persistent volume path if available (e.g. Railway Volume at /data),
+// fall back to local dir for development
+const DB_DIR = process.env.DB_PATH || (existsSync('/data') ? '/data' : __dirname);
+const DB_PATH = join(DB_DIR, 'piilosana.db');
 let db;
 
 async function initDb() {
@@ -39,8 +42,10 @@ async function initDb() {
   if (existsSync(DB_PATH)) {
     const fileBuffer = readFileSync(DB_PATH);
     db = new SQL.Database(fileBuffer);
+    console.log(`Database loaded from ${DB_PATH} (${fileBuffer.length} bytes)`);
   } else {
     db = new SQL.Database();
+    console.log(`New database created at ${DB_PATH}`);
   }
   db.run(`
     CREATE TABLE IF NOT EXISTS hall_of_fame (
