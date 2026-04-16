@@ -555,18 +555,24 @@ function PixelFlag({lang,size=2}){
 
 // Pixel art icons (each row is a string, . = transparent, letter = color key)
 const ICON_PIXELS={
-  gear:{ // 9x9 gear
-    cols:9,
+  gear:{ // 15x15 high-res gear
+    cols:15,
     rows:[
-      "..G.G.G..",
-      ".GGGGGGG.",
-      "GG.GGG.GG",
-      "GGG.G.GGG",
-      "GG.GGG.GG",
-      "GGG.G.GGG",
-      "GG.GGG.GG",
-      ".GGGGGGG.",
-      "..G.G.G..",
+      "......GGG......",
+      ".....GGGGG.....",
+      "..GGG.....GGG..",
+      "..GG.......GG..",
+      ".GG..GGGGG..GG.",
+      "GGG.GG...GG.GGG",
+      "GG..G.....G..GG",
+      "GGG.G..G..G.GGG",
+      "GG..G.....G..GG",
+      "GGG.GG...GG.GGG",
+      ".GG..GGGGG..GG.",
+      "..GG.......GG..",
+      "..GGG.....GGG..",
+      ".....GGGGG.....",
+      "......GGG......",
     ],
     colors:{G:"currentColor"},
   },
@@ -754,21 +760,26 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
             textShadow:"none",
             cursor:"pointer",
             display:"inline-flex",alignItems:"center",justifyContent:"center",
-          }}><PixelIcon icon="gear" color={isLit?dw.color:"#88aacc"} size={3}/></span>;
+            marginRight:"4px",
+          }}><PixelIcon icon="gear" color={isLit?dw.color:"#88aacc"} size={2}/></span>;
         }
         return <span key={i} style={baseStyle}>{ch}</span>;
       })}
     </h1>
     {/* Speech bubble below title pointing up */}
     {showBubble&&!scramble&&(
-      <div style={{position:"absolute",bottom:"-44px",left:"50%",transform:"translateX(-50%)",
-        animation:bubbleFading?"bubbleOut 0.8s ease-in forwards":"bubbleIn 0.6s ease-out forwards",whiteSpace:"nowrap",zIndex:50}}>
-        <div style={{background:"#88aacc",color:"#0a0a1a",fontFamily:"'Press Start 2P',monospace",
-          fontSize:"7px",padding:"6px 10px",borderRadius:"8px",position:"relative",lineHeight:"1.6",
-          boxShadow:"0 0 12px #88aacc44"}}>
-          <div style={{position:"absolute",top:"-6px",left:"50%",transform:"translateX(-50%)",
-            width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #88aacc"}}/>
-          {lang==="en"?"Click the gear for settings!":lang==="sv"?"Klicka kugghjulet för inställningar!":"Klikkaa ratasta asetuksiin!"}
+      <div style={{position:"absolute",bottom:"-52px",left:"50%",transform:"translateX(-50%)",
+        animation:bubbleFading?"bubbleOut 0.6s ease-in forwards":`bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards`,
+        whiteSpace:"nowrap",zIndex:50}}>
+        <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
+          fontSize:"9px",padding:"8px 14px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
+          border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",
+          imageRendering:"pixelated"}}>
+          <div style={{position:"absolute",top:"-9px",left:"50%",transform:"translateX(-50%)",
+            width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderBottom:"8px solid #000000"}}/>
+          <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
+            width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #ffffff"}}/>
+          {lang==="en"?"Click the gear!":lang==="sv"?"Klicka kugghjulet!":"Klikkaa ratasta!"}
         </div>
       </div>
     )}
@@ -1715,8 +1726,9 @@ export default function Piilosana(){
         @keyframes cellGlitch{0%{opacity:1;transform:translate(0,0)}25%{transform:translate(5px,-3px);filter:hue-rotate(90deg)}50%{transform:translate(-5px,3px);filter:hue-rotate(180deg)}75%{transform:translate(3px,5px);filter:hue-rotate(270deg)}100%{opacity:0;transform:translate(-10px,-10px);filter:hue-rotate(360deg)}}
         @keyframes cellDrop{0%{transform:translateY(-100%);opacity:0.5}60%{transform:translateY(5%);opacity:1}80%{transform:translateY(-2%)}100%{transform:translateY(0)}}
         @keyframes cellPop{0%{transform:scale(1)}50%{transform:scale(0);opacity:0}100%{transform:scale(0);opacity:0}}
-        @keyframes bubbleIn{0%{opacity:0;transform:translateX(-50%) scale(0.5) translateY(-10px)}100%{opacity:1;transform:translateX(-50%) scale(1) translateY(0)}}
-        @keyframes bubbleOut{0%{opacity:1;transform:translateX(-50%) scale(1) translateY(0)}100%{opacity:0;transform:translateX(-50%) scale(0.5) translateY(-10px)}}
+        @keyframes bubbleIn{0%{opacity:0;transform:translateX(-50%) translateY(8px) scale(0.3)}30%{opacity:1;transform:translateX(-50%) translateY(-4px) scale(1.05)}50%{transform:translateX(-50%) translateY(2px) scale(0.97)}70%{transform:translateX(-50%) translateY(-1px) scale(1.01)}100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+        @keyframes bubbleOut{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}40%{opacity:0.8;transform:translateX(-50%) translateY(-3px) scale(1.03)}100%{opacity:0;transform:translateX(-50%) translateY(10px) scale(0.3)}}
+        @keyframes bubbleFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
         @keyframes floatUnicorn{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-20px) rotate(5deg)}}
         @keyframes scanlines{0%,100%{opacity:1}}
         @keyframes electricPulse{0%,100%{opacity:0.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}}
@@ -1731,8 +1743,9 @@ export default function Piilosana(){
           animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
           {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>{
             if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
-              cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center"}}>
-              <PixelIcon icon="gear" color="#88aacc" size={3}/></span>;
+              cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",
+              marginRight:"4px"}}>
+              <PixelIcon icon="gear" color="#88aacc" size={2}/></span>;
             return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>;
           });})()}
         </h1>
