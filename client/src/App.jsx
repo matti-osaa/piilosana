@@ -782,18 +782,24 @@ export default function Piilosana(){
   },[state,mode]);
 
 
-  // Cell detection
-  const cellAt=useCallback((x,y)=>{
+  // Cell detection - uses Chebyshev (square hitbox) with adjacency bias:
+  // When dragging, prefer cells adjacent to the last selected cell.
+  // This prevents accidental horizontal/vertical pickups during diagonal swipes.
+  const cellAt=useCallback((x,y,lastCell)=>{
     if(!gRef.current)return null;
     let best=null,bestDist=Infinity;
     for(const el of gRef.current.querySelectorAll("[data-c]")){
       const rect=el.getBoundingClientRect();
       const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-      // Square hitbox (Chebyshev distance): max(|dx|,|dy|)
-      // Diagonal reach = √2 × axis reach, compensating for √2× longer cell distance
       const dist=Math.max(Math.abs(x-cx),Math.abs(y-cy));
       const hitSize=rect.width*0.55;
-      if(dist<hitSize&&dist<bestDist){const[row,col]=el.dataset.c.split(",").map(Number);best={r:row,c:col};bestDist=dist;}
+      if(dist<hitSize){
+        const[row,col]=el.dataset.c.split(",").map(Number);
+        // Bias: if we have a last cell, penalize non-adjacent cells so adjacents win ties
+        let score=dist;
+        if(lastCell&&(Math.abs(row-lastCell.r)>1||Math.abs(col-lastCell.c)>1))score+=hitSize*0.5;
+        if(score<bestDist){best={r:row,c:col};bestDist=score;}
+      }
     }
     return best;
   },[]);
@@ -884,12 +890,15 @@ export default function Piilosana(){
   const activeGrid=mode==="multi"?currentMultiGrid:grid;
 
   // Drag handlers
-  const onDragStart=useCallback((r,c)=>{if(state!=="play")return;setDragging(true);setSel([{r,c}]);setWord(activeGrid[r]?.[c]||"");setMsg(null);
+  const onDragStart=useCallback((r,c)=>{if(state!=="play")return;setDragging(true);const s=[{r,c}];setSel(s);selRef.current=s;setWord(activeGrid[r]?.[c]||"");setMsg(null);
     // Battle mode: broadcast selection start
     if(mode==="multi"&&gameMode==="battle"&&socket)socket.emit("battle_selection",{cells:[{r,c}]});
   },[state,activeGrid,mode,gameMode,socket]);
+  const selRef=useRef([]);
   const onDragMove=useCallback((x,y)=>{
-    if(!dragging||state!=="play")return;const cell=cellAt(x,y);if(!cell)return;
+    if(!dragging||state!=="play")return;
+    const last=selRef.current.length>0?selRef.current[selRef.current.length-1]:null;
+    const cell=cellAt(x,y,last);if(!cell)return;
     setSel(prev=>{
       let next=prev;
       if(prev.length>0&&prev[prev.length-1].r===cell.r&&prev[prev.length-1].c===cell.c)return prev;
@@ -899,10 +908,11 @@ export default function Piilosana(){
       else{next=[...prev,cell];setWord(next.map(s=>activeGrid[s.r][s.c]).join(""));}
       // Battle mode: broadcast selection
       if(mode==="multi"&&gameMode==="battle"&&socket)socket.emit("battle_selection",{cells:next.map(s=>({r:s.r,c:s.c}))});
+      selRef.current=next;
       return next;
     });
   },[dragging,state,cellAt,activeGrid,mode,gameMode,socket]);
-  const onDragEnd=useCallback(()=>{if(!dragging)return;setDragging(false);submitWord(sel,word);setSel([]);setWord("");
+  const onDragEnd=useCallback(()=>{if(!dragging)return;setDragging(false);submitWord(sel,word);setSel([]);selRef.current=[];setWord("");
     // Battle mode: clear selection broadcast
     if(mode==="multi"&&gameMode==="battle"&&socket)socket.emit("battle_selection",{cells:[]});
   },[dragging,sel,word,submitWord,mode,gameMode,socket]);
