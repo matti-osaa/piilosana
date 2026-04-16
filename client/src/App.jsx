@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
 // PIILOSANA - Finnish Word Hunt Game
 // ============================================
 
-const VERSION = "2.0.0";
+const VERSION = "2.1.0";
 const SERVER_URL = window.location.origin;
 
 import WORDS_RAW_FI from "./words.js";
@@ -475,6 +475,7 @@ function ScorePopup({text,color,x,y}){
 const TITLE_CONFIG={
   fi:{
     title:"PIILOSANA",
+    gearIdx:4, // the O in PIIL⚙SANA
     demos:[
       {word:"PII",indices:[0,1,2],color:"#44ff88"},
       {word:"ILO",indices:[2,3,4],color:"#4488ff"},
@@ -486,6 +487,7 @@ const TITLE_CONFIG={
   },
   en:{
     title:"LETTERLOOT",
+    gearIdx:7, // the first O in LETTERL⚙OT
     // L(0) E(1) T(2) T(3) E(4) R(5) L(6) O(7) O(8) T(9)
     demos:[
       {word:"LET",indices:[0,1,2],color:"#44ff88"},
@@ -497,6 +499,7 @@ const TITLE_CONFIG={
   },
   sv:{
     title:"ORDJAKT",
+    gearIdx:0, // the O in ⚙RDJAKT
     // O(0) R(1) D(2) J(3) A(4) K(5) T(6)
     demos:[
       {word:"ORD",indices:[0,1,2],color:"#44ff88"},
@@ -550,7 +553,7 @@ function PixelFlag({lang,size=2}){
   );
 }
 
-function TitleDemo({active,lang}){
+function TitleDemo({active,lang,onGearClick}){
   const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;
   const titleChars=tc.title.split("");
   const demoWords=tc.demos;
@@ -623,7 +626,8 @@ function TitleDemo({active,lang}){
     <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",gap:"2px"}}>
       {displayChars.map((ch,i)=>{
         const isLit=lit.has(i);
-        return <span key={i} style={{
+        const isGear=!scramble&&i===tc.gearIdx;
+        const baseStyle={
           color:scramble?"#ffcc0088":"#ffcc00",
           textShadow:scramble
             ?"3px 3px 0 #cc6600, 0 0 10px #ffcc0044"
@@ -633,7 +637,12 @@ function TitleDemo({active,lang}){
           transition:scramble?"none":"text-shadow 0.25s ease, transform 0.25s ease",
           transform:scramble?`translateY(${Math.random()>0.5?-2:2}px)`:isLit?"translateY(-2px)":"none",
           fontFamily:"'Press Start 2P',monospace"
-        }}>{ch}</span>;
+        };
+        if(isGear){
+          return <span key={i} onClick={onGearClick} style={{...baseStyle,cursor:"pointer",position:"relative"}}
+            title="Settings">⚙</span>;
+        }
+        return <span key={i} style={baseStyle}>{ch}</span>;
       })}
     </h1>
   );
@@ -1573,26 +1582,15 @@ export default function Piilosana(){
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
 
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
-        <div style={{position:"relative",display:"flex",alignItems:"flex-start",justifyContent:"center"}}>
-          <TitleDemo active={true} lang={lang}/>
-          <button onClick={()=>setShowSettings(v=>!v)} style={{fontFamily:S.font,fontSize:"10px",color:showSettings?S.green:S.textMuted||"#556",
-            background:"transparent",border:"none",cursor:"pointer",padding:"8px 4px",marginTop:"6px",
-            filter:showSettings?`drop-shadow(0 0 4px ${S.green}88)`:"none",transition:"all 0.2s",lineHeight:1}}>
-            ⚙
-          </button>
-        </div>
+        <TitleDemo active={true} lang={lang} onGearClick={()=>setShowSettings(v=>!v)}/>
       ):(
-        <div style={{position:"relative",display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}>
-          <h1 style={{fontSize:"28px",color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,letterSpacing:"4px",margin:"10px 0",
-            animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
-            {(TITLE_CONFIG[lang]||TITLE_CONFIG.fi).title}
-          </h1>
-          <button onClick={()=>setShowSettings(v=>!v)} style={{fontFamily:S.font,fontSize:"10px",color:showSettings?S.green:S.textMuted||"#556",
-            background:"transparent",border:"none",cursor:"pointer",padding:"4px",
-            filter:showSettings?`drop-shadow(0 0 4px ${S.green}88)`:"none",transition:"all 0.2s",lineHeight:1}}>
-            ⚙
-          </button>
-        </div>
+        <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",gap:"2px",
+          animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
+          {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>{
+            if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace",cursor:"pointer"}}>⚙</span>;
+            return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>;
+          });})()}
+        </h1>
       )}
 
       {/* Settings panel - overlay below title */}
