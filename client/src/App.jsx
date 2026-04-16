@@ -446,18 +446,18 @@ const DEMO_WORDS=[
 // Pixel art flags (7x5 grids)
 const FLAG_PIXELS={
   fi:[
-    "WWWBWWW",
-    "WWWBWWW",
+    "WWBWWWW",
+    "WWBWWWW",
     "BBBBBBB",
-    "WWWBWWW",
-    "WWWBWWW",
+    "WWBWWWW",
+    "WWBWWWW",
   ],
   en:[
-    "RWBWBWR",
-    "WRBWBRW",
-    "BBBRBBB",
-    "WRBWBRW",
-    "RWBWBWR",
+    "BBBWRWR",
+    "BBBWRWR",
+    "RWRWRWR",
+    "WRWRWRW",
+    "RWRWRWR",
   ],
   sv:[
     "BBYBBBB",
