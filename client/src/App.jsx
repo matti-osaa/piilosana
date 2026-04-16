@@ -491,7 +491,7 @@ const TITLE_CONFIG={
       {word:"LET",indices:[0,1,2],color:"#44ff88"},
       {word:"LOOT",indices:[6,7,8,9],color:"#4488ff"},
       {word:"LETTER",indices:[0,1,2,3,4,5],color:"#ff8844"},
-      {word:"TOOT",indices:[3,7,8,9],color:"#ff44cc"},
+      {word:"RLOOT",indices:[5,6,7,8,9],color:"#ff44cc"},
       {word:"LETTERLOOT",indices:[0,1,2,3,4,5,6,7,8,9],color:"#ff6644"},
     ]
   },
@@ -502,7 +502,7 @@ const TITLE_CONFIG={
       {word:"ORD",indices:[0,1,2],color:"#44ff88"},
       {word:"JAKT",indices:[3,4,5,6],color:"#4488ff"},
       {word:"AKT",indices:[4,5,6],color:"#ff8844"},
-      {word:"KORD",indices:[5,0,1,2],color:"#ff44cc"},
+      {word:"ORDJA",indices:[0,1,2,3,4],color:"#ff44cc"},
       {word:"ORDJAKT",indices:[0,1,2,3,4,5,6],color:"#ff6644"},
     ]
   },
