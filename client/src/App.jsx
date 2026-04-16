@@ -309,6 +309,7 @@ const TITLE_CHARS="PIILOSANA".split("");
 const DEMO_WORDS=[
   {word:"PII",indices:[0,1,2],color:"#44ff88"},
   {word:"ILO",indices:[2,3,4],color:"#4488ff"},
+  {word:"OSA",indices:[4,5,6],color:"#ff8844"},
   {word:"SANA",indices:[5,6,7,8],color:"#ff44cc"},
   {word:"PIILO",indices:[0,1,2,3,4],color:"#ffcc00"},
   {word:"PIILOSANA",indices:[0,1,2,3,4,5,6,7,8],color:"#ff6644"},
@@ -498,6 +499,7 @@ export default function Piilosana(){
   const[publicOnlineCount,setPublicOnlineCount]=useState(0);
 
   const gRef=useRef(null);
+  const wordBarRef=useRef(null);
   const tRef=useRef(null);
   const nicknameRef=useRef(null);
   const popupIdRef=useRef(0);
@@ -682,9 +684,10 @@ export default function Piilosana(){
       setFlashKey(k=>k+1);
       sounds.playByLength(currentWord.length);
       if(newCombo>=3)setTimeout(()=>sounds.playCombo(newCombo),200);
-      if(gRef.current){
-        const rect=gRef.current.getBoundingClientRect();
-        const popX=rect.left+rect.width/2,popY=rect.top+rect.height*0.3;
+      {
+        const bar=wordBarRef.current||gRef.current;
+        const rect=bar.getBoundingClientRect();
+        const popX=rect.left+rect.width/2,popY=rect.top+rect.height/2;
         const color=currentWord.length>=6?"#ff66ff":currentWord.length>=5?"#ffcc00":"#00ff88";
         let text=`+${totalPts}`;
         if(newCombo>=3)text+=` x${comboMult}`;
@@ -844,9 +847,10 @@ export default function Piilosana(){
           sounds.playByLength(w.length);
           if(c>=3)setTimeout(()=>sounds.playCombo(c),200);
           setMsg({t:w,ok:true,p:points,combo:c});
-          if(gRef.current){
-            const rect=gRef.current.getBoundingClientRect();
-            const popX=rect.left+rect.width/2,popY=rect.top+rect.height*0.3;
+          {
+            const bar=wordBarRef.current||gRef.current;
+            const rect=bar.getBoundingClientRect();
+            const popX=rect.left+rect.width/2,popY=rect.top+rect.height/2;
             const color=w.length>=6?"#ff66ff":w.length>=5?"#ffcc00":"#00ff88";
             let text=`+${points}`;
             if(c>=3)text+=` x${Math.floor(points/(pts(w.length)))}`;
@@ -1112,13 +1116,12 @@ export default function Piilosana(){
         <div style={{display:"flex",flexDirection:"column",gap:"12px",marginBottom:"24px"}}>
           <button onClick={async()=>{await sounds.init();setMode("public");setPublicState("nickname");}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:"#ff6644",border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
             <span>AREENA</span>
-            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>jatkuva klassinen online-peli</span>
-            <span style={{fontSize:"7px",marginTop:"4px",opacity:0.5,fontFamily:"'VT323',monospace",letterSpacing:"2px"}}>piilosana</span>
+            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>24/7 nettipeli · kirjainkertoimet</span>
             {publicOnlineCount>0&&<span style={{fontSize:"9px",marginTop:"4px",opacity:0.7}}>{publicOnlineCount} online</span>}
           </button>
           <button onClick={async()=>{await sounds.init();setMode("multi");setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc8800",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-            <span>OMA PELI</span>
-            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>online, eri moodeja</span>
+            <span>OMA NETTIPELI</span>
+            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>eri moodeja</span>
           </button>
           <button onClick={async()=>{await sounds.init();setMode("solo");setState("menu");}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
             <span>HARJOITUS</span>
@@ -1211,7 +1214,7 @@ export default function Piilosana(){
               </div>
             )}
             {missedWords.length>0&&(
-              <div style={{marginTop:"10px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,textAlign:"left",maxHeight:"300px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
+              <div style={{marginTop:"10px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
                 <div style={{fontSize:"14px",color:"#ff6666",marginBottom:"6px"}}>JÄIVÄT LÖYTÄMÄTTÄ ({missedWords.length})</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                   {missedWords.map((w,i)=>(
@@ -1223,7 +1226,7 @@ export default function Piilosana(){
           </>);
         })()}
         <div style={{marginTop:"16px",display:"flex",flexDirection:"column",gap:"8px",alignItems:"center"}}>
-          {isHost&&<button onClick={playAgain} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>UUSI OMA PELI</button>}
+          {isHost&&<button onClick={playAgain} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>UUSI OMA NETTIPELI</button>}
           <button onClick={switchToSolo} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>HARJOITUS</button>
           <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",width:"280px"}}>VALIKKO</button>
         </div>
@@ -1265,7 +1268,7 @@ export default function Piilosana(){
 
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
 
-      {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname"))?(
+      {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
         <TitleDemo active={true}/>
       ):(
         <h1 style={{fontSize:"28px",color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,letterSpacing:"4px",margin:"10px 0",
@@ -1483,7 +1486,7 @@ export default function Piilosana(){
 
           {/* Missed words */}
           {publicMissed.length>0&&(
-            <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"10px",textAlign:"left",maxHeight:"200px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
+            <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"10px",textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
               <div style={{fontSize:"13px",color:"#ff6666",marginBottom:"6px"}}>JÄIVÄT LÖYTÄMÄTTÄ ({publicMissed.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {publicMissed.map((w,i)=>(
@@ -1583,7 +1586,7 @@ export default function Piilosana(){
                 <div style={{fontSize:"18px",color:S.yellow}}>{score}</div>
               </div>
             </div>
-            <div key={flashKey} style={{borderTop:`1px solid ${S.border}`,padding:"4px 10px",textAlign:"center",animation:flashKey>0&&!word&&msg?.ok?"wordFlash 0.6s ease-out":"none"}}>
+            <div ref={wordBarRef} key={flashKey} style={{borderTop:`1px solid ${S.border}`,padding:"4px 10px",textAlign:"center",animation:flashKey>0&&!word&&msg?.ok?"wordFlash 0.6s ease-out":"none"}}>
               <div style={{fontSize:"18px",minHeight:"20px",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined}}>
                 {state==="ending"?<span style={{color:ending?.color,fontSize:"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
                  word?word.toUpperCase():
@@ -1756,7 +1759,7 @@ export default function Piilosana(){
 
             <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center",marginTop:"10px"}}>
               <button onClick={()=>{setHofSubmitted(false);start();}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>UUSI HARJOITUS</button>
-              <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>OMA PELI</button>
+              <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>OMA NETTIPELI</button>
               <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",width:"280px"}}>VALIKKO</button>
             </div>
           </div>
@@ -1773,11 +1776,11 @@ export default function Piilosana(){
           )}
 
           {soloMode!=="tetris"&&gameTime!==0&&missed.length>0&&(
-            <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,textAlign:"left",maxHeight:"300px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
-              <div style={{fontSize:"18px",color:"#ff6666",marginBottom:"6px"}}>JÄIVÄT LÖYTÄMÄTTÄ ({missed.length})</div>
+            <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
+              <div style={{fontSize:"13px",color:"#ff6666",marginBottom:"6px"}}>JÄIVÄT LÖYTÄMÄTTÄ ({missed.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {missed.map((w,i)=>(
-                  <span key={i} style={{fontSize:"18px",background:"#2a1a1a",padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666"}}>{w.toUpperCase()}</span>
+                  <span key={i} style={{fontSize:"14px",background:"#2a1a1a",padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
             </div>
@@ -1787,6 +1790,9 @@ export default function Piilosana(){
           <HallOfFame gameMode={soloMode} gameTime={gameTime} currentScore={hofSubmitted?score:null} S={S}/>
         </div>
       )}
+
+      {/* Ad banner placeholder */}
+      <div style={{width:"100%",maxWidth:"600px",minHeight:"60px",marginTop:"16px",flexShrink:0}}/>
     </div>
   );
 }
