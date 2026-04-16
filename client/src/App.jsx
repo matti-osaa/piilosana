@@ -1429,6 +1429,7 @@ export default function Piilosana(){
         <div style={{fontSize:"14px",color:"#556",marginTop:"12px"}}>{WORDS_SET.size.toLocaleString()} {t.words}</div>
         <div style={{fontSize:"11px",color:"#334",marginTop:"8px"}}>v{VERSION}</div>
         <div style={{fontSize:"11px",color:"#334",marginTop:"4px"}}>© Matti Kuokkanen 2026</div>
+
       </div>
     </div>
   );
@@ -1572,12 +1573,86 @@ export default function Piilosana(){
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
 
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
-        <TitleDemo active={true} lang={lang}/>
+        <div style={{position:"relative",display:"flex",alignItems:"flex-start",justifyContent:"center"}}>
+          <TitleDemo active={true} lang={lang}/>
+          <button onClick={()=>setShowSettings(v=>!v)} style={{fontFamily:S.font,fontSize:"10px",color:showSettings?S.green:S.textMuted||"#556",
+            background:"transparent",border:"none",cursor:"pointer",padding:"8px 4px",marginTop:"6px",
+            filter:showSettings?`drop-shadow(0 0 4px ${S.green}88)`:"none",transition:"all 0.2s",lineHeight:1}}>
+            ⚙
+          </button>
+        </div>
       ):(
-        <h1 style={{fontSize:"28px",color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,letterSpacing:"4px",margin:"10px 0",
-          animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
-          {(TITLE_CONFIG[lang]||TITLE_CONFIG.fi).title}
-        </h1>
+        <div style={{position:"relative",display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}>
+          <h1 style={{fontSize:"28px",color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,letterSpacing:"4px",margin:"10px 0",
+            animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
+            {(TITLE_CONFIG[lang]||TITLE_CONFIG.fi).title}
+          </h1>
+          <button onClick={()=>setShowSettings(v=>!v)} style={{fontFamily:S.font,fontSize:"10px",color:showSettings?S.green:S.textMuted||"#556",
+            background:"transparent",border:"none",cursor:"pointer",padding:"4px",
+            filter:showSettings?`drop-shadow(0 0 4px ${S.green}88)`:"none",transition:"all 0.2s",lineHeight:1}}>
+            ⚙
+          </button>
+        </div>
+      )}
+
+      {/* Settings panel - overlay below title */}
+      {showSettings&&(
+        <div style={{width:"100%",maxWidth:"500px",padding:"14px",border:`2px solid ${S.green}`,background:S.dark,
+          boxShadow:`0 0 20px ${S.green}33`,animation:"fadeIn 0.3s ease",marginBottom:"8px",zIndex:100,position:"relative"}}>
+          <div style={{fontFamily:S.font,fontSize:"9px",color:S.yellow,marginBottom:"10px",textAlign:"center"}}>
+            {lang==="en"?"SETTINGS":lang==="sv"?"INSTÄLLNINGAR":"ASETUKSET"}
+          </div>
+          {/* Theme */}
+          <div style={{marginBottom:"12px"}}>
+            <div style={{fontFamily:S.font,fontSize:"8px",color:S.green,marginBottom:"6px"}}>
+              {lang==="en"?"THEME":lang==="sv"?"TEMA":"TEEMA"}
+            </div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
+              {Object.entries(THEMES).map(([id,th])=>(
+                <button key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);}}
+                  style={{fontFamily:S.font,fontSize:"7px",
+                    color:themeId===id?th.bg:th.green,
+                    background:themeId===id?th.green:"transparent",
+                    border:`2px solid ${th.green}`,padding:"5px 8px",cursor:"pointer",
+                    boxShadow:themeId===id?`0 0 8px ${th.green}66`:"none"}}>
+                  {lang==="en"?th.nameEn:lang==="sv"?th.nameSv:th.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Size */}
+          <div style={{marginBottom:"12px"}}>
+            <div style={{fontFamily:S.font,fontSize:"8px",color:S.green,marginBottom:"6px"}}>
+              {lang==="en"?"SIZE":lang==="sv"?"STORLEK":"KOKO"}
+            </div>
+            <div style={{display:"flex",gap:"4px"}}>
+              <button onClick={()=>{setUiSize("normal");localStorage.setItem("piilosana_size","normal");}}
+                style={{fontFamily:S.font,fontSize:"7px",
+                  color:uiSize==="normal"?S.bg:S.green,background:uiSize==="normal"?S.green:"transparent",
+                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
+                {lang==="en"?"NORMAL":lang==="sv"?"NORMAL":"NORMAALI"}
+              </button>
+              <button onClick={()=>{setUiSize("large");localStorage.setItem("piilosana_size","large");}}
+                style={{fontFamily:S.font,fontSize:"7px",
+                  color:uiSize==="large"?S.bg:S.green,background:uiSize==="large"?S.green:"transparent",
+                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
+                {lang==="en"?"LARGE":lang==="sv"?"STOR":"ISO"}
+              </button>
+            </div>
+          </div>
+          {/* Confetti */}
+          <div>
+            <div style={{fontFamily:S.font,fontSize:"8px",color:S.green,marginBottom:"6px"}}>
+              {lang==="en"?"EFFECTS":lang==="sv"?"EFFEKTER":"TEHOSTEET"}
+            </div>
+            <button onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");}}
+              style={{fontFamily:S.font,fontSize:"7px",
+                color:confettiOn?S.bg:S.green,background:confettiOn?S.green:"transparent",
+                border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
+              {confettiOn?"✓ ":""}{lang==="en"?"CONFETTI ON WIN":lang==="sv"?"KONFETTI VID VINST":"KONFETTI VOITOSTA"}
+            </button>
+          </div>
+        </div>
       )}
 
       {/* MENU */}
@@ -2101,85 +2176,6 @@ export default function Piilosana(){
       {/* Ad banner placeholder */}
       <div style={{width:"100%",maxWidth:"600px",minHeight:"60px",marginTop:"16px",flexShrink:0}}/>
 
-      {/* Settings gear icon - always visible */}
-      <button onClick={()=>setShowSettings(v=>!v)} style={{position:"fixed",bottom:isLarge?"16px":"12px",right:isLarge?"16px":"12px",
-        fontFamily:S.font,fontSize:isLarge?"18px":"14px",color:showSettings?S.green:S.textMuted||"#556",
-        background:showSettings?S.dark:S.bg,border:`2px solid ${showSettings?S.green:S.border}`,
-        borderRadius:"50%",width:isLarge?"44px":"36px",height:isLarge?"44px":"36px",
-        cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",
-        boxShadow:showSettings?`0 0 12px ${S.green}44`:"none",transition:"all 0.2s",zIndex:300}}>
-        ⚙
-      </button>
-
-      {/* Settings panel */}
-      {showSettings&&(
-        <div style={{position:"fixed",bottom:isLarge?"68px":"56px",right:isLarge?"16px":"12px",
-          background:S.dark,border:`3px solid ${S.green}`,boxShadow:`0 0 20px ${S.green}44`,
-          padding:isLarge?"20px":"14px",zIndex:300,maxWidth:"320px",width:"90vw",
-          maxHeight:"70vh",overflowY:"auto",animation:"fadeIn 0.3s ease"}}>
-          <div style={{fontFamily:S.font,fontSize:isLarge?"12px":"10px",color:S.yellow,marginBottom:"12px",textAlign:"center"}}>
-            {lang==="en"?"SETTINGS":lang==="sv"?"INSTÄLLNINGAR":"ASETUKSET"}
-          </div>
-
-          {/* Theme selection */}
-          <div style={{marginBottom:"14px"}}>
-            <div style={{fontFamily:S.font,fontSize:isLarge?"10px":"8px",color:S.green,marginBottom:"6px"}}>
-              {lang==="en"?"THEME":lang==="sv"?"TEMA":"TEEMA"}
-            </div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
-              {Object.entries(THEMES).map(([id,th])=>(
-                <button key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);}}
-                  style={{fontFamily:S.font,fontSize:isLarge?"9px":"7px",
-                    color:themeId===id?th.bg:th.green,
-                    background:themeId===id?th.green:"transparent",
-                    border:`2px solid ${th.green}`,padding:"5px 8px",cursor:"pointer",
-                    boxShadow:themeId===id?`0 0 8px ${th.green}66`:"none"}}>
-                  {lang==="en"?th.nameEn:lang==="sv"?th.nameSv:th.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* UI Size */}
-          <div style={{marginBottom:"14px"}}>
-            <div style={{fontFamily:S.font,fontSize:isLarge?"10px":"8px",color:S.green,marginBottom:"6px"}}>
-              {lang==="en"?"SIZE":lang==="sv"?"STORLEK":"KOKO"}
-            </div>
-            <div style={{display:"flex",gap:"4px"}}>
-              <button onClick={()=>{setUiSize("normal");localStorage.setItem("piilosana_size","normal");}}
-                style={{fontFamily:S.font,fontSize:isLarge?"9px":"7px",
-                  color:uiSize==="normal"?S.bg:S.green,background:uiSize==="normal"?S.green:"transparent",
-                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
-                {lang==="en"?"NORMAL":lang==="sv"?"NORMAL":"NORMAALI"}
-              </button>
-              <button onClick={()=>{setUiSize("large");localStorage.setItem("piilosana_size","large");}}
-                style={{fontFamily:S.font,fontSize:isLarge?"9px":"7px",
-                  color:uiSize==="large"?S.bg:S.green,background:uiSize==="large"?S.green:"transparent",
-                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
-                {lang==="en"?"LARGE":lang==="sv"?"STOR":"ISO"}
-              </button>
-            </div>
-          </div>
-
-          {/* Confetti toggle */}
-          <div style={{marginBottom:"8px"}}>
-            <div style={{fontFamily:S.font,fontSize:isLarge?"10px":"8px",color:S.green,marginBottom:"6px"}}>
-              {lang==="en"?"EFFECTS":lang==="sv"?"EFFEKTER":"TEHOSTEET"}
-            </div>
-            <button onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");}}
-              style={{fontFamily:S.font,fontSize:isLarge?"9px":"7px",
-                color:confettiOn?S.bg:S.green,background:confettiOn?S.green:"transparent",
-                border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
-              {confettiOn?"✓ ":""}{lang==="en"?"CONFETTI ON WIN":lang==="sv"?"KONFETTI VID VINST":"KONFETTI VOITOSTA"}
-            </button>
-          </div>
-
-          <button onClick={()=>setShowSettings(false)} style={{fontFamily:S.font,fontSize:isLarge?"9px":"7px",color:S.textMuted||"#556",
-            border:`1px solid ${S.border}`,background:"transparent",padding:"4px 8px",cursor:"pointer",marginTop:"8px",width:"100%"}}>
-            {lang==="en"?"CLOSE":lang==="sv"?"STÄNG":"SULJE"}
-          </button>
-        </div>
-      )}
 
       {/* Pink theme unicorn decorations */}
       {themeId==="pink"&&(
