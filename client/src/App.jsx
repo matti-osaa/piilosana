@@ -782,22 +782,24 @@ export default function Piilosana(){
   },[state,mode]);
 
 
-  // Cell detection - uses Chebyshev (square hitbox) with adjacency bias:
-  // When dragging, prefer cells adjacent to the last selected cell.
-  // This prevents accidental horizontal/vertical pickups during diagonal swipes.
+  // Cell detection - astroid hitbox clipped to cell bounds + adjacency bias.
+  // Astroid |dx|^⅔+|dy|^⅔ ≤ (w/2)^⅔ with cusps at cell edges.
+  // Large diagonal dead zones prevent accidental cross-picks during diagonal swipes.
   const cellAt=useCallback((x,y,lastCell)=>{
     if(!gRef.current)return null;
     let best=null,bestDist=Infinity;
     for(const el of gRef.current.querySelectorAll("[data-c]")){
       const rect=el.getBoundingClientRect();
       const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-      const dist=Math.max(Math.abs(x-cx),Math.abs(y-cy));
-      const hitSize=rect.width*0.55;
-      if(dist<hitSize){
+      const dx=Math.abs(x-cx),dy=Math.abs(y-cy);
+      const hw=rect.width/2;
+      if(dx>hw||dy>hw)continue; // clipped to cell bounds
+      const dist=Math.pow(dx,2/3)+Math.pow(dy,2/3);
+      const limit=Math.pow(hw,2/3);
+      if(dist<=limit){
         const[row,col]=el.dataset.c.split(",").map(Number);
-        // Bias: if we have a last cell, penalize non-adjacent cells so adjacents win ties
         let score=dist;
-        if(lastCell&&(Math.abs(row-lastCell.r)>1||Math.abs(col-lastCell.c)>1))score+=hitSize*0.5;
+        if(lastCell&&(Math.abs(row-lastCell.r)>1||Math.abs(col-lastCell.c)>1))score+=limit*0.5;
         if(score<bestDist){best={r:row,c:col};bestDist=score;}
       }
     }
