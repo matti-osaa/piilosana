@@ -1116,7 +1116,7 @@ export default function Piilosana(){
         <div style={{display:"flex",flexDirection:"column",gap:"12px",marginBottom:"24px"}}>
           <button onClick={async()=>{await sounds.init();setMode("public");setPublicState("nickname");}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:"#ff6644",border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
             <span>AREENA</span>
-            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>24/7 nettipeli · kirjainkertoimet</span>
+            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>24/7 nettipeli</span>
             {publicOnlineCount>0&&<span style={{fontSize:"9px",marginTop:"4px",opacity:0.7}}>{publicOnlineCount} online</span>}
           </button>
           <button onClick={async()=>{await sounds.init();setMode("multi");setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc8800",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
@@ -1419,7 +1419,7 @@ export default function Piilosana(){
       {/* PIILOSAUNA - countdown */}
       {mode==="public"&&publicState==="countdown"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{fontSize:"11px",color:"#ff6644",marginBottom:"24px"}}>AREENA — KIERROS {publicRound}</div>
+          <div style={{fontSize:"11px",color:"#ff6644",marginBottom:"24px"}}>AREENA</div>
           <div style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>{publicPlayerCount} pelaajaa</div>
           <div style={{fontSize:"18px",color:S.green}}>VALMISTAUDU</div>
         </div>
@@ -1434,7 +1434,7 @@ export default function Piilosana(){
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease"}}>
           {/* Your score */}
           <div style={{border:"3px solid #ff6644",padding:"20px",marginBottom:"12px",boxShadow:"0 0 30px #ff664433",background:S.dark}}>
-            <div style={{fontSize:"13px",color:"#ff6644",marginBottom:"4px"}}>AREENA — KIERROS {publicRound} PÄÄTTYI</div>
+            <div style={{fontSize:"13px",color:"#ff6644",marginBottom:"4px"}}>AREENA — KIERROS PÄÄTTYI</div>
             <div style={{fontSize:"13px",color:"#556",marginBottom:"10px"}}>PISTEESI</div>
             <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",animation:"pop 0.3s ease"}}>{score}</div>
             <div style={{fontSize:"13px",color:"#88ccaa",marginTop:"6px"}}>{found.length} / {valid.size} sanaa ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>

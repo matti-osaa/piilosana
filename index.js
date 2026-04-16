@@ -297,9 +297,7 @@ function endPublicRound() {
     if (nextRoundCountdown <= 0) {
       clearInterval(publicGame.nextRoundInterval);
       publicGame.nextRoundInterval = null;
-      if (publicGame.players.size > 0) {
-        startPublicRound();
-      }
+      startPublicRound();
     }
   }, 1000);
 }
@@ -551,12 +549,7 @@ io.on('connection', (socket) => {
     publicScoreUpdate();
     io.to('public_game').emit('public_player_count', { count: publicGame.players.size });
 
-    // Start a round if this is the first player and no round/countdown is active
-    if (publicGame.state === 'waiting' && publicGame.players.size >= 1 && !publicGame.nextRoundInterval) {
-      startPublicRound();
-    }
-
-    console.log(`${nickname} joined Piilosauna (${publicGame.players.size} players)`);
+    console.log(`${nickname} joined Arena (${publicGame.players.size} players)`);
   });
 
   // ---- PUBLIC GAME: WORD FOUND ----
@@ -1007,6 +1000,9 @@ app.get('*', (req, res) => {
 initDb().then(() => {
   httpServer.listen(PORT, () => {
     console.log(`Piilosana server listening on port ${PORT}`);
+    // Start the always-on public arena immediately
+    startPublicRound();
+    console.log('Public arena started (always-on)');
   });
 }).catch(err => {
   console.error('Failed to init database:', err);
