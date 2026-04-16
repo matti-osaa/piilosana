@@ -747,17 +747,6 @@ export default function Piilosana(){
   const sounds=useSounds();
   const isLarge=uiSize==="large";
 
-  // Show settings bubble briefly on main menu
-  useEffect(()=>{
-    if(mode!==null){setSettingsBubble(false);setBubbleFading(false);return;}
-    const shown=sessionStorage.getItem("piilosana_bubble_shown");
-    if(shown)return;
-    const t1=setTimeout(()=>setSettingsBubble(true),2000);
-    const t2=setTimeout(()=>setBubbleFading(true),6000);
-    const t3=setTimeout(()=>{setSettingsBubble(false);setBubbleFading(false);sessionStorage.setItem("piilosana_bubble_shown","1");},7000);
-    return()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);};
-  },[mode]);
-
   // Game settings (must be declared before states that reference them)
   const[gameTime,setGameTime]=useState(120); // 120 (2min) or 402 (6min 42s = "6,7")
   const[letterMult,setLetterMult]=useState(false); // scrabble-style letter values
@@ -829,6 +818,17 @@ export default function Piilosana(){
 
   // Keep foundRef in sync with found state (avoids stale closure in socket handlers)
   useEffect(()=>{foundRef.current=found;},[found]);
+
+  // Show settings bubble briefly on main menu
+  useEffect(()=>{
+    if(mode!==null){setSettingsBubble(false);setBubbleFading(false);return;}
+    const shown=sessionStorage.getItem("piilosana_bubble_shown");
+    if(shown)return;
+    const t1=setTimeout(()=>setSettingsBubble(true),2000);
+    const t2=setTimeout(()=>setBubbleFading(true),6000);
+    const t3=setTimeout(()=>{setSettingsBubble(false);setBubbleFading(false);sessionStorage.setItem("piilosana_bubble_shown","1");},7000);
+    return()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);};
+  },[mode]);
 
   // Fetch online player count for Piilosauna button
   useEffect(()=>{
