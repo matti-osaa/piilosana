@@ -789,10 +789,10 @@ export default function Piilosana(){
     for(const el of gRef.current.querySelectorAll("[data-c]")){
       const rect=el.getBoundingClientRect();
       const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-      // Diamond hitbox (square rotated 45°): Manhattan distance
-      // Maximizes diagonal hit area so all 8 directions feel equal
-      const dist=Math.abs(x-cx)+Math.abs(y-cy);
-      const hitSize=rect.width*0.75;
+      // Square hitbox (Chebyshev distance): max(|dx|,|dy|)
+      // Diagonal reach = √2 × axis reach, compensating for √2× longer cell distance
+      const dist=Math.max(Math.abs(x-cx),Math.abs(y-cy));
+      const hitSize=rect.width*0.55;
       if(dist<hitSize&&dist<bestDist){const[row,col]=el.dataset.c.split(",").map(Number);best={r:row,c:col};bestDist=dist;}
     }
     return best;
