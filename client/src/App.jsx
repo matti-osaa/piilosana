@@ -11,6 +11,7 @@ const SERVER_URL = window.location.origin;
 
 import WORDS_RAW_FI from "./words.js";
 import WORDS_RAW_EN from "./words_en.js";
+import WORDS_RAW_SV from "./words_sv.js";
 
 class TrieNode{constructor(){this.c={};this.w=false;}}
 function buildTrie(words){const root=new TrieNode();for(const word of words){let n=root;for(const ch of word){if(!n.c[ch])n.c[ch]=new TrieNode();n=n.c[ch];}n.w=true;}return root;}
@@ -29,12 +30,20 @@ const LANG_CONFIG={
     letterValues:{e:1,a:1,i:1,o:1,n:1,r:1,t:1,l:1,s:1,u:1,d:2,g:2,b:3,c:3,m:3,p:3,f:4,h:4,v:4,w:4,y:4,k:5,j:8,x:8,q:10,z:10},
     flag:"🇬🇧", name:"English", code:"en",
   },
+  sv:{
+    words:null, trie:null,
+    lw:{a:93,e:100,n:82,r:84,s:63,t:76,i:58,l:52,d:45,k:32,o:41,g:33,m:35,v:24,h:21,f:20,u:18,p:17,b:15,"ä":15,"ö":13,c:13,y:7,"å":13,j:7,x:2,z:1,w:1,q:1},
+    letterValues:{a:1,e:1,n:1,r:1,s:1,t:1,d:1,i:1,l:1,o:2,g:2,k:2,m:2,h:3,b:3,f:3,u:3,v:3,p:4,c:4,y:4,"ä":4,"å":4,"ö":4,j:7,x:8,z:10,w:10,q:10},
+    flag:"🇸🇪", name:"Svenska", code:"sv",
+  },
 };
 // Build word sets + tries
 LANG_CONFIG.fi.words=new Set(WORDS_RAW_FI.split("|"));
 LANG_CONFIG.fi.trie=buildTrie(LANG_CONFIG.fi.words);
 LANG_CONFIG.en.words=new Set(WORDS_RAW_EN.split("|"));
 LANG_CONFIG.en.trie=buildTrie(LANG_CONFIG.en.words);
+LANG_CONFIG.sv.words=new Set(WORDS_RAW_SV.split("|"));
+LANG_CONFIG.sv.trie=buildTrie(LANG_CONFIG.sv.words);
 
 function getLangConf(lang){return LANG_CONFIG[lang]||LANG_CONFIG.fi;}
 
@@ -122,6 +131,36 @@ const T={
     megaCombo:"MEGA COMBO",combo:"COMBO",online:"online",
     openGames:"OPEN GAMES",roomFull:"Room is full",gameInProgress:"Game already in progress",roomNotFound:"Room not found",
     someoneBeatYou:"Someone got it first!",tooShort:"Too short",notInGrid:"Not found in grid",wrongMode:"Wrong mode",gameNotRunning:"Game not running",
+  },
+  sv:{
+    selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
+    findWords:"Hitta ord i rutnätet!",dragHint:"DRA över bokstäverna i alla riktningar. 2 min tid.",comboHint:"Hitta ord snabbt i rad = kombo och bonuspoäng!",
+    scoring:"POÄNG: 3bok=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"ord",
+    nickname:"SMEKNAMN",join:"GÅ MED",back:"TILLBAKA",exit:"LÄMNA",play:"SPELA",
+    arenaJoinDesc:"Löpande spel för alla! Gå med och hitta ord. Rundan varar 2 min.",
+    nextRound:"Nästa runda börjar",playersInArena:"spelare i arenan",players:"spelare",
+    getReady:"GÖR DIG REDO",roundOver:"RUNDAN SLUT",yourScore:"DINA POÄNG",nextRoundIn:"Nästa runda",starts:"börjar!",
+    roundResults:"RUNDANS RESULTAT",foundWords:"HITTADE ORD",ownHighlighted:"Dina ord markerade i färg",
+    missed:"INTE HITTADE",
+    gameMode:"SPELLÄGE",classic:"KLASSISKT",battle:"STRID ⚔️",battleDesc:"Ord syns för andra! Hittade bokstäver försvinner och nya faller uppifrån.",
+    time:"TID",unlimited:"OBEGRÄNSAD ∞",unlimitedDesc:"Ingen tidsgräns! Byt rutnät när du vill.",
+    letterMult:"BOKSTAVSMULTIPLIKATOR",letterMultBtn:"BOKSTAVSMULTIPLIKATORER",letterMultDesc:"Ovanliga bokstäver = mer poäng! (Z=10 X=8 J=7 ...)",
+    otherOptions:"ANDRA VAL",nickForHof:"SMEKNAMN (för topplistan)",optional:"VALFRITT",scoresSaved:"Dina poäng sparas som",
+    modeNormal:"NORMAL",modeTetris:"TETRIS ⬇️",tetrisDesc:"Hittade bokstäver försvinner och nya faller uppifrån!",
+    waiting:"VÄNTAR PÅ SPELARE",playersCount:"SPELARE",youTag:"DU",createGame:"SKAPA SPEL",connecting:"ANSLUTER...",
+    startGame:"STARTA SPEL",waitForPlayers:"Vänta tills någon går med...",waitForHost:"Väntar på att värden startar...",
+    joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
+    newCustom:"NYTT EGET SPEL",menu:"MENY",newPractice:"NY ÖVNING",
+    results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
+    found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
+    notValid:"Ogiltigt",alreadyFound:"Redan hittat",
+    arenaLabel:"ARENA",battleLabel:"⚔️ STRID",tetrisLabel:"⬇️ TETRIS",unlimitedLabel:"∞ OBEGRÄNSAD",letterMultLabel:"BOKSTAVSMULTIPLIKATORER",
+    newLetters:"🔄 NYA BOKSTÄVER",stop:"⏹ STOPPA",
+    saveAs:"SPARA SOM",save:"SPARA",saved:"✓ Sparat!",saveToHof:"SPARA TILL TOPPLISTAN",
+    gameStarts:"SPELET BÖRJAR",battleStarts:"⚔️ STRIDEN BÖRJAR",tetrisStarts:"⬇️ TETRIS BÖRJAR",comboStreak:"i rad!",
+    megaCombo:"MEGA KOMBO",combo:"KOMBO",online:"online",
+    openGames:"ÖPPNA SPEL",roomFull:"Rummet är fullt",gameInProgress:"Spelet pågår redan",roomNotFound:"Rummet hittades inte",
+    someoneBeatYou:"Någon hann före!",tooShort:"För kort",notInGrid:"Finns inte i rutnätet",wrongMode:"Fel läge",gameNotRunning:"Spelet är inte igång",
   },
 };
 

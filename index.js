@@ -121,6 +121,7 @@ function getAllHallOfFame() {
 
 import WORDS_RAW_FI from './words.js';
 import WORDS_RAW_EN from './words_en.js';
+import WORDS_RAW_SV from './words_sv.js';
 
 class TrieNode { constructor() { this.c = {}; this.w = false; } }
 function buildTrie(words) {
@@ -150,6 +151,15 @@ const LANGS = {
       e:127, t:91, a:82, o:75, i:70, n:67, s:63, h:61, r:60,
       d:43, l:40, c:28, u:28, m:24, w:24, f:22, g:20, y:20,
       p:19, b:15, v:10, k:8, j:2, x:2, q:1, z:1
+    },
+  },
+  sv: {
+    words: new Set(WORDS_RAW_SV.split('|')),
+    trie: null,
+    letterWeights: {
+      a:93, e:88, n:82, r:73, t:70, s:66, i:58, l:52, d:45, o:41,
+      k:34, g:33, m:32, f:20, v:20, 'ä':18, u:18, h:17, p:17,
+      b:16, 'å':13, 'ö':13, c:6, j:6, y:6, x:2, w:1, z:1, q:1
     },
   },
 };
@@ -234,7 +244,7 @@ function createPublicGame() {
     nextRoundCountdown: 0,
   };
 }
-const publicGames = { fi: createPublicGame(), en: createPublicGame() };
+const publicGames = { fi: createPublicGame(), en: createPublicGame(), sv: createPublicGame() };
 // Keep backward compat reference
 const publicGame = publicGames.fi;
 
@@ -549,15 +559,15 @@ io.on('connection', (socket) => {
 
   // ---- JOIN PUBLIC GAME (ARENA) ----
   socket.on('join_public', ({ nickname, lang }) => {
-    const gameLang = (lang === 'en') ? 'en' : 'fi';
+    const gameLang = LANGS[lang] ? lang : 'fi';
     if (!nickname || nickname.length > 12) {
-      socket.emit('error', { message: gameLang === 'en' ? 'Invalid nickname' : 'Virheellinen nimimerkki' });
+      socket.emit('error', { message: gameLang === 'en' ? 'Invalid nickname' : gameLang === 'sv' ? 'Ogiltigt smeknamn' : 'Virheellinen nimimerkki' });
       return;
     }
     const pg = getPublicGame(gameLang);
     const room = publicRoomName(gameLang);
     if (pg.players.size >= 64) {
-      socket.emit('error', { message: gameLang === 'en' ? 'Arena is full (max 64)' : 'Areena on täynnä (max 64)' });
+      socket.emit('error', { message: gameLang === 'en' ? 'Arena is full (max 64)' : gameLang === 'sv' ? 'Arenan är full (max 64)' : 'Areena on täynnä (max 64)' });
       return;
     }
 
@@ -644,7 +654,7 @@ io.on('connection', (socket) => {
 
   // ---- CREATE ROOM ----
   socket.on('create_room', ({ nickname, lang }) => {
-    const gameLang = (lang === 'en') ? 'en' : 'fi';
+    const gameLang = LANGS[lang] ? lang : 'fi';
     let roomCode;
     do {
       roomCode = generateRoomCode();
