@@ -84,7 +84,7 @@ const T={
     missed:"JÄIVÄT LÖYTÄMÄTTÄ",
     gameMode:"PELIMUOTO",classic:"KLASSINEN",battle:"TAISTELU",battleDesc:"Sanat näkyvät muille! Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä.",
     time:"AIKA",unlimited:"RAJATON",unlimitedDesc:"Ei aikarajaa! Vaihda ruudukko kun haluat.",
-    letterMult:"KIRJAINKERROIN",letterMultBtn:"KIRJAINKERTOIMET",letterMultDesc:"Harvinaiset kirjaimet = enemmän pisteitä! (D,Ö=7 V,J,H,Y,P,U=4 ...)",
+    letterMult:"PISTEYTYS",letterMultBtn:"KIRJAINARVOT",letterMultDesc:"Harvinaiset kirjaimet = enemmän pisteitä! (D,Ö=7 V,J,H,Y,P,U=4 ...)",
     otherOptions:"MUUT VALINNAT",nickForHof:"NIMIMERKKI (ennätystauluun)",optional:"VAPAAEHTOINEN",scoresSaved:"Pisteesi tallennetaan nimellä",
     modeNormal:"NORMAALI",modeTetris:"TETRIS",tetrisDesc:"Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä!",
     waiting:"ODOTETAAN PELAAJIA",playersCount:"PELAAJAT",youTag:"SINÄ",createGame:"LUO PELI",connecting:"YHDISTETÄÄN...",
@@ -94,7 +94,7 @@ const T={
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
     notValid:"Ei kelpaa",alreadyFound:"Jo löydetty",
-    arenaLabel:"AREENA",battleLabel:"TAISTELU",tetrisLabel:"TETRIS",unlimitedLabel:"RAJATON",letterMultLabel:"KIRJAINKERTOIMET",
+    arenaLabel:"AREENA",battleLabel:"TAISTELU",tetrisLabel:"TETRIS",unlimitedLabel:"RAJATON",letterMultLabel:"KIRJAINARVOT",
     newLetters:"UUDET KIRJAIMET",stop:"LOPETA",
     saveAs:"TALLENNA NIMELLÄ",save:"TALLENNA",saved:"✓ Tallennettu!",saveToHof:"TALLENNA ENNÄTYSTAULULLE",
     gameStarts:"PELI ALKAA",battleStarts:"TAISTELU ALKAA",tetrisStarts:"TETRIS ALKAA",comboStreak:"putkeen!",
@@ -114,7 +114,7 @@ const T={
     missed:"NOT FOUND",
     gameMode:"GAME MODE",classic:"CLASSIC",battle:"BATTLE",battleDesc:"Words visible to others! Found letters disappear and new ones drop from above.",
     time:"TIME",unlimited:"UNLIMITED",unlimitedDesc:"No time limit! Change grid whenever you want.",
-    letterMult:"LETTER MULTIPLIER",letterMultBtn:"LETTER MULTIPLIERS",letterMultDesc:"Rare letters = more points! (Q,Z=10 J,X=8 K=5 ...)",
+    letterMult:"SCORING",letterMultBtn:"LETTER VALUES",letterMultDesc:"Rare letters = more points! (Q,Z=10 J,X=8 K=5 ...)",
     otherOptions:"OTHER OPTIONS",nickForHof:"NICKNAME (for leaderboard)",optional:"OPTIONAL",scoresSaved:"Your score will be saved as",
     modeNormal:"NORMAL",modeTetris:"TETRIS",tetrisDesc:"Found letters disappear and new ones drop from above!",
     waiting:"WAITING FOR PLAYERS",playersCount:"PLAYERS",youTag:"YOU",createGame:"CREATE GAME",connecting:"CONNECTING...",
@@ -124,7 +124,7 @@ const T={
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
     notValid:"Not valid",alreadyFound:"Already found",
-    arenaLabel:"ARENA",battleLabel:"BATTLE",tetrisLabel:"TETRIS",unlimitedLabel:"UNLIMITED",letterMultLabel:"LETTER MULTIPLIERS",
+    arenaLabel:"ARENA",battleLabel:"BATTLE",tetrisLabel:"TETRIS",unlimitedLabel:"UNLIMITED",letterMultLabel:"LETTER VALUES",
     newLetters:"NEW LETTERS",stop:"STOP",
     saveAs:"SAVE AS",save:"SAVE",saved:"✓ Saved!",saveToHof:"SAVE TO LEADERBOARD",
     gameStarts:"GAME STARTS",battleStarts:"BATTLE STARTS",tetrisStarts:"TETRIS STARTS",comboStreak:"in a row!",
@@ -144,7 +144,7 @@ const T={
     missed:"INTE HITTADE",
     gameMode:"SPELLÄGE",classic:"KLASSISKT",battle:"STRID",battleDesc:"Ord syns för andra! Hittade bokstäver försvinner och nya faller uppifrån.",
     time:"TID",unlimited:"OBEGRÄNSAD",unlimitedDesc:"Ingen tidsgräns! Byt rutnät när du vill.",
-    letterMult:"BOKSTAVSMULTIPLIKATOR",letterMultBtn:"BOKSTAVSMULTIPLIKATORER",letterMultDesc:"Ovanliga bokstäver = mer poäng! (Z=10 X=8 J=7 ...)",
+    letterMult:"POÄNGSÄTTNING",letterMultBtn:"BOKSTAVSVÄRDEN",letterMultDesc:"Ovanliga bokstäver = mer poäng! (Z=10 X=8 J=7 ...)",
     otherOptions:"ANDRA VAL",nickForHof:"SMEKNAMN (för topplistan)",optional:"VALFRITT",scoresSaved:"Dina poäng sparas som",
     modeNormal:"NORMAL",modeTetris:"TETRIS",tetrisDesc:"Hittade bokstäver försvinner och nya faller uppifrån!",
     waiting:"VÄNTAR PÅ SPELARE",playersCount:"SPELARE",youTag:"DU",createGame:"SKAPA SPEL",connecting:"ANSLUTER...",
@@ -154,7 +154,7 @@ const T={
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
     notValid:"Ogiltigt",alreadyFound:"Redan hittat",
-    arenaLabel:"ARENA",battleLabel:"STRID",tetrisLabel:"TETRIS",unlimitedLabel:"OBEGRÄNSAD",letterMultLabel:"BOKSTAVSMULTIPLIKATORER",
+    arenaLabel:"ARENA",battleLabel:"STRID",tetrisLabel:"TETRIS",unlimitedLabel:"OBEGRÄNSAD",letterMultLabel:"BOKSTAVSVÄRDEN",
     newLetters:"NYA BOKSTÄVER",stop:"STOPPA",
     saveAs:"SPARA SOM",save:"SPARA",saved:"✓ Sparat!",saveToHof:"SPARA TILL TOPPLISTAN",
     gameStarts:"SPELET BÖRJAR",battleStarts:"STRIDEN BÖRJAR",tetrisStarts:"TETRIS BÖRJAR",comboStreak:"i rad!",
@@ -578,24 +578,26 @@ const ICON_PIXELS={
       ".........B.........",
       "...................",
     ],
-    colors:{B:"#222",W:"#ffffff",h:"#a8bcd0",l:"#8a9bb0",d:"#5a6a7a"},
+    colors:{B:"#445566",W:"#ffffff",h:"#c8d8e8",l:"#a0b0c4",d:"#7888a0"},
   },
-  swords:{ // 11x11 crossed swords
-    cols:11,
+  swords:{ // 13x13 crossed swords with guards and handles
+    cols:13,
     rows:[
-      "S........SS",
-      ".S......S..",
-      "..S....S...",
-      "...S..S....",
-      "....SS.....",
-      "....SS.....",
-      "...S..S....",
-      "..S....S...",
-      ".SH....HS.",
-      "S.HH..HH.S",
-      "...HH.HH..",
+      "S...........S",
+      ".S.........S.",
+      "..S.......S..",
+      "...S.....S...",
+      "....S...S....",
+      ".....S.S.....",
+      "......S......",
+      ".....S.S.....",
+      "....S...S....",
+      "...GS...SG...",
+      "..GGG...GGG..",
+      "...H.....H...",
+      "...H.....H...",
     ],
-    colors:{S:"currentColor",H:"#cc8844"},
+    colors:{S:"currentColor",G:"#ccaa44",H:"#aa7733"},
   },
   arrow:{ // 9x11 down arrow
     cols:9,
@@ -627,18 +629,21 @@ const ICON_PIXELS={
     ],
     colors:{I:"currentColor"},
   },
-  refresh:{ // 9x9 circular arrows
-    cols:9,
+  refresh:{ // 11x11 circular arrows with arrowheads
+    cols:11,
     rows:[
-      "..RRRRR..",
-      ".R.....R.",
-      "R......RR",
-      "R.....RRR",
-      "R.......R",
-      "RRR.....R",
-      "RR......R",
-      ".R.....R.",
-      "..RRRRR..",
+      "...RRRRR...",
+      "..R.....R..",
+      ".R.......R.",
+      "R.....RRRRR",
+      "R......RRR.",
+      "R.......R..",
+      "..R.......R",
+      ".RRR......R",
+      "RRRRR.....R",
+      ".R.......R.",
+      "..R.....R..",
+      "...RRRRR...",
     ],
     colors:{R:"currentColor"},
   },
@@ -765,7 +770,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
             cursor:"pointer",
             display:"inline-flex",alignItems:"center",justifyContent:"center",
             marginRight:"4px",
-          }}><PixelIcon icon="gear" color={isLit?dw.color:"#88aacc"} size={1.5}/></span>;
+          }}><PixelIcon icon="gear" color={isLit?dw.color:"#88aacc"} size={1.7}/></span>;
         }
         return <span key={i} style={baseStyle}>{ch}</span>;
       })}
@@ -1753,7 +1758,7 @@ export default function Piilosana(){
             if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
               cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",
               marginRight:"4px"}}>
-              <PixelIcon icon="gear" color="#88aacc" size={1.5}/></span>;
+              <PixelIcon icon="gear" color="#88aacc" size={1.7}/></span>;
             return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>;
           });})()}
         </h1>
