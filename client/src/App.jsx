@@ -553,7 +553,7 @@ function PixelFlag({lang,size=2}){
   );
 }
 
-function TitleDemo({active,lang,onGearClick}){
+function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
   const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;
   const titleChars=tc.title.split("");
   const demoWords=tc.demos;
@@ -623,7 +623,8 @@ function TitleDemo({active,lang,onGearClick}){
     for(let i=0;i<=Math.min(charStep,dw.indices.length-1);i++)lit.add(dw.indices[i]);
   }
   return(
-    <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",gap:"2px"}}>
+    <div style={{position:"relative",display:"inline-block"}}>
+    <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px"}}>
       {displayChars.map((ch,i)=>{
         const isLit=lit.has(i);
         const isGear=!scramble&&i===tc.gearIdx;
@@ -636,15 +637,37 @@ function TitleDemo({active,lang,onGearClick}){
             :"3px 3px 0 #cc6600, 0 0 20px #ffcc0066",
           transition:scramble?"none":"text-shadow 0.25s ease, transform 0.25s ease",
           transform:scramble?`translateY(${Math.random()>0.5?-2:2}px)`:isLit?"translateY(-2px)":"none",
-          fontFamily:"'Press Start 2P',monospace"
+          fontFamily:"'Press Start 2P',monospace",
+          lineHeight:1,
         };
         if(isGear){
-          return <span key={i} onClick={onGearClick} style={{...baseStyle,cursor:"pointer",position:"relative"}}
-            title="Settings">⚙</span>;
+          return <span key={i} onClick={onGearClick} style={{...baseStyle,
+            color:isLit?dw.color:"#88aacc",
+            textShadow:isLit
+              ?`3px 3px 0 #335566, 0 0 20px ${dw.color}cc, 0 0 40px ${dw.color}66`
+              :"3px 3px 0 #335566, 0 0 20px #88aacc66",
+            cursor:"pointer",fontSize:"28px",lineHeight:1,
+            display:"inline-flex",alignItems:"center",justifyContent:"center",
+            width:"28px",height:"28px",
+          }}>⚙</span>;
         }
         return <span key={i} style={baseStyle}>{ch}</span>;
       })}
     </h1>
+    {/* Thought bubble pointing at gear */}
+    {showBubble&&!scramble&&(
+      <div className={bubbleFading?"bubble-fading":""} style={{position:"absolute",top:"-48px",left:"50%",transform:"translateX(-50%)",
+        animation:bubbleFading?"bubbleOut 0.8s ease-in forwards":"bubbleIn 0.6s ease-out forwards",whiteSpace:"nowrap",zIndex:50}}>
+        <div style={{background:"#88aacc",color:"#0a0a1a",fontFamily:"'Press Start 2P',monospace",
+          fontSize:"7px",padding:"6px 10px",borderRadius:"8px",position:"relative",lineHeight:"1.6",
+          boxShadow:"0 0 12px #88aacc44"}}>
+          {lang==="en"?"Click ⚙ for settings!":lang==="sv"?"Klicka ⚙ för inställningar!":"Klikkaa ⚙ asetuksiin!"}
+          <div style={{position:"absolute",bottom:"-6px",left:"50%",transform:"translateX(-50%)",
+            width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:"6px solid #88aacc"}}/>
+        </div>
+      </div>
+    )}
+    </div>
   );
 }
 
@@ -714,6 +737,8 @@ export default function Piilosana(){
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[showSettings,setShowSettings]=useState(false);
+  const[settingsBubble,setSettingsBubble]=useState(false);
+  const[bubbleFading,setBubbleFading]=useState(false);
   const theme=getTheme(themeId);
   const langConf=getLangConf(lang);
   const WORDS_SET=langConf.words;
@@ -721,6 +746,17 @@ export default function Piilosana(){
   const t=T[lang]||T.fi;
   const sounds=useSounds();
   const isLarge=uiSize==="large";
+
+  // Show settings bubble briefly on main menu
+  useEffect(()=>{
+    if(mode!==null){setSettingsBubble(false);setBubbleFading(false);return;}
+    const shown=sessionStorage.getItem("piilosana_bubble_shown");
+    if(shown)return;
+    const t1=setTimeout(()=>setSettingsBubble(true),2000);
+    const t2=setTimeout(()=>setBubbleFading(true),6000);
+    const t3=setTimeout(()=>{setSettingsBubble(false);setBubbleFading(false);sessionStorage.setItem("piilosana_bubble_shown","1");},7000);
+    return()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);};
+  },[mode]);
 
   // Game settings (must be declared before states that reference them)
   const[gameTime,setGameTime]=useState(120); // 120 (2min) or 402 (6min 42s = "6,7")
@@ -1574,6 +1610,8 @@ export default function Piilosana(){
         @keyframes cellGlitch{0%{opacity:1;transform:translate(0,0)}25%{transform:translate(5px,-3px);filter:hue-rotate(90deg)}50%{transform:translate(-5px,3px);filter:hue-rotate(180deg)}75%{transform:translate(3px,5px);filter:hue-rotate(270deg)}100%{opacity:0;transform:translate(-10px,-10px);filter:hue-rotate(360deg)}}
         @keyframes cellDrop{0%{transform:translateY(-100%);opacity:0.5}60%{transform:translateY(5%);opacity:1}80%{transform:translateY(-2%)}100%{transform:translateY(0)}}
         @keyframes cellPop{0%{transform:scale(1)}50%{transform:scale(0);opacity:0}100%{transform:scale(0);opacity:0}}
+        @keyframes bubbleIn{0%{opacity:0;transform:translateX(-50%) scale(0.5) translateY(10px)}100%{opacity:1;transform:translateX(-50%) scale(1) translateY(0)}}
+        @keyframes bubbleOut{0%{opacity:1;transform:translateX(-50%) scale(1) translateY(0)}100%{opacity:0;transform:translateX(-50%) scale(0.5) translateY(10px)}}
         @keyframes floatUnicorn{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-20px) rotate(5deg)}}
         @keyframes scanlines{0%,100%{opacity:1}}
         @keyframes electricPulse{0%,100%{opacity:0.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}}
@@ -1582,12 +1620,16 @@ export default function Piilosana(){
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
 
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
-        <TitleDemo active={true} lang={lang} onGearClick={()=>setShowSettings(v=>!v)}/>
+        <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={settingsBubble} bubbleFading={bubbleFading}/>
       ):(
-        <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",gap:"2px",
+        <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
           animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
           {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>{
-            if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace",cursor:"pointer"}}>⚙</span>;
+            if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
+              color:"#88aacc",textShadow:"3px 3px 0 #335566, 0 0 20px #88aacc66",
+              fontFamily:"'Press Start 2P',monospace",cursor:"pointer",
+              fontSize:"28px",lineHeight:1,display:"inline-flex",alignItems:"center",justifyContent:"center",
+              width:"28px",height:"28px"}}>⚙</span>;
             return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>;
           });})()}
         </h1>
