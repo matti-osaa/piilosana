@@ -119,8 +119,8 @@ function getAllHallOfFame() {
 // WORD LIST + TRIE (for server-side grid generation & validation)
 // ============================================================================
 
-import WORDS_RAW from './words.js';
-const WORDS_SET = new Set(WORDS_RAW.split('|'));
+import WORDS_RAW_FI from './words.js';
+import WORDS_RAW_EN from './words_en.js';
 
 class TrieNode { constructor() { this.c = {}; this.w = false; } }
 function buildTrie(words) {
@@ -132,13 +132,39 @@ function buildTrie(words) {
   }
   return root;
 }
-const TRIE = buildTrie(WORDS_SET);
+
+// Per-language word sets and tries
+const LANGS = {
+  fi: {
+    words: new Set(WORDS_RAW_FI.split('|')),
+    trie: null,
+    letterWeights: {
+      a:120, i:108, t:87, n:88, e:80, s:79, l:58, o:53, k:51, u:51,
+      'ä':37, m:33, v:25, r:29, j:20, h:19, y:19, p:18, d:10, 'ö':4
+    },
+  },
+  en: {
+    words: new Set(WORDS_RAW_EN.split('|')),
+    trie: null,
+    letterWeights: {
+      e:127, t:91, a:82, o:75, i:70, n:67, s:63, h:61, r:60,
+      d:43, l:40, c:28, u:28, m:24, w:24, f:22, g:20, y:20,
+      p:19, b:15, v:10, k:8, j:2, x:2, q:1, z:1
+    },
+  },
+};
+// Build tries
+for (const lang of Object.keys(LANGS)) {
+  LANGS[lang].trie = buildTrie(LANGS[lang].words);
+}
+
+function getLang(lang) { return LANGS[lang] || LANGS.fi; }
 
 const GRID_SIZE = 5;
 
-function makeGrid() {
+function makeGrid(lang = 'fi') {
   return Array.from({ length: GRID_SIZE }, () =>
-    Array.from({ length: GRID_SIZE }, () => randLetter())
+    Array.from({ length: GRID_SIZE }, () => randLetter(lang))
   );
 }
 
@@ -164,11 +190,12 @@ function findWords(grid, trie) {
   return found;
 }
 
-function generateGoodGrid() {
+function generateGoodGrid(lang = 'fi') {
+  const trie = getLang(lang).trie;
   let bestGrid = null, bestWords = new Set();
   for (let i = 0; i < 30; i++) {
-    const g = makeGrid();
-    const w = findWords(g, TRIE);
+    const g = makeGrid(lang);
+    const w = findWords(g, trie);
     if (w.size > bestWords.size) { bestGrid = g; bestWords = w; }
     if (w.size >= 15) break;
   }
@@ -191,91 +218,99 @@ function getScoreForWord(word) {
 
 const PUBLIC_GAME_TIME = 120; // 2 minutes
 
-const publicGame = {
-  grid: null,
-  validWords: new Set(),
-  validWordsList: [],
-  players: new Map(), // socketId -> { nickname, score, wordsFound: Set }
-  state: 'waiting', // 'waiting' | 'countdown' | 'playing'
-  timeLeft: PUBLIC_GAME_TIME,
-  timer: null,
-  countdownTimer: null,
-  nextRoundInterval: null, // countdown between rounds
-  roundNumber: 0,
-};
+// Per-language public arenas
+function createPublicGame() {
+  return {
+    grid: null,
+    validWords: new Set(),
+    validWordsList: [],
+    players: new Map(), // socketId -> { nickname, score, wordsFound: Set }
+    state: 'waiting', // 'waiting' | 'countdown' | 'playing'
+    timeLeft: PUBLIC_GAME_TIME,
+    timer: null,
+    countdownTimer: null,
+    nextRoundInterval: null,
+    roundNumber: 0,
+    nextRoundCountdown: 0,
+  };
+}
+const publicGames = { fi: createPublicGame(), en: createPublicGame() };
+// Keep backward compat reference
+const publicGame = publicGames.fi;
 
-function startPublicRound() {
-  // Clear any existing between-round countdown
-  if (publicGame.nextRoundInterval) {
-    clearInterval(publicGame.nextRoundInterval);
-    publicGame.nextRoundInterval = null;
+function getPublicGame(lang) { return publicGames[lang] || publicGames.fi; }
+function publicRoomName(lang) { return `public_game_${lang}`; }
+
+function startPublicRound(lang = 'fi') {
+  const pg = getPublicGame(lang);
+  const room = publicRoomName(lang);
+  if (pg.nextRoundInterval) {
+    clearInterval(pg.nextRoundInterval);
+    pg.nextRoundInterval = null;
   }
-  const { grid, validWords } = generateGoodGrid();
-  publicGame.grid = grid;
-  publicGame.validWords = validWords;
-  publicGame.validWordsList = [...validWords];
-  publicGame.state = 'countdown';
-  publicGame.timeLeft = PUBLIC_GAME_TIME;
-  publicGame.roundNumber++;
+  const { grid, validWords } = generateGoodGrid(lang);
+  pg.grid = grid;
+  pg.validWords = validWords;
+  pg.validWordsList = [...validWords];
+  pg.state = 'countdown';
+  pg.timeLeft = PUBLIC_GAME_TIME;
+  pg.roundNumber++;
 
-  // Reset scores for all current players
-  for (const [, p] of publicGame.players) {
+  for (const [, p] of pg.players) {
     p.score = 0;
     p.wordsFound = new Set();
   }
 
-  // Send countdown to all players
-  io.to('public_game').emit('public_countdown', {
+  io.to(room).emit('public_countdown', {
     grid,
-    validWords: publicGame.validWordsList,
-    roundNumber: publicGame.roundNumber,
+    validWords: pg.validWordsList,
+    roundNumber: pg.roundNumber,
   });
 
-  // 5 second countdown, then start
-  publicGame.countdownTimer = setTimeout(() => {
-    publicGame.state = 'playing';
-    io.to('public_game').emit('public_game_start');
+  pg.countdownTimer = setTimeout(() => {
+    pg.state = 'playing';
+    io.to(room).emit('public_game_start');
 
-    publicGame.timer = setInterval(() => {
-      publicGame.timeLeft--;
-      io.to('public_game').emit('public_timer_tick', { remaining: publicGame.timeLeft });
+    pg.timer = setInterval(() => {
+      pg.timeLeft--;
+      io.to(room).emit('public_timer_tick', { remaining: pg.timeLeft });
 
-      if (publicGame.timeLeft <= 0) {
-        clearInterval(publicGame.timer);
-        publicGame.timer = null;
-        endPublicRound();
+      if (pg.timeLeft <= 0) {
+        clearInterval(pg.timer);
+        pg.timer = null;
+        endPublicRound(lang);
       }
     }, 1000);
   }, 5000);
 }
 
-function endPublicRound() {
-  publicGame.state = 'waiting';
+function endPublicRound(lang = 'fi') {
+  const pg = getPublicGame(lang);
+  const room = publicRoomName(lang);
+  pg.state = 'waiting';
 
-  const rankings = Array.from(publicGame.players.entries())
+  const rankings = Array.from(pg.players.entries())
     .map(([sid, p]) => ({
       nickname: p.nickname,
       score: p.score,
       wordsFound: p.wordsFound.size,
-      percentage: publicGame.validWords.size > 0
-        ? Math.round((p.wordsFound.size / publicGame.validWords.size) * 100) : 0,
+      percentage: pg.validWords.size > 0
+        ? Math.round((p.wordsFound.size / pg.validWords.size) * 100) : 0,
     }))
     .sort((a, b) => b.score - a.score);
 
-  // Collect all words found by all players
   const allFoundWords = new Set();
-  for (const [, p] of publicGame.players) {
+  for (const [, p] of pg.players) {
     for (const w of p.wordsFound) allFoundWords.add(w);
   }
 
-  // Save to hall of fame
   for (const r of rankings) {
     if (r.score > 0) {
       submitScore({
         nickname: r.nickname,
         score: r.score,
         wordsFound: r.wordsFound,
-        wordsTotal: publicGame.validWords.size,
+        wordsTotal: pg.validWords.size,
         gameMode: 'normal',
         gameTime: PUBLIC_GAME_TIME,
         isMulti: true,
@@ -283,33 +318,37 @@ function endPublicRound() {
     }
   }
 
-  io.to('public_game').emit('public_game_over', {
+  io.to(room).emit('public_game_over', {
     rankings,
-    validWords: publicGame.validWordsList,
+    validWords: pg.validWordsList,
     allFoundWords: [...allFoundWords],
   });
 
-  // Countdown to next round (40 seconds)
-  publicGame.nextRoundCountdown = 40;
+  pg.nextRoundCountdown = 40;
   let nextRoundCountdown = 40;
-  publicGame.nextRoundInterval = setInterval(() => {
+  pg.nextRoundInterval = setInterval(() => {
     nextRoundCountdown--;
-    publicGame.nextRoundCountdown = nextRoundCountdown;
-    io.to('public_game').emit('public_next_round_countdown', { seconds: nextRoundCountdown });
+    pg.nextRoundCountdown = nextRoundCountdown;
+    io.to(room).emit('public_next_round_countdown', { seconds: nextRoundCountdown });
     if (nextRoundCountdown <= 0) {
-      clearInterval(publicGame.nextRoundInterval);
-      publicGame.nextRoundInterval = null;
-      startPublicRound();
+      clearInterval(pg.nextRoundInterval);
+      pg.nextRoundInterval = null;
+      startPublicRound(lang);
     }
   }, 1000);
 }
 
-function publicScoreUpdate() {
-  const scores = Array.from(publicGame.players.entries())
+function publicScoreUpdate(lang = 'fi') {
+  const pg = getPublicGame(lang);
+  const room = publicRoomName(lang);
+  const scores = Array.from(pg.players.entries())
     .map(([, p]) => ({ nickname: p.nickname, score: p.score, wordsFound: p.wordsFound.size }))
     .sort((a, b) => b.score - a.score);
-  io.to('public_game').emit('public_score_update', { scores });
+  io.to(room).emit('public_score_update', { scores });
 }
+
+// Track which public arena each socket is in
+const playerPublicLang = new Map(); // socketId -> lang
 
 // ============================================================================
 // DATA STRUCTURES
@@ -322,20 +361,16 @@ const playerRooms = new Map(); // socketId -> roomCode
 // LETTER GENERATION (for battle mode)
 // ============================================================================
 
-const LETTER_WEIGHTS = {
-  a:120, i:108, t:87, n:88, e:80, s:79, l:58, o:53, k:51, u:51,
-  '\u00e4':37, m:33, v:25, r:29, j:20, h:19, y:19, p:18, d:10, '\u00f6':4
-};
-const LETTERS = Object.keys(LETTER_WEIGHTS);
-const TOTAL_WEIGHT = Object.values(LETTER_WEIGHTS).reduce((a, b) => a + b, 0);
-
-function randLetter() {
-  let r = Math.random() * TOTAL_WEIGHT;
-  for (let i = 0; i < LETTERS.length; i++) {
-    r -= LETTER_WEIGHTS[LETTERS[i]];
-    if (r <= 0) return LETTERS[i];
+function randLetter(lang = 'fi') {
+  const lw = getLang(lang).letterWeights;
+  const ls = Object.keys(lw);
+  const tot = Object.values(lw).reduce((a, b) => a + b, 0);
+  let r = Math.random() * tot;
+  for (let i = 0; i < ls.length; i++) {
+    r -= lw[ls[i]];
+    if (r <= 0) return ls[i];
   }
-  return LETTERS[LETTERS.length - 1];
+  return ls[ls.length - 1];
 }
 
 // ============================================================================
@@ -374,7 +409,7 @@ function canTraceWord(grid, word) {
 }
 
 // Apply gravity: letters fall down, empty cells filled from top
-function applyGravity(grid, removedCells) {
+function applyGravity(grid, removedCells, lang = 'fi') {
   const sz = grid.length;
   const newGrid = grid.map(row => [...row]);
 
@@ -396,7 +431,7 @@ function applyGravity(grid, removedCells) {
       if (idx < letters.length) {
         newGrid[r][c] = letters[idx];
       } else {
-        newGrid[r][c] = randLetter();
+        newGrid[r][c] = randLetter(lang);
       }
     }
   }
@@ -489,7 +524,8 @@ function getPublicRooms() {
         roomCode: code,
         hostNickname: room.players.get(room.hostId)?.nickname || '?',
         playerCount: room.players.size,
-        maxPlayers: 8
+        maxPlayers: 8,
+        lang: room.lang || 'fi',
       });
     }
   }
@@ -511,63 +547,67 @@ io.on('connection', (socket) => {
   // Send room list on connect
   socket.emit('room_list', { rooms: getPublicRooms() });
 
-  // ---- JOIN PUBLIC GAME (PIILOSAUNA) ----
-  socket.on('join_public', ({ nickname }) => {
+  // ---- JOIN PUBLIC GAME (ARENA) ----
+  socket.on('join_public', ({ nickname, lang }) => {
+    const gameLang = (lang === 'en') ? 'en' : 'fi';
     if (!nickname || nickname.length > 12) {
-      socket.emit('error', { message: 'Virheellinen nimimerkki' });
+      socket.emit('error', { message: gameLang === 'en' ? 'Invalid nickname' : 'Virheellinen nimimerkki' });
       return;
     }
-    if (publicGame.players.size >= 64) {
-      socket.emit('error', { message: 'Piilosauna on täynnä (max 64)' });
+    const pg = getPublicGame(gameLang);
+    const room = publicRoomName(gameLang);
+    if (pg.players.size >= 64) {
+      socket.emit('error', { message: gameLang === 'en' ? 'Arena is full (max 64)' : 'Areena on täynnä (max 64)' });
       return;
     }
 
-    socket.join('public_game');
-    publicGame.players.set(socket.id, {
+    socket.join(room);
+    playerPublicLang.set(socket.id, gameLang);
+    pg.players.set(socket.id, {
       nickname,
       score: 0,
       wordsFound: new Set(),
     });
 
-    // Tell the player the current state
-    if (publicGame.state === 'playing') {
-      // Join mid-game
+    if (pg.state === 'playing') {
       socket.emit('public_join_midgame', {
-        grid: publicGame.grid,
-        validWords: publicGame.validWordsList,
-        timeLeft: publicGame.timeLeft,
-        roundNumber: publicGame.roundNumber,
+        grid: pg.grid,
+        validWords: pg.validWordsList,
+        timeLeft: pg.timeLeft,
+        roundNumber: pg.roundNumber,
       });
-    } else if (publicGame.state === 'countdown') {
+    } else if (pg.state === 'countdown') {
       socket.emit('public_countdown', {
-        grid: publicGame.grid,
-        validWords: publicGame.validWordsList,
-        roundNumber: publicGame.roundNumber,
+        grid: pg.grid,
+        validWords: pg.validWordsList,
+        roundNumber: pg.roundNumber,
       });
     } else {
-      socket.emit('public_waiting', { playerCount: publicGame.players.size, nextRoundCountdown: publicGame.nextRoundCountdown || 0 });
+      socket.emit('public_waiting', { playerCount: pg.players.size, nextRoundCountdown: pg.nextRoundCountdown || 0 });
     }
 
-    publicScoreUpdate();
-    io.to('public_game').emit('public_player_count', { count: publicGame.players.size });
+    publicScoreUpdate(gameLang);
+    io.to(room).emit('public_player_count', { count: pg.players.size });
 
     console.log(`${nickname} joined Arena (${publicGame.players.size} players)`);
   });
 
   // ---- PUBLIC GAME: WORD FOUND ----
   socket.on('public_word_found', ({ word }) => {
-    if (publicGame.state !== 'playing') return;
-    const player = publicGame.players.get(socket.id);
+    const gameLang = playerPublicLang.get(socket.id) || 'fi';
+    const pg = getPublicGame(gameLang);
+    if (pg.state !== 'playing') return;
+    const player = pg.players.get(socket.id);
     if (!player) return;
 
     const normalized = word.toLowerCase().trim();
     if (normalized.length < 3) return;
-    if (!publicGame.validWords.has(normalized)) {
-      socket.emit('public_word_result', { valid: false, message: 'Ei kelpaa' });
+    if (!pg.validWords.has(normalized)) {
+      socket.emit('public_word_result', { valid: false, message: gameLang === 'en' ? 'Not valid' : 'Ei kelpaa' });
       return;
     }
     if (player.wordsFound.has(normalized)) {
-      socket.emit('public_word_result', { valid: false, message: 'Jo löydetty' });
+      socket.emit('public_word_result', { valid: false, message: gameLang === 'en' ? 'Already found' : 'Jo löydetty' });
       return;
     }
 
@@ -582,15 +622,19 @@ io.on('connection', (socket) => {
       wordsFound: player.wordsFound.size,
     });
 
-    publicScoreUpdate();
+    publicScoreUpdate(gameLang);
   });
 
   // ---- LEAVE PUBLIC GAME ----
   socket.on('leave_public', () => {
-    socket.leave('public_game');
-    publicGame.players.delete(socket.id);
-    io.to('public_game').emit('public_player_count', { count: publicGame.players.size });
-    console.log(`Player left Piilosauna (${publicGame.players.size} remaining)`);
+    const gameLang = playerPublicLang.get(socket.id) || 'fi';
+    const pg = getPublicGame(gameLang);
+    const room = publicRoomName(gameLang);
+    socket.leave(room);
+    pg.players.delete(socket.id);
+    playerPublicLang.delete(socket.id);
+    io.to(room).emit('public_player_count', { count: pg.players.size });
+    console.log(`Player left Arena/${gameLang} (${pg.players.size} remaining)`);
   });
 
   // ---- LIST ROOMS ----
@@ -599,7 +643,8 @@ io.on('connection', (socket) => {
   });
 
   // ---- CREATE ROOM ----
-  socket.on('create_room', ({ nickname }) => {
+  socket.on('create_room', ({ nickname, lang }) => {
+    const gameLang = (lang === 'en') ? 'en' : 'fi';
     let roomCode;
     do {
       roomCode = generateRoomCode();
@@ -612,13 +657,13 @@ io.on('connection', (socket) => {
       grid: null,
       validWords: [],
       gameState: 'waiting',
-      gameMode: 'classic', // 'classic' or 'battle'
+      gameMode: 'classic',
       timer: null,
       countdownTimer: null,
       timeLeft: 120,
       scores: new Map(),
-      // Battle mode: track all found words globally
       battleFoundWords: new Set(),
+      lang: gameLang,
     };
 
     room.players.set(socket.id, { nickname, isHost: true });
@@ -856,7 +901,7 @@ io.on('connection', (socket) => {
     }
 
     // Apply gravity: remove cells, drop letters, fill new
-    room.grid = applyGravity(room.grid, path);
+    room.grid = applyGravity(room.grid, path, room.lang || 'fi');
 
     // Send result to the finder
     socket.emit('word_result', {
@@ -910,10 +955,14 @@ io.on('connection', (socket) => {
 
 function handleDisconnect(socket) {
   // Remove from public game if present
-  if (publicGame.players.has(socket.id)) {
-    publicGame.players.delete(socket.id);
-    socket.leave('public_game');
-    io.to('public_game').emit('public_player_count', { count: publicGame.players.size });
+  const pubLang = playerPublicLang.get(socket.id);
+  if (pubLang) {
+    const pg = getPublicGame(pubLang);
+    const room = publicRoomName(pubLang);
+    pg.players.delete(socket.id);
+    playerPublicLang.delete(socket.id);
+    socket.leave(room);
+    io.to(room).emit('public_player_count', { count: pg.players.size });
   }
 
   const roomCode = playerRooms.get(socket.id);
@@ -967,13 +1016,15 @@ app.get('/api/hall-of-fame/:gameMode/:gameTime', (req, res) => {
   res.json(getHallOfFame(gameMode, Number(gameTime)));
 });
 
-// Public game status
+// Public game status (supports ?lang=fi|en)
 app.get('/api/public-game', (req, res) => {
+  const lang = req.query.lang === 'en' ? 'en' : 'fi';
+  const pg = getPublicGame(lang);
   res.json({
-    state: publicGame.state,
-    playerCount: publicGame.players.size,
-    timeLeft: publicGame.timeLeft,
-    roundNumber: publicGame.roundNumber,
+    state: pg.state,
+    playerCount: pg.players.size,
+    timeLeft: pg.timeLeft,
+    roundNumber: pg.roundNumber,
   });
 });
 
@@ -1002,9 +1053,11 @@ app.get('*', (req, res) => {
 initDb().then(() => {
   httpServer.listen(PORT, () => {
     console.log(`Piilosana server listening on port ${PORT}`);
-    // Start the always-on public arena immediately
-    startPublicRound();
-    console.log('Public arena started (always-on)');
+    // Start always-on public arenas for all languages
+    for (const lang of Object.keys(LANGS)) {
+      startPublicRound(lang);
+      console.log(`Public arena started for ${lang} (always-on)`);
+    }
   });
 }).catch(err => {
   console.error('Failed to init database:', err);
