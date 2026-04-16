@@ -82,11 +82,11 @@ const T={
     getReady:"VALMISTAUDU",roundOver:"KIERROS PÄÄTTYI",yourScore:"PISTEESI",nextRoundIn:"Seuraava kierros",starts:"alkaa!",
     roundResults:"KIERROKSEN TULOKSET",foundWords:"LÖYDETYT SANAT",ownHighlighted:"Omat sanasi korostettu väreillä",
     missed:"JÄIVÄT LÖYTÄMÄTTÄ",
-    gameMode:"PELIMUOTO",classic:"KLASSINEN",battle:"TAISTELU ⚔️",battleDesc:"Sanat näkyvät muille! Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä.",
-    time:"AIKA",unlimited:"RAJATON ∞",unlimitedDesc:"Ei aikarajaa! Vaihda ruudukko kun haluat.",
+    gameMode:"PELIMUOTO",classic:"KLASSINEN",battle:"TAISTELU",battleDesc:"Sanat näkyvät muille! Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä.",
+    time:"AIKA",unlimited:"RAJATON",unlimitedDesc:"Ei aikarajaa! Vaihda ruudukko kun haluat.",
     letterMult:"KIRJAINKERROIN",letterMultBtn:"KIRJAINKERTOIMET",letterMultDesc:"Harvinaiset kirjaimet = enemmän pisteitä! (D,Ö=7 V,J,H,Y,P,U=4 ...)",
     otherOptions:"MUUT VALINNAT",nickForHof:"NIMIMERKKI (ennätystauluun)",optional:"VAPAAEHTOINEN",scoresSaved:"Pisteesi tallennetaan nimellä",
-    modeNormal:"NORMAALI",modeTetris:"TETRIS ⬇️",tetrisDesc:"Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä!",
+    modeNormal:"NORMAALI",modeTetris:"TETRIS",tetrisDesc:"Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä!",
     waiting:"ODOTETAAN PELAAJIA",playersCount:"PELAAJAT",youTag:"SINÄ",createGame:"LUO PELI",connecting:"YHDISTETÄÄN...",
     startGame:"ALOITA PELI",waitForPlayers:"Odota, että joku liittyy peliisi...",waitForHost:"Odota, että isäntä aloittaa pelin...",
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
@@ -94,10 +94,10 @@ const T={
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
     notValid:"Ei kelpaa",alreadyFound:"Jo löydetty",
-    arenaLabel:"AREENA",battleLabel:"⚔️ TAISTELU",tetrisLabel:"⬇️ TETRIS",unlimitedLabel:"∞ RAJATON",letterMultLabel:"KIRJAINKERTOIMET",
-    newLetters:"🔄 UUDET KIRJAIMET",stop:"⏹ LOPETA",
+    arenaLabel:"AREENA",battleLabel:"TAISTELU",tetrisLabel:"TETRIS",unlimitedLabel:"RAJATON",letterMultLabel:"KIRJAINKERTOIMET",
+    newLetters:"UUDET KIRJAIMET",stop:"LOPETA",
     saveAs:"TALLENNA NIMELLÄ",save:"TALLENNA",saved:"✓ Tallennettu!",saveToHof:"TALLENNA ENNÄTYSTAULULLE",
-    gameStarts:"PELI ALKAA",battleStarts:"⚔️ TAISTELU ALKAA",tetrisStarts:"⬇️ TETRIS ALKAA",comboStreak:"putkeen!",
+    gameStarts:"PELI ALKAA",battleStarts:"TAISTELU ALKAA",tetrisStarts:"TETRIS ALKAA",comboStreak:"putkeen!",
     megaCombo:"MEGA KOMBO",combo:"KOMBO",online:"online",
     openGames:"AVOIMET PELIT",roomFull:"Huone on täynnä",gameInProgress:"Peli on jo käynnissä",roomNotFound:"Huonetta ei löydy",
     someoneBeatYou:"Joku ehti ensin!",tooShort:"Liian lyhyt",notInGrid:"Ei löydy ruudukosta",wrongMode:"Väärä moodi",gameNotRunning:"Peli ei käynnissä",
@@ -112,11 +112,11 @@ const T={
     getReady:"GET READY",roundOver:"ROUND OVER",yourScore:"YOUR SCORE",nextRoundIn:"Next round",starts:"starting!",
     roundResults:"ROUND RESULTS",foundWords:"FOUND WORDS",ownHighlighted:"Your words highlighted in color",
     missed:"NOT FOUND",
-    gameMode:"GAME MODE",classic:"CLASSIC",battle:"BATTLE ⚔️",battleDesc:"Words visible to others! Found letters disappear and new ones drop from above.",
-    time:"TIME",unlimited:"UNLIMITED ∞",unlimitedDesc:"No time limit! Change grid whenever you want.",
+    gameMode:"GAME MODE",classic:"CLASSIC",battle:"BATTLE",battleDesc:"Words visible to others! Found letters disappear and new ones drop from above.",
+    time:"TIME",unlimited:"UNLIMITED",unlimitedDesc:"No time limit! Change grid whenever you want.",
     letterMult:"LETTER MULTIPLIER",letterMultBtn:"LETTER MULTIPLIERS",letterMultDesc:"Rare letters = more points! (Q,Z=10 J,X=8 K=5 ...)",
     otherOptions:"OTHER OPTIONS",nickForHof:"NICKNAME (for leaderboard)",optional:"OPTIONAL",scoresSaved:"Your score will be saved as",
-    modeNormal:"NORMAL",modeTetris:"TETRIS ⬇️",tetrisDesc:"Found letters disappear and new ones drop from above!",
+    modeNormal:"NORMAL",modeTetris:"TETRIS",tetrisDesc:"Found letters disappear and new ones drop from above!",
     waiting:"WAITING FOR PLAYERS",playersCount:"PLAYERS",youTag:"YOU",createGame:"CREATE GAME",connecting:"CONNECTING...",
     startGame:"START GAME",waitForPlayers:"Wait for someone to join...",waitForHost:"Waiting for host to start...",
     joinGame:"JOIN GAME",roomCode:"ROOM CODE",noRooms:"No open rooms",orJoinRoom:"or join with code",
@@ -124,10 +124,10 @@ const T={
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
     notValid:"Not valid",alreadyFound:"Already found",
-    arenaLabel:"ARENA",battleLabel:"⚔️ BATTLE",tetrisLabel:"⬇️ TETRIS",unlimitedLabel:"∞ UNLIMITED",letterMultLabel:"LETTER MULTIPLIERS",
-    newLetters:"🔄 NEW LETTERS",stop:"⏹ STOP",
+    arenaLabel:"ARENA",battleLabel:"BATTLE",tetrisLabel:"TETRIS",unlimitedLabel:"UNLIMITED",letterMultLabel:"LETTER MULTIPLIERS",
+    newLetters:"NEW LETTERS",stop:"STOP",
     saveAs:"SAVE AS",save:"SAVE",saved:"✓ Saved!",saveToHof:"SAVE TO LEADERBOARD",
-    gameStarts:"GAME STARTS",battleStarts:"⚔️ BATTLE STARTS",tetrisStarts:"⬇️ TETRIS STARTS",comboStreak:"in a row!",
+    gameStarts:"GAME STARTS",battleStarts:"BATTLE STARTS",tetrisStarts:"TETRIS STARTS",comboStreak:"in a row!",
     megaCombo:"MEGA COMBO",combo:"COMBO",online:"online",
     openGames:"OPEN GAMES",roomFull:"Room is full",gameInProgress:"Game already in progress",roomNotFound:"Room not found",
     someoneBeatYou:"Someone got it first!",tooShort:"Too short",notInGrid:"Not found in grid",wrongMode:"Wrong mode",gameNotRunning:"Game not running",
@@ -142,11 +142,11 @@ const T={
     getReady:"GÖR DIG REDO",roundOver:"RUNDAN SLUT",yourScore:"DINA POÄNG",nextRoundIn:"Nästa runda",starts:"börjar!",
     roundResults:"RUNDANS RESULTAT",foundWords:"HITTADE ORD",ownHighlighted:"Dina ord markerade i färg",
     missed:"INTE HITTADE",
-    gameMode:"SPELLÄGE",classic:"KLASSISKT",battle:"STRID ⚔️",battleDesc:"Ord syns för andra! Hittade bokstäver försvinner och nya faller uppifrån.",
-    time:"TID",unlimited:"OBEGRÄNSAD ∞",unlimitedDesc:"Ingen tidsgräns! Byt rutnät när du vill.",
+    gameMode:"SPELLÄGE",classic:"KLASSISKT",battle:"STRID",battleDesc:"Ord syns för andra! Hittade bokstäver försvinner och nya faller uppifrån.",
+    time:"TID",unlimited:"OBEGRÄNSAD",unlimitedDesc:"Ingen tidsgräns! Byt rutnät när du vill.",
     letterMult:"BOKSTAVSMULTIPLIKATOR",letterMultBtn:"BOKSTAVSMULTIPLIKATORER",letterMultDesc:"Ovanliga bokstäver = mer poäng! (Z=10 X=8 J=7 ...)",
     otherOptions:"ANDRA VAL",nickForHof:"SMEKNAMN (för topplistan)",optional:"VALFRITT",scoresSaved:"Dina poäng sparas som",
-    modeNormal:"NORMAL",modeTetris:"TETRIS ⬇️",tetrisDesc:"Hittade bokstäver försvinner och nya faller uppifrån!",
+    modeNormal:"NORMAL",modeTetris:"TETRIS",tetrisDesc:"Hittade bokstäver försvinner och nya faller uppifrån!",
     waiting:"VÄNTAR PÅ SPELARE",playersCount:"SPELARE",youTag:"DU",createGame:"SKAPA SPEL",connecting:"ANSLUTER...",
     startGame:"STARTA SPEL",waitForPlayers:"Vänta tills någon går med...",waitForHost:"Väntar på att värden startar...",
     joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
@@ -154,10 +154,10 @@ const T={
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
     notValid:"Ogiltigt",alreadyFound:"Redan hittat",
-    arenaLabel:"ARENA",battleLabel:"⚔️ STRID",tetrisLabel:"⬇️ TETRIS",unlimitedLabel:"∞ OBEGRÄNSAD",letterMultLabel:"BOKSTAVSMULTIPLIKATORER",
-    newLetters:"🔄 NYA BOKSTÄVER",stop:"⏹ STOPPA",
+    arenaLabel:"ARENA",battleLabel:"STRID",tetrisLabel:"TETRIS",unlimitedLabel:"OBEGRÄNSAD",letterMultLabel:"BOKSTAVSMULTIPLIKATORER",
+    newLetters:"NYA BOKSTÄVER",stop:"STOPPA",
     saveAs:"SPARA SOM",save:"SPARA",saved:"✓ Sparat!",saveToHof:"SPARA TILL TOPPLISTAN",
-    gameStarts:"SPELET BÖRJAR",battleStarts:"⚔️ STRIDEN BÖRJAR",tetrisStarts:"⬇️ TETRIS BÖRJAR",comboStreak:"i rad!",
+    gameStarts:"SPELET BÖRJAR",battleStarts:"STRIDEN BÖRJAR",tetrisStarts:"TETRIS BÖRJAR",comboStreak:"i rad!",
     megaCombo:"MEGA KOMBO",combo:"KOMBO",online:"online",
     openGames:"ÖPPNA SPEL",roomFull:"Rummet är fullt",gameInProgress:"Spelet pågår redan",roomNotFound:"Rummet hittades inte",
     someoneBeatYou:"Någon hann före!",tooShort:"För kort",notInGrid:"Finns inte i rutnätet",wrongMode:"Fel läge",gameNotRunning:"Spelet är inte igång",
@@ -553,6 +553,115 @@ function PixelFlag({lang,size=2}){
   );
 }
 
+// Pixel art icons (each row is a string, . = transparent, letter = color key)
+const ICON_PIXELS={
+  gear:{ // 9x9 gear
+    cols:9,
+    rows:[
+      "..G.G.G..",
+      ".GGGGGGG.",
+      "GG.GGG.GG",
+      "GGG.G.GGG",
+      "GG.GGG.GG",
+      "GGG.G.GGG",
+      "GG.GGG.GG",
+      ".GGGGGGG.",
+      "..G.G.G..",
+    ],
+    colors:{G:"currentColor"},
+  },
+  swords:{ // 11x11 crossed swords
+    cols:11,
+    rows:[
+      "S........SS",
+      ".S......S..",
+      "..S....S...",
+      "...S..S....",
+      "....SS.....",
+      "....SS.....",
+      "...S..S....",
+      "..S....S...",
+      ".SH....HS.",
+      "S.HH..HH.S",
+      "...HH.HH..",
+    ],
+    colors:{S:"currentColor",H:"#cc8844"},
+  },
+  arrow:{ // 9x11 down arrow
+    cols:9,
+    rows:[
+      "...A.A...",
+      "...AAA...",
+      "...AAA...",
+      "...AAA...",
+      "...AAA...",
+      "...AAA...",
+      ".A.AAA.A.",
+      ".AAAAAAA.",
+      "..AAAAA..",
+      "...AAA...",
+      "....A....",
+    ],
+    colors:{A:"currentColor"},
+  },
+  infinity:{ // 11x7 infinity
+    cols:11,
+    rows:[
+      "..II...II..",
+      ".I..I.I..I.",
+      "I....I....I",
+      "I....I....I",
+      "I....I....I",
+      ".I..I.I..I.",
+      "..II...II..",
+    ],
+    colors:{I:"currentColor"},
+  },
+  refresh:{ // 9x9 circular arrows
+    cols:9,
+    rows:[
+      "..RRRRR..",
+      ".R.....R.",
+      "R......RR",
+      "R.....RRR",
+      "R.......R",
+      "RRR.....R",
+      "RR......R",
+      ".R.....R.",
+      "..RRRRR..",
+    ],
+    colors:{R:"currentColor"},
+  },
+  stop:{ // 7x7 stop square
+    cols:7,
+    rows:[
+      "SSSSSSS",
+      "SSSSSSS",
+      "SS...SS",
+      "SS...SS",
+      "SS...SS",
+      "SSSSSSS",
+      "SSSSSSS",
+    ],
+    colors:{S:"currentColor"},
+  },
+};
+
+function PixelIcon({icon,color="currentColor",size=2,style={}}){
+  const data=ICON_PIXELS[icon];
+  if(!data)return null;
+  const {cols,rows,colors}=data;
+  return(
+    <div style={{display:"inline-grid",gridTemplateColumns:`repeat(${cols},${size}px)`,gridTemplateRows:`repeat(${rows.length},${size}px)`,
+      gap:0,imageRendering:"pixelated",flexShrink:0,verticalAlign:"middle",...style}}>
+      {rows.map((row,r)=>Array.from(row).map((ch,c)=>(
+        <div key={r*cols+c} style={{width:size,height:size,
+          background:ch==="."?"transparent":(colors[ch]==="currentColor"?color:colors[ch])}}/>
+      )))}
+    </div>
+  );
+}
+
 function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
   const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;
   const titleChars=tc.title.split("");
@@ -642,28 +751,24 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
         };
         if(isGear){
           return <span key={i} onClick={onGearClick} style={{...baseStyle,
-            color:isLit?dw.color:"#88aacc",
-            textShadow:isLit
-              ?`3px 3px 0 #335566, 0 0 20px ${dw.color}cc, 0 0 40px ${dw.color}66`
-              :"3px 3px 0 #335566, 0 0 20px #88aacc66",
-            cursor:"pointer",fontSize:"48px",lineHeight:"28px",
+            textShadow:"none",
+            cursor:"pointer",
             display:"inline-flex",alignItems:"center",justifyContent:"center",
-            width:"28px",height:"28px",overflow:"hidden",
-          }}>⚙</span>;
+          }}><PixelIcon icon="gear" color={isLit?dw.color:"#88aacc"} size={3}/></span>;
         }
         return <span key={i} style={baseStyle}>{ch}</span>;
       })}
     </h1>
-    {/* Thought bubble pointing at gear */}
+    {/* Speech bubble below title pointing up */}
     {showBubble&&!scramble&&(
-      <div className={bubbleFading?"bubble-fading":""} style={{position:"absolute",top:"-48px",left:"50%",transform:"translateX(-50%)",
+      <div style={{position:"absolute",bottom:"-44px",left:"50%",transform:"translateX(-50%)",
         animation:bubbleFading?"bubbleOut 0.8s ease-in forwards":"bubbleIn 0.6s ease-out forwards",whiteSpace:"nowrap",zIndex:50}}>
         <div style={{background:"#88aacc",color:"#0a0a1a",fontFamily:"'Press Start 2P',monospace",
           fontSize:"7px",padding:"6px 10px",borderRadius:"8px",position:"relative",lineHeight:"1.6",
           boxShadow:"0 0 12px #88aacc44"}}>
-          {lang==="en"?"Click ⚙ for settings!":lang==="sv"?"Klicka ⚙ för inställningar!":"Klikkaa ⚙ asetuksiin!"}
-          <div style={{position:"absolute",bottom:"-6px",left:"50%",transform:"translateX(-50%)",
-            width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:"6px solid #88aacc"}}/>
+          <div style={{position:"absolute",top:"-6px",left:"50%",transform:"translateX(-50%)",
+            width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #88aacc"}}/>
+          {lang==="en"?"Click the gear for settings!":lang==="sv"?"Klicka kugghjulet för inställningar!":"Klikkaa ratasta asetuksiin!"}
         </div>
       </div>
     )}
@@ -1513,7 +1618,7 @@ export default function Piilosana(){
           if(multiRankings)multiRankings.forEach(p=>{nickMap[p.playerId]=p.nickname;});
           return foundWords.length>0&&(
             <div style={{marginTop:"16px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,textAlign:"left",animation:"fadeIn 0.8s ease"}}>
-              <div style={{fontSize:"14px",color:S.purple,marginBottom:"6px"}}>⚔️ LÖYDETYT ({foundWords.length})</div>
+              <div style={{fontSize:"14px",color:S.purple,marginBottom:"6px",display:"flex",alignItems:"center",gap:"6px"}}><PixelIcon icon="swords" color={S.purple} size={2}/>LÖYDETYT ({foundWords.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {foundWords.map((w,i)=>{
                   const finders=Object.entries(multiAllFoundWords).filter(([,ws])=>ws.includes(w)).map(([pid])=>nickMap[pid]||"?");
@@ -1610,8 +1715,8 @@ export default function Piilosana(){
         @keyframes cellGlitch{0%{opacity:1;transform:translate(0,0)}25%{transform:translate(5px,-3px);filter:hue-rotate(90deg)}50%{transform:translate(-5px,3px);filter:hue-rotate(180deg)}75%{transform:translate(3px,5px);filter:hue-rotate(270deg)}100%{opacity:0;transform:translate(-10px,-10px);filter:hue-rotate(360deg)}}
         @keyframes cellDrop{0%{transform:translateY(-100%);opacity:0.5}60%{transform:translateY(5%);opacity:1}80%{transform:translateY(-2%)}100%{transform:translateY(0)}}
         @keyframes cellPop{0%{transform:scale(1)}50%{transform:scale(0);opacity:0}100%{transform:scale(0);opacity:0}}
-        @keyframes bubbleIn{0%{opacity:0;transform:translateX(-50%) scale(0.5) translateY(10px)}100%{opacity:1;transform:translateX(-50%) scale(1) translateY(0)}}
-        @keyframes bubbleOut{0%{opacity:1;transform:translateX(-50%) scale(1) translateY(0)}100%{opacity:0;transform:translateX(-50%) scale(0.5) translateY(10px)}}
+        @keyframes bubbleIn{0%{opacity:0;transform:translateX(-50%) scale(0.5) translateY(-10px)}100%{opacity:1;transform:translateX(-50%) scale(1) translateY(0)}}
+        @keyframes bubbleOut{0%{opacity:1;transform:translateX(-50%) scale(1) translateY(0)}100%{opacity:0;transform:translateX(-50%) scale(0.5) translateY(-10px)}}
         @keyframes floatUnicorn{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-20px) rotate(5deg)}}
         @keyframes scanlines{0%,100%{opacity:1}}
         @keyframes electricPulse{0%,100%{opacity:0.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}}
@@ -1626,10 +1731,8 @@ export default function Piilosana(){
           animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
           {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>{
             if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
-              color:"#88aacc",textShadow:"3px 3px 0 #335566, 0 0 20px #88aacc66",
-              fontFamily:"'Press Start 2P',monospace",cursor:"pointer",
-              fontSize:"48px",lineHeight:"28px",display:"inline-flex",alignItems:"center",justifyContent:"center",
-              width:"28px",height:"28px",overflow:"hidden"}}>⚙</span>;
+              cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center"}}>
+              <PixelIcon icon="gear" color="#88aacc" size={3}/></span>;
             return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>;
           });})()}
         </h1>
@@ -1728,7 +1831,7 @@ export default function Piilosana(){
             {!socketConnected&&<p style={{fontSize:"13px",color:S.yellow,marginBottom:"12px",animation:"pulse 1s infinite"}}>{t.connecting}</p>}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
               <p style={{fontSize:"11px",lineHeight:"2",color:S.green,margin:0}}>{t.openGames}</p>
-              <button onClick={refreshRooms} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.green,border:`1px solid ${S.green}`,background:"transparent",padding:"4px 10px",cursor:"pointer"}}>🔄</button>
+              <button onClick={refreshRooms} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.green,border:`1px solid ${S.green}`,background:"transparent",padding:"4px 10px",cursor:"pointer",display:"flex",alignItems:"center"}}><PixelIcon icon="refresh" color={S.green} size={2}/></button>
             </div>
             <div style={{background:S.dark,padding:"8px",border:`1px solid ${S.border}`,marginBottom:"16px",minHeight:"80px",maxHeight:"200px",overflowY:"auto"}}>
               {publicRooms.length===0&&(
@@ -1765,7 +1868,7 @@ export default function Piilosana(){
                 <p style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>{t.gameMode}</p>
                 <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
                   <button onClick={()=>setGameMode("classic")} style={{fontFamily:S.font,fontSize:"11px",color:gameMode==="classic"?S.bg:S.green,background:gameMode==="classic"?S.green:"transparent",border:`2px solid ${S.green}`,padding:"8px 16px",cursor:"pointer"}}>{t.classic}</button>
-                  <button onClick={()=>setGameMode("battle")} style={{fontFamily:S.font,fontSize:"11px",color:gameMode==="battle"?S.bg:S.purple,background:gameMode==="battle"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"8px 16px",cursor:"pointer"}}>{t.battle}</button>
+                  <button onClick={()=>setGameMode("battle")} style={{fontFamily:S.font,fontSize:"11px",color:gameMode==="battle"?S.bg:S.purple,background:gameMode==="battle"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"8px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px"}}><PixelIcon icon="swords" color={gameMode==="battle"?S.bg:S.purple} size={2}/>{t.battle}</button>
                 </div>
                 {gameMode==="battle"&&<p style={{fontSize:"11px",color:S.purple,marginTop:"8px",lineHeight:"1.8"}}>{t.battleDesc}</p>}
                 <div style={{marginTop:"12px"}}>
@@ -1930,7 +2033,7 @@ export default function Piilosana(){
             <p style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>{t.gameMode}</p>
             <div style={{display:"flex",gap:"8px",justifyContent:"center",flexWrap:"wrap"}}>
               <button onClick={()=>setSoloMode("normal")} style={{fontFamily:S.font,fontSize:"11px",color:soloMode==="normal"?S.bg:S.green,background:soloMode==="normal"?S.green:"transparent",border:`2px solid ${S.green}`,padding:"8px 16px",cursor:"pointer"}}>{t.modeNormal}</button>
-              <button onClick={()=>setSoloMode("tetris")} style={{fontFamily:S.font,fontSize:"11px",color:soloMode==="tetris"?S.bg:S.purple,background:soloMode==="tetris"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"8px 16px",cursor:"pointer"}}>{t.modeTetris}</button>
+              <button onClick={()=>setSoloMode("tetris")} style={{fontFamily:S.font,fontSize:"11px",color:soloMode==="tetris"?S.bg:S.purple,background:soloMode==="tetris"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"8px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px"}}><PixelIcon icon="arrow" color={soloMode==="tetris"?S.bg:S.purple} size={2}/>{t.modeTetris}</button>
             </div>
             {soloMode==="tetris"&&<p style={{fontSize:"11px",color:S.purple,marginTop:"8px",lineHeight:"1.8"}}>{t.tetrisDesc}</p>}
           </div>
@@ -1939,7 +2042,7 @@ export default function Piilosana(){
             <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
               <button onClick={()=>setGameTime(120)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===120?S.bg:S.green,background:gameTime===120?S.green:"transparent",border:`2px solid ${S.green}`,padding:"8px 16px",cursor:"pointer"}}>2 MIN</button>
               <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"8px 16px",cursor:"pointer"}}>6.7 MIN</button>
-              <button onClick={()=>setGameTime(0)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===0?S.bg:"#44ddff",background:gameTime===0?"#44ddff":"transparent",border:"2px solid #44ddff",padding:"8px 16px",cursor:"pointer"}}>{t.unlimited}</button>
+              <button onClick={()=>setGameTime(0)} style={{fontFamily:S.font,fontSize:"11px",color:gameTime===0?S.bg:"#44ddff",background:gameTime===0?"#44ddff":"transparent",border:"2px solid #44ddff",padding:"8px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px"}}><PixelIcon icon="infinity" color={gameTime===0?S.bg:"#44ddff"} size={2}/>{t.unlimited}</button>
             </div>
             {gameTime===0&&<p style={{fontSize:"11px",color:"#44ddff",marginTop:"8px",lineHeight:"1.8"}}>{t.unlimitedDesc}</p>}
           </div>
@@ -1986,9 +2089,9 @@ export default function Piilosana(){
           {/* HUD */}
           <div style={{marginBottom:"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
             {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {t.players}</div>}
-            {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`}}>{t.battleLabel}</div>}
-            {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`}}>{t.tetrisLabel}</div>}
-            {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`}}>{t.unlimitedLabel}</div>}
+            {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><PixelIcon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
+            {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><PixelIcon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
+            {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><PixelIcon icon="infinity" color="#44ddff" size={1}/>{t.unlimitedLabel}</div>}
             {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 10px"}}>
               {gameTime!==0?(
@@ -2125,8 +2228,8 @@ export default function Piilosana(){
           {/* Unlimited mode: refresh + end buttons */}
           {state==="play"&&mode==="solo"&&gameTime===0&&(
             <div style={{display:"flex",gap:"8px",marginTop:"8px"}}>
-              <button onClick={refreshGrid} style={{fontFamily:S.font,fontSize:"11px",color:"#44ddff",background:"transparent",border:"2px solid #44ddff",padding:"10px 16px",cursor:"pointer",flex:1}}>{t.newLetters}</button>
-              <button onClick={endUnlimited} style={{fontFamily:S.font,fontSize:"11px",color:S.red,background:"transparent",border:`2px solid ${S.red}`,padding:"10px 16px",cursor:"pointer",flex:1}}>{t.stop}</button>
+              <button onClick={refreshGrid} style={{fontFamily:S.font,fontSize:"11px",color:"#44ddff",background:"transparent",border:"2px solid #44ddff",padding:"10px 16px",cursor:"pointer",flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><PixelIcon icon="refresh" color="#44ddff" size={2}/>{t.newLetters}</button>
+              <button onClick={endUnlimited} style={{fontFamily:S.font,fontSize:"11px",color:S.red,background:"transparent",border:`2px solid ${S.red}`,padding:"10px 16px",cursor:"pointer",flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><PixelIcon icon="stop" color={S.red} size={2}/>{t.stop}</button>
             </div>
           )}
         </div>
