@@ -619,7 +619,7 @@ export default function Piilosana(){
       const rect=el.getBoundingClientRect();
       const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
       const dist=Math.sqrt((x-cx)**2+(y-cy)**2);
-      const coreRadius=rect.width*0.4;
+      const coreRadius=rect.width*0.55;
       if(dist<coreRadius&&dist<bestDist){const[row,col]=el.dataset.c.split(",").map(Number);best={r:row,c:col};bestDist=dist;}
     }
     return best;
@@ -1110,19 +1110,19 @@ export default function Piilosana(){
       <div style={{border:`3px solid ${S.green}`,padding:"40px 24px",boxShadow:`0 0 20px ${S.green}44, inset 0 0 20px ${S.green}11`,maxWidth:"600px"}}>
         <p style={{fontSize:"11px",lineHeight:"2",marginBottom:"16px",color:S.green}}>VALITSE PELIMUOTO</p>
         <div style={{display:"flex",flexDirection:"column",gap:"12px",marginBottom:"24px"}}>
-          <button onClick={async()=>{await sounds.init();setMode("public");setPublicState("nickname");}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:"#ff6644",border:"none",padding:"20px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"72px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+          <button onClick={async()=>{await sounds.init();setMode("public");setPublicState("nickname");}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:"#ff6644",border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
             <span>AREENA</span>
-            <span style={{fontSize:"8px",marginTop:"6px",opacity:0.8}}>jatkuva klassinen online-peli</span>
+            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>jatkuva klassinen online-peli</span>
             <span style={{fontSize:"7px",marginTop:"4px",opacity:0.5,fontFamily:"'VT323',monospace",letterSpacing:"2px"}}>piilosana</span>
             {publicOnlineCount>0&&<span style={{fontSize:"9px",marginTop:"4px",opacity:0.7}}>{publicOnlineCount} online</span>}
           </button>
-          <button onClick={async()=>{await sounds.init();setMode("multi");setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.yellow,border:"none",padding:"20px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc8800",width:"100%",minHeight:"72px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+          <button onClick={async()=>{await sounds.init();setMode("multi");setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc8800",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
             <span>OMA PELI</span>
-            <span style={{fontSize:"8px",marginTop:"6px",opacity:0.8}}>online, eri moodeja</span>
+            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>online, eri moodeja</span>
           </button>
-          <button onClick={async()=>{await sounds.init();setMode("solo");setState("menu");}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"20px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844",width:"100%",minHeight:"72px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+          <button onClick={async()=>{await sounds.init();setMode("solo");setState("menu");}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
             <span>HARJOITUS</span>
-            <span style={{fontSize:"8px",marginTop:"6px",opacity:0.8}}>yksinpeli</span>
+            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>yksinpeli</span>
           </button>
         </div>
         <p style={{fontSize:"14px",lineHeight:"1.8",marginBottom:"12px"}}>Etsi sanoja ruudukosta!</p>
@@ -1234,7 +1234,7 @@ export default function Piilosana(){
   const S={bg:"#0a0a1a",green:"#00ff88",yellow:"#ffcc00",red:"#ff4444",purple:"#ff66ff",dark:"#0d0d22",border:"#334",cell:"#1a1a3a",cellBorder:"#2a2a4a",font:"'Press Start 2P',monospace"};
 
   return(
-    <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"16px",position:"relative",overflow:"hidden"}}
+    <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflow:"hidden"}}
       onMouseMove={e=>onDragMove(e.clientX,e.clientY)} onMouseUp={onDragEnd} onTouchEnd={onDragEnd}>
       <style>{fontCSS}</style>
       <style>{`
@@ -1558,7 +1558,7 @@ export default function Piilosana(){
 
       {/* PLAYING + ENDING */}
       {(state==="play"||state==="ending")&&(
-        <div style={{width:"100%",maxWidth:"600px",position:"relative"}}>
+        <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:"0 2px"}}>
           {/* HUD */}
           <div style={{marginBottom:"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
             {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>AREENA — {publicPlayerCount} pelaajaa</div>}
@@ -1628,7 +1628,7 @@ export default function Piilosana(){
           <div style={{position:"relative"}}>
             <div ref={gRef}
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
-              style={{display:"grid",gridTemplateColumns:`repeat(${SZ},1fr)`,gap:"6px",padding:"10px",background:"#111133",
+              style={{display:"grid",gridTemplateColumns:`repeat(${SZ},1fr)`,gap:"4px",padding:"6px",background:"#111133",
                 border:`3px solid ${combo>=3&&state==="play"?S.yellow:ending?ending.color+"88":S.border}`,
                 boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:`0 0 30px ${S.green}22`,
                 touchAction:"none",
