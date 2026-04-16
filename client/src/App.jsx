@@ -684,7 +684,7 @@ function PixelIcon({icon,color="currentColor",size=2,style={}}){
       gap:0,imageRendering:"pixelated",flexShrink:0,verticalAlign:"middle",transition:"filter 2s ease",...style}}>
       {rows.map((row,r)=>Array.from(row).map((ch,c)=>(
         <div key={r*cols+c} style={{width:size,height:size,
-          background:resolveColor(ch),opacity:resolveOpacity(ch)}}/>
+          background:resolveColor(ch),opacity:resolveOpacity(ch),transition:"background 2s ease"}}/>
       )))}
     </div>
   );
@@ -785,7 +785,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
             cursor:"pointer",
             display:"inline-flex",alignItems:"center",justifyContent:"center",
             marginRight:"4px",
-          }}><PixelIcon icon="gear" color={isLit?dw.color:"#88aacc"} size={1.7}/></span>;
+          }}><PixelIcon icon="gear" color={isLit?dw.color:gearBlend?"#ffcc00":"#88aacc"} size={1.7} style={{transition:"filter 2s ease"}}/></span>;
         }
         return <span key={i} style={baseStyle}>{ch}</span>;
       })}
@@ -879,6 +879,8 @@ export default function Piilosana(){
   const[showSettings,setShowSettings]=useState(false);
   const[settingsBubble,setSettingsBubble]=useState(false);
   const[bubbleFading,setBubbleFading]=useState(false);
+  const[gearBlend,setGearBlend]=useState(false);
+  useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
   const theme=getTheme(themeId);
   const langConf=getLangConf(lang);
   const WORDS_SET=langConf.words;
@@ -1773,7 +1775,7 @@ export default function Piilosana(){
             if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
               cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",
               marginRight:"4px"}}>
-              <PixelIcon icon="gear" color="#88aacc" size={1.7}/></span>;
+              <PixelIcon icon="gear" color={gearBlend?S.yellow:"#88aacc"} size={1.7} style={{transition:"filter 2s ease"}}/></span>;
             return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>;
           });})()}
         </h1>
