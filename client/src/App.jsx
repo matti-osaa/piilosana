@@ -1110,11 +1110,20 @@ export default function Piilosana(){
       <div style={{border:`3px solid ${S.green}`,padding:"40px 24px",boxShadow:`0 0 20px ${S.green}44, inset 0 0 20px ${S.green}11`,maxWidth:"600px"}}>
         <p style={{fontSize:"11px",lineHeight:"2",marginBottom:"16px",color:S.green}}>VALITSE PELIMUOTO</p>
         <div style={{display:"flex",flexDirection:"column",gap:"12px",marginBottom:"24px"}}>
-          <button onClick={async()=>{await sounds.init();setMode("solo");setState("menu");}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"16px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844"}}>YKSINPELI</button>
-          <button onClick={async()=>{await sounds.init();setMode("public");setPublicState("nickname");}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:"#ff6644",border:"none",padding:"16px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311"}}>
-            PIILOSAUNA 🍃🪣{publicOnlineCount>0&&<span style={{fontSize:"11px",display:"block",marginTop:"4px"}}>{publicOnlineCount} online</span>}
+          <button onClick={async()=>{await sounds.init();setMode("public");setPublicState("nickname");}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:"#ff6644",border:"none",padding:"20px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"72px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+            <span>AREENA</span>
+            <span style={{fontSize:"8px",marginTop:"6px",opacity:0.8}}>jatkuva klassinen online-peli</span>
+            <span style={{fontSize:"7px",marginTop:"4px",opacity:0.5,fontFamily:"'VT323',monospace",letterSpacing:"2px"}}>piilosana</span>
+            {publicOnlineCount>0&&<span style={{fontSize:"9px",marginTop:"4px",opacity:0.7}}>{publicOnlineCount} online</span>}
           </button>
-          <button onClick={async()=>{await sounds.init();setMode("multi");setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.yellow,border:"none",padding:"16px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc8800"}}>MONINPELI</button>
+          <button onClick={async()=>{await sounds.init();setMode("multi");setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.yellow,border:"none",padding:"20px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc8800",width:"100%",minHeight:"72px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+            <span>OMA PELI</span>
+            <span style={{fontSize:"8px",marginTop:"6px",opacity:0.8}}>online, eri moodeja</span>
+          </button>
+          <button onClick={async()=>{await sounds.init();setMode("solo");setState("menu");}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"20px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844",width:"100%",minHeight:"72px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+            <span>HARJOITUS</span>
+            <span style={{fontSize:"8px",marginTop:"6px",opacity:0.8}}>yksinpeli</span>
+          </button>
         </div>
         <p style={{fontSize:"14px",lineHeight:"1.8",marginBottom:"12px"}}>Etsi sanoja ruudukosta!</p>
         <p style={{fontSize:"14px",lineHeight:"2.2",color:"#88ccaa",marginBottom:"16px"}}>
@@ -1214,8 +1223,8 @@ export default function Piilosana(){
           </>);
         })()}
         <div style={{marginTop:"16px",display:"flex",flexDirection:"column",gap:"8px",alignItems:"center"}}>
-          {isHost&&<button onClick={playAgain} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>UUSI MONINPELI</button>}
-          <button onClick={switchToSolo} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>YKSINPELI</button>
+          {isHost&&<button onClick={playAgain} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>UUSI OMA PELI</button>}
+          <button onClick={switchToSolo} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>HARJOITUS</button>
           <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",width:"280px"}}>VALIKKO</button>
         </div>
       </div>
@@ -1366,7 +1375,7 @@ export default function Piilosana(){
       {mode==="public"&&publicState==="nickname"&&(
         <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
           <div style={{border:"3px solid #ff6644",padding:"24px",boxShadow:"0 0 20px #ff664444",maxWidth:"600px"}}>
-            <p style={{fontSize:"18px",color:"#ff6644",marginBottom:"8px"}}>🍃 PIILOSAUNA</p>
+            <p style={{fontSize:"18px",color:"#ff6644",marginBottom:"8px"}}>AREENA</p>
             <p style={{fontSize:"11px",color:"#88ccaa",marginBottom:"16px",lineHeight:"1.8"}}>Jatkuva peli kaikille! Liity mukaan ja etsi sanoja. Kierros kestää 2 min.</p>
             <p style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>NIMIMERKKI</p>
             <input type="text" maxLength="12" value={soloNickname} onChange={e=>setSoloNickname(e.target.value.toUpperCase())}
@@ -1398,7 +1407,7 @@ export default function Piilosana(){
       {/* PIILOSAUNA - waiting for round */}
       {mode==="public"&&publicState==="waiting"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
-          <p style={{fontSize:"18px",color:"#ff6644"}}>🍃 PIILOSAUNA</p>
+          <p style={{fontSize:"18px",color:"#ff6644"}}>AREENA</p>
           <p style={{fontSize:"13px",color:"#556",marginTop:"12px"}}>Odotetaan seuraavaa kierrosta...</p>
           <p style={{fontSize:"11px",color:"#88ccaa",marginTop:"8px"}}>{publicPlayerCount} pelaajaa saunassa</p>
         </div>
@@ -1407,7 +1416,7 @@ export default function Piilosana(){
       {/* PIILOSAUNA - countdown */}
       {mode==="public"&&publicState==="countdown"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{fontSize:"11px",color:"#ff6644",marginBottom:"24px"}}>🍃 PIILOSAUNA — KIERROS {publicRound}</div>
+          <div style={{fontSize:"11px",color:"#ff6644",marginBottom:"24px"}}>AREENA — KIERROS {publicRound}</div>
           <div style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>{publicPlayerCount} pelaajaa</div>
           <div style={{fontSize:"18px",color:S.green}}>VALMISTAUDU</div>
         </div>
@@ -1422,7 +1431,7 @@ export default function Piilosana(){
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease"}}>
           {/* Your score */}
           <div style={{border:"3px solid #ff6644",padding:"20px",marginBottom:"12px",boxShadow:"0 0 30px #ff664433",background:S.dark}}>
-            <div style={{fontSize:"13px",color:"#ff6644",marginBottom:"4px"}}>🍃 PIILOSAUNA — KIERROS {publicRound} PÄÄTTYI</div>
+            <div style={{fontSize:"13px",color:"#ff6644",marginBottom:"4px"}}>AREENA — KIERROS {publicRound} PÄÄTTYI</div>
             <div style={{fontSize:"13px",color:"#556",marginBottom:"10px"}}>PISTEESI</div>
             <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",animation:"pop 0.3s ease"}}>{score}</div>
             <div style={{fontSize:"13px",color:"#88ccaa",marginTop:"6px"}}>{found.length} / {valid.size} sanaa ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>
@@ -1552,7 +1561,7 @@ export default function Piilosana(){
         <div style={{width:"100%",maxWidth:"600px",position:"relative"}}>
           {/* HUD */}
           <div style={{marginBottom:"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
-            {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>🍃 PIILOSAUNA — {publicPlayerCount} pelaajaa</div>}
+            {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>AREENA — {publicPlayerCount} pelaajaa</div>}
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`}}>⚔️ TAISTELU</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`}}>⬇️ TETRIS</div>}
             {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`}}>∞ RAJATON</div>}
@@ -1746,8 +1755,8 @@ export default function Piilosana(){
             {hofSubmitted&&<div style={{fontSize:"11px",color:S.green,marginTop:"8px"}}>✓ Tallennettu!</div>}
 
             <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center",marginTop:"10px"}}>
-              <button onClick={()=>{setHofSubmitted(false);start();}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>UUSI YKSINPELI</button>
-              <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>MONINPELI</button>
+              <button onClick={()=>{setHofSubmitted(false);start();}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>UUSI HARJOITUS</button>
+              <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>OMA PELI</button>
               <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",width:"280px"}}>VALIKKO</button>
             </div>
           </div>
