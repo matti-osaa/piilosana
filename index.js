@@ -58,9 +58,12 @@ async function initDb() {
       game_mode TEXT NOT NULL,
       game_time INTEGER NOT NULL,
       is_multi INTEGER NOT NULL DEFAULT 0,
+      lang TEXT NOT NULL DEFAULT 'fi',
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
   `);
+  // Add lang column to existing databases that don't have it
+  try { db.run(`ALTER TABLE hall_of_fame ADD COLUMN lang TEXT NOT NULL DEFAULT 'fi'`); } catch(e) { /* column already exists */ }
   saveDb();
 }
 
@@ -78,38 +81,41 @@ const HOF_CATEGORIES = [
   { gameMode: 'tetris', gameTime: 402, label: 'Tetris 6,7 min' },
 ];
 
-function submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti }) {
+function submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti, lang }) {
   if (!db || !nickname || score < 0 || !gameMode || !gameTime) return null;
   if (gameTime === 0) return null;
+  const safeLang = LANGS[lang] ? lang : 'fi';
   const percentage = wordsTotal > 0 ? Math.round((wordsFound / wordsTotal) * 100) : 0;
   db.run(
-    `INSERT INTO hall_of_fame (nickname, score, words_found, words_total, percentage, game_mode, game_time, is_multi)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [nickname, score, wordsFound, wordsTotal, percentage, gameMode, Number(gameTime), isMulti ? 1 : 0]
+    `INSERT INTO hall_of_fame (nickname, score, words_found, words_total, percentage, game_mode, game_time, is_multi, lang)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [nickname, score, wordsFound, wordsTotal, percentage, gameMode, Number(gameTime), isMulti ? 1 : 0, safeLang]
   );
   saveDb();
   return true;
 }
 
-function getHallOfFame(gameMode, gameTime) {
+function getHallOfFame(gameMode, gameTime, lang) {
   if (!db) return [];
+  const safeLang = lang || 'fi';
   const stmt = db.prepare(
     `SELECT nickname, score, words_found, words_total, percentage, created_at
-     FROM hall_of_fame WHERE game_mode = ? AND game_time = ? ORDER BY score DESC LIMIT 10`
+     FROM hall_of_fame WHERE game_mode = ? AND game_time = ? AND lang = ? ORDER BY score DESC LIMIT 10`
   );
-  stmt.bind([gameMode, Number(gameTime)]);
+  stmt.bind([gameMode, Number(gameTime), safeLang]);
   const results = [];
   while (stmt.step()) results.push(stmt.getAsObject());
   stmt.free();
   return results;
 }
 
-function getAllHallOfFame() {
+function getAllHallOfFame(lang) {
+  const safeLang = lang || 'fi';
   const result = {};
   for (const cat of HOF_CATEGORIES) {
     result[`${cat.gameMode}-${cat.gameTime}`] = {
       label: cat.label,
-      scores: getHallOfFame(cat.gameMode, cat.gameTime)
+      scores: getHallOfFame(cat.gameMode, cat.gameTime, safeLang)
     };
   }
   return result;
@@ -324,6 +330,7 @@ function endPublicRound(lang = 'fi') {
         gameMode: 'normal',
         gameTime: PUBLIC_GAME_TIME,
         isMulti: true,
+        lang,
       });
     }
   }
@@ -786,7 +793,8 @@ io.on('connection', (socket) => {
                 wordsTotal: room.validWords.length || s.wordsFound.size,
                 gameMode: room.gameMode === 'battle' ? 'tetris' : 'normal',
                 gameTime: room.timeLeft > 0 ? 120 : (room.originalGameTime || 120),
-                isMulti: true
+                isMulti: true,
+                lang: room.lang || 'fi'
               });
             }
           }
@@ -1017,13 +1025,15 @@ app.get('/health', (req, res) => {
 
 // Hall of Fame: get all categories
 app.get('/api/hall-of-fame', (req, res) => {
-  res.json(getAllHallOfFame());
+  const lang = req.query.lang || 'fi';
+  res.json(getAllHallOfFame(lang));
 });
 
 // Hall of Fame: get specific category
 app.get('/api/hall-of-fame/:gameMode/:gameTime', (req, res) => {
   const { gameMode, gameTime } = req.params;
-  res.json(getHallOfFame(gameMode, Number(gameTime)));
+  const lang = req.query.lang || 'fi';
+  res.json(getHallOfFame(gameMode, Number(gameTime), lang));
 });
 
 // Public game status (supports ?lang=fi|en)
@@ -1040,14 +1050,15 @@ app.get('/api/public-game', (req, res) => {
 
 // Hall of Fame: submit score (for solo games)
 app.post('/api/hall-of-fame', (req, res) => {
-  const { nickname, score, wordsFound, wordsTotal, gameMode, gameTime } = req.body;
+  const { nickname, score, wordsFound, wordsTotal, gameMode, gameTime, lang } = req.body;
   if (!nickname || nickname.length > 12) {
     return res.status(400).json({ error: 'Virheellinen nimimerkki' });
   }
-  const id = submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti: false });
+  const safeLang = LANGS[lang] ? lang : 'fi';
+  const id = submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti: false, lang: safeLang });
   if (!id) return res.status(400).json({ error: 'Tulosta ei voitu tallentaa' });
   // Return updated top 10 for this category
-  const top = getHallOfFame(gameMode, gameTime);
+  const top = getHallOfFame(gameMode, gameTime, safeLang);
   res.json({ id, top });
 });
 

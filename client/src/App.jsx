@@ -542,22 +542,23 @@ function TitleDemo({active}){
 // ============================================
 // HALL OF FAME COMPONENT
 // ============================================
-function HallOfFame({gameMode,gameTime,currentScore,S}){
+function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
   const[scores,setScores]=useState(null);
   const[loading,setLoading]=useState(true);
   useEffect(()=>{
     if(!gameMode||!gameTime||gameTime===0)return;
     setLoading(true);
-    fetch(`${SERVER_URL}/api/hall-of-fame/${gameMode}/${gameTime}`)
+    fetch(`${SERVER_URL}/api/hall-of-fame/${gameMode}/${gameTime}?lang=${lang||"fi"}`)
       .then(r=>r.json()).then(data=>{setScores(data);setLoading(false);})
       .catch(()=>{setScores([]);setLoading(false);});
-  },[gameMode,gameTime,currentScore]);
+  },[gameMode,gameTime,currentScore,lang]);
   if(!gameMode||!gameTime||gameTime===0)return null;
   const label=gameMode==="tetris"?"Tetris":"Normaali";
   const timeLabel=gameTime===120?"2 min":"6,7 min";
+  const langName=LANG_CONFIG[lang]?.name||"Suomi";
   return(
     <div style={{border:`2px solid ${S.border}`,padding:"8px",background:S.dark,marginTop:"10px",animation:"fadeIn 0.8s ease"}}>
-      <div style={{fontSize:"13px",color:S.yellow,marginBottom:"6px",textAlign:"center"}}>ENNÄTYKSET — {label} {timeLabel}</div>
+      <div style={{fontSize:"13px",color:S.yellow,marginBottom:"6px",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><PixelFlag lang={lang||"fi"} size={2}/>ENNÄTYKSET — {label} {timeLabel}</div>
       {loading?<div style={{fontSize:"11px",color:"#556",textAlign:"center"}}>Ladataan...</div>:
       !scores||scores.length===0?<div style={{fontSize:"11px",color:"#556",textAlign:"center"}}>Ei tuloksia vielä</div>:
       <div style={{display:"flex",flexDirection:"column",gap:"2px"}}>
@@ -582,12 +583,12 @@ function HallOfFame({gameMode,gameTime,currentScore,S}){
 }
 
 // Submit score to hall of fame
-async function submitToHallOfFame({nickname,score,wordsFound,wordsTotal,gameMode,gameTime}){
+async function submitToHallOfFame({nickname,score,wordsFound,wordsTotal,gameMode,gameTime,lang}){
   if(!nickname||score<=0||!gameMode||!gameTime||gameTime===0)return null;
   try{
     const res=await fetch(`${SERVER_URL}/api/hall-of-fame`,{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({nickname,score,wordsFound,wordsTotal,gameMode,gameTime})
+      body:JSON.stringify({nickname,score,wordsFound,wordsTotal,gameMode,gameTime,lang:lang||"fi"})
     });
     if(!res.ok)return null;
     return await res.json();
@@ -793,7 +794,7 @@ export default function Piilosana(){
       const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
       const dx=Math.abs(x-cx),dy=Math.abs(y-cy);
       const hw=rect.width/2;
-      if(dx>hw||dy>hw)continue; // clipped to cell bounds
+      if(dx>hw||dy>hw)continue;
       const dist=Math.pow(dx,2/3)+Math.pow(dy,2/3);
       const limit=Math.pow(hw,2/3);
       if(dist<=limit){
@@ -1419,8 +1420,8 @@ export default function Piilosana(){
   return(
     <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflow:"hidden"}}
       onMouseMove={e=>onDragMove(e.clientX,e.clientY)} onMouseUp={onDragEnd} onTouchEnd={onDragEnd}>
-      {/* Language selector */}
-      <div style={{display:"flex",gap:"6px",marginBottom:"4px"}}>
+      {/* Language selector - only visible in main menu */}
+      {mode===null&&<div style={{display:"flex",gap:"6px",marginBottom:"4px"}}>
         {Object.entries(LANG_CONFIG).map(([code,lc])=>(
           <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);}}
             style={{fontFamily:S.font,fontSize:"9px",background:lang===code?S.dark:"transparent",
@@ -1431,7 +1432,7 @@ export default function Piilosana(){
             <PixelFlag lang={code} size={3}/>{lc.name}
           </button>
         ))}
-      </div>
+      </div>}
       <style>{fontCSS}</style>
       <style>{`
         @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
@@ -1693,7 +1694,7 @@ export default function Piilosana(){
           )}
 
           {/* Hall of Fame */}
-          <HallOfFame gameMode="normal" gameTime={120} currentScore={score} S={S}/>
+          <HallOfFame gameMode="normal" gameTime={120} currentScore={score} S={S} lang={lang}/>
         </div>
         );
       })()}
@@ -1924,7 +1925,7 @@ export default function Piilosana(){
                 {soloNickname.trim()?(
                   <button onClick={async()=>{
                     await submitToHallOfFame({nickname:soloNickname.trim(),score,wordsFound:found.length,
-                      wordsTotal:valid.size,gameMode:soloMode,gameTime});
+                      wordsTotal:valid.size,gameMode:soloMode,gameTime,lang});
                     setHofSubmitted(true);
                   }} style={{fontFamily:S.font,fontSize:"11px",color:S.bg,background:S.yellow,border:"none",padding:"8px 16px",cursor:"pointer"}}>
                     {t.saveAs} {soloNickname.trim()}
@@ -1939,7 +1940,7 @@ export default function Piilosana(){
                       <button onClick={async()=>{
                         if(!soloNickname.trim())return;
                         await submitToHallOfFame({nickname:soloNickname.trim(),score,wordsFound:found.length,
-                          wordsTotal:valid.size,gameMode:soloMode,gameTime});
+                          wordsTotal:valid.size,gameMode:soloMode,gameTime,lang});
                         setHofSubmitted(true);
                       }} disabled={!soloNickname.trim()}
                         style={{fontFamily:S.font,fontSize:"11px",color:soloNickname.trim()?S.bg:"#556",
@@ -1983,7 +1984,7 @@ export default function Piilosana(){
           )}
 
           {/* Hall of Fame */}
-          <HallOfFame gameMode={soloMode} gameTime={gameTime} currentScore={hofSubmitted?score:null} S={S}/>
+          <HallOfFame gameMode={soloMode} gameTime={gameTime} currentScore={hofSubmitted?score:null} S={S} lang={lang}/>
         </div>
       )}
 
