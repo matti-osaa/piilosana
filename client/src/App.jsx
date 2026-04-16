@@ -181,6 +181,45 @@ function letterColor(ch,lang='fi'){const lv=getLetterValues(lang);return LETTER_
 const fontCSS=`@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');`;
 
 // ============================================
+// THEMES
+// ============================================
+const THEMES={
+  dark:{
+    name:"TUMMA",nameEn:"DARK",nameSv:"MÖRK",
+    bg:"#0a0a1a",green:"#00ff88",yellow:"#ffcc00",red:"#ff4444",purple:"#ff66ff",
+    dark:"#0d0d22",border:"#334",cell:"#1a1a3a",cellBorder:"#2a2a4a",
+    font:"'Press Start 2P',monospace",
+    gridBg:"#111133",textMuted:"#556",textSoft:"#88ccaa",
+    inputBg:"#0d0d22",
+  },
+  light:{
+    name:"VAALEA",nameEn:"LIGHT",nameSv:"LJUS",
+    bg:"#f0f0f5",green:"#00aa55",yellow:"#cc8800",red:"#cc2222",purple:"#aa44cc",
+    dark:"#e0e0ea",border:"#bbb",cell:"#ffffff",cellBorder:"#ccc",
+    font:"'Press Start 2P',monospace",
+    gridBg:"#d8d8e8",textMuted:"#888",textSoft:"#446655",
+    inputBg:"#ffffff",
+  },
+  pink:{
+    name:"PINKKI",nameEn:"PINK",nameSv:"ROSA",
+    bg:"#1a0a1a",green:"#ff66cc",yellow:"#ffaadd",red:"#ff4488",purple:"#ff99ff",
+    dark:"#220d22",border:"#553",cell:"#2a1a2a",cellBorder:"#4a2a4a",
+    font:"'Press Start 2P',monospace",
+    gridBg:"#1a0a2a",textMuted:"#886",textSoft:"#cc88aa",
+    inputBg:"#220d22",
+  },
+  electric:{
+    name:"SÄHKÖ",nameEn:"ELECTRIC",nameSv:"ELEKTRO",
+    bg:"#000820",green:"#00eeff",yellow:"#44ff44",red:"#ff2244",purple:"#8844ff",
+    dark:"#001030",border:"#0055aa",cell:"#001848",cellBorder:"#0066cc",
+    font:"'Press Start 2P',monospace",
+    gridBg:"#000c30",textMuted:"#336699",textSoft:"#44aacc",
+    inputBg:"#001030",
+  },
+};
+function getTheme(id){return THEMES[id]||THEMES.dark;}
+
+// ============================================
 // ENDINGS - 10 different game over animations
 // ============================================
 const ENDINGS = [
@@ -446,23 +485,25 @@ const TITLE_CONFIG={
     ]
   },
   en:{
-    title:"WORDHUNT",
+    title:"LETTERLOOT",
+    // L(0) E(1) T(2) T(3) E(4) R(5) L(6) O(7) O(8) T(9)
     demos:[
-      {word:"WORD",indices:[0,1,2,3],color:"#44ff88"},
-      {word:"HUNT",indices:[4,5,6,7],color:"#4488ff"},
-      {word:"NORD",indices:[5,1,2,3],color:"#ff8844"},
-      {word:"WORTH",indices:[0,1,2,7,4],color:"#ff44cc"},
-      {word:"WORDHUNT",indices:[0,1,2,3,4,5,6,7],color:"#ff6644"},
+      {word:"LET",indices:[0,1,2],color:"#44ff88"},
+      {word:"LOOT",indices:[6,7,8,9],color:"#4488ff"},
+      {word:"LETTER",indices:[0,1,2,3,4,5],color:"#ff8844"},
+      {word:"TOOT",indices:[3,7,8,9],color:"#ff44cc"},
+      {word:"LETTERLOOT",indices:[0,1,2,3,4,5,6,7,8,9],color:"#ff6644"},
     ]
   },
   sv:{
-    title:"ORDGÖMMA",
+    title:"ORDJAKT",
+    // O(0) R(1) D(2) J(3) A(4) K(5) T(6)
     demos:[
       {word:"ORD",indices:[0,1,2],color:"#44ff88"},
-      {word:"GÖM",indices:[3,4,5],color:"#4488ff"},
-      {word:"GÖMMA",indices:[3,4,5,6,7],color:"#ff8844"},
-      {word:"MORD",indices:[6,0,1,2],color:"#ff44cc"},
-      {word:"ORDGÖMMA",indices:[0,1,2,3,4,5,6,7],color:"#ff6644"},
+      {word:"JAKT",indices:[3,4,5,6],color:"#4488ff"},
+      {word:"AKT",indices:[4,5,6],color:"#ff8844"},
+      {word:"KORD",indices:[5,0,1,2],color:"#ff44cc"},
+      {word:"ORDJAKT",indices:[0,1,2,3,4,5,6],color:"#ff6644"},
     ]
   },
 };
@@ -473,7 +514,7 @@ const FLAG_PIXELS={
     "WWWBWWWWW",
     "WWWBWWWWW",
     "BBBBBBBBB",
-    "WWWBWWWWW",
+    "BBBBBBBBB",
     "WWWBWWWWW",
     "WWWBWWWWW",
   ],
@@ -489,7 +530,7 @@ const FLAG_PIXELS={
     "BBBYBBBBB",
     "BBBYBBBBB",
     "YYYYYYYYY",
-    "BBBYBBBBB",
+    "YYYYYYYYY",
     "BBBYBBBBB",
     "BBBYBBBBB",
   ],
@@ -660,11 +701,17 @@ async function submitToHallOfFame({nickname,score,wordsFound,wordsTotal,gameMode
 export default function Piilosana(){
   const SZ=5,COMBO_WINDOW=4000;
   const[lang,setLang]=useState(()=>localStorage.getItem("piilosana_lang")||"fi");
+  const[themeId,setThemeId]=useState(()=>localStorage.getItem("piilosana_theme")||"dark");
+  const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
+  const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
+  const[showSettings,setShowSettings]=useState(false);
+  const theme=getTheme(themeId);
   const langConf=getLangConf(lang);
   const WORDS_SET=langConf.words;
   const trie=useMemo(()=>langConf.trie,[lang]);
   const t=T[lang]||T.fi;
   const sounds=useSounds();
+  const isLarge=uiSize==="large";
 
   // Game settings (must be declared before states that reference them)
   const[gameTime,setGameTime]=useState(120); // 120 (2min) or 402 (6min 42s = "6,7")
@@ -1474,7 +1521,7 @@ export default function Piilosana(){
     </div>
   );
 
-  const S={bg:"#0a0a1a",green:"#00ff88",yellow:"#ffcc00",red:"#ff4444",purple:"#ff66ff",dark:"#0d0d22",border:"#334",cell:"#1a1a3a",cellBorder:"#2a2a4a",font:"'Press Start 2P',monospace"};
+  const S=theme;
 
   return(
     <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflow:"hidden"}}
@@ -1517,6 +1564,9 @@ export default function Piilosana(){
         @keyframes cellGlitch{0%{opacity:1;transform:translate(0,0)}25%{transform:translate(5px,-3px);filter:hue-rotate(90deg)}50%{transform:translate(-5px,3px);filter:hue-rotate(180deg)}75%{transform:translate(3px,5px);filter:hue-rotate(270deg)}100%{opacity:0;transform:translate(-10px,-10px);filter:hue-rotate(360deg)}}
         @keyframes cellDrop{0%{transform:translateY(-100%);opacity:0.5}60%{transform:translateY(5%);opacity:1}80%{transform:translateY(-2%)}100%{transform:translateY(0)}}
         @keyframes cellPop{0%{transform:scale(1)}50%{transform:scale(0);opacity:0}100%{transform:scale(0);opacity:0}}
+        @keyframes floatUnicorn{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-20px) rotate(5deg)}}
+        @keyframes scanlines{0%,100%{opacity:1}}
+        @keyframes electricPulse{0%,100%{opacity:0.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}}
       `}</style>
 
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
@@ -1887,7 +1937,7 @@ export default function Piilosana(){
           <div style={{position:"relative"}}>
             <div ref={gRef}
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
-              style={{display:"grid",gridTemplateColumns:`repeat(${SZ},1fr)`,gap:"4px",padding:"6px",background:"#111133",
+              style={{display:"grid",gridTemplateColumns:`repeat(${SZ},1fr)`,gap:isLarge?"6px":"4px",padding:isLarge?"8px":"6px",background:S.gridBg||"#111133",
                 border:`3px solid ${combo>=3&&state==="play"?S.yellow:ending?ending.color+"88":S.border}`,
                 boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:`0 0 30px ${S.green}22`,
                 touchAction:"none",
@@ -1920,10 +1970,10 @@ export default function Piilosana(){
                     onTouchStart={e=>{e.preventDefault();onDragStart(r,c);}}
                     style={{
                       width:"100%",aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",
-                      fontSize:"clamp(28px,8vw,48px)",fontFamily:"'VT323',monospace",fontWeight:"normal",
-                      color:eaten?endColor||"transparent":s?"#0a0a1a":otherSelColor||(letterMult?letterColor(letter,lang):S.green),
-                      background:eaten?"#111133":last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":S.cell,
-                      border:`2px solid ${eaten?"#111133":s?S.green:otherSelColor||S.cellBorder}`,
+                      fontSize:isLarge?"clamp(34px,10vw,56px)":"clamp(28px,8vw,48px)",fontFamily:"'VT323',monospace",fontWeight:"normal",
+                      color:eaten?endColor||"transparent":s?S.bg:otherSelColor||(letterMult?letterColor(letter,lang):S.green),
+                      background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":S.cell,
+                      border:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
                       cursor:state==="play"?"pointer":"default",transition:"all 0.1s",
                       boxShadow:eaten?"none":s?`0 0 12px ${S.green}66`:otherSelColor?`0 0 8px ${otherSelColor}44`:"none",
                       textTransform:"uppercase",textShadow:s||eaten?"none":`0 0 8px ${otherSelColor||(letterMult?letterColor(letter,lang):S.green)}44`,
@@ -1969,8 +2019,9 @@ export default function Piilosana(){
 
       {/* GAME OVER */}
       {mode==="solo"&&state==="end"&&(
-        <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease"}}>
-          <div style={{border:`3px solid ${ending?.color||S.yellow}`,padding:"20px",marginBottom:"12px",boxShadow:`0 0 30px ${ending?.color||S.yellow}33`,background:S.dark}}>
+        <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease",position:"relative"}}>
+          {confettiOn&&<ConfettiCelebration isWinner={true}/>}
+          <div style={{position:"relative",zIndex:1,border:`3px solid ${ending?.color||S.yellow}`,padding:"20px",marginBottom:"12px",boxShadow:`0 0 30px ${ending?.color||S.yellow}33`,background:S.dark}}>
             <div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>
             <div style={{fontSize:"13px",color:"#556",marginBottom:"10px"}}>{t.score}</div>
             <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",animation:"pop 0.3s ease"}}>{score}{(soloMode!=="tetris"&&gameTime!==0)?<span style={{fontSize:"16px",color:"#556"}}> / {totalPossible}</span>:null}</div>
@@ -2049,6 +2100,111 @@ export default function Piilosana(){
 
       {/* Ad banner placeholder */}
       <div style={{width:"100%",maxWidth:"600px",minHeight:"60px",marginTop:"16px",flexShrink:0}}/>
+
+      {/* Settings gear icon - always visible */}
+      <button onClick={()=>setShowSettings(v=>!v)} style={{position:"fixed",bottom:isLarge?"16px":"12px",right:isLarge?"16px":"12px",
+        fontFamily:S.font,fontSize:isLarge?"18px":"14px",color:showSettings?S.green:S.textMuted||"#556",
+        background:showSettings?S.dark:S.bg,border:`2px solid ${showSettings?S.green:S.border}`,
+        borderRadius:"50%",width:isLarge?"44px":"36px",height:isLarge?"44px":"36px",
+        cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",
+        boxShadow:showSettings?`0 0 12px ${S.green}44`:"none",transition:"all 0.2s",zIndex:300}}>
+        ⚙
+      </button>
+
+      {/* Settings panel */}
+      {showSettings&&(
+        <div style={{position:"fixed",bottom:isLarge?"68px":"56px",right:isLarge?"16px":"12px",
+          background:S.dark,border:`3px solid ${S.green}`,boxShadow:`0 0 20px ${S.green}44`,
+          padding:isLarge?"20px":"14px",zIndex:300,maxWidth:"320px",width:"90vw",
+          maxHeight:"70vh",overflowY:"auto",animation:"fadeIn 0.3s ease"}}>
+          <div style={{fontFamily:S.font,fontSize:isLarge?"12px":"10px",color:S.yellow,marginBottom:"12px",textAlign:"center"}}>
+            {lang==="en"?"SETTINGS":lang==="sv"?"INSTÄLLNINGAR":"ASETUKSET"}
+          </div>
+
+          {/* Theme selection */}
+          <div style={{marginBottom:"14px"}}>
+            <div style={{fontFamily:S.font,fontSize:isLarge?"10px":"8px",color:S.green,marginBottom:"6px"}}>
+              {lang==="en"?"THEME":lang==="sv"?"TEMA":"TEEMA"}
+            </div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
+              {Object.entries(THEMES).map(([id,th])=>(
+                <button key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);}}
+                  style={{fontFamily:S.font,fontSize:isLarge?"9px":"7px",
+                    color:themeId===id?th.bg:th.green,
+                    background:themeId===id?th.green:"transparent",
+                    border:`2px solid ${th.green}`,padding:"5px 8px",cursor:"pointer",
+                    boxShadow:themeId===id?`0 0 8px ${th.green}66`:"none"}}>
+                  {lang==="en"?th.nameEn:lang==="sv"?th.nameSv:th.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* UI Size */}
+          <div style={{marginBottom:"14px"}}>
+            <div style={{fontFamily:S.font,fontSize:isLarge?"10px":"8px",color:S.green,marginBottom:"6px"}}>
+              {lang==="en"?"SIZE":lang==="sv"?"STORLEK":"KOKO"}
+            </div>
+            <div style={{display:"flex",gap:"4px"}}>
+              <button onClick={()=>{setUiSize("normal");localStorage.setItem("piilosana_size","normal");}}
+                style={{fontFamily:S.font,fontSize:isLarge?"9px":"7px",
+                  color:uiSize==="normal"?S.bg:S.green,background:uiSize==="normal"?S.green:"transparent",
+                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
+                {lang==="en"?"NORMAL":lang==="sv"?"NORMAL":"NORMAALI"}
+              </button>
+              <button onClick={()=>{setUiSize("large");localStorage.setItem("piilosana_size","large");}}
+                style={{fontFamily:S.font,fontSize:isLarge?"9px":"7px",
+                  color:uiSize==="large"?S.bg:S.green,background:uiSize==="large"?S.green:"transparent",
+                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
+                {lang==="en"?"LARGE":lang==="sv"?"STOR":"ISO"}
+              </button>
+            </div>
+          </div>
+
+          {/* Confetti toggle */}
+          <div style={{marginBottom:"8px"}}>
+            <div style={{fontFamily:S.font,fontSize:isLarge?"10px":"8px",color:S.green,marginBottom:"6px"}}>
+              {lang==="en"?"EFFECTS":lang==="sv"?"EFFEKTER":"TEHOSTEET"}
+            </div>
+            <button onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");}}
+              style={{fontFamily:S.font,fontSize:isLarge?"9px":"7px",
+                color:confettiOn?S.bg:S.green,background:confettiOn?S.green:"transparent",
+                border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
+              {confettiOn?"✓ ":""}{lang==="en"?"CONFETTI ON WIN":lang==="sv"?"KONFETTI VID VINST":"KONFETTI VOITOSTA"}
+            </button>
+          </div>
+
+          <button onClick={()=>setShowSettings(false)} style={{fontFamily:S.font,fontSize:isLarge?"9px":"7px",color:S.textMuted||"#556",
+            border:`1px solid ${S.border}`,background:"transparent",padding:"4px 8px",cursor:"pointer",marginTop:"8px",width:"100%"}}>
+            {lang==="en"?"CLOSE":lang==="sv"?"STÄNG":"SULJE"}
+          </button>
+        </div>
+      )}
+
+      {/* Pink theme unicorn decorations */}
+      {themeId==="pink"&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
+          <div style={{position:"absolute",top:"10%",left:"5%",fontSize:"32px",opacity:0.12,animation:"floatUnicorn 8s ease-in-out infinite"}}>🦄</div>
+          <div style={{position:"absolute",top:"30%",right:"8%",fontSize:"24px",opacity:0.10,animation:"floatUnicorn 10s ease-in-out infinite 2s"}}>🌸</div>
+          <div style={{position:"absolute",bottom:"20%",left:"10%",fontSize:"28px",opacity:0.10,animation:"floatUnicorn 9s ease-in-out infinite 4s"}}>✨</div>
+          <div style={{position:"absolute",top:"60%",right:"5%",fontSize:"26px",opacity:0.08,animation:"floatUnicorn 11s ease-in-out infinite 1s"}}>🦄</div>
+          <div style={{position:"absolute",bottom:"35%",left:"45%",fontSize:"20px",opacity:0.08,animation:"floatUnicorn 7s ease-in-out infinite 3s"}}>💖</div>
+          <div style={{position:"absolute",top:"5%",right:"30%",fontSize:"18px",opacity:0.10,animation:"floatUnicorn 12s ease-in-out infinite 5s"}}>🌈</div>
+        </div>
+      )}
+
+      {/* Electric theme scanline / glow effects */}
+      {themeId==="electric"&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
+          <div style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",
+            background:"repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,100,255,0.03) 2px,rgba(0,100,255,0.03) 4px)",
+            animation:"scanlines 0.1s steps(1) infinite"}}/>
+          <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",
+            width:"120%",height:"120%",
+            background:"radial-gradient(ellipse at center,rgba(0,100,255,0.08) 0%,transparent 70%)",
+            animation:"electricPulse 4s ease-in-out infinite"}}/>
+        </div>
+      )}
     </div>
   );
 }
