@@ -2705,7 +2705,7 @@ export default function Piilosana(){
             {lang==="en"?"Save your nickname?":lang==="sv"?"Spara ditt smeknamn?":"Tallenna nimimerkkisi?"}
           </div>
           <div style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
-            {lang==="en"?"Create an account so you don't have to type it every time":lang==="sv"?"Skapa ett konto så slipper du skriva det varje gång":"Luo tunnus niin ei tarvi syöttää joka kerta"}
+            {lang==="en"?"Create an account to save your progress":lang==="sv"?"Skapa ett konto för att spara dina framsteg":"Luo tunnus — nimimerkkisi ja saavutuksesi tallentuvat"}
           </div>
           <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
             <button onClick={()=>{setShowAuth(true);setAuthMode("register");setShowFirstTimeAuth(false);}}
