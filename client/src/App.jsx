@@ -1800,7 +1800,7 @@ export default function Piilosana(){
                 padding:"4px 8px",cursor:"pointer",color:lang===code?S.green:"#556",
                 boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
                 transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px"}}>
-              <PixelFlag lang={code} size={2}/>{lc.name}
+              <PixelFlag lang={code} size={2}/>
             </button>
           ))}
         </div>
