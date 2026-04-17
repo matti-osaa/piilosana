@@ -2404,7 +2404,7 @@ export default function Piilosana(){
           {flagBubble&&(
             <div style={{position:"absolute",top:"100%",left:"0",marginTop:"8px",
               animation:flagBubbleFading?"bubbleOut 0.6s ease-in forwards":"bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
-              whiteSpace:"nowrap",zIndex:50}}>
+              whiteSpace:"normal",width:"max-content",maxWidth:"calc(100vw - 24px)",zIndex:50}}>
               <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
                 fontSize:"9px",padding:"8px 14px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
                 border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",imageRendering:"pixelated"}}>
