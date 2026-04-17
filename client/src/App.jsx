@@ -2232,7 +2232,7 @@ export default function Piilosana(){
       <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"22px",color:S.bg,background:"#ff6644",border:"none",padding:"24px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"70px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"10px"}}
         onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="6px 6px 0 #cc3311"}}
         onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="4px 4px 0 #cc3311"}}>
-        <span style={{display:"flex",alignItems:"center",gap:"8px"}}>{t.arena}<span style={{fontSize:"11px",display:"inline-flex",alignItems:"center",gap:"4px",background:"#cc441188",padding:"2px 8px",borderRadius:"2px"}}><PixelIcon icon="person" color={S.bg} size={1.3}/>{publicOnlineCount}</span></span>
+        <span style={{display:"flex",alignItems:"center",gap:"8px"}}>{t.arena}<span style={{fontSize:"11px",display:"inline-flex",alignItems:"center",gap:"4px",background:"#00000033",padding:"2px 8px",borderRadius:"2px"}}><PixelIcon icon="person" color={S.bg} size={1.3}/>{publicOnlineCount}</span></span>
         <span style={{fontSize:"9px",opacity:0.8}}>{t.arenaDesc}</span>
       </button>
 
@@ -2473,13 +2473,7 @@ export default function Piilosana(){
 
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
 
-      {mode===null?(
-        <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px"}}>
-          {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>(
-            <span key={i} style={{color:S.yellow,textShadow:"3px 3px 0 #cc6600, 0 0 20px #ffcc0066",fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>
-          ));})()}
-        </h1>
-      ):((mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
+      {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
         <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={settingsBubble} bubbleFading={bubbleFading}/>
       ):(
         <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
