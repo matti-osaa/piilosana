@@ -1120,7 +1120,7 @@ app.post('/api/register', async (req, res) => {
     if (safeEmail && resend) {
       try {
         await resend.emails.send({
-          from: 'Piilosana <noreply@piilosana.app>',
+          from: process.env.RESEND_FROM || 'Piilosana <onboarding@resend.dev>',
           to: safeEmail,
           subject: 'Piilosana — tunnuksesi',
           html: `
