@@ -1369,6 +1369,18 @@ export default function Piilosana(){
   const[publicNextCountdown,setPublicNextCountdown]=useState(0);
   const[publicOnlineCount,setPublicOnlineCount]=useState(0);
 
+  // Poll arena player count from REST API when on main menu
+  useEffect(()=>{
+    if(mode!==null)return;
+    let active=true;
+    const poll=async()=>{
+      try{const r=await fetch(`${SERVER_URL}/api/arena-count`);const d=await r.json();if(active)setPublicOnlineCount(d.count);}catch{}
+    };
+    poll();
+    const iv=setInterval(poll,10000);
+    return()=>{active=false;clearInterval(iv);};
+  },[mode]);
+
   const gRef=useRef(null);
   const wordBarRef=useRef(null);
   const tRef=useRef(null);

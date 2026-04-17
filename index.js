@@ -1319,6 +1319,15 @@ app.post('/api/me', (req, res) => {
   }
 });
 
+// Get arena player count (for main menu display)
+app.get('/api/arena-count', (req, res) => {
+  let total = 0;
+  for (const lang of Object.keys(publicGames)) {
+    total += publicGames[lang].players.size;
+  }
+  res.json({ count: total });
+});
+
 // Save achievements
 app.post('/api/achievements', async (req, res) => {
   try {
