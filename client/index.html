@@ -5,20 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#0a0a1a" />
     <meta name="description" content="Piilosana — löydä piilotettuja sanoja ruudukosta! Suomalainen sanapeli verkossa." />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Piilosana — Sanapeli</title>
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Piilosana — Sanapeli" />
     <meta property="og:description" content="Löydä piilotettuja sanoja ruudukosta! Pelaa yksin tai haasta kaverit areenalla." />
-    <meta property="og:url" content="https://piilosana.up.railway.app" />
-    <meta property="og:image" content="https://piilosana.up.railway.app/og-image.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://piilosana.com" />
+    <meta property="og:image" content="https://piilosana.com/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Piilosana — Sanapeli" />
     <meta name="twitter:description" content="Löydä piilotettuja sanoja ruudukosta!" />
-    <meta name="twitter:image" content="https://piilosana.up.railway.app/og-image.png" />
+    <meta name="twitter:image" content="https://piilosana.com/icon-512.png" />
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { background: #0a0a1a; overflow-x: hidden; }
@@ -27,5 +32,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
