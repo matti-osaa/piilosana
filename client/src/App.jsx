@@ -1503,7 +1503,7 @@ export default function Piilosana(){
     if(mode!==null)return;
     let active=true;
     const poll=async()=>{
-      try{const r=await fetch(`${SERVER_URL}/api/arena-count`);const d=await r.json();if(active)setPublicOnlineCount(d.count);}catch{}
+      try{const r=await fetch(`${SERVER_URL}/api/arena-count`);const d=await r.json();if(active)setPublicOnlineCount(prev=>prev===d.count?prev:d.count);}catch{}
     };
     poll();
     const iv=setInterval(poll,10000);
@@ -1644,7 +1644,9 @@ export default function Piilosana(){
     const wordsFound=found.length;
     if(wordsFound===0&&score===0)return; // no-op game
     const longestFound=found.reduce((max,w)=>Math.max(max,w.length),0);
-    const gameTimeSec=gameTime||120;
+    // Use actual elapsed time if available, fall back to gameTime setting
+    const actualElapsed=startTimeRef.current?Math.max(1,Math.floor((Date.now()-startTimeRef.current)/1000)):null;
+    const gameTimeSec=gameTime===0?(actualElapsed||60):(actualElapsed||gameTime||120);
     const wordsPerMin=gameTimeSec>0?Math.round(wordsFound/(gameTimeSec/60)*10)/10:0;
     // Count 6+ letter words found this game
     const longWordsThisGame=found.filter(w=>w.length>=6).length;
@@ -2013,9 +2015,10 @@ export default function Piilosana(){
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
       setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setEnding(null);setDropKey(0);
       setTime(tl);setPublicState("playing");setPublicRound(roundNumber);setPublicRankings(null);setState("play");
+      startTimeRef.current=Date.now();
     });
     newSocket.on("public_game_start",()=>{
-      setPublicState("playing");setState("play");
+      setPublicState("playing");setState("play");startTimeRef.current=Date.now();
     });
     newSocket.on("public_timer_tick",({remaining})=>{
       setTime(remaining);
@@ -2689,6 +2692,14 @@ export default function Piilosana(){
                       });
                     }
                   }}/>
+                  <div style={{fontFamily:S.font,fontSize:"7px",color:S.textMuted,marginTop:"10px",lineHeight:"1.8",maxWidth:"280px",textAlign:"center"}}>
+                    {lang==="en"?"Google only shares your name and email. We never see your password or access your Google account. "
+                    :lang==="sv"?"Google delar bara ditt namn och e-post. Vi ser aldrig ditt lösenord eller kommer åt ditt Google-konto. "
+                    :"Google jakaa vain nimesi ja sähköpostisi. Emme näe salasanaasi emmekä pääse Google-tilillesi. "}
+                    <a href="https://support.google.com/accounts/answer/112802" target="_blank" rel="noopener noreferrer" style={{color:S.green,textDecoration:"underline"}}>
+                      {lang==="en"?"Learn more":lang==="sv"?"Läs mer":"Lue lisää"}
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
