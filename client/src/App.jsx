@@ -197,10 +197,10 @@ const THEMES={
   },
   light:{
     name:"VAALEA",nameEn:"LIGHT",nameSv:"LJUS",
-    bg:"#f0f0f5",green:"#00aa55",yellow:"#cc8800",red:"#cc2222",purple:"#aa44cc",
-    dark:"#e0e0ea",border:"#bbb",cell:"#ffffff",cellBorder:"#ccc",
+    bg:"#f0f0f5",green:"#007744",yellow:"#aa6600",red:"#cc2222",purple:"#8833aa",
+    dark:"#e0e0ea",border:"#999",cell:"#ffffff",cellBorder:"#bbb",
     font:"'Press Start 2P',monospace",
-    gridBg:"#d8d8e8",textMuted:"#888",textSoft:"#446655",
+    gridBg:"#d8d8e8",textMuted:"#666",textSoft:"#335544",
     inputBg:"#ffffff",
   },
   pink:{
@@ -218,6 +218,14 @@ const THEMES={
     font:"'Press Start 2P',monospace",
     gridBg:"#000c30",textMuted:"#336699",textSoft:"#44aacc",
     inputBg:"#001030",
+  },
+  neon:{
+    name:"NEON",nameEn:"NEON",nameSv:"NEON",
+    bg:"#001a00",green:"#00ff44",yellow:"#88ff00",red:"#ff2200",purple:"#00ff88",
+    dark:"#002200",border:"#005500",cell:"#003300",cellBorder:"#006600",
+    font:"'Press Start 2P',monospace",
+    gridBg:"#001800",textMuted:"#338833",textSoft:"#44cc44",
+    inputBg:"#002200",
   },
 };
 function getTheme(id){return THEMES[id]||THEMES.dark;}
