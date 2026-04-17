@@ -807,86 +807,163 @@ const BADGE_PIXELS={
 // ============================================
 const ACHIEVEMENTS={
   // Word-based achievements
-  first_word:    {icon:"star",   color:"#00ff88",tier:1,
-    fi:"Ensimmäinen sana",     en:"First Word",         sv:"Första ordet",
-    fi_d:"Löydä ensimmäinen sanasi",en_d:"Find your first word",sv_d:"Hitta ditt första ord",
-    check:(s)=>s.totalWords>=1},
-  ten_words:     {icon:"star",   color:"#00ff88",tier:1,
-    fi:"Sananiekka",           en:"Word Finder",        sv:"Ordhittare",
-    fi_d:"Löydä 10 sanaa yhteensä",en_d:"Find 10 words total",sv_d:"Hitta 10 ord totalt",
-    check:(s)=>s.totalWords>=10},
-  hundred_words: {icon:"scroll", color:"#44ddff",tier:2,
-    fi:"Sanamestari",          en:"Word Master",        sv:"Ordmästare",
-    fi_d:"Löydä 100 sanaa yhteensä",en_d:"Find 100 words total",sv_d:"Hitta 100 ord totalt",
-    check:(s)=>s.totalWords>=100},
-  thousand_words:{icon:"scroll", color:"#ff66ff",tier:3,
-    fi:"Sanalegenda",          en:"Word Legend",         sv:"Ordlegend",
-    fi_d:"Löydä 1000 sanaa yhteensä",en_d:"Find 1000 words total",sv_d:"Hitta 1000 ord totalt",
-    check:(s)=>s.totalWords>=1000},
-  long_word_5:   {icon:"diamond",color:"#44ddff",tier:2,
-    fi:"Pitkä sana",           en:"Long Word",          sv:"Långt ord",
-    fi_d:"Löydä 5-kirjaiminen sana",en_d:"Find a 5-letter word",sv_d:"Hitta ett 5-bokstavsord",
-    check:(s)=>s.longestWord>=5},
-  long_word_6:   {icon:"diamond",color:"#ff66ff",tier:2,
-    fi:"Todella pitkä",        en:"Really Long",        sv:"Riktigt långt",
-    fi_d:"Löydä 6-kirjaiminen sana",en_d:"Find a 6-letter word",sv_d:"Hitta ett 6-bokstavsord",
-    check:(s)=>s.longestWord>=6},
-  long_word_7:   {icon:"diamond",color:"#ffcc00",tier:3,
-    fi:"Sanamagiikka",         en:"Word Magic",         sv:"Ordmagi",
-    fi_d:"Löydä 7+ kirjaimen sana",en_d:"Find a 7+ letter word",sv_d:"Hitta ett 7+ bokstavsord",
-    check:(s)=>s.longestWord>=7},
-  // Game/score achievements
+  // -- TIER 1: Ensimmäinen peli (saa heti) --
   first_game:    {icon:"trophy", color:"#00ff88",tier:1,
     fi:"Ensimmäinen peli",     en:"First Game",         sv:"Första spelet",
     fi_d:"Pelaa ensimmäinen pelisi",en_d:"Play your first game",sv_d:"Spela ditt första spel",
     check:(s)=>s.gamesPlayed>=1},
-  ten_games:     {icon:"trophy", color:"#44ddff",tier:2,
-    fi:"Kokenut pelaaja",      en:"Experienced",        sv:"Erfaren",
-    fi_d:"Pelaa 10 peliä",en_d:"Play 10 games",sv_d:"Spela 10 spel",
-    check:(s)=>s.gamesPlayed>=10},
-  fifty_games:   {icon:"trophy", color:"#ff66ff",tier:3,
-    fi:"Veteraani",            en:"Veteran",            sv:"Veteran",
-    fi_d:"Pelaa 50 peliä",en_d:"Play 50 games",sv_d:"Spela 50 spel",
-    check:(s)=>s.gamesPlayed>=50},
-  score_50:      {icon:"star",   color:"#ffcc00",tier:2,
-    fi:"Puolivuosisata",       en:"Half Century",       sv:"Halvt sekel",
-    fi_d:"Saa 50 pistettä yhdessä pelissä",en_d:"Score 50 in one game",sv_d:"Få 50 poäng i ett spel",
-    check:(s)=>s.bestScore>=50},
-  score_100:     {icon:"crown",  color:"#ffcc00",tier:3,
-    fi:"Satanen",              en:"Century",            sv:"Hundra",
-    fi_d:"Saa 100 pistettä yhdessä pelissä",en_d:"Score 100 in one game",sv_d:"Få 100 poäng i ett spel",
-    check:(s)=>s.bestScore>=100},
-  // Combo achievements
+  first_word:    {icon:"star",   color:"#00ff88",tier:1,
+    fi:"Ensimmäinen sana",     en:"First Word",         sv:"Första ordet",
+    fi_d:"Löydä ensimmäinen sanasi",en_d:"Find your first word",sv_d:"Hitta ditt första ord",
+    check:(s)=>s.totalWords>=1},
   combo_3:       {icon:"flame",  color:"#ff6644",tier:1,
     fi:"Komboilija",           en:"Combo Starter",      sv:"Kombostartare",
     fi_d:"Saa 3 sanan kombo",en_d:"Get a 3 word combo",sv_d:"Få en 3-ordskombo",
     check:(s)=>s.bestCombo>=3},
-  combo_5:       {icon:"flame",  color:"#ff66ff",tier:2,
-    fi:"Megakombo",            en:"Mega Combo",         sv:"Megakombo",
-    fi_d:"Saa 5 sanan kombo",en_d:"Get a 5 word combo",sv_d:"Få en 5-ordskombo",
-    check:(s)=>s.bestCombo>=5},
-  // Speed
-  speed_demon:   {icon:"bolt",   color:"#ffcc00",tier:2,
-    fi:"Salamannopea",         en:"Speed Demon",        sv:"Blixtsnabb",
-    fi_d:"Löydä 10 sanaa minuutissa",en_d:"Find 10 words in a minute",sv_d:"Hitta 10 ord på en minut",
-    check:(s)=>s.bestWordsPerMin>=10},
-  // Arena
-  arena_player:  {icon:"sword",  color:"#ff6644",tier:1,
-    fi:"Areenataisteli­ja",     en:"Arena Fighter",      sv:"Arenakämpe",
+  // -- TIER 2: Muutaman pelin jälkeen --
+  hundred_words: {icon:"scroll", color:"#44ddff",tier:2,
+    fi:"Sananiekka",           en:"Word Finder",        sv:"Ordhittare",
+    fi_d:"Löydä 100 sanaa yhteensä",en_d:"Find 100 words total",sv_d:"Hitta 100 ord totalt",
+    check:(s)=>s.totalWords>=100},
+  ten_games:     {icon:"trophy", color:"#44ddff",tier:2,
+    fi:"Kokenut pelaaja",      en:"Experienced",        sv:"Erfaren",
+    fi_d:"Pelaa 10 peliä",en_d:"Play 10 games",sv_d:"Spela 10 spel",
+    check:(s)=>s.gamesPlayed>=10},
+  long_word_5:   {icon:"diamond",color:"#44ddff",tier:2,
+    fi:"Pitkä sana",           en:"Long Word",          sv:"Långt ord",
+    fi_d:"Löydä 5-kirjaiminen sana",en_d:"Find a 5-letter word",sv_d:"Hitta ett 5-bokstavsord",
+    check:(s)=>s.longestWord>=5},
+  score_30:      {icon:"star",   color:"#44ddff",tier:2,
+    fi:"Hyvä alku",            en:"Good Start",         sv:"Bra start",
+    fi_d:"Saa 30 pistettä yhdessä pelissä",en_d:"Score 30 in one game",sv_d:"Få 30 poäng i ett spel",
+    check:(s)=>s.bestScore>=30},
+  arena_player:  {icon:"sword",  color:"#ff6644",tier:2,
+    fi:"Areenataistelija",     en:"Arena Fighter",      sv:"Arenakämpe",
     fi_d:"Pelaa areenalla",en_d:"Play in the arena",sv_d:"Spela i arenan",
     check:(s)=>s.arenaGames>=1},
-  arena_winner:  {icon:"crown",  color:"#ff6644",tier:3,
-    fi:"Areenakunkku",         en:"Arena Champion",     sv:"Arenamästare",
-    fi_d:"Voita areenakierros",en_d:"Win an arena round",sv_d:"Vinn en arenarunda",
-    check:(s)=>s.arenaWins>=1},
-  // Multilingual
   polyglot:      {icon:"scroll", color:"#ffcc00",tier:2,
     fi:"Monikielinen",         en:"Polyglot",           sv:"Polyglott",
     fi_d:"Pelaa kaikilla kolmella kielellä",en_d:"Play in all three languages",sv_d:"Spela på alla tre språk",
     check:(s)=>(s.langsPlayed||[]).length>=3},
+  // -- TIER 3: Kymmenien pelien jälkeen --
+  five_hundred_words:{icon:"scroll",color:"#ff66ff",tier:3,
+    fi:"Sanamestari",          en:"Word Master",        sv:"Ordmästare",
+    fi_d:"Löydä 500 sanaa yhteensä",en_d:"Find 500 words total",sv_d:"Hitta 500 ord totalt",
+    check:(s)=>s.totalWords>=500},
+  fifty_games:   {icon:"trophy", color:"#ff66ff",tier:3,
+    fi:"Veteraani",            en:"Veteran",            sv:"Veteran",
+    fi_d:"Pelaa 50 peliä",en_d:"Play 50 games",sv_d:"Spela 50 spel",
+    check:(s)=>s.gamesPlayed>=50},
+  long_word_6:   {icon:"diamond",color:"#ff66ff",tier:3,
+    fi:"Todella pitkä",        en:"Really Long",        sv:"Riktigt långt",
+    fi_d:"Löydä 6-kirjaiminen sana",en_d:"Find a 6-letter word",sv_d:"Hitta ett 6-bokstavsord",
+    check:(s)=>s.longestWord>=6},
+  score_60:      {icon:"star",   color:"#ffcc00",tier:3,
+    fi:"Kuusikymppinen",       en:"Sixty Club",         sv:"Sextio",
+    fi_d:"Saa 60 pistettä yhdessä pelissä",en_d:"Score 60 in one game",sv_d:"Få 60 poäng i ett spel",
+    check:(s)=>s.bestScore>=60},
+  combo_5:       {icon:"flame",  color:"#ff66ff",tier:3,
+    fi:"Megakombo",            en:"Mega Combo",         sv:"Megakombo",
+    fi_d:"Saa 5 sanan kombo",en_d:"Get a 5 word combo",sv_d:"Få en 5-ordskombo",
+    check:(s)=>s.bestCombo>=5},
+  speed_8:       {icon:"bolt",   color:"#ffcc00",tier:3,
+    fi:"Nopea sormi",          en:"Quick Finger",       sv:"Snabbt finger",
+    fi_d:"Löydä 8 sanaa minuutissa",en_d:"Find 8 words per minute",sv_d:"Hitta 8 ord per minut",
+    check:(s)=>s.bestWordsPerMin>=8},
+  arena_winner:  {icon:"crown",  color:"#ff6644",tier:3,
+    fi:"Arenavoittaja",        en:"Arena Victor",       sv:"Arenavinnare",
+    fi_d:"Voita areenakierros",en_d:"Win an arena round",sv_d:"Vinn en arenarunda",
+    check:(s)=>s.arenaWins>=1},
+  long_words_10: {icon:"diamond",color:"#44ddff",tier:3,
+    fi:"Sanaetsijä",           en:"Word Hunter",        sv:"Ordjägare",
+    fi_d:"Löydä 10 eri 6+ kirjaimen sanaa",en_d:"Find 10 different 6+ letter words",sv_d:"Hitta 10 olika 6+ bokstavsord",
+    check:(s)=>s.longWordsTotal>=10},
+  // -- TIER 4: Satoja pelejä, oikeasti hyvä --
+  thousand_words:{icon:"scroll", color:"#ffcc00",tier:4,
+    fi:"Sanalegenda",          en:"Word Legend",         sv:"Ordlegend",
+    fi_d:"Löydä 1000 sanaa yhteensä",en_d:"Find 1000 words total",sv_d:"Hitta 1000 ord totalt",
+    check:(s)=>s.totalWords>=1000},
+  hundred_games: {icon:"trophy", color:"#ffcc00",tier:4,
+    fi:"Omistautunut",         en:"Dedicated",          sv:"Hängiven",
+    fi_d:"Pelaa 100 peliä",en_d:"Play 100 games",sv_d:"Spela 100 spel",
+    check:(s)=>s.gamesPlayed>=100},
+  long_word_7:   {icon:"diamond",color:"#ffcc00",tier:4,
+    fi:"Sanamagiikka",         en:"Word Magic",         sv:"Ordmagi",
+    fi_d:"Löydä 7+ kirjaimen sana",en_d:"Find a 7+ letter word",sv_d:"Hitta ett 7+ bokstavsord",
+    check:(s)=>s.longestWord>=7},
+  score_80:      {icon:"crown",  color:"#ffcc00",tier:4,
+    fi:"Kahdeksankymppinen",   en:"Eighty Club",        sv:"Åttio",
+    fi_d:"Saa 80 pistettä yhdessä pelissä",en_d:"Score 80 in one game",sv_d:"Få 80 poäng i ett spel",
+    check:(s)=>s.bestScore>=80},
+  combo_7:       {icon:"flame",  color:"#ffcc00",tier:4,
+    fi:"Tulimyrsky",           en:"Firestorm",          sv:"Eldstorm",
+    fi_d:"Saa 7 sanan kombo",en_d:"Get a 7 word combo",sv_d:"Få en 7-ordskombo",
+    check:(s)=>s.bestCombo>=7},
+  speed_12:      {icon:"bolt",   color:"#ff66ff",tier:4,
+    fi:"Salamannopea",         en:"Speed Demon",        sv:"Blixtsnabb",
+    fi_d:"Löydä 12 sanaa minuutissa",en_d:"Find 12 words per minute",sv_d:"Hitta 12 ord per minut",
+    check:(s)=>s.bestWordsPerMin>=12},
+  arena_5:       {icon:"sword",  color:"#ff66ff",tier:4,
+    fi:"Gladiaattori",         en:"Gladiator",          sv:"Gladiator",
+    fi_d:"Voita 5 areenakierrosta",en_d:"Win 5 arena rounds",sv_d:"Vinn 5 arenarundor",
+    check:(s)=>s.arenaWins>=5},
+  long_words_30: {icon:"diamond",color:"#ff66ff",tier:4,
+    fi:"Sanakirja",            en:"Dictionary",         sv:"Ordbok",
+    fi_d:"Löydä 30 eri 6+ kirjaimen sanaa",en_d:"Find 30 different 6+ letter words",sv_d:"Hitta 30 olika 6+ bokstavsord",
+    check:(s)=>s.longWordsTotal>=30},
+  marathon:      {icon:"trophy", color:"#ff6644",tier:4,
+    fi:"Maratoonari",          en:"Marathoner",         sv:"Maratonlöpare",
+    fi_d:"Pelaa 10 peliä yhden päivän aikana",en_d:"Play 10 games in one day",sv_d:"Spela 10 spel på en dag",
+    check:(s)=>s.bestDayGames>=10},
+  // -- TIER 5: Legenda, todella vaikea --
+  three_thousand:{icon:"scroll", color:"#ff4400",tier:5,
+    fi:"Sanatieteilijä",       en:"Lexicographer",      sv:"Lexikograf",
+    fi_d:"Löydä 3000 sanaa yhteensä",en_d:"Find 3000 words total",sv_d:"Hitta 3000 ord totalt",
+    check:(s)=>s.totalWords>=3000},
+  score_100:     {icon:"crown",  color:"#ff4400",tier:5,
+    fi:"Satanen",              en:"Century",            sv:"Hundra",
+    fi_d:"Saa 100 pistettä yhdessä pelissä",en_d:"Score 100 in one game",sv_d:"Få 100 poäng i ett spel",
+    check:(s)=>s.bestScore>=100},
+  combo_10:      {icon:"flame",  color:"#ff4400",tier:5,
+    fi:"Inferno",              en:"Inferno",            sv:"Inferno",
+    fi_d:"Saa 10 sanan kombo",en_d:"Get a 10 word combo",sv_d:"Få en 10-ordskombo",
+    check:(s)=>s.bestCombo>=10},
+  arena_15:      {icon:"sword",  color:"#ff4400",tier:5,
+    fi:"Mestari",              en:"Grand Master",       sv:"Stormästare",
+    fi_d:"Voita 15 areenakierrosta",en_d:"Win 15 arena rounds",sv_d:"Vinn 15 arenarundor",
+    check:(s)=>s.arenaWins>=15},
+  perfect_game:  {icon:"crown",  color:"#ff4400",tier:5,
+    fi:"Täydellinen peli",     en:"Perfect Game",       sv:"Perfekt spel",
+    fi_d:"Löydä kaikki sanat yhdessä pelissä",en_d:"Find every word in a game",sv_d:"Hitta alla ord i ett spel",
+    check:(s)=>s.perfectGames>=1},
+  // -- TIER 6: Mahdoton / legenda --
+  ten_thousand:  {icon:"scroll", color:"#ff0000",tier:6,
+    fi:"Sanakoneen ydin",      en:"Word Engine",        sv:"Ordmaskin",
+    fi_d:"Löydä 10 000 sanaa yhteensä",en_d:"Find 10,000 words total",sv_d:"Hitta 10 000 ord totalt",
+    check:(s)=>s.totalWords>=10000},
+  five_hundred_games:{icon:"trophy",color:"#ff0000",tier:6,
+    fi:"Elinikäinen",          en:"Lifer",              sv:"Livstid",
+    fi_d:"Pelaa 500 peliä",en_d:"Play 500 games",sv_d:"Spela 500 spel",
+    check:(s)=>s.gamesPlayed>=500},
+  score_150:     {icon:"crown",  color:"#ff0000",tier:6,
+    fi:"Jumalallinen",         en:"Divine",             sv:"Gudomlig",
+    fi_d:"Saa 150 pistettä yhdessä pelissä",en_d:"Score 150 in one game",sv_d:"Få 150 poäng i ett spel",
+    check:(s)=>s.bestScore>=150},
+  speed_15:      {icon:"bolt",   color:"#ff0000",tier:6,
+    fi:"Aikamatkaaja",         en:"Time Traveler",      sv:"Tidsresenär",
+    fi_d:"Löydä 15 sanaa minuutissa",en_d:"Find 15 words per minute",sv_d:"Hitta 15 ord per minut",
+    check:(s)=>s.bestWordsPerMin>=15},
+  arena_50:      {icon:"sword",  color:"#ff0000",tier:6,
+    fi:"Kuolematon",           en:"Immortal",           sv:"Odödlig",
+    fi_d:"Voita 50 areenakierrosta",en_d:"Win 50 arena rounds",sv_d:"Vinn 50 arenarundor",
+    check:(s)=>s.arenaWins>=50},
+  long_words_100:{icon:"diamond",color:"#ff0000",tier:6,
+    fi:"Professori",           en:"Professor",          sv:"Professor",
+    fi_d:"Löydä 100 eri 6+ kirjaimen sanaa",en_d:"Find 100 different 6+ letter words",sv_d:"Hitta 100 olika 6+ bokstavsord",
+    check:(s)=>s.longWordsTotal>=100},
 };
 
-const INITIAL_STATS={totalWords:0,gamesPlayed:0,bestScore:0,bestCombo:0,longestWord:0,bestWordsPerMin:0,arenaGames:0,arenaWins:0,langsPlayed:[]};
+const INITIAL_STATS={totalWords:0,gamesPlayed:0,bestScore:0,bestCombo:0,longestWord:0,bestWordsPerMin:0,arenaGames:0,arenaWins:0,langsPlayed:[],perfectGames:0,longWordsTotal:0,bestDayGames:0,lastPlayDate:"",dayGames:0};
 
 const SHADE_MAP={outline:0.4,dark:0.55,mid:0.7,light:0.85,highlight:1.0};
 function PixelIcon({icon,color="currentColor",size=2,style={},badge=false}){
@@ -1278,6 +1355,18 @@ export default function Piilosana(){
       if(updates.addGames)next.gamesPlayed=(prev.gamesPlayed||0)+updates.addGames;
       if(updates.addArenaGames)next.arenaGames=(prev.arenaGames||0)+updates.addArenaGames;
       if(updates.addArenaWins)next.arenaWins=(prev.arenaWins||0)+updates.addArenaWins;
+      if(updates.addLongWords)next.longWordsTotal=(prev.longWordsTotal||0)+updates.addLongWords;
+      if(updates.addPerfect)next.perfectGames=(prev.perfectGames||0)+1;
+      // Daily games tracking
+      if(updates.dayDate){
+        if(prev.lastPlayDate===updates.dayDate){
+          next.dayGames=(prev.dayGames||0)+1;
+        }else{
+          next.dayGames=1;
+        }
+        next.lastPlayDate=updates.dayDate;
+        next.bestDayGames=Math.max(prev.bestDayGames||0,next.dayGames);
+      }
       localStorage.setItem("piilosana_ach_stats",JSON.stringify(next));
       achStatsRef.current=next;
       checkAchievements(next);
@@ -1524,11 +1613,19 @@ export default function Piilosana(){
     const longestFound=found.reduce((max,w)=>Math.max(max,w.length),0);
     const gameTimeSec=gameTime||120;
     const wordsPerMin=gameTimeSec>0?Math.round(wordsFound/(gameTimeSec/60)*10)/10:0;
+    // Count 6+ letter words found this game
+    const longWordsThisGame=found.filter(w=>w.length>=6).length;
+    // Perfect game check (solo non-unlimited only)
+    const isPerfect=mode==="solo"&&gameTime!==0&&soloMode!=="tetris"&&valid.size>0&&wordsFound>=valid.size;
+    // Daily games tracking
+    const today=new Date().toISOString().slice(0,10);
     const updates={addWords:wordsFound,addGames:1,bestScore:score,longestWord:longestFound,bestWordsPerMin:wordsPerMin,
-      langsPlayed:[lang]};
+      langsPlayed:[lang],addLongWords:longWordsThisGame};
+    if(isPerfect)updates.addPerfect=1;
+    // Day tracking
+    updates.dayDate=today;
     if(mode==="public"){
       updates.addArenaGames=1;
-      // Check if won arena round
       if(publicRankings&&publicRankings.length>0){
         const myNick=(authUser?.nickname||nickname||"").toUpperCase();
         if(publicRankings[0]?.nickname?.toUpperCase()===myNick)updates.addArenaWins=1;
