@@ -79,6 +79,8 @@ async function initDb() {
   `);
   // Link hall_of_fame to users (optional, add user_id column)
   try { db.run(`ALTER TABLE hall_of_fame ADD COLUMN user_id INTEGER`); } catch(e) { /* column already exists */ }
+  // Add settings column to users
+  try { db.run(`ALTER TABLE users ADD COLUMN settings TEXT`); } catch(e) { /* column already exists */ }
 
   saveDb();
 }
@@ -1152,18 +1154,21 @@ app.post('/api/login', async (req, res) => {
     const { nickname, password } = req.body;
     if (!nickname || !password) return res.status(400).json({ error: 'Nimimerkki ja salasana vaaditaan' });
 
-    const rows = db.exec(`SELECT id, nickname, password_hash, email FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    const rows = db.exec(`SELECT id, nickname, password_hash, email, settings FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
     if (rows.length === 0 || rows[0].values.length === 0) {
       return res.status(401).json({ error: 'Väärä nimimerkki tai salasana' });
     }
 
-    const [id, dbNickname, password_hash, email] = rows[0].values[0];
+    const [id, dbNickname, password_hash, email, settingsJson] = rows[0].values[0];
     const match = await bcrypt.compare(password, password_hash);
     if (!match) {
       return res.status(401).json({ error: 'Väärä nimimerkki tai salasana' });
     }
 
-    res.json({ ok: true, user: { id, nickname: dbNickname, email } });
+    let settings = null;
+    try { settings = settingsJson ? JSON.parse(settingsJson) : null; } catch(e) {}
+
+    res.json({ ok: true, user: { id, nickname: dbNickname, email, settings } });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Kirjautuminen epäonnistui' });
@@ -1173,19 +1178,16 @@ app.post('/api/login', async (req, res) => {
 // Forgot password — generate new password and send to email
 app.post('/api/forgot-password', async (req, res) => {
   try {
-    const { nickname } = req.body;
-    if (!nickname) return res.status(400).json({ error: 'Nimimerkki vaaditaan' });
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Sähköposti vaaditaan' });
 
-    const rows = db.exec(`SELECT id, nickname, email FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    const rows = db.exec(`SELECT id, nickname, email FROM users WHERE email = ?`, [email.trim().toLowerCase()]);
     if (rows.length === 0 || rows[0].values.length === 0) {
-      // Don't reveal if user exists
-      return res.json({ ok: true, message: 'Jos tunnus löytyy ja sähköposti on asetettu, uusi salasana lähetetään.' });
+      // Don't reveal if email exists
+      return res.json({ ok: true, message: 'Jos sähköposti löytyy, uusi salasana lähetetään.' });
     }
 
-    const [id, dbNickname, email] = rows[0].values[0];
-    if (!email) {
-      return res.json({ ok: true, message: 'Jos tunnus löytyy ja sähköposti on asetettu, uusi salasana lähetetään.' });
-    }
+    const [id, dbNickname, dbEmail] = rows[0].values[0];
 
     if (!resend) {
       return res.status(500).json({ error: 'Sähköpostipalvelu ei ole käytössä' });
@@ -1202,7 +1204,7 @@ app.post('/api/forgot-password', async (req, res) => {
 
     await resend.emails.send({
       from: process.env.RESEND_FROM || 'Piilosana <onboarding@resend.dev>',
-      to: email,
+      to: dbEmail,
       subject: 'Piilosana — uusi salasana',
       html: `
         <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
@@ -1214,11 +1216,85 @@ app.post('/api/forgot-password', async (req, res) => {
       `
     });
 
-    console.log(`Password reset email sent to ${email} for user ${dbNickname}`);
+    console.log(`Password reset email sent to ${dbEmail} for user ${dbNickname}`);
     res.json({ ok: true, message: 'Uusi salasana lähetetty sähköpostiin!' });
   } catch (err) {
     console.error('Forgot password error:', err);
     res.status(500).json({ error: 'Salasanan nollaus epäonnistui' });
+  }
+});
+
+// Change password (requires current password)
+app.post('/api/change-password', async (req, res) => {
+  try {
+    const { nickname, currentPassword, newPassword } = req.body;
+    if (!nickname || !currentPassword || !newPassword) return res.status(400).json({ error: 'Kaikki kentät vaaditaan' });
+    if (newPassword.length < 4) return res.status(400).json({ error: 'Uusi salasana min 4 merkkiä' });
+
+    const rows = db.exec(`SELECT id, password_hash, email FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    if (rows.length === 0 || rows[0].values.length === 0) {
+      return res.status(401).json({ error: 'Käyttäjää ei löydy' });
+    }
+
+    const [id, password_hash, email] = rows[0].values[0];
+    const match = await bcrypt.compare(currentPassword, password_hash);
+    if (!match) {
+      return res.status(401).json({ error: 'Nykyinen salasana on väärin' });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+    db.run(`UPDATE users SET password_hash = ? WHERE id = ?`, [newHash, id]);
+    saveDb();
+
+    // Send new password to email if available
+    if (email && resend) {
+      try {
+        await resend.emails.send({
+          from: process.env.RESEND_FROM || 'Piilosana <onboarding@resend.dev>',
+          to: email,
+          subject: 'Piilosana — salasana vaihdettu',
+          html: `
+            <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
+              <h2 style="color:#ffcc00;">Salasana vaihdettu</h2>
+              <p>Nimimerkkisi: <strong>${nickname.toUpperCase()}</strong></p>
+              <p>Uusi salasanasi: <strong>${newPassword}</strong></p>
+              <p style="color:#556;margin-top:20px;font-size:12px;">Kirjaudu osoitteessa piilosana.app</p>
+            </div>
+          `
+        });
+      } catch (emailErr) {
+        console.error('Failed to send password change email:', emailErr);
+      }
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Change password error:', err);
+    res.status(500).json({ error: 'Salasanan vaihto epäonnistui' });
+  }
+});
+
+// Save user settings
+app.post('/api/settings', async (req, res) => {
+  try {
+    const { nickname, password, settings } = req.body;
+    if (!nickname || !password) return res.status(401).json({ error: 'Ei kirjautunut' });
+
+    const rows = db.exec(`SELECT id, password_hash FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    if (rows.length === 0 || rows[0].values.length === 0) return res.status(401).json({ error: 'Ei kirjautunut' });
+
+    const [id, password_hash] = rows[0].values[0];
+    const match = await bcrypt.compare(password, password_hash);
+    if (!match) return res.status(401).json({ error: 'Ei kirjautunut' });
+
+    const settingsJson = JSON.stringify(settings || {});
+    db.run(`UPDATE users SET settings = ? WHERE id = ?`, [settingsJson, id]);
+    saveDb();
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Settings save error:', err);
+    res.status(500).json({ error: 'Asetusten tallennus epäonnistui' });
   }
 });
 

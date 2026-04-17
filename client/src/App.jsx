@@ -910,6 +910,13 @@ export default function Piilosana(){
   const[authSuccess,setAuthSuccess]=useState("");
   const[showFirstTimeAuth,setShowFirstTimeAuth]=useState(()=>!localStorage.getItem("piilosana_auth")&&!sessionStorage.getItem("piilosana_auth_dismissed"));
 
+  const applySettings=useCallback((s)=>{
+    if(!s)return;
+    if(s.theme){setThemeId(s.theme);localStorage.setItem("piilosana_theme",s.theme);}
+    if(s.lang){setLang(s.lang);localStorage.setItem("piilosana_lang",s.lang);}
+    if(s.size){setUiSize(s.size);localStorage.setItem("piilosana_size",s.size);}
+    if(typeof s.confetti==="boolean"){setConfettiOn(s.confetti);localStorage.setItem("piilosana_confetti",s.confetti?"on":"off");}
+  },[]);
   const doLogin=useCallback(async(nickname,password)=>{
     setAuthLoading(true);setAuthError("");
     try{
@@ -918,9 +925,10 @@ export default function Piilosana(){
       if(!res.ok){setAuthError(data.error||"Virhe");setAuthLoading(false);return false;}
       setAuthUser(data.user);localStorage.setItem("piilosana_auth",JSON.stringify(data.user));
       localStorage.setItem("piilosana_auth_cred",JSON.stringify({nickname,password}));
+      if(data.user.settings)applySettings(data.user.settings);
       setShowAuth(false);setShowFirstTimeAuth(false);setAuthLoading(false);return true;
     }catch{setAuthError("Yhteysvirhe");setAuthLoading(false);return false;}
-  },[]);
+  },[applySettings]);
 
   const doRegister=useCallback(async(nickname,password,email,email2)=>{
     setAuthLoading(true);setAuthError("");
@@ -937,10 +945,37 @@ export default function Piilosana(){
   const doLogout=useCallback(()=>{
     setAuthUser(null);localStorage.removeItem("piilosana_auth");localStorage.removeItem("piilosana_auth_cred");
   },[]);
-  const doForgotPassword=useCallback(async(nickname)=>{
+  const saveSettingsToServer=useCallback(async(settings)=>{
+    try{
+      const cred=JSON.parse(localStorage.getItem("piilosana_auth_cred")||"null");
+      if(!cred)return;
+      await fetch(`${SERVER_URL}/api/settings`,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({nickname:cred.nickname,password:cred.password,settings})});
+    }catch{}
+  },[]);
+  const syncSettings=useCallback((overrides={})=>{
+    if(!authUser)return;
+    const s={theme:themeId,lang,size:uiSize,confetti:confettiOn,...overrides};
+    saveSettingsToServer(s);
+  },[authUser,themeId,lang,uiSize,confettiOn,saveSettingsToServer]);
+
+  const doChangePassword=useCallback(async(currentPassword,newPassword)=>{
     setAuthLoading(true);setAuthError("");setAuthSuccess("");
     try{
-      const res=await fetch(`${SERVER_URL}/api/forgot-password`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nickname})});
+      const res=await fetch(`${SERVER_URL}/api/change-password`,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({nickname:authUser?.nickname,currentPassword,newPassword})});
+      const data=await res.json();
+      if(!res.ok){setAuthError(data.error||"Virhe");setAuthLoading(false);return;}
+      localStorage.setItem("piilosana_auth_cred",JSON.stringify({nickname:authUser.nickname,password:newPassword}));
+      setAuthSuccess(lang==="en"?"Password changed!":lang==="sv"?"Lösenord ändrat!":"Salasana vaihdettu!");
+      setAuthLoading(false);
+    }catch{setAuthError("Yhteysvirhe");setAuthLoading(false);}
+  },[authUser,lang]);
+
+  const doForgotPassword=useCallback(async(email)=>{
+    setAuthLoading(true);setAuthError("");setAuthSuccess("");
+    try{
+      const res=await fetch(`${SERVER_URL}/api/forgot-password`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
       const data=await res.json();
       if(!res.ok){setAuthError(data.error||"Virhe");setAuthLoading(false);return;}
       setAuthSuccess(data.message);setAuthLoading(false);
@@ -1806,7 +1841,7 @@ export default function Piilosana(){
       {mode===null&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",maxWidth:"600px",marginBottom:"4px"}}>
         <div style={{display:"flex",gap:"6px",position:"relative"}}>
           {Object.entries(LANG_CONFIG).map(([code,lc])=>(
-            <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");}}
+            <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
               style={{fontFamily:S.font,fontSize:"9px",background:lang===code?S.dark:"transparent",
                 border:lang===code?`2px solid ${S.green}`:`2px solid ${S.border}`,
                 padding:"4px 8px",cursor:"pointer",color:lang===code?S.green:"#556",
@@ -1906,7 +1941,7 @@ export default function Piilosana(){
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
               {Object.entries(THEMES).map(([id,th])=>(
-                <button key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);}}
+                <button key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);syncSettings({theme:id});}}
                   style={{fontFamily:S.font,fontSize:"8px",
                     color:themeId===id?th.bg:th.green,
                     background:themeId===id?th.green:"transparent",
@@ -1923,13 +1958,13 @@ export default function Piilosana(){
               {lang==="en"?"SIZE":lang==="sv"?"STORLEK":"KOKO"}
             </div>
             <div style={{display:"flex",gap:"4px"}}>
-              <button onClick={()=>{setUiSize("normal");localStorage.setItem("piilosana_size","normal");}}
+              <button onClick={()=>{setUiSize("normal");localStorage.setItem("piilosana_size","normal");syncSettings({size:"normal"});}}
                 style={{fontFamily:S.font,fontSize:"8px",
                   color:uiSize==="normal"?S.bg:S.green,background:uiSize==="normal"?S.green:"transparent",
                   border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
                 {lang==="en"?"NORMAL":lang==="sv"?"NORMAL":"NORMAALI"}
               </button>
-              <button onClick={()=>{setUiSize("large");localStorage.setItem("piilosana_size","large");}}
+              <button onClick={()=>{setUiSize("large");localStorage.setItem("piilosana_size","large");syncSettings({size:"large"});}}
                 style={{fontFamily:S.font,fontSize:"8px",
                   color:uiSize==="large"?S.bg:S.green,background:uiSize==="large"?S.green:"transparent",
                   border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
@@ -1942,7 +1977,7 @@ export default function Piilosana(){
             <div style={{fontFamily:S.font,fontSize:"9px",color:S.green,marginBottom:"6px"}}>
               {lang==="en"?"EFFECTS":lang==="sv"?"EFFEKTER":"TEHOSTEET"}
             </div>
-            <button onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");}}
+            <button onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");syncSettings({confetti:v});}}
               style={{fontFamily:S.font,fontSize:"8px",
                 color:confettiOn?S.bg:S.green,background:confettiOn?S.green:"transparent",
                 border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
@@ -1963,11 +1998,32 @@ export default function Piilosana(){
                 {authUser.nickname}
               </div>
               {authUser.email&&<div style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,marginBottom:"12px"}}>{authUser.email}</div>}
-              <button onClick={()=>{doLogout();setShowAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:S.red||"#ff4444",background:"transparent",border:`2px solid ${S.red||"#ff4444"}`,padding:"6px 16px",cursor:"pointer"}}>
-                {lang==="en"?"LOG OUT":lang==="sv"?"LOGGA UT":"KIRJAUDU ULOS"}
-              </button>
-              <br/>
-              <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"11px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"6px 14px",cursor:"pointer",marginTop:"12px"}}>✕</button>
+              {authMode==="changePassword"?(
+                <form onSubmit={async(e)=>{e.preventDefault();const fd=new FormData(e.target);await doChangePassword(fd.get("currentPassword"),fd.get("newPassword"));}} style={{textAlign:"left"}}>
+                  <input name="currentPassword" type="password" autoComplete="current-password" placeholder={lang==="en"?"CURRENT PASSWORD":lang==="sv"?"NUVARANDE LÖSENORD":"NYKYINEN SALASANA"}
+                    style={{fontFamily:S.font,fontSize:"11px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
+                  <input name="newPassword" type="password" autoComplete="new-password" minLength="4" placeholder={lang==="en"?"NEW PASSWORD":lang==="sv"?"NYTT LÖSENORD":"UUSI SALASANA"}
+                    style={{fontFamily:S.font,fontSize:"11px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
+                  {authError&&<div style={{fontFamily:S.font,fontSize:"9px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
+                  {authSuccess&&<div style={{fontFamily:S.font,fontSize:"9px",color:S.green,marginBottom:"8px"}}>{authSuccess}</div>}
+                  <button type="submit" disabled={authLoading} style={{fontFamily:S.font,fontSize:"11px",color:S.bg,background:S.yellow,border:"none",padding:"8px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"100%"}}>
+                    {authLoading?"...":(lang==="en"?"CHANGE PASSWORD":lang==="sv"?"ÄNDRA LÖSENORD":"VAIHDA SALASANA")}
+                  </button>
+                  <button type="button" onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
+                    ← {lang==="en"?"Back":lang==="sv"?"Tillbaka":"Takaisin"}
+                  </button>
+                </form>
+              ):(
+                <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center"}}>
+                  <button onClick={()=>{setAuthMode("changePassword");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"9px",color:S.yellow,background:"transparent",border:`2px solid ${S.yellow}`,padding:"6px 16px",cursor:"pointer"}}>
+                    {lang==="en"?"CHANGE PASSWORD":lang==="sv"?"ÄNDRA LÖSENORD":"VAIHDA SALASANA"}
+                  </button>
+                  <button onClick={()=>{doLogout();setShowAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:S.red||"#ff4444",background:"transparent",border:`2px solid ${S.red||"#ff4444"}`,padding:"6px 16px",cursor:"pointer"}}>
+                    {lang==="en"?"LOG OUT":lang==="sv"?"LOGGA UT":"KIRJAUDU ULOS"}
+                  </button>
+                  <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"11px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"6px 14px",cursor:"pointer",marginTop:"4px"}}>✕</button>
+                </div>
+              )}
             </div>
           ):(
             <div>
@@ -1983,11 +2039,11 @@ export default function Piilosana(){
                 <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"4px 10px",cursor:"pointer"}}>✕</button>
               </div>
               {authMode==="forgot"?(
-                <form onSubmit={async(e)=>{e.preventDefault();const fd=new FormData(e.target);await doForgotPassword(fd.get("nickname"));}}>
+                <form onSubmit={async(e)=>{e.preventDefault();const fd=new FormData(e.target);await doForgotPassword(fd.get("email"));}}>
                   <div style={{fontFamily:S.font,fontSize:"9px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
-                    {lang==="en"?"Enter your nickname and we'll send a new password to your email.":lang==="sv"?"Ange ditt smeknamn så skickar vi ett nytt lösenord till din e-post.":"Syötä nimimerkkisi niin lähetämme uuden salasanan sähköpostiisi."}
+                    {lang==="en"?"Enter your email and we'll send a new password.":lang==="sv"?"Ange din e-post så skickar vi ett nytt lösenord.":"Syötä sähköpostisi niin lähetämme uuden salasanan."}
                   </div>
-                  <input name="nickname" type="text" autoComplete="username" maxLength="12" placeholder={lang==="en"?"NICKNAME":lang==="sv"?"SMEKNAMN":"NIMIMERKKI"}
+                  <input name="email" type="email" autoComplete="email" placeholder={lang==="en"?"EMAIL":lang==="sv"?"E-POST":"SÄHKÖPOSTI"}
                     style={{fontFamily:S.font,fontSize:"11px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
                   {authError&&<div style={{fontFamily:S.font,fontSize:"9px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
                   {authSuccess&&<div style={{fontFamily:S.font,fontSize:"9px",color:S.green,marginBottom:"8px"}}>{authSuccess}</div>}
