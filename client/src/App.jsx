@@ -1830,7 +1830,7 @@ export default function Piilosana(){
           display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",
           boxShadow:authUser?`0 0 8px ${S.green}44`:"none"}}>
           <PixelIcon icon="person" color={authUser?S.green:S.yellow} size={2}/>
-          {authUser?authUser.nickname:(lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU")}
+          {authUser&&authUser.nickname}
         </button>
       </div>}
       <style>{fontCSS}</style>
