@@ -1536,14 +1536,7 @@ export default function Piilosana(){
     return()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);if(t4)clearTimeout(t4);if(t5)clearTimeout(t5);if(t6)clearTimeout(t6);};
   },[mode]);
 
-  // Fetch online player count for Piilosauna button
-  useEffect(()=>{
-    if(mode!==null)return;
-    const fetchCount=()=>fetch(`${SERVER_URL}/api/public-game?lang=${lang}`).then(r=>r.json()).then(d=>setPublicOnlineCount(d.playerCount||0)).catch(()=>{});
-    fetchCount();
-    const t=setInterval(fetchCount,10000);
-    return()=>clearInterval(t);
-  },[mode]);
+  // (arena count polling handled above via /api/arena-count)
 
   // Global button sound — plays on any <button> tap
   useEffect(()=>{
