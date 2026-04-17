@@ -2233,11 +2233,6 @@ export default function Piilosana(){
         </div>
         <p style={{fontSize:"14px",lineHeight:"1.8",marginBottom:"12px"}}>{t.findWords}</p>
         <p style={{fontSize:"14px",lineHeight:"2.2",color:"#88ccaa",marginBottom:"16px"}}>{t.dragHint}</p>
-        <p style={{fontSize:"14px",lineHeight:"2.2",color:"#ccaa66",marginBottom:"20px"}}>{t.comboHint}</p>
-        <div style={{fontSize:"14px",color:"#446655",lineHeight:"2.2"}}>
-          <p>{t.scoring}</p>
-          <p>{t.comboScoring}</p>
-        </div>
         <div style={{fontSize:"14px",color:"#556",marginTop:"12px"}}>{WORDS_SET.size.toLocaleString()} {t.words}</div>
         <div style={{fontSize:"11px",color:"#334",marginTop:"8px"}}>v{VERSION}</div>
         <div style={{fontSize:"11px",color:"#334",marginTop:"4px"}}>© Matti Kuokkanen 2026</div>
