@@ -1109,8 +1109,14 @@ export default function Piilosana(){
   },[sounds]);
 
   const addPopup=useCallback((text,color,x,y)=>{
+    let px=x,py=y;
+    if(px===undefined||py===undefined){
+      const el=gRef.current||wordBarRef.current;
+      if(el){const r=el.getBoundingClientRect();px=r.left+r.width/2;py=r.top+r.height/2;}
+      else{px=window.innerWidth/2;py=window.innerHeight/2;}
+    }
     const id=++popupIdRef.current;
-    setPopups(p=>[...p,{id,text,color,x,y}]);
+    setPopups(p=>[...p,{id,text,color,x:px,y:py}]);
     setTimeout(()=>setPopups(p=>p.filter(pp=>pp.id!==id)),1100);
   },[]);
 
@@ -1363,6 +1369,13 @@ export default function Piilosana(){
     newSocket.on("connect",()=>{
       console.log("Connected to server");
       setSocketConnected(true);
+      // Auto-join public arena if logged in (skipped nickname screen)
+      if(mode==="public"){
+        const auth=(() => {try{return JSON.parse(localStorage.getItem("piilosana_auth")||"null")}catch{return null}})();
+        if(auth?.nickname){
+          newSocket.emit("join_public",{nickname:auth.nickname,lang});
+        }
+      }
     });
 
     newSocket.on("disconnect",()=>{
@@ -1532,7 +1545,8 @@ export default function Piilosana(){
         setFound(prev=>[...prev,w]);
         const p=points||pts(w.length);
         setScore(prev=>prev+p);
-        addPopup(w,p);
+        const color=w.length>=6?"#ff66ff":w.length>=5?"#ffcc00":"#00ff88";
+        addPopup(`+${p}`,color);
         soundsRef.current.playByLength(w.length);
       }else{
         setMsg({t:lastSubmittedWordRef.current,ok:false,m:message});
@@ -1716,7 +1730,7 @@ export default function Piilosana(){
       <div style={{border:`3px solid ${S.green}`,padding:"40px 24px",boxShadow:`0 0 20px ${S.green}44, inset 0 0 20px ${S.green}11`,maxWidth:"600px"}}>
         <p style={{fontSize:"11px",lineHeight:"2",marginBottom:"16px",color:S.green}}>{t.selectMode}</p>
         <div style={{display:"flex",flexDirection:"column",gap:"12px",marginBottom:"24px"}}>
-          <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");if(socket)socket.emit("join_public",{nickname:authUser.nickname,lang});}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:"#ff6644",border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",position:"relative"}}>
+          <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:"#ff6644",border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",position:"relative"}}>
             <span style={{display:"flex",alignItems:"center",gap:"8px"}}>{t.arena}{publicOnlineCount>0&&<span style={{fontSize:"11px",display:"inline-flex",alignItems:"center",gap:"4px",background:"#00000022",padding:"2px 8px",borderRadius:"2px"}}><PixelIcon icon="person" color={S.bg} size={1.3}/>{publicOnlineCount}</span>}</span>
             <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>{t.arenaDesc}</span>
           </button>
@@ -2259,9 +2273,16 @@ export default function Piilosana(){
       {mode==="public"&&publicState==="waiting"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
           <p style={{fontSize:"18px",color:"#ff6644"}}>{t.arena}</p>
-          <p style={{fontSize:"13px",color:"#556",marginTop:"12px"}}>{t.nextRound}</p>
-          {publicNextCountdown>0&&<p style={{fontSize:"28px",color:S.green,marginTop:"8px"}}>{publicNextCountdown}s</p>}
+          {publicNextCountdown>0?(
+            <>
+              <p style={{fontSize:"13px",color:"#556",marginTop:"12px"}}>{t.nextRound}</p>
+              <p style={{fontSize:"28px",color:S.green,marginTop:"8px",animation:publicNextCountdown<=5?"pulse 0.5s infinite":"none"}}>{publicNextCountdown}s</p>
+            </>
+          ):(
+            <p style={{fontSize:"13px",color:"#556",marginTop:"12px",animation:"pulse 1s infinite"}}>{lang==="en"?"Connecting...":lang==="sv"?"Ansluter...":"Yhdistetään..."}</p>
+          )}
           <p style={{fontSize:"11px",color:"#88ccaa",marginTop:"8px"}}>{publicPlayerCount} {t.playersInArena}</p>
+          <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",marginTop:"16px"}}>{t.back}</button>
         </div>
       )}
 
