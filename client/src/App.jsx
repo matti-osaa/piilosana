@@ -904,9 +904,10 @@ export default function Piilosana(){
     try{const s=localStorage.getItem("piilosana_auth");return s?JSON.parse(s):null;}catch{return null;}
   });
   const[showAuth,setShowAuth]=useState(false);
-  const[authMode,setAuthMode]=useState("login"); // "login" or "register"
+  const[authMode,setAuthMode]=useState("login"); // "login", "register", or "forgot"
   const[authError,setAuthError]=useState("");
   const[authLoading,setAuthLoading]=useState(false);
+  const[authSuccess,setAuthSuccess]=useState("");
   const[showFirstTimeAuth,setShowFirstTimeAuth]=useState(()=>!localStorage.getItem("piilosana_auth")&&!sessionStorage.getItem("piilosana_auth_dismissed"));
 
   const doLogin=useCallback(async(nickname,password)=>{
@@ -935,6 +936,15 @@ export default function Piilosana(){
 
   const doLogout=useCallback(()=>{
     setAuthUser(null);localStorage.removeItem("piilosana_auth");localStorage.removeItem("piilosana_auth_cred");
+  },[]);
+  const doForgotPassword=useCallback(async(nickname)=>{
+    setAuthLoading(true);setAuthError("");setAuthSuccess("");
+    try{
+      const res=await fetch(`${SERVER_URL}/api/forgot-password`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nickname})});
+      const data=await res.json();
+      if(!res.ok){setAuthError(data.error||"Virhe");setAuthLoading(false);return;}
+      setAuthSuccess(data.message);setAuthLoading(false);
+    }catch{setAuthError("Yhteysvirhe");setAuthLoading(false);}
   },[]);
 
   const theme=getTheme(themeId);
@@ -1963,15 +1973,32 @@ export default function Piilosana(){
             <div>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
                 <div style={{display:"flex",gap:"8px"}}>
-                  <button onClick={()=>{setAuthMode("login");setAuthError("");}} style={{fontFamily:S.font,fontSize:"9px",color:authMode==="login"?S.bg:S.yellow,background:authMode==="login"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
+                  <button onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"9px",color:authMode==="login"?S.bg:S.yellow,background:authMode==="login"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
                     {lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"}
                   </button>
-                  <button onClick={()=>{setAuthMode("register");setAuthError("");}} style={{fontFamily:S.font,fontSize:"9px",color:authMode==="register"?S.bg:S.yellow,background:authMode==="register"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
+                  <button onClick={()=>{setAuthMode("register");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"9px",color:authMode==="register"?S.bg:S.yellow,background:authMode==="register"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
                     {lang==="en"?"REGISTER":lang==="sv"?"REGISTRERA":"LUO TUNNUS"}
                   </button>
                 </div>
                 <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"4px 10px",cursor:"pointer"}}>✕</button>
               </div>
+              {authMode==="forgot"?(
+                <form onSubmit={async(e)=>{e.preventDefault();const fd=new FormData(e.target);await doForgotPassword(fd.get("nickname"));}}>
+                  <div style={{fontFamily:S.font,fontSize:"9px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
+                    {lang==="en"?"Enter your nickname and we'll send a new password to your email.":lang==="sv"?"Ange ditt smeknamn så skickar vi ett nytt lösenord till din e-post.":"Syötä nimimerkkisi niin lähetämme uuden salasanan sähköpostiisi."}
+                  </div>
+                  <input name="nickname" type="text" autoComplete="username" maxLength="12" placeholder={lang==="en"?"NICKNAME":lang==="sv"?"SMEKNAMN":"NIMIMERKKI"}
+                    style={{fontFamily:S.font,fontSize:"11px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
+                  {authError&&<div style={{fontFamily:S.font,fontSize:"9px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
+                  {authSuccess&&<div style={{fontFamily:S.font,fontSize:"9px",color:S.green,marginBottom:"8px"}}>{authSuccess}</div>}
+                  <button type="submit" disabled={authLoading} style={{fontFamily:S.font,fontSize:"11px",color:S.bg,background:S.yellow,border:"none",padding:"8px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"100%"}}>
+                    {authLoading?"...":(lang==="en"?"SEND NEW PASSWORD":lang==="sv"?"SKICKA NYTT LÖSENORD":"LÄHETÄ UUSI SALASANA")}
+                  </button>
+                  <button type="button" onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
+                    ← {lang==="en"?"Back to login":lang==="sv"?"Tillbaka till inloggning":"Takaisin kirjautumiseen"}
+                  </button>
+                </form>
+              ):(
               <form autoComplete="on" onSubmit={async(e)=>{
                 e.preventDefault();
                 const fd=new FormData(e.target);
@@ -1999,7 +2026,13 @@ export default function Piilosana(){
                 <button type="submit" disabled={authLoading} style={{fontFamily:S.font,fontSize:"11px",color:S.bg,background:S.yellow,border:"none",padding:"8px 20px",cursor:"pointer",boxShadow:`3px 3px 0 #cc8800`,width:"100%"}}>
                   {authLoading?"...":(authMode==="login"?(lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"):(lang==="en"?"CREATE ACCOUNT":lang==="sv"?"SKAPA KONTO":"LUO TUNNUS"))}
                 </button>
+                {authMode==="login"&&(
+                  <button type="button" onClick={()=>{setAuthMode("forgot");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
+                    {lang==="en"?"Forgot password?":lang==="sv"?"Glömt lösenord?":"Unohtuiko salasana?"}
+                  </button>
+                )}
               </form>
+              )}
             </div>
           )}
         </div>

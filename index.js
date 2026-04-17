@@ -1170,6 +1170,58 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Forgot password — generate new password and send to email
+app.post('/api/forgot-password', async (req, res) => {
+  try {
+    const { nickname } = req.body;
+    if (!nickname) return res.status(400).json({ error: 'Nimimerkki vaaditaan' });
+
+    const rows = db.exec(`SELECT id, nickname, email FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    if (rows.length === 0 || rows[0].values.length === 0) {
+      // Don't reveal if user exists
+      return res.json({ ok: true, message: 'Jos tunnus löytyy ja sähköposti on asetettu, uusi salasana lähetetään.' });
+    }
+
+    const [id, dbNickname, email] = rows[0].values[0];
+    if (!email) {
+      return res.json({ ok: true, message: 'Jos tunnus löytyy ja sähköposti on asetettu, uusi salasana lähetetään.' });
+    }
+
+    if (!resend) {
+      return res.status(500).json({ error: 'Sähköpostipalvelu ei ole käytössä' });
+    }
+
+    // Generate random password (8 chars)
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let newPassword = '';
+    for (let i = 0; i < 8; i++) newPassword += chars[Math.floor(Math.random() * chars.length)];
+
+    const password_hash = await bcrypt.hash(newPassword, 10);
+    db.run(`UPDATE users SET password_hash = ? WHERE id = ?`, [password_hash, id]);
+    saveDb();
+
+    await resend.emails.send({
+      from: process.env.RESEND_FROM || 'Piilosana <onboarding@resend.dev>',
+      to: email,
+      subject: 'Piilosana — uusi salasana',
+      html: `
+        <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
+          <h2 style="color:#ffcc00;">Uusi salasana</h2>
+          <p>Nimimerkkisi: <strong>${dbNickname}</strong></p>
+          <p>Uusi salasanasi: <strong>${newPassword}</strong></p>
+          <p style="color:#556;margin-top:20px;font-size:12px;">Kirjaudu osoitteessa piilosana.app</p>
+        </div>
+      `
+    });
+
+    console.log(`Password reset email sent to ${email} for user ${dbNickname}`);
+    res.json({ ok: true, message: 'Uusi salasana lähetetty sähköpostiin!' });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ error: 'Salasanan nollaus epäonnistui' });
+  }
+});
+
 // Get user info (check if logged in)
 app.post('/api/me', (req, res) => {
   try {
