@@ -1139,14 +1139,16 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
       .catch(()=>{setScores([]);setLoading(false);});
   },[gameMode,gameTime,currentScore,lang]);
   if(!gameMode||!gameTime||gameTime===0)return null;
-  const label=gameMode==="tetris"?"Tetris":"Normaali";
+  const label=gameMode==="tetris"?"Tetris":lang==="en"?"Normal":lang==="sv"?"Normal":"Normaali";
   const timeLabel=gameTime===120?"2 min":lang==="en"?"6.7 min":"6,7 min";
-  const langName=LANG_CONFIG[lang]?.name||"Suomi";
+  const hofTitle=lang==="en"?"RECORDS":lang==="sv"?"REKORD":"ENNÄTYKSET";
+  const hofLoading=lang==="en"?"Loading...":lang==="sv"?"Laddar...":"Ladataan...";
+  const hofEmpty=lang==="en"?"No results yet":lang==="sv"?"Inga resultat ännu":"Ei tuloksia vielä";
   return(
     <div style={{border:`2px solid ${S.border}`,padding:"8px",background:S.dark,marginTop:"10px",animation:"fadeIn 0.8s ease"}}>
-      <div style={{fontSize:"13px",color:S.yellow,marginBottom:"6px",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><PixelFlag lang={lang||"fi"} size={2}/>ENNÄTYKSET — {label} {timeLabel}</div>
-      {loading?<div style={{fontSize:"11px",color:"#556",textAlign:"center"}}>Ladataan...</div>:
-      !scores||scores.length===0?<div style={{fontSize:"11px",color:"#556",textAlign:"center"}}>Ei tuloksia vielä</div>:
+      <div style={{fontSize:"13px",color:S.yellow,marginBottom:"6px",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><PixelFlag lang={lang||"fi"} size={2}/>{hofTitle} — {label} {timeLabel}</div>
+      {loading?<div style={{fontSize:"11px",color:"#556",textAlign:"center"}}>{hofLoading}</div>:
+      !scores||scores.length===0?<div style={{fontSize:"11px",color:"#556",textAlign:"center"}}>{hofEmpty}</div>:
       <div style={{display:"flex",flexDirection:"column",gap:"2px"}}>
         {scores.map((s,i)=>{
           const isHighlight=currentScore&&s.score===currentScore&&i<10;
