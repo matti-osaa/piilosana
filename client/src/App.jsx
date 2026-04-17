@@ -1826,9 +1826,10 @@ export default function Piilosana(){
           )}
         </div>
         <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:authUser?S.green:S.yellow,
-          background:"transparent",border:`2px solid ${authUser?S.green+"66":S.yellow+"66"}`,padding:"4px 10px",cursor:"pointer",
-          display:"flex",alignItems:"center",gap:"6px",transition:"all 0.2s"}}>
-          <PixelIcon icon="person" color={authUser?S.green:S.yellow} size={1.8}/>
+          background:authUser?S.dark:"transparent",border:`2px solid ${authUser?S.green:S.border}`,padding:"4px 8px",cursor:"pointer",
+          display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",
+          boxShadow:authUser?`0 0 8px ${S.green}44`:"none"}}>
+          <PixelIcon icon="person" color={authUser?S.green:S.yellow} size={2}/>
           {authUser?authUser.nickname:(lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU")}
         </button>
       </div>}
