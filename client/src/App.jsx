@@ -660,6 +660,25 @@ const ICON_PIXELS={
     ],
     colors:{S:"currentColor"},
   },
+  person:{ // 11x13 person/user icon
+    cols:11,
+    rows:[
+      "....PPP....",
+      "...PPPPP...",
+      "..PP...PP..",
+      "..PP...PP..",
+      "...PPPPP...",
+      "....PPP....",
+      ".....P.....",
+      "..PPPPPPP..",
+      ".PP..P..PP.",
+      "PP...P...PP",
+      ".....P.....",
+      "....PPP....",
+      "...PP.PP...",
+    ],
+    colors:{P:"currentColor"},
+  },
 };
 
 const SHADE_MAP={outline:0.4,dark:0.55,mid:0.7,light:0.85,highlight:1.0};
@@ -803,7 +822,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
             width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderBottom:"8px solid #000000"}}/>
           <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
             width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #ffffff"}}/>
-          {lang==="en"?"Click the gear!":lang==="sv"?"Klicka kugghjulet!":"Klikkaa ratasta!"}
+          {lang==="en"?"Change settings like color theme!":lang==="sv"?"Ändra inställningar, som färgtema!":"Vaihda asetuksia, kuten väriteemaa!"}
         </div>
       </div>
     )}
@@ -881,6 +900,45 @@ export default function Piilosana(){
   const[bubbleFading,setBubbleFading]=useState(false);
   const[gearBlend,setGearBlend]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
+
+  // Auth state
+  const[authUser,setAuthUser]=useState(()=>{
+    try{const s=localStorage.getItem("piilosana_auth");return s?JSON.parse(s):null;}catch{return null;}
+  });
+  const[showAuth,setShowAuth]=useState(false);
+  const[authMode,setAuthMode]=useState("login"); // "login" or "register"
+  const[authError,setAuthError]=useState("");
+  const[authLoading,setAuthLoading]=useState(false);
+  const[showFirstTimeAuth,setShowFirstTimeAuth]=useState(()=>!localStorage.getItem("piilosana_auth")&&!sessionStorage.getItem("piilosana_auth_dismissed"));
+
+  const doLogin=useCallback(async(nickname,password)=>{
+    setAuthLoading(true);setAuthError("");
+    try{
+      const res=await fetch(`${SERVER_URL}/api/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nickname,password})});
+      const data=await res.json();
+      if(!res.ok){setAuthError(data.error||"Virhe");setAuthLoading(false);return false;}
+      setAuthUser(data.user);localStorage.setItem("piilosana_auth",JSON.stringify(data.user));
+      localStorage.setItem("piilosana_auth_cred",JSON.stringify({nickname,password}));
+      setShowAuth(false);setShowFirstTimeAuth(false);setAuthLoading(false);return true;
+    }catch{setAuthError("Yhteysvirhe");setAuthLoading(false);return false;}
+  },[]);
+
+  const doRegister=useCallback(async(nickname,password,email,email2)=>{
+    setAuthLoading(true);setAuthError("");
+    try{
+      const res=await fetch(`${SERVER_URL}/api/register`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nickname,password,email,email2})});
+      const data=await res.json();
+      if(!res.ok){setAuthError(data.error||"Virhe");setAuthLoading(false);return false;}
+      setAuthUser(data.user);localStorage.setItem("piilosana_auth",JSON.stringify(data.user));
+      localStorage.setItem("piilosana_auth_cred",JSON.stringify({nickname,password}));
+      setShowAuth(false);setShowFirstTimeAuth(false);setAuthLoading(false);return true;
+    }catch{setAuthError("Yhteysvirhe");setAuthLoading(false);return false;}
+  },[]);
+
+  const doLogout=useCallback(()=>{
+    setAuthUser(null);localStorage.removeItem("piilosana_auth");localStorage.removeItem("piilosana_auth_cred");
+  },[]);
+
   const theme=getTheme(themeId);
   const langConf=getLangConf(lang);
   const WORDS_SET=langConf.words;
@@ -912,7 +970,10 @@ export default function Piilosana(){
   const[lastFoundTime,setLastFoundTime]=useState(0);
   const[flashKey,setFlashKey]=useState(0);
   // Solo nickname for hall of fame
-  const[soloNickname,setSoloNickname]=useState(()=>localStorage.getItem("piilosana_nick")||"");
+  const[soloNickname,setSoloNickname]=useState(()=>{
+    try{const a=JSON.parse(localStorage.getItem("piilosana_auth")||"null");if(a?.nickname)return a.nickname;}catch{}
+    return localStorage.getItem("piilosana_nick")||"";
+  });
   const[hofSubmitted,setHofSubmitted]=useState(false);
   // Ending
   const[ending,setEnding]=useState(null);
@@ -922,7 +983,19 @@ export default function Piilosana(){
   const[mode,setMode]=useState(null);
   const[socket,setSocket]=useState(null);
   const[roomCode,setRoomCode]=useState("");
-  const[nickname,setNickname]=useState("");
+  const[nickname,setNickname]=useState(()=>{
+    try{const a=JSON.parse(localStorage.getItem("piilosana_auth")||"null");if(a?.nickname)return a.nickname;}catch{}
+    return "";
+  });
+  // Sync nicknames when authUser changes
+  useEffect(()=>{
+    if(authUser?.nickname){
+      setNickname(authUser.nickname);
+      setSoloNickname(authUser.nickname);
+      localStorage.setItem("piilosana_nick",authUser.nickname);
+    }
+  },[authUser]);
+
   const[players,setPlayers]=useState([]);
   const[playerId,setPlayerId]=useState(null);
   const[isHost,setIsHost]=useState(false);
@@ -1618,6 +1691,14 @@ export default function Piilosana(){
           <p>{t.comboScoring}</p>
         </div>
         <div style={{fontSize:"14px",color:"#556",marginTop:"12px"}}>{WORDS_SET.size.toLocaleString()} {t.words}</div>
+        <div style={{marginTop:"16px"}}>
+          <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"10px",color:authUser?S.green:S.yellow,
+            background:"transparent",border:`2px solid ${authUser?S.green:S.yellow}`,padding:"8px 16px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"8px",margin:"0 auto"}}>
+            <PixelIcon icon="person" color={authUser?S.green:S.yellow} size={2}/>
+            {authUser?authUser.nickname:(lang==="en"?"LOG IN / REGISTER":lang==="sv"?"LOGGA IN / REGISTRERA":"KIRJAUDU / LUO TUNNUS")}
+          </button>
+        </div>
         <div style={{fontSize:"11px",color:"#334",marginTop:"8px"}}>v{VERSION}</div>
         <div style={{fontSize:"11px",color:"#334",marginTop:"4px"}}>© Matti Kuokkanen 2026</div>
 
@@ -1783,20 +1864,23 @@ export default function Piilosana(){
 
       {/* Settings panel - overlay below title */}
       {showSettings&&(
-        <div style={{width:"100%",maxWidth:"500px",padding:"14px",border:`2px solid ${S.green}`,background:S.dark,
+        <div style={{width:"100%",maxWidth:"500px",padding:"18px",border:`2px solid ${S.green}`,background:S.dark,
           boxShadow:`0 0 20px ${S.green}33`,animation:"fadeIn 0.3s ease",marginBottom:"8px",zIndex:100,position:"relative"}}>
-          <div style={{fontFamily:S.font,fontSize:"9px",color:S.yellow,marginBottom:"10px",textAlign:"center"}}>
-            {lang==="en"?"SETTINGS":lang==="sv"?"INSTÄLLNINGAR":"ASETUKSET"}
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
+            <div style={{fontFamily:S.font,fontSize:"11px",color:S.yellow}}>
+              {lang==="en"?"SETTINGS":lang==="sv"?"INSTÄLLNINGAR":"ASETUKSET"}
+            </div>
+            <button onClick={()=>setShowSettings(false)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"4px 10px",cursor:"pointer"}}>✕</button>
           </div>
           {/* Theme */}
           <div style={{marginBottom:"12px"}}>
-            <div style={{fontFamily:S.font,fontSize:"8px",color:S.green,marginBottom:"6px"}}>
+            <div style={{fontFamily:S.font,fontSize:"9px",color:S.green,marginBottom:"6px"}}>
               {lang==="en"?"THEME":lang==="sv"?"TEMA":"TEEMA"}
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
               {Object.entries(THEMES).map(([id,th])=>(
                 <button key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);}}
-                  style={{fontFamily:S.font,fontSize:"7px",
+                  style={{fontFamily:S.font,fontSize:"8px",
                     color:themeId===id?th.bg:th.green,
                     background:themeId===id?th.green:"transparent",
                     border:`2px solid ${th.green}`,padding:"5px 8px",cursor:"pointer",
@@ -1808,18 +1892,18 @@ export default function Piilosana(){
           </div>
           {/* Size */}
           <div style={{marginBottom:"12px"}}>
-            <div style={{fontFamily:S.font,fontSize:"8px",color:S.green,marginBottom:"6px"}}>
+            <div style={{fontFamily:S.font,fontSize:"9px",color:S.green,marginBottom:"6px"}}>
               {lang==="en"?"SIZE":lang==="sv"?"STORLEK":"KOKO"}
             </div>
             <div style={{display:"flex",gap:"4px"}}>
               <button onClick={()=>{setUiSize("normal");localStorage.setItem("piilosana_size","normal");}}
-                style={{fontFamily:S.font,fontSize:"7px",
+                style={{fontFamily:S.font,fontSize:"8px",
                   color:uiSize==="normal"?S.bg:S.green,background:uiSize==="normal"?S.green:"transparent",
                   border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
                 {lang==="en"?"NORMAL":lang==="sv"?"NORMAL":"NORMAALI"}
               </button>
               <button onClick={()=>{setUiSize("large");localStorage.setItem("piilosana_size","large");}}
-                style={{fontFamily:S.font,fontSize:"7px",
+                style={{fontFamily:S.font,fontSize:"8px",
                   color:uiSize==="large"?S.bg:S.green,background:uiSize==="large"?S.green:"transparent",
                   border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
                 {lang==="en"?"LARGE":lang==="sv"?"STOR":"ISO"}
@@ -1828,15 +1912,104 @@ export default function Piilosana(){
           </div>
           {/* Confetti */}
           <div>
-            <div style={{fontFamily:S.font,fontSize:"8px",color:S.green,marginBottom:"6px"}}>
+            <div style={{fontFamily:S.font,fontSize:"9px",color:S.green,marginBottom:"6px"}}>
               {lang==="en"?"EFFECTS":lang==="sv"?"EFFEKTER":"TEHOSTEET"}
             </div>
             <button onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");}}
-              style={{fontFamily:S.font,fontSize:"7px",
+              style={{fontFamily:S.font,fontSize:"8px",
                 color:confettiOn?S.bg:S.green,background:confettiOn?S.green:"transparent",
                 border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
               {confettiOn?"✓ ":""}{lang==="en"?"CONFETTI ON WIN":lang==="sv"?"KONFETTI VID VINST":"KONFETTI VOITOSTA"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* AUTH PANEL */}
+      {showAuth&&(
+        <div style={{width:"100%",maxWidth:"500px",padding:"18px",border:`2px solid ${S.yellow}`,background:S.dark,
+          boxShadow:`0 0 20px ${S.yellow}33`,animation:"fadeIn 0.3s ease",marginBottom:"8px",zIndex:100,position:"relative"}}>
+          {authUser?(
+            <div style={{textAlign:"center"}}>
+              <div style={{fontFamily:S.font,fontSize:"11px",color:S.green,marginBottom:"12px",display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}>
+                <PixelIcon icon="person" color={S.green} size={2}/>
+                {authUser.nickname}
+              </div>
+              {authUser.email&&<div style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,marginBottom:"12px"}}>{authUser.email}</div>}
+              <button onClick={()=>{doLogout();setShowAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:S.red||"#ff4444",background:"transparent",border:`2px solid ${S.red||"#ff4444"}`,padding:"6px 16px",cursor:"pointer"}}>
+                {lang==="en"?"LOG OUT":lang==="sv"?"LOGGA UT":"KIRJAUDU ULOS"}
+              </button>
+              <br/>
+              <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,background:"transparent",border:"none",padding:"6px",cursor:"pointer",marginTop:"8px"}}>✕</button>
+            </div>
+          ):(
+            <div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
+                <div style={{display:"flex",gap:"8px"}}>
+                  <button onClick={()=>{setAuthMode("login");setAuthError("");}} style={{fontFamily:S.font,fontSize:"9px",color:authMode==="login"?S.bg:S.yellow,background:authMode==="login"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
+                    {lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"}
+                  </button>
+                  <button onClick={()=>{setAuthMode("register");setAuthError("");}} style={{fontFamily:S.font,fontSize:"9px",color:authMode==="register"?S.bg:S.yellow,background:authMode==="register"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
+                    {lang==="en"?"REGISTER":lang==="sv"?"REGISTRERA":"LUO TUNNUS"}
+                  </button>
+                </div>
+                <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"4px 10px",cursor:"pointer"}}>✕</button>
+              </div>
+              <form autoComplete="on" onSubmit={async(e)=>{
+                e.preventDefault();
+                const fd=new FormData(e.target);
+                const nick=fd.get("nickname"),pw=fd.get("password");
+                if(authMode==="login"){await doLogin(nick,pw);}
+                else{await doRegister(nick,pw,fd.get("email")||"",fd.get("email2")||"");}
+              }}>
+                <input name="nickname" type="text" autoComplete="username" maxLength="12" placeholder={lang==="en"?"NICKNAME":lang==="sv"?"SMEKNAMN":"NIMIMERKKI"}
+                  style={{fontFamily:S.font,fontSize:"11px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
+                <input name="password" type="password" autoComplete={authMode==="register"?"new-password":"current-password"} minLength="4"
+                  placeholder={lang==="en"?"PASSWORD":lang==="sv"?"LÖSENORD":"SALASANA"}
+                  style={{fontFamily:S.font,fontSize:"11px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
+                {authMode==="register"&&(
+                  <>
+                    <input name="email" type="email" autoComplete="email" placeholder={`${lang==="en"?"EMAIL":lang==="sv"?"E-POST":"SÄHKÖPOSTI"} (${lang==="en"?"optional":lang==="sv"?"valfritt":"vapaaehtoinen"})`}
+                      style={{fontFamily:S.font,fontSize:"9px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
+                    <input name="email2" type="email" autoComplete="email" placeholder={lang==="en"?"CONFIRM EMAIL":lang==="sv"?"BEKRÄFTA E-POST":"VAHVISTA SÄHKÖPOSTI"}
+                      style={{fontFamily:S.font,fontSize:"9px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
+                    <div style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,marginBottom:"8px",lineHeight:"1.6"}}>
+                      {lang==="en"?"Password will be sent to your email for safekeeping":lang==="sv"?"Lösenordet skickas till din e-post":"Salasana lähetetään sähköpostiisi muistiksi"}
+                    </div>
+                  </>
+                )}
+                {authError&&<div style={{fontFamily:S.font,fontSize:"9px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
+                <button type="submit" disabled={authLoading} style={{fontFamily:S.font,fontSize:"11px",color:S.bg,background:S.yellow,border:"none",padding:"8px 20px",cursor:"pointer",boxShadow:`3px 3px 0 #cc8800`,width:"100%"}}>
+                  {authLoading?"...":(authMode==="login"?(lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"):(lang==="en"?"CREATE ACCOUNT":lang==="sv"?"SKAPA KONTO":"LUO TUNNUS"))}
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* First-time auth prompt */}
+      {mode===null&&showFirstTimeAuth&&!authUser&&!showAuth&&(
+        <div style={{width:"100%",maxWidth:"500px",padding:"12px",border:`2px solid ${S.yellow}`,background:S.dark,
+          boxShadow:`0 0 12px ${S.yellow}22`,animation:"fadeIn 0.5s ease",marginBottom:"8px",textAlign:"center"}}>
+          <div style={{fontFamily:S.font,fontSize:"9px",color:S.yellow,marginBottom:"8px",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>
+            <PixelIcon icon="person" color={S.yellow} size={2}/>
+            {lang==="en"?"Save your nickname?":lang==="sv"?"Spara ditt smeknamn?":"Tallenna nimimerkkisi?"}
+          </div>
+          <div style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
+            {lang==="en"?"Create an account so you don't have to type it every time":lang==="sv"?"Skapa ett konto så slipper du skriva det varje gång":"Luo tunnus niin ei tarvi syöttää joka kerta"}
+          </div>
+          <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
+            <button onClick={()=>{setShowAuth(true);setAuthMode("register");setShowFirstTimeAuth(false);}}
+              style={{fontFamily:S.font,fontSize:"9px",color:S.bg,background:S.yellow,border:"none",padding:"6px 16px",cursor:"pointer",boxShadow:"2px 2px 0 #cc8800"}}>
+              {lang==="en"?"CREATE ACCOUNT":lang==="sv"?"SKAPA KONTO":"LUO TUNNUS"}
+            </button>
+            <button onClick={()=>{setShowAuth(true);setAuthMode("login");setShowFirstTimeAuth(false);}}
+              style={{fontFamily:S.font,fontSize:"9px",color:S.yellow,background:"transparent",border:`1px solid ${S.yellow}`,padding:"6px 16px",cursor:"pointer"}}>
+              {lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"}
+            </button>
+            <button onClick={()=>{setShowFirstTimeAuth(false);sessionStorage.setItem("piilosana_auth_dismissed","1");}}
+              style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,background:"transparent",border:"none",padding:"6px",cursor:"pointer"}}>✕</button>
           </div>
         </div>
       )}

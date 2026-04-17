@@ -6,6 +6,8 @@ import initSqlJs from 'sql.js';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import bcrypt from 'bcryptjs';
+import { Resend } from 'resend';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -64,8 +66,25 @@ async function initDb() {
   `);
   // Add lang column to existing databases that don't have it
   try { db.run(`ALTER TABLE hall_of_fame ADD COLUMN lang TEXT NOT NULL DEFAULT 'fi'`); } catch(e) { /* column already exists */ }
+
+  // Users table for authentication
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nickname TEXT NOT NULL UNIQUE COLLATE NOCASE,
+      password_hash TEXT NOT NULL,
+      email TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+  // Link hall_of_fame to users (optional, add user_id column)
+  try { db.run(`ALTER TABLE hall_of_fame ADD COLUMN user_id INTEGER`); } catch(e) { /* column already exists */ }
+
   saveDb();
 }
+
+// Resend email client (optional - only if RESEND_API_KEY is set)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 function saveDb() {
   if (!db) return;
@@ -1060,6 +1079,112 @@ app.post('/api/hall-of-fame', (req, res) => {
   // Return updated top 10 for this category
   const top = getHallOfFame(gameMode, gameTime, safeLang);
   res.json({ id, top });
+});
+
+// ============================================================================
+// AUTH ROUTES
+// ============================================================================
+
+// Register new user
+app.post('/api/register', async (req, res) => {
+  try {
+    const { nickname, password, email } = req.body;
+    if (!nickname || !password) return res.status(400).json({ error: 'Nimimerkki ja salasana vaaditaan' });
+    if (nickname.length > 12) return res.status(400).json({ error: 'Nimimerkki max 12 merkkiä' });
+    if (password.length < 4) return res.status(400).json({ error: 'Salasana min 4 merkkiä' });
+    if (email && email.length > 0) {
+      // Validate both emails match (client sends email, email2)
+      const { email2 } = req.body;
+      if (email !== email2) return res.status(400).json({ error: 'Sähköpostit eivät täsmää' });
+    }
+
+    // Check if nickname exists
+    const existing = db.exec(`SELECT id FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    if (existing.length > 0 && existing[0].values.length > 0) {
+      return res.status(409).json({ error: 'Nimimerkki on jo käytössä' });
+    }
+
+    const password_hash = await bcrypt.hash(password, 10);
+    const safeEmail = email && email.trim().length > 0 ? email.trim().toLowerCase() : null;
+
+    db.run(
+      `INSERT INTO users (nickname, password_hash, email) VALUES (?, ?, ?)`,
+      [nickname.toUpperCase(), password_hash, safeEmail]
+    );
+    saveDb();
+
+    const userRows = db.exec(`SELECT id FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    const userId = userRows[0].values[0][0];
+
+    // Send password to email if provided and Resend is configured
+    if (safeEmail && resend) {
+      try {
+        await resend.emails.send({
+          from: 'Piilosana <noreply@piilosana.app>',
+          to: safeEmail,
+          subject: 'Piilosana — tunnuksesi',
+          html: `
+            <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
+              <h2 style="color:#ffcc00;">Tervetuloa Piilosanaan!</h2>
+              <p>Nimimerkkisi: <strong>${nickname.toUpperCase()}</strong></p>
+              <p>Salasanasi: <strong>${password}</strong></p>
+              <p style="color:#556;margin-top:20px;font-size:12px;">Säilytä tämä viesti tallessa. Voit kirjautua osoitteessa piilosana.app</p>
+            </div>
+          `
+        });
+        console.log(`Welcome email sent to ${safeEmail} for user ${nickname}`);
+      } catch (emailErr) {
+        console.error('Failed to send email:', emailErr);
+        // Don't fail registration if email fails
+      }
+    }
+
+    res.json({ ok: true, user: { id: userId, nickname: nickname.toUpperCase(), email: safeEmail } });
+  } catch (err) {
+    console.error('Registration error:', err);
+    res.status(500).json({ error: 'Rekisteröinti epäonnistui' });
+  }
+});
+
+// Login
+app.post('/api/login', async (req, res) => {
+  try {
+    const { nickname, password } = req.body;
+    if (!nickname || !password) return res.status(400).json({ error: 'Nimimerkki ja salasana vaaditaan' });
+
+    const rows = db.exec(`SELECT id, nickname, password_hash, email FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    if (rows.length === 0 || rows[0].values.length === 0) {
+      return res.status(401).json({ error: 'Väärä nimimerkki tai salasana' });
+    }
+
+    const [id, dbNickname, password_hash, email] = rows[0].values[0];
+    const match = await bcrypt.compare(password, password_hash);
+    if (!match) {
+      return res.status(401).json({ error: 'Väärä nimimerkki tai salasana' });
+    }
+
+    res.json({ ok: true, user: { id, nickname: dbNickname, email } });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Kirjautuminen epäonnistui' });
+  }
+});
+
+// Get user info (check if logged in)
+app.post('/api/me', (req, res) => {
+  try {
+    const { nickname, password } = req.body;
+    if (!nickname || !password) return res.status(401).json({ error: 'Ei kirjautunut' });
+
+    const rows = db.exec(`SELECT id, nickname, email FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    if (rows.length === 0 || rows[0].values.length === 0) {
+      return res.status(401).json({ error: 'Ei kirjautunut' });
+    }
+    const [id, dbNickname, email] = rows[0].values[0];
+    res.json({ ok: true, user: { id, nickname: dbNickname, email } });
+  } catch (err) {
+    res.status(500).json({ error: 'Virhe' });
+  }
 });
 
 // SPA catch-all: serve index.html for any non-API route
