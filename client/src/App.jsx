@@ -103,6 +103,7 @@ const T={
     someoneBeatYou:"Joku ehti ensin!",tooShort:"Liian lyhyt",notInGrid:"Ei löydy ruudukosta",wrongMode:"Väärä moodi",gameNotRunning:"Peli ei käynnissä",
     achievements:"SAAVUTUKSET",achievementUnlocked:"Uusi saavutus!",locked:"Lukittu",
     share:"JAA TULOS",shareCopied:"Kopioitu!",shareText:"Piilosana — löysin {words} sanaa ja sain {score} pistettä! Pääsetkö parempaan?",
+    options:"ASETUKSET",quickPlay:"PELAA",or:"tai",advancedOptions:"Lisävalinnat",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -135,6 +136,7 @@ const T={
     someoneBeatYou:"Someone got it first!",tooShort:"Too short",notInGrid:"Not found in grid",wrongMode:"Wrong mode",gameNotRunning:"Game not running",
     achievements:"ACHIEVEMENTS",achievementUnlocked:"New achievement!",locked:"Locked",
     share:"SHARE",shareCopied:"Copied!",shareText:"Piilosana — I found {words} words and scored {score} points! Can you beat me?",
+    options:"SETTINGS",quickPlay:"PLAY",or:"or",advancedOptions:"More options",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -167,6 +169,7 @@ const T={
     someoneBeatYou:"Någon hann före!",tooShort:"För kort",notInGrid:"Finns inte i rutnätet",wrongMode:"Fel läge",gameNotRunning:"Spelet är inte igång",
     achievements:"PRESTATIONER",achievementUnlocked:"Ny prestation!",locked:"Låst",
     share:"DELA",shareCopied:"Kopierat!",shareText:"Piilosana — jag hittade {words} ord och fick {score} poäng! Kan du slå mig?",
+    options:"INSTÄLLNINGAR",quickPlay:"SPELA",or:"eller",advancedOptions:"Fler alternativ",
   },
 };
 
@@ -1193,6 +1196,7 @@ export default function Piilosana(){
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[showSettings,setShowSettings]=useState(false);
+  const[showMenuOptions,setShowMenuOptions]=useState(false);
   const[settingsBubble,setSettingsBubble]=useState(false);
   const[bubbleFading,setBubbleFading]=useState(false);
   const[flagBubble,setFlagBubble]=useState(false);
@@ -1559,18 +1563,25 @@ export default function Piilosana(){
     setTimeout(()=>setPopups(p=>p.filter(pp=>pp.id!==id)),1100);
   },[]);
 
+  const startSolo=useCallback(async(overrideMode,overrideTime)=>{
+    await sounds.init();
+    const gt=overrideTime!==undefined?overrideTime:gameTime;
+    let bg=null,bw=new Set();
+    for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=findWords(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
+    setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(gt);setScore(0);setMsg(null);
+    setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);
+    setEnding(null);setEndingProgress(0);setDropKey(0);
+    setMode("solo");setCountdown(5);setState("countdown");
+    if(overrideMode!==undefined)setSoloMode(overrideMode);
+    if(overrideTime!==undefined)setGameTime(overrideTime);
+    window.scrollTo(0,0);
+  },[trie,sounds,gameTime,soloMode]);
+
   const start=useCallback(async()=>{
     if(mode==="solo"){
-      await sounds.init();
-      let bg=null,bw=new Set();
-      for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=findWords(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
-      setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(gameTime);setScore(0);setMsg(null);
-      setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);
-      setEnding(null);setEndingProgress(0);setDropKey(0);
-      setCountdown(5);setState("countdown");
-      window.scrollTo(0,0);
+      await startSolo();
     }
-  },[trie,sounds,mode,gameTime,soloMode]);
+  },[mode,startSolo]);
 
   // Countdown timer (shared for solo + multi)
   useEffect(()=>{
@@ -2216,33 +2227,69 @@ export default function Piilosana(){
 
   // Render multiplayer screens
   const ModeSelectScreen=()=>(
-    <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
-      <div style={{border:`3px solid ${S.green}`,padding:"40px 24px",boxShadow:`0 0 20px ${S.green}44, inset 0 0 20px ${S.green}11`,maxWidth:"600px"}}>
-        <p style={{fontSize:"11px",lineHeight:"2",marginBottom:"16px",color:S.green}}>{t.selectMode}</p>
-        <div style={{display:"flex",flexDirection:"column",gap:"12px",marginBottom:"24px"}}>
-          <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:"#ff6644",border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",position:"relative"}}>
-            <span style={{display:"flex",alignItems:"center",gap:"8px"}}>{t.arena}<span style={{fontSize:"11px",display:"inline-flex",alignItems:"center",gap:"4px",background:"#cc441188",padding:"2px 8px",borderRadius:"2px"}}><PixelIcon icon="person" color={S.bg} size={1.3}/>{publicOnlineCount}</span></span>
-            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>{t.arenaDesc}</span>
-          </button>
-          <button onClick={async()=>{await sounds.init();setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc8800",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-            <span>{t.customGame}</span>
-            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>{t.customDesc}</span>
-          </button>
-          <button onClick={async()=>{await sounds.init();setMode("solo");setState("menu");}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"22px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844",width:"100%",minHeight:"82px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-            <span>{t.practice}</span>
-            <span style={{fontSize:"9px",marginTop:"6px",opacity:0.8}}>{t.practiceDesc}</span>
-          </button>
+    <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
+      {/* Main play button — starts solo immediately with default settings */}
+      <button onClick={()=>startSolo("normal",120)} style={{fontFamily:S.font,fontSize:"22px",color:S.bg,background:S.green,border:"none",padding:"24px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844",width:"100%",minHeight:"70px",display:"flex",alignItems:"center",justifyContent:"center",gap:"10px",marginBottom:"6px"}}
+        onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="6px 6px 0 #008844"}}
+        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="4px 4px 0 #008844"}}>
+        {t.quickPlay}
+      </button>
+
+      {/* Expandable options under play button */}
+      <button onClick={()=>setShowMenuOptions(v=>!v)} style={{fontFamily:S.font,fontSize:"9px",color:"#556",background:"transparent",border:"none",padding:"8px",cursor:"pointer",display:"flex",alignItems:"center",gap:"4px",margin:"0 auto"}}>
+        <span style={{transform:showMenuOptions?"rotate(90deg)":"rotate(0deg)",transition:"transform 0.2s",display:"inline-block"}}>▶</span>
+        {t.advancedOptions}
+      </button>
+      {showMenuOptions&&(
+        <div style={{padding:"16px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"12px",animation:"fadeIn 0.3s ease"}}>
+          <div style={{marginBottom:"12px"}}>
+            <div style={{fontSize:"9px",color:S.green,marginBottom:"6px"}}>{t.gameMode}</div>
+            <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap"}}>
+              <button onClick={()=>setSoloMode("normal")} style={{fontFamily:S.font,fontSize:"10px",color:soloMode==="normal"?S.bg:S.green,background:soloMode==="normal"?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer"}}>{t.modeNormal}</button>
+              <button onClick={()=>setSoloMode("tetris")} style={{fontFamily:S.font,fontSize:"10px",color:soloMode==="tetris"?S.bg:S.purple,background:soloMode==="tetris"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"6px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}><PixelIcon icon="arrow" color={soloMode==="tetris"?S.bg:S.purple} size={1.5}/>{t.modeTetris}</button>
+            </div>
+          </div>
+          <div style={{marginBottom:"12px"}}>
+            <div style={{fontSize:"9px",color:S.green,marginBottom:"6px"}}>{t.time}</div>
+            <div style={{display:"flex",gap:"6px",justifyContent:"center"}}>
+              <button onClick={()=>setGameTime(120)} style={{fontFamily:S.font,fontSize:"10px",color:gameTime===120?S.bg:S.green,background:gameTime===120?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer"}}>2 MIN</button>
+              <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"10px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"6px 14px",cursor:"pointer"}}>{lang==="en"?"6.7":"6,7"} MIN</button>
+              <button onClick={()=>setGameTime(0)} style={{fontFamily:S.font,fontSize:"10px",color:gameTime===0?S.bg:"#44ddff",background:gameTime===0?"#44ddff":"transparent",border:"2px solid #44ddff",padding:"6px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:"4px"}}><PixelIcon icon="infinity" color={gameTime===0?S.bg:"#44ddff"} size={1.5}/>{t.unlimited}</button>
+            </div>
+          </div>
+          <div>
+            <button onClick={()=>setLetterMult(v=>!v)} style={{fontFamily:S.font,fontSize:"10px",color:letterMult?S.bg:S.yellow,background:letterMult?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"6px 14px",cursor:"pointer"}}>
+              {letterMult?"✓ ":""}{t.letterMultBtn}
+            </button>
+          </div>
+          <button onClick={()=>startSolo()} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 24px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",marginTop:"14px"}}>{t.quickPlay}</button>
         </div>
-        <p style={{fontSize:"14px",lineHeight:"1.8",marginBottom:"12px"}}>{t.findWords}</p>
-        <p style={{fontSize:"14px",lineHeight:"2.2",color:"#88ccaa",marginBottom:"16px"}}>{t.dragHint}</p>
-        <div style={{fontSize:"14px",color:"#556",marginTop:"12px"}}>{WORDS_SET.size.toLocaleString()} {t.words}</div>
-        <div style={{fontSize:"11px",color:"#334",marginTop:"8px"}}>v{VERSION}</div>
-        <div style={{fontSize:"11px",color:"#334",marginTop:"4px"}}>© Matti Kuokkanen 2026</div>
-        <div style={{fontSize:"10px",marginTop:"6px",display:"flex",gap:"12px",justifyContent:"center"}}>
+      )}
+
+      {/* Multiplayer options */}
+      <div style={{display:"flex",gap:"8px",marginTop:"8px"}}>
+        <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:"#ff6644",border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:"3px 3px 0 #cc3311",flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="5px 5px 0 #cc3311"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="3px 3px 0 #cc3311"}}>
+          <span style={{display:"flex",alignItems:"center",gap:"6px"}}>{t.arena}<span style={{fontSize:"10px",display:"inline-flex",alignItems:"center",gap:"3px",background:"#cc441188",padding:"1px 6px",borderRadius:"2px"}}><PixelIcon icon="person" color={S.bg} size={1.2}/>{publicOnlineCount}</span></span>
+          <span style={{fontSize:"8px",opacity:0.7}}>{t.arenaDesc}</span>
+        </button>
+        <button onClick={async()=>{await sounds.init();setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.yellow,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="5px 5px 0 #cc8800"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="3px 3px 0 #cc8800"}}>
+          <span>{t.customGame}</span>
+          <span style={{fontSize:"8px",opacity:0.7}}>{t.customDesc}</span>
+        </button>
+      </div>
+
+      {/* Footer */}
+      <div style={{marginTop:"24px"}}>
+        <div style={{fontSize:"12px",color:"#445",marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString()} {t.words}</div>
+        <div style={{fontSize:"9px",color:"#334"}}>v{VERSION} · © Matti Kuokkanen 2026</div>
+        <div style={{fontSize:"9px",marginTop:"4px",display:"flex",gap:"10px",justifyContent:"center"}}>
           <a href="mailto:info@piilosana.com" style={{color:"#445",textDecoration:"none"}}>{lang==="en"?"Feedback":lang==="sv"?"Feedback":"Palaute"}</a>
           <a href="/privacy" style={{color:"#445",textDecoration:"none"}}>{lang==="en"?"Privacy":lang==="sv"?"Integritet":"Tietosuoja"}</a>
         </div>
-
       </div>
     </div>
   );
@@ -2354,15 +2401,15 @@ export default function Piilosana(){
             </button>
           ))}
           {flagBubble&&(
-            <div style={{position:"absolute",top:"100%",left:"50%",transform:"translateX(-50%)",marginTop:"8px",
+            <div style={{position:"absolute",top:"100%",left:"0",marginTop:"8px",
               animation:flagBubbleFading?"bubbleOut 0.6s ease-in forwards":"bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
               whiteSpace:"nowrap",zIndex:50}}>
               <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
                 fontSize:"9px",padding:"8px 14px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
                 border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",imageRendering:"pixelated"}}>
-                <div style={{position:"absolute",top:"-9px",left:"50%",transform:"translateX(-50%)",
+                <div style={{position:"absolute",top:"-9px",left:"20px",
                   width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderBottom:"8px solid #000000"}}/>
-                <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
+                <div style={{position:"absolute",top:"-5px",left:"22px",
                   width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #ffffff"}}/>
                 {lang==="en"?"Play in different languages!":lang==="sv"?"Spela på olika språk!":"Pelaa eri kielillä!"}
               </div>
@@ -2370,6 +2417,11 @@ export default function Piilosana(){
           )}
         </div>
         <div style={{display:"flex",gap:"6px",alignItems:"center"}}>
+          <button onClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} style={{fontFamily:S.font,fontSize:"9px",color:"#88aacc",
+            background:"transparent",border:`2px solid ${S.border}`,padding:"4px 8px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s"}}>
+            <PixelIcon icon="gear" color="#88aacc" size={2}/>
+          </button>
           <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"9px",color:"#ffcc00",
             background:"transparent",border:`2px solid ${S.border}`,padding:"4px 8px",cursor:"pointer",
             display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",position:"relative"}}>
@@ -2420,7 +2472,13 @@ export default function Piilosana(){
 
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
 
-      {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
+      {mode===null?(
+        <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px"}}>
+          {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>(
+            <span key={i} style={{color:S.yellow,textShadow:"3px 3px 0 #cc6600, 0 0 20px #ffcc0066",fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>
+          ));})()}
+        </h1>
+      ):((mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
         <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={settingsBubble} bubbleFading={bubbleFading}/>
       ):(
         <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
