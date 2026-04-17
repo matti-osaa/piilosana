@@ -1468,7 +1468,7 @@ a{color:#00ff88;}
 
 <div id="fi">
 <h2>1. Rekisterinpitäjä</h2>
-<p>Matti Kuokkanen (yksityishenkilö)<br/>Sähköposti: mkuokkanen@gmail.com</p>
+<p>Matti Kuokkanen (yksityishenkilö)<br/>Sähköposti: info@piilosana.com</p>
 
 <h2>2. Mitä tietoja keräämme</h2>
 <p>Piilosana kerää vain tietoja, jotka ovat välttämättömiä pelin toiminnalle:</p>
@@ -1481,7 +1481,7 @@ a{color:#00ff88;}
 <p>Tietoja käytetään ainoastaan pelin toimintaan: kirjautumiseen, tulosten tallentamiseen ja ennätystaulukon ylläpitoon. Emme myy tai jaa tietojasi kolmansille osapuolille.</p>
 
 <h2>4. Tietojen säilytys</h2>
-<p>Tiedot säilytetään palvelimella niin kauan kuin tili on aktiivinen. Voit pyytää tilisi ja tietojesi poistamista lähettämällä sähköpostia osoitteeseen mkuokkanen@gmail.com.</p>
+<p>Tiedot säilytetään palvelimella niin kauan kuin tili on aktiivinen. Voit pyytää tilisi ja tietojesi poistamista lähettämällä sähköpostia osoitteeseen info@piilosana.com.</p>
 
 <h2>5. Evästeet</h2>
 <p>Piilosana käyttää selaimen paikallista tallennustilaa (localStorage) asetusten ja kirjautumistietojen muistamiseen. Emme käytä seurantaevästeitä.</p>
@@ -1496,7 +1496,7 @@ a{color:#00ff88;}
 <h2>Privacy Policy (English)</h2>
 
 <h2>1. Data Controller</h2>
-<p>Matti Kuokkanen (private individual)<br/>Email: mkuokkanen@gmail.com</p>
+<p>Matti Kuokkanen (private individual)<br/>Email: info@piilosana.com</p>
 
 <h2>2. What Data We Collect</h2>
 <p>Piilosana only collects data necessary for the game to function:</p>
@@ -1509,7 +1509,7 @@ a{color:#00ff88;}
 <p>Data is used solely for game functionality: authentication, saving results, and maintaining leaderboards. We do not sell or share your data with third parties.</p>
 
 <h2>4. Data Retention</h2>
-<p>Data is stored on the server as long as the account is active. You can request deletion of your account and data by emailing mkuokkanen@gmail.com.</p>
+<p>Data is stored on the server as long as the account is active. You can request deletion of your account and data by emailing info@piilosana.com.</p>
 
 <h2>5. Cookies</h2>
 <p>Piilosana uses browser local storage (localStorage) to remember settings and login. We do not use tracking cookies.</p>

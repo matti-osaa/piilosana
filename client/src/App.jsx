@@ -2238,6 +2238,10 @@ export default function Piilosana(){
         <div style={{fontSize:"14px",color:"#556",marginTop:"12px"}}>{WORDS_SET.size.toLocaleString()} {t.words}</div>
         <div style={{fontSize:"11px",color:"#334",marginTop:"8px"}}>v{VERSION}</div>
         <div style={{fontSize:"11px",color:"#334",marginTop:"4px"}}>© Matti Kuokkanen 2026</div>
+        <div style={{fontSize:"10px",marginTop:"6px",display:"flex",gap:"12px",justifyContent:"center"}}>
+          <a href="mailto:info@piilosana.com" style={{color:"#445",textDecoration:"none"}}>{lang==="en"?"Feedback":lang==="sv"?"Feedback":"Palaute"}</a>
+          <a href="/privacy" style={{color:"#445",textDecoration:"none"}}>{lang==="en"?"Privacy":lang==="sv"?"Integritet":"Tietosuoja"}</a>
+        </div>
 
       </div>
     </div>
