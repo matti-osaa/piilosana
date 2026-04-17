@@ -1939,7 +1939,7 @@ export default function Piilosana(){
                 {lang==="en"?"LOG OUT":lang==="sv"?"LOGGA UT":"KIRJAUDU ULOS"}
               </button>
               <br/>
-              <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,background:"transparent",border:"none",padding:"6px",cursor:"pointer",marginTop:"8px"}}>✕</button>
+              <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"11px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"6px 14px",cursor:"pointer",marginTop:"12px"}}>✕</button>
             </div>
           ):(
             <div>
