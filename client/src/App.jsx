@@ -898,6 +898,8 @@ export default function Piilosana(){
   const[showSettings,setShowSettings]=useState(false);
   const[settingsBubble,setSettingsBubble]=useState(false);
   const[bubbleFading,setBubbleFading]=useState(false);
+  const[flagBubble,setFlagBubble]=useState(false);
+  const[flagBubbleFading,setFlagBubbleFading]=useState(false);
   const[gearBlend,setGearBlend]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
 
@@ -1036,13 +1038,17 @@ export default function Piilosana(){
 
   // Show settings bubble briefly on main menu
   useEffect(()=>{
-    if(mode!==null){setSettingsBubble(false);setBubbleFading(false);return;}
+    if(mode!==null){setSettingsBubble(false);setBubbleFading(false);setFlagBubble(false);setFlagBubbleFading(false);return;}
     const shown=sessionStorage.getItem("piilosana_bubble_shown");
     if(shown)return;
     const t1=setTimeout(()=>setSettingsBubble(true),2000);
     const t2=setTimeout(()=>setBubbleFading(true),6000);
     const t3=setTimeout(()=>{setSettingsBubble(false);setBubbleFading(false);sessionStorage.setItem("piilosana_bubble_shown","1");},7000);
-    return()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);};
+    const flagShown=sessionStorage.getItem("piilosana_flag_bubble_shown");
+    const t4=flagShown?null:setTimeout(()=>setFlagBubble(true),8500);
+    const t5=flagShown?null:setTimeout(()=>setFlagBubbleFading(true),12500);
+    const t6=flagShown?null:setTimeout(()=>{setFlagBubble(false);setFlagBubbleFading(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");},13500);
+    return()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);if(t4)clearTimeout(t4);if(t5)clearTimeout(t5);if(t6)clearTimeout(t6);};
   },[mode]);
 
   // Fetch online player count for Piilosauna button
@@ -1792,9 +1798,9 @@ export default function Piilosana(){
       onMouseMove={e=>onDragMove(e.clientX,e.clientY)} onMouseUp={onDragEnd} onTouchEnd={onDragEnd}>
       {/* Top bar: language selector + login button - only visible in main menu */}
       {mode===null&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",maxWidth:"600px",marginBottom:"4px"}}>
-        <div style={{display:"flex",gap:"6px"}}>
+        <div style={{display:"flex",gap:"6px",position:"relative"}}>
           {Object.entries(LANG_CONFIG).map(([code,lc])=>(
-            <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);}}
+            <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");}}
               style={{fontFamily:S.font,fontSize:"9px",background:lang===code?S.dark:"transparent",
                 border:lang===code?`2px solid ${S.green}`:`2px solid ${S.border}`,
                 padding:"4px 8px",cursor:"pointer",color:lang===code?S.green:"#556",
@@ -1803,6 +1809,21 @@ export default function Piilosana(){
               <PixelFlag lang={code} size={2}/>
             </button>
           ))}
+          {flagBubble&&(
+            <div style={{position:"absolute",top:"100%",left:"50%",transform:"translateX(-50%)",marginTop:"8px",
+              animation:flagBubbleFading?"bubbleOut 0.6s ease-in forwards":"bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
+              whiteSpace:"nowrap",zIndex:50}}>
+              <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
+                fontSize:"9px",padding:"8px 14px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
+                border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",imageRendering:"pixelated"}}>
+                <div style={{position:"absolute",top:"-9px",left:"50%",transform:"translateX(-50%)",
+                  width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderBottom:"8px solid #000000"}}/>
+                <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
+                  width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #ffffff"}}/>
+                {lang==="en"?"Play in different languages!":lang==="sv"?"Spela på olika språk!":"Pelaa eri kielillä!"}
+              </div>
+            </div>
+          )}
         </div>
         <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:authUser?S.green:S.yellow,
           background:"transparent",border:`2px solid ${authUser?S.green+"66":S.yellow+"66"}`,padding:"4px 10px",cursor:"pointer",
