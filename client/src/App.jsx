@@ -2228,20 +2228,37 @@ export default function Piilosana(){
   // Render multiplayer screens
   const ModeSelectScreen=()=>(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
-      {/* Main play button — starts solo immediately with default settings */}
-      <button onClick={()=>startSolo("normal",120)} style={{fontFamily:S.font,fontSize:"22px",color:S.bg,background:S.green,border:"none",padding:"24px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #008844",width:"100%",minHeight:"70px",display:"flex",alignItems:"center",justifyContent:"center",gap:"10px",marginBottom:"6px"}}
-        onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="6px 6px 0 #008844"}}
-        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="4px 4px 0 #008844"}}>
-        {t.quickPlay}
+      {/* Main button — ARENA */}
+      <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"22px",color:S.bg,background:"#ff6644",border:"none",padding:"24px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"70px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"10px"}}
+        onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="6px 6px 0 #cc3311"}}
+        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="4px 4px 0 #cc3311"}}>
+        <span style={{display:"flex",alignItems:"center",gap:"8px"}}>{t.arena}<span style={{fontSize:"11px",display:"inline-flex",alignItems:"center",gap:"4px",background:"#cc441188",padding:"2px 8px",borderRadius:"2px"}}><PixelIcon icon="person" color={S.bg} size={1.3}/>{publicOnlineCount}</span></span>
+        <span style={{fontSize:"9px",opacity:0.8}}>{t.arenaDesc}</span>
       </button>
 
-      {/* Expandable options under play button */}
-      <button onClick={()=>setShowMenuOptions(v=>!v)} style={{fontFamily:S.font,fontSize:"9px",color:"#556",background:"transparent",border:"none",padding:"8px",cursor:"pointer",display:"flex",alignItems:"center",gap:"4px",margin:"0 auto"}}>
+      {/* Two smaller buttons side by side */}
+      <div style={{display:"flex",gap:"8px"}}>
+        <button onClick={()=>startSolo("normal",120)} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.green,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="5px 5px 0 #008844"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="3px 3px 0 #008844"}}>
+          <span>{t.practice}</span>
+          <span style={{fontSize:"8px",opacity:0.7}}>{t.practiceDesc}</span>
+        </button>
+        <button onClick={async()=>{await sounds.init();setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.yellow,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="5px 5px 0 #cc8800"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="3px 3px 0 #cc8800"}}>
+          <span>{t.customGame}</span>
+          <span style={{fontSize:"8px",opacity:0.7}}>{t.customDesc}</span>
+        </button>
+      </div>
+
+      {/* Expandable solo options under the smaller buttons */}
+      <button onClick={()=>setShowMenuOptions(v=>!v)} style={{fontFamily:S.font,fontSize:"9px",color:"#556",background:"transparent",border:"none",padding:"8px",cursor:"pointer",display:"flex",alignItems:"center",gap:"4px",margin:"0 auto",marginTop:"4px"}}>
         <span style={{transform:showMenuOptions?"rotate(90deg)":"rotate(0deg)",transition:"transform 0.2s",display:"inline-block"}}>▶</span>
         {t.advancedOptions}
       </button>
       {showMenuOptions&&(
-        <div style={{padding:"16px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"12px",animation:"fadeIn 0.3s ease"}}>
+        <div style={{padding:"16px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"4px",animation:"fadeIn 0.3s ease"}}>
           <div style={{marginBottom:"12px"}}>
             <div style={{fontSize:"9px",color:S.green,marginBottom:"6px"}}>{t.gameMode}</div>
             <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap"}}>
@@ -2262,25 +2279,9 @@ export default function Piilosana(){
               {letterMult?"✓ ":""}{t.letterMultBtn}
             </button>
           </div>
-          <button onClick={()=>startSolo()} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 24px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",marginTop:"14px"}}>{t.quickPlay}</button>
+          <button onClick={()=>startSolo()} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 24px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",marginTop:"14px"}}>{t.practice}</button>
         </div>
       )}
-
-      {/* Multiplayer options */}
-      <div style={{display:"flex",gap:"8px",marginTop:"8px"}}>
-        <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:"#ff6644",border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:"3px 3px 0 #cc3311",flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="5px 5px 0 #cc3311"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="3px 3px 0 #cc3311"}}>
-          <span style={{display:"flex",alignItems:"center",gap:"6px"}}>{t.arena}<span style={{fontSize:"10px",display:"inline-flex",alignItems:"center",gap:"3px",background:"#cc441188",padding:"1px 6px",borderRadius:"2px"}}><PixelIcon icon="person" color={S.bg} size={1.2}/>{publicOnlineCount}</span></span>
-          <span style={{fontSize:"8px",opacity:0.7}}>{t.arenaDesc}</span>
-        </button>
-        <button onClick={async()=>{await sounds.init();setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.yellow,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="5px 5px 0 #cc8800"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="3px 3px 0 #cc8800"}}>
-          <span>{t.customGame}</span>
-          <span style={{fontSize:"8px",opacity:0.7}}>{t.customDesc}</span>
-        </button>
-      </div>
 
       {/* Footer */}
       <div style={{marginTop:"24px"}}>
