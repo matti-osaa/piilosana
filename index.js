@@ -81,6 +81,8 @@ async function initDb() {
   try { db.run(`ALTER TABLE hall_of_fame ADD COLUMN user_id INTEGER`); } catch(e) { /* column already exists */ }
   // Add settings column to users
   try { db.run(`ALTER TABLE users ADD COLUMN settings TEXT`); } catch(e) { /* column already exists */ }
+  // Add achievements column to users (JSON string)
+  try { db.run(`ALTER TABLE users ADD COLUMN achievements TEXT`); } catch(e) { /* column already exists */ }
 
   saveDb();
 }
@@ -1154,12 +1156,12 @@ app.post('/api/login', async (req, res) => {
     const { nickname, password } = req.body;
     if (!nickname || !password) return res.status(400).json({ error: 'Nimimerkki ja salasana vaaditaan' });
 
-    const rows = db.exec(`SELECT id, nickname, password_hash, email, settings FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    const rows = db.exec(`SELECT id, nickname, password_hash, email, settings, achievements FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
     if (rows.length === 0 || rows[0].values.length === 0) {
       return res.status(401).json({ error: 'Väärä nimimerkki tai salasana' });
     }
 
-    const [id, dbNickname, password_hash, email, settingsJson] = rows[0].values[0];
+    const [id, dbNickname, password_hash, email, settingsJson, achievementsJson] = rows[0].values[0];
     const match = await bcrypt.compare(password, password_hash);
     if (!match) {
       return res.status(401).json({ error: 'Väärä nimimerkki tai salasana' });
@@ -1167,8 +1169,10 @@ app.post('/api/login', async (req, res) => {
 
     let settings = null;
     try { settings = settingsJson ? JSON.parse(settingsJson) : null; } catch(e) {}
+    let achievements = null;
+    try { achievements = achievementsJson ? JSON.parse(achievementsJson) : null; } catch(e) {}
 
-    res.json({ ok: true, user: { id, nickname: dbNickname, email, settings } });
+    res.json({ ok: true, user: { id, nickname: dbNickname, email, settings, achievements } });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Kirjautuminen epäonnistui' });
@@ -1312,6 +1316,30 @@ app.post('/api/me', (req, res) => {
     res.json({ ok: true, user: { id, nickname: dbNickname, email } });
   } catch (err) {
     res.status(500).json({ error: 'Virhe' });
+  }
+});
+
+// Save achievements
+app.post('/api/achievements', async (req, res) => {
+  try {
+    const { nickname, password, achievements } = req.body;
+    if (!nickname || !password) return res.status(401).json({ error: 'Ei kirjautunut' });
+
+    const rows = db.exec(`SELECT id, password_hash FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
+    if (rows.length === 0 || rows[0].values.length === 0) return res.status(401).json({ error: 'Ei kirjautunut' });
+
+    const [id, password_hash] = rows[0].values[0];
+    const match = await bcrypt.compare(password, password_hash);
+    if (!match) return res.status(401).json({ error: 'Ei kirjautunut' });
+
+    const achievementsJson = JSON.stringify(achievements || {});
+    db.run(`UPDATE users SET achievements = ? WHERE id = ?`, [achievementsJson, id]);
+    saveDb();
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Achievements save error:', err);
+    res.status(500).json({ error: 'Saavutusten tallennus epäonnistui' });
   }
 });
 

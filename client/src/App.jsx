@@ -101,6 +101,7 @@ const T={
     megaCombo:"MEGA KOMBO",combo:"KOMBO",online:"online",
     openGames:"AVOIMET PELIT",roomFull:"Huone on täynnä",gameInProgress:"Peli on jo käynnissä",roomNotFound:"Huonetta ei löydy",
     someoneBeatYou:"Joku ehti ensin!",tooShort:"Liian lyhyt",notInGrid:"Ei löydy ruudukosta",wrongMode:"Väärä moodi",gameNotRunning:"Peli ei käynnissä",
+    achievements:"SAAVUTUKSET",achievementUnlocked:"Uusi saavutus!",locked:"Lukittu",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -131,6 +132,7 @@ const T={
     megaCombo:"MEGA COMBO",combo:"COMBO",online:"online",
     openGames:"OPEN GAMES",roomFull:"Room is full",gameInProgress:"Game already in progress",roomNotFound:"Room not found",
     someoneBeatYou:"Someone got it first!",tooShort:"Too short",notInGrid:"Not found in grid",wrongMode:"Wrong mode",gameNotRunning:"Game not running",
+    achievements:"ACHIEVEMENTS",achievementUnlocked:"New achievement!",locked:"Locked",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -161,6 +163,7 @@ const T={
     megaCombo:"MEGA KOMBO",combo:"KOMBO",online:"online",
     openGames:"ÖPPNA SPEL",roomFull:"Rummet är fullt",gameInProgress:"Spelet pågår redan",roomNotFound:"Rummet hittades inte",
     someoneBeatYou:"Någon hann före!",tooShort:"För kort",notInGrid:"Finns inte i rutnätet",wrongMode:"Fel läge",gameNotRunning:"Spelet är inte igång",
+    achievements:"PRESTATIONER",achievementUnlocked:"Ny prestation!",locked:"Låst",
   },
 };
 
@@ -677,9 +680,217 @@ const ICON_PIXELS={
   },
 };
 
+// ============================================
+// ACHIEVEMENT BADGE PIXEL ART (11x11 each)
+// ============================================
+const BADGE_PIXELS={
+  star:{
+    cols:9,rows:[
+      "....*....",
+      "...***...",
+      "...***...",
+      "*********",
+      ".******.*",
+      "..*****!.",
+      "...*.*...",
+      "..**.**!.",
+      ".**...**.",
+    ],colors:{"*":"currentColor","!":"currentColor"},
+  },
+  flame:{ // fire/streak
+    cols:11,rows:[
+      ".....*.....",
+      "....**.....",
+      "...**F*....",
+      "..**FFF*...",
+      "..*FFFFF*..",
+      "..*FFFFF*..",
+      ".*FFFFFFF*.",
+      ".*FFFFFFF*.",
+      ".*FFFFFFF*.",
+      "..*FFFFF*..",
+      "...***.*...",
+    ],colors:{"*":"#ff4400",F:"currentColor"},
+  },
+  diamond:{
+    cols:9,rows:[
+      "....*....",
+      "...*D*...",
+      "..*DDD*..",
+      ".*DDDDD*.",
+      "*DDDDDDD*",
+      ".*DDDDD*.",
+      "..*DDD*..",
+      "...*D*...",
+      "....*....",
+    ],colors:{"*":"outline",D:"currentColor"},
+  },
+  crown:{ // king crown
+    cols:11,rows:[
+      ".*...*...*.",
+      ".*...*...*.",
+      ".**.***..**",
+      ".***.***..*",
+      ".**GGGGG**.",
+      ".*GGGGGGG*.",
+      ".*GGGGGGG*.",
+      ".*GGGGGGG*.",
+      ".**GGGGG**.",
+      "...........",
+      "...........",
+    ],colors:{"*":"currentColor",G:"#ffcc00"},
+  },
+  scroll:{ // word scroll
+    cols:11,rows:[
+      "..********.",
+      ".*SSSSSS**.",
+      ".*SSSSSS*.*",
+      ".*SSSSSS*.*",
+      ".*SSSSSS*.*",
+      ".*SSSSSS*.*",
+      ".*SSSSSS*.*",
+      ".*SSSSSS*.*",
+      ".**SSSSSS*.",
+      "..********.",
+      "...........",
+    ],colors:{"*":"outline",S:"currentColor"},
+  },
+  trophy:{ // trophy cup
+    cols:11,rows:[
+      "...........",
+      ".**GGGGG**.",
+      "*.*GGGGG*.*",
+      "*.*GGGGG*.*",
+      "**.*GGG*..*",
+      "...*GGG*...",
+      "....*G*....",
+      "....*G*....",
+      "...*GGG*...",
+      "..*GGGGG*..",
+      "...........",
+    ],colors:{"*":"outline",G:"currentColor"},
+  },
+  bolt:{ // lightning bolt speed
+    cols:11,rows:[
+      ".....****..",
+      "....**.....",
+      "...**......",
+      "..**.......",
+      ".********.*",
+      "...........",
+      ".*********.",
+      ".......**.*",
+      "......**...",
+      ".....**....",
+      "...**......",
+    ],colors:{"*":"currentColor"},
+  },
+  sword:{ // arena sword
+    cols:11,rows:[
+      ".........*.",
+      "........*..",
+      ".......*...",
+      "......*....",
+      ".....*.....",
+      "....*......",
+      "..G*.......",
+      ".GG........",
+      "..G*.......",
+      "...H.......",
+      "...H.......",
+    ],colors:{"*":"currentColor",G:"#ccaa44",H:"#aa7733"},
+  },
+};
+
+// ============================================
+// ACHIEVEMENT DEFINITIONS
+// ============================================
+const ACHIEVEMENTS={
+  // Word-based achievements
+  first_word:    {icon:"star",   color:"#00ff88",tier:1,
+    fi:"Ensimmäinen sana",     en:"First Word",         sv:"Första ordet",
+    fi_d:"Löydä ensimmäinen sanasi",en_d:"Find your first word",sv_d:"Hitta ditt första ord",
+    check:(s)=>s.totalWords>=1},
+  ten_words:     {icon:"star",   color:"#00ff88",tier:1,
+    fi:"Sananiekka",           en:"Word Finder",        sv:"Ordhittare",
+    fi_d:"Löydä 10 sanaa yhteensä",en_d:"Find 10 words total",sv_d:"Hitta 10 ord totalt",
+    check:(s)=>s.totalWords>=10},
+  hundred_words: {icon:"scroll", color:"#44ddff",tier:2,
+    fi:"Sanamestari",          en:"Word Master",        sv:"Ordmästare",
+    fi_d:"Löydä 100 sanaa yhteensä",en_d:"Find 100 words total",sv_d:"Hitta 100 ord totalt",
+    check:(s)=>s.totalWords>=100},
+  thousand_words:{icon:"scroll", color:"#ff66ff",tier:3,
+    fi:"Sanalegenda",          en:"Word Legend",         sv:"Ordlegend",
+    fi_d:"Löydä 1000 sanaa yhteensä",en_d:"Find 1000 words total",sv_d:"Hitta 1000 ord totalt",
+    check:(s)=>s.totalWords>=1000},
+  long_word_5:   {icon:"diamond",color:"#44ddff",tier:2,
+    fi:"Pitkä sana",           en:"Long Word",          sv:"Långt ord",
+    fi_d:"Löydä 5-kirjaiminen sana",en_d:"Find a 5-letter word",sv_d:"Hitta ett 5-bokstavsord",
+    check:(s)=>s.longestWord>=5},
+  long_word_6:   {icon:"diamond",color:"#ff66ff",tier:2,
+    fi:"Todella pitkä",        en:"Really Long",        sv:"Riktigt långt",
+    fi_d:"Löydä 6-kirjaiminen sana",en_d:"Find a 6-letter word",sv_d:"Hitta ett 6-bokstavsord",
+    check:(s)=>s.longestWord>=6},
+  long_word_7:   {icon:"diamond",color:"#ffcc00",tier:3,
+    fi:"Sanamagiikka",         en:"Word Magic",         sv:"Ordmagi",
+    fi_d:"Löydä 7+ kirjaimen sana",en_d:"Find a 7+ letter word",sv_d:"Hitta ett 7+ bokstavsord",
+    check:(s)=>s.longestWord>=7},
+  // Game/score achievements
+  first_game:    {icon:"trophy", color:"#00ff88",tier:1,
+    fi:"Ensimmäinen peli",     en:"First Game",         sv:"Första spelet",
+    fi_d:"Pelaa ensimmäinen pelisi",en_d:"Play your first game",sv_d:"Spela ditt första spel",
+    check:(s)=>s.gamesPlayed>=1},
+  ten_games:     {icon:"trophy", color:"#44ddff",tier:2,
+    fi:"Kokenut pelaaja",      en:"Experienced",        sv:"Erfaren",
+    fi_d:"Pelaa 10 peliä",en_d:"Play 10 games",sv_d:"Spela 10 spel",
+    check:(s)=>s.gamesPlayed>=10},
+  fifty_games:   {icon:"trophy", color:"#ff66ff",tier:3,
+    fi:"Veteraani",            en:"Veteran",            sv:"Veteran",
+    fi_d:"Pelaa 50 peliä",en_d:"Play 50 games",sv_d:"Spela 50 spel",
+    check:(s)=>s.gamesPlayed>=50},
+  score_50:      {icon:"star",   color:"#ffcc00",tier:2,
+    fi:"Puolivuosisata",       en:"Half Century",       sv:"Halvt sekel",
+    fi_d:"Saa 50 pistettä yhdessä pelissä",en_d:"Score 50 in one game",sv_d:"Få 50 poäng i ett spel",
+    check:(s)=>s.bestScore>=50},
+  score_100:     {icon:"crown",  color:"#ffcc00",tier:3,
+    fi:"Satanen",              en:"Century",            sv:"Hundra",
+    fi_d:"Saa 100 pistettä yhdessä pelissä",en_d:"Score 100 in one game",sv_d:"Få 100 poäng i ett spel",
+    check:(s)=>s.bestScore>=100},
+  // Combo achievements
+  combo_3:       {icon:"flame",  color:"#ff6644",tier:1,
+    fi:"Komboilija",           en:"Combo Starter",      sv:"Kombostartare",
+    fi_d:"Saa 3 sanan kombo",en_d:"Get a 3 word combo",sv_d:"Få en 3-ordskombo",
+    check:(s)=>s.bestCombo>=3},
+  combo_5:       {icon:"flame",  color:"#ff66ff",tier:2,
+    fi:"Megakombo",            en:"Mega Combo",         sv:"Megakombo",
+    fi_d:"Saa 5 sanan kombo",en_d:"Get a 5 word combo",sv_d:"Få en 5-ordskombo",
+    check:(s)=>s.bestCombo>=5},
+  // Speed
+  speed_demon:   {icon:"bolt",   color:"#ffcc00",tier:2,
+    fi:"Salamannopea",         en:"Speed Demon",        sv:"Blixtsnabb",
+    fi_d:"Löydä 10 sanaa minuutissa",en_d:"Find 10 words in a minute",sv_d:"Hitta 10 ord på en minut",
+    check:(s)=>s.bestWordsPerMin>=10},
+  // Arena
+  arena_player:  {icon:"sword",  color:"#ff6644",tier:1,
+    fi:"Areenataisteli­ja",     en:"Arena Fighter",      sv:"Arenakämpe",
+    fi_d:"Pelaa areenalla",en_d:"Play in the arena",sv_d:"Spela i arenan",
+    check:(s)=>s.arenaGames>=1},
+  arena_winner:  {icon:"crown",  color:"#ff6644",tier:3,
+    fi:"Areenakunkku",         en:"Arena Champion",     sv:"Arenamästare",
+    fi_d:"Voita areenakierros",en_d:"Win an arena round",sv_d:"Vinn en arenarunda",
+    check:(s)=>s.arenaWins>=1},
+  // Multilingual
+  polyglot:      {icon:"scroll", color:"#ffcc00",tier:2,
+    fi:"Monikielinen",         en:"Polyglot",           sv:"Polyglott",
+    fi_d:"Pelaa kaikilla kolmella kielellä",en_d:"Play in all three languages",sv_d:"Spela på alla tre språk",
+    check:(s)=>(s.langsPlayed||[]).length>=3},
+};
+
+const INITIAL_STATS={totalWords:0,gamesPlayed:0,bestScore:0,bestCombo:0,longestWord:0,bestWordsPerMin:0,arenaGames:0,arenaWins:0,langsPlayed:[]};
+
 const SHADE_MAP={outline:0.4,dark:0.55,mid:0.7,light:0.85,highlight:1.0};
-function PixelIcon({icon,color="currentColor",size=2,style={}}){
-  const data=ICON_PIXELS[icon];
+function PixelIcon({icon,color="currentColor",size=2,style={},badge=false}){
+  const data=badge?BADGE_PIXELS[icon]:ICON_PIXELS[icon];
   if(!data)return null;
   const {cols,rows,colors}=data;
   const resolveColor=(ch)=>{
@@ -982,6 +1193,98 @@ export default function Piilosana(){
     }catch{setAuthError("Yhteysvirhe");setAuthLoading(false);}
   },[]);
 
+  // ============================================
+  // ACHIEVEMENTS STATE
+  // ============================================
+  const[achStats,setAchStats]=useState(()=>{
+    try{const s=localStorage.getItem("piilosana_ach_stats");return s?{...INITIAL_STATS,...JSON.parse(s)}:{...INITIAL_STATS};}catch{return{...INITIAL_STATS};}
+  });
+  const[achUnlocked,setAchUnlocked]=useState(()=>{
+    try{const s=localStorage.getItem("piilosana_ach_unlocked");return s?JSON.parse(s):{};}catch{return{};}
+  });
+  const[showAchievements,setShowAchievements]=useState(false);
+  const[newAchPopup,setNewAchPopup]=useState(null);
+  const achStatsRef=useRef(achStats);
+  achStatsRef.current=achStats;
+  const achUnlockedRef=useRef(achUnlocked);
+  achUnlockedRef.current=achUnlocked;
+
+  // Load achievements from server on login
+  useEffect(()=>{
+    if(authUser?.achievements){
+      const serverAch=authUser.achievements;
+      if(serverAch.stats){
+        const merged={...INITIAL_STATS,...serverAch.stats};
+        // Take max of local and server stats
+        const local=achStatsRef.current;
+        const best={...merged};
+        for(const k of["totalWords","gamesPlayed","bestScore","bestCombo","longestWord","bestWordsPerMin","arenaGames","arenaWins"]){
+          best[k]=Math.max(local[k]||0,merged[k]||0);
+        }
+        best.langsPlayed=[...new Set([...(local.langsPlayed||[]),...(merged.langsPlayed||[])])];
+        setAchStats(best);localStorage.setItem("piilosana_ach_stats",JSON.stringify(best));
+      }
+      if(serverAch.unlocked){
+        const merged={...achUnlockedRef.current,...serverAch.unlocked};
+        setAchUnlocked(merged);localStorage.setItem("piilosana_ach_unlocked",JSON.stringify(merged));
+      }
+    }
+  },[authUser]);
+
+  const saveAchievementsToServer=useCallback(async(stats,unlocked)=>{
+    try{
+      const cred=JSON.parse(localStorage.getItem("piilosana_auth_cred")||"null");
+      if(!cred)return;
+      await fetch(`${SERVER_URL}/api/achievements`,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({nickname:cred.nickname,password:cred.password,achievements:{stats,unlocked}})});
+    }catch{}
+  },[]);
+
+  const checkAchievements=useCallback((newStats)=>{
+    const prev=achUnlockedRef.current;
+    const newUnlocked={...prev};
+    let anyNew=null;
+    for(const[id,ach]of Object.entries(ACHIEVEMENTS)){
+      if(!prev[id]&&ach.check(newStats)){
+        newUnlocked[id]=Date.now();
+        anyNew=id;
+      }
+    }
+    if(anyNew){
+      setAchUnlocked(newUnlocked);
+      localStorage.setItem("piilosana_ach_unlocked",JSON.stringify(newUnlocked));
+      achUnlockedRef.current=newUnlocked;
+      // Show popup for the last unlocked one
+      setNewAchPopup(anyNew);
+      setTimeout(()=>setNewAchPopup(null),3500);
+      saveAchievementsToServer(newStats,newUnlocked);
+    }
+    return newUnlocked;
+  },[saveAchievementsToServer]);
+
+  const updateAchStats=useCallback((updates)=>{
+    setAchStats(prev=>{
+      const next={...prev,...updates};
+      // For array fields like langsPlayed, merge
+      if(updates.langsPlayed){
+        next.langsPlayed=[...new Set([...(prev.langsPlayed||[]),...updates.langsPlayed])];
+      }
+      // Keep max values for best* fields
+      for(const k of["bestScore","bestCombo","longestWord","bestWordsPerMin"]){
+        if(updates[k]!==undefined)next[k]=Math.max(prev[k]||0,updates[k]);
+      }
+      // Accumulate counters
+      if(updates.addWords)next.totalWords=(prev.totalWords||0)+updates.addWords;
+      if(updates.addGames)next.gamesPlayed=(prev.gamesPlayed||0)+updates.addGames;
+      if(updates.addArenaGames)next.arenaGames=(prev.arenaGames||0)+updates.addArenaGames;
+      if(updates.addArenaWins)next.arenaWins=(prev.arenaWins||0)+updates.addArenaWins;
+      localStorage.setItem("piilosana_ach_stats",JSON.stringify(next));
+      achStatsRef.current=next;
+      checkAchievements(next);
+      return next;
+    });
+  },[checkAchievements]);
+
   const theme=getTheme(themeId);
   const langConf=getLangConf(lang);
   const WORDS_SET=langConf.words;
@@ -1201,6 +1504,46 @@ export default function Piilosana(){
     return()=>clearInterval(t);
   },[state,mode]);
 
+  // Track achievements when game ends
+  useEffect(()=>{
+    if(state!=="end")return;
+    const wordsFound=found.length;
+    if(wordsFound===0&&score===0)return; // no-op game
+    const longestFound=found.reduce((max,w)=>Math.max(max,w.length),0);
+    const gameTimeSec=gameTime||120;
+    const wordsPerMin=gameTimeSec>0?Math.round(wordsFound/(gameTimeSec/60)*10)/10:0;
+    const updates={addWords:wordsFound,addGames:1,bestScore:score,longestWord:longestFound,bestWordsPerMin:wordsPerMin,
+      langsPlayed:[lang]};
+    if(mode==="public"){
+      updates.addArenaGames=1;
+      // Check if won arena round
+      if(publicRankings&&publicRankings.length>0){
+        const myNick=(authUser?.nickname||nickname||"").toUpperCase();
+        if(publicRankings[0]?.nickname?.toUpperCase()===myNick)updates.addArenaWins=1;
+      }
+    }
+    updateAchStats(updates);
+  },[state]);
+
+  // Track combo achievements during play
+  const achComboRef=useRef(0);
+  useEffect(()=>{
+    if(combo>achComboRef.current)achComboRef.current=combo;
+    if(state==="end"&&achComboRef.current>0){
+      const c=achComboRef.current;
+      achComboRef.current=0;
+      setAchStats(prev=>{
+        if(c>prev.bestCombo){
+          const next={...prev,bestCombo:c};
+          localStorage.setItem("piilosana_ach_stats",JSON.stringify(next));
+          achStatsRef.current=next;
+          checkAchievements(next);
+          return next;
+        }
+        return prev;
+      });
+    }
+  },[combo,state,checkAchievements]);
 
   // Cell detection - astroid hitbox clipped to cell bounds + adjacency bias.
   // Astroid |dx|^⅔+|dy|^⅔ ≤ (w/2)^⅔ with cusps at cell edges.
@@ -1880,13 +2223,21 @@ export default function Piilosana(){
             </div>
           )}
         </div>
-        <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:authUser?S.green:S.yellow,
-          background:authUser?S.dark:"transparent",border:`2px solid ${authUser?S.green:S.border}`,padding:"4px 8px",cursor:"pointer",
-          display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",
-          boxShadow:authUser?`0 0 8px ${S.green}44`:"none"}}>
-          <PixelIcon icon="person" color={authUser?S.green:S.yellow} size={2}/>
-          {authUser&&authUser.nickname}
-        </button>
+        <div style={{display:"flex",gap:"6px",alignItems:"center"}}>
+          <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"9px",color:"#ffcc00",
+            background:"transparent",border:`2px solid ${S.border}`,padding:"4px 8px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",position:"relative"}}>
+            <PixelIcon icon="trophy" color="#ffcc00" size={2} badge={true}/>
+            {Object.keys(achUnlocked).length>0&&<span style={{fontSize:"8px"}}>{Object.keys(achUnlocked).length}/{Object.keys(ACHIEVEMENTS).length}</span>}
+          </button>
+          <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:authUser?S.green:S.yellow,
+            background:authUser?S.dark:"transparent",border:`2px solid ${authUser?S.green:S.border}`,padding:"4px 8px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",
+            boxShadow:authUser?`0 0 8px ${S.green}44`:"none"}}>
+            <PixelIcon icon="person" color={authUser?S.green:S.yellow} size={2}/>
+            {authUser&&authUser.nickname}
+          </button>
+        </div>
       </div>}
       <style>{fontCSS}</style>
       <style>{`
@@ -1936,6 +2287,81 @@ export default function Piilosana(){
             return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>;
           });})()}
         </h1>
+      )}
+
+      {/* Achievement unlock popup */}
+      {newAchPopup&&ACHIEVEMENTS[newAchPopup]&&(
+        <div style={{position:"fixed",top:"20%",left:"50%",transform:"translateX(-50%)",zIndex:200,
+          animation:"pop 0.5s ease",pointerEvents:"none",textAlign:"center"}}>
+          <div style={{background:S.dark,border:`3px solid ${ACHIEVEMENTS[newAchPopup].color}`,
+            padding:"16px 24px",boxShadow:`0 0 40px ${ACHIEVEMENTS[newAchPopup].color}66`,minWidth:"200px"}}>
+            <div style={{fontSize:"11px",color:ACHIEVEMENTS[newAchPopup].color,marginBottom:"8px"}}>{t.achievementUnlocked}</div>
+            <div style={{display:"flex",justifyContent:"center",marginBottom:"8px"}}>
+              <PixelIcon icon={ACHIEVEMENTS[newAchPopup].icon} color={ACHIEVEMENTS[newAchPopup].color} size={4} badge={true}/>
+            </div>
+            <div style={{fontSize:"13px",color:"#fff"}}>{ACHIEVEMENTS[newAchPopup][lang]||ACHIEVEMENTS[newAchPopup].fi}</div>
+            <div style={{fontSize:"9px",color:"#88ccaa",marginTop:"4px"}}>{ACHIEVEMENTS[newAchPopup][lang+"_d"]||ACHIEVEMENTS[newAchPopup].fi_d}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Achievements view */}
+      {showAchievements&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:150,
+          display:"flex",justifyContent:"center",alignItems:"flex-start",padding:"40px 16px",overflowY:"auto"}}
+          onClick={(e)=>{if(e.target===e.currentTarget)setShowAchievements(false);}}>
+          <div style={{width:"100%",maxWidth:"500px",background:S.dark,border:`2px solid #ffcc00`,
+            boxShadow:"0 0 30px #ffcc0033",padding:"20px",animation:"fadeIn 0.3s ease"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
+                <PixelIcon icon="trophy" color="#ffcc00" size={3} badge={true}/>
+                <span style={{fontFamily:S.font,fontSize:"14px",color:"#ffcc00"}}>{t.achievements}</span>
+              </div>
+              <span style={{fontSize:"11px",color:"#88ccaa"}}>{Object.keys(achUnlocked).length} / {Object.keys(ACHIEVEMENTS).length}</span>
+              <button onClick={()=>setShowAchievements(false)} style={{fontFamily:S.font,fontSize:"14px",color:S.green,
+                background:"transparent",border:`2px solid ${S.green}`,padding:"4px 10px",cursor:"pointer"}}>X</button>
+            </div>
+            {/* Progress bar */}
+            <div style={{width:"100%",height:"6px",background:"#333",marginBottom:"16px",border:`1px solid ${S.border}`}}>
+              <div style={{width:`${Object.keys(achUnlocked).length/Object.keys(ACHIEVEMENTS).length*100}%`,height:"100%",
+                background:"linear-gradient(90deg, #ffcc00, #ff6644)",transition:"width 0.5s ease"}}/>
+            </div>
+            {/* Achievement grid */}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(130px, 1fr))",gap:"8px"}}>
+              {Object.entries(ACHIEVEMENTS).map(([id,ach])=>{
+                const unlocked=!!achUnlocked[id];
+                return(
+                  <div key={id} style={{border:`2px solid ${unlocked?ach.color+"88":"#333"}`,
+                    padding:"10px",textAlign:"center",background:unlocked?"#ffffff08":"#00000044",
+                    opacity:unlocked?1:0.5,transition:"all 0.3s"}}>
+                    <div style={{display:"flex",justifyContent:"center",marginBottom:"6px"}}>
+                      <PixelIcon icon={ach.icon} color={unlocked?ach.color:"#444"} size={3} badge={true}/>
+                    </div>
+                    <div style={{fontSize:"9px",color:unlocked?ach.color:"#556",marginBottom:"2px",lineHeight:"1.4"}}>
+                      {ach[lang]||ach.fi}
+                    </div>
+                    <div style={{fontSize:"8px",color:unlocked?"#88ccaa":"#334",lineHeight:"1.3"}}>
+                      {ach[lang+"_d"]||ach.fi_d}
+                    </div>
+                    {unlocked&&<div style={{fontSize:"7px",color:"#556",marginTop:"3px"}}>
+                      {new Date(achUnlocked[id]).toLocaleDateString()}
+                    </div>}
+                  </div>
+                );
+              })}
+            </div>
+            {/* Stats summary */}
+            <div style={{marginTop:"16px",padding:"10px",border:`1px solid ${S.border}`,fontSize:"9px",color:"#88ccaa",
+              display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4px"}}>
+              <div>{lang==="en"?"Words found":lang==="sv"?"Ord hittade":"Sanoja löydetty"}: {achStats.totalWords}</div>
+              <div>{lang==="en"?"Games played":lang==="sv"?"Spel spelade":"Pelejä pelattu"}: {achStats.gamesPlayed}</div>
+              <div>{lang==="en"?"Best score":lang==="sv"?"Bästa poäng":"Paras tulos"}: {achStats.bestScore}</div>
+              <div>{lang==="en"?"Best combo":lang==="sv"?"Bästa kombo":"Paras kombo"}: {achStats.bestCombo}</div>
+              <div>{lang==="en"?"Longest word":lang==="sv"?"Längsta ord":"Pisin sana"}: {achStats.longestWord} {lang==="en"?"letters":lang==="sv"?"bokstäver":"kirjainta"}</div>
+              <div>{lang==="en"?"Arena wins":lang==="sv"?"Arenavinster":"Arenavoitot"}: {achStats.arenaWins}</div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Settings panel - overlay below title */}
