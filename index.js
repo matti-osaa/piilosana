@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import bcrypt from 'bcryptjs';
 import { Resend } from 'resend';
+import rateLimit from 'express-rate-limit';
+import { OAuth2Client } from 'google-auth-library';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -83,6 +85,8 @@ async function initDb() {
   try { db.run(`ALTER TABLE users ADD COLUMN settings TEXT`); } catch(e) { /* column already exists */ }
   // Add achievements column to users (JSON string)
   try { db.run(`ALTER TABLE users ADD COLUMN achievements TEXT`); } catch(e) { /* column already exists */ }
+  // Add google_id column for Google Sign-In
+  try { db.run(`ALTER TABLE users ADD COLUMN google_id TEXT`); } catch(e) { /* column already exists */ }
 
   saveDb();
 }
@@ -1089,6 +1093,18 @@ app.post('/api/hall-of-fame', (req, res) => {
 // AUTH ROUTES
 // ============================================================================
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 20, // max 20 requests per 15 min per IP
+  message: { error: 'Liian monta yritystä. Odota hetki.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api/login', authLimiter);
+app.use('/api/register', authLimiter);
+app.use('/api/forgot-password', authLimiter);
+
 // Register new user
 app.post('/api/register', async (req, res) => {
   try {
@@ -1131,8 +1147,8 @@ app.post('/api/register', async (req, res) => {
             <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
               <h2 style="color:#ffcc00;">Tervetuloa Piilosanaan!</h2>
               <p>Nimimerkkisi: <strong>${nickname.toUpperCase()}</strong></p>
-              <p>Salasanasi: <strong>${password}</strong></p>
-              <p style="color:#556;margin-top:20px;font-size:12px;">Säilytä tämä viesti tallessa. Voit kirjautua osoitteessa piilosana.app</p>
+              <p>Tilisi on luotu onnistuneesti. Pelaa osoitteessa piilosana.up.railway.app</p>
+              <p style="color:#556;margin-top:20px;font-size:12px;">Jos unohdat salasanasi, voit nollata sen pelin kirjautumissivulta.</p>
             </div>
           `
         });
@@ -1261,8 +1277,8 @@ app.post('/api/change-password', async (req, res) => {
             <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
               <h2 style="color:#ffcc00;">Salasana vaihdettu</h2>
               <p>Nimimerkkisi: <strong>${nickname.toUpperCase()}</strong></p>
-              <p>Uusi salasanasi: <strong>${newPassword}</strong></p>
-              <p style="color:#556;margin-top:20px;font-size:12px;">Kirjaudu osoitteessa piilosana.app</p>
+              <p>Salasanasi on vaihdettu onnistuneesti.</p>
+              <p style="color:#ff4444;margin-top:10px;font-size:12px;">Jos et vaihtanut salasanaasi, ota yhteyttä ylläpitoon.</p>
             </div>
           `
         });
@@ -1276,6 +1292,82 @@ app.post('/api/change-password', async (req, res) => {
     console.error('Change password error:', err);
     res.status(500).json({ error: 'Salasanan vaihto epäonnistui' });
   }
+});
+
+// Google Sign-In
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
+
+app.post('/api/google-login', async (req, res) => {
+  try {
+    if (!googleClient) return res.status(500).json({ error: 'Google-kirjautuminen ei ole käytössä' });
+    const { credential } = req.body;
+    if (!credential) return res.status(400).json({ error: 'Token puuttuu' });
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const googleId = payload.sub;
+    const email = payload.email;
+    const name = payload.name || payload.email.split('@')[0];
+
+    // Check if user exists with this google_id
+    let rows = db.exec(`SELECT id, nickname, email, settings, achievements FROM users WHERE google_id = ?`, [googleId]);
+    if (rows.length > 0 && rows[0].values.length > 0) {
+      const [id, nickname, dbEmail, settingsJson, achievementsJson] = rows[0].values[0];
+      let settings = null, achievements = null;
+      try { settings = settingsJson ? JSON.parse(settingsJson) : null; } catch(e) {}
+      try { achievements = achievementsJson ? JSON.parse(achievementsJson) : null; } catch(e) {}
+      return res.json({ ok: true, user: { id, nickname, email: dbEmail, settings, achievements }, isNew: false });
+    }
+
+    // Check if user exists with same email — link accounts
+    rows = db.exec(`SELECT id, nickname, email FROM users WHERE email = ?`, [email?.toLowerCase()]);
+    if (rows.length > 0 && rows[0].values.length > 0) {
+      const [id, nickname] = rows[0].values[0];
+      db.run(`UPDATE users SET google_id = ? WHERE id = ?`, [googleId, id]);
+      saveDb();
+      const updated = db.exec(`SELECT id, nickname, email, settings, achievements FROM users WHERE id = ?`, [id]);
+      const [uid, uNick, uEmail, sJson, aJson] = updated[0].values[0];
+      let settings = null, achievements = null;
+      try { settings = sJson ? JSON.parse(sJson) : null; } catch(e) {}
+      try { achievements = aJson ? JSON.parse(aJson) : null; } catch(e) {}
+      return res.json({ ok: true, user: { id: uid, nickname: uNick, email: uEmail, settings, achievements }, isNew: false });
+    }
+
+    // Create new user with Google
+    const nickname = name.toUpperCase().replace(/[^A-ZÄÖÅ0-9]/g, '').slice(0, 12) || 'PELAAJA';
+    // Ensure unique nickname
+    let finalNick = nickname;
+    let counter = 1;
+    while (true) {
+      const check = db.exec(`SELECT id FROM users WHERE nickname = ? COLLATE NOCASE`, [finalNick]);
+      if (check.length === 0 || check[0].values.length === 0) break;
+      finalNick = nickname.slice(0, 9) + counter;
+      counter++;
+    }
+
+    // Random password hash (user won't use it — they use Google)
+    const dummyHash = await bcrypt.hash(Math.random().toString(36), 10);
+    db.run(`INSERT INTO users (nickname, password_hash, email, google_id) VALUES (?, ?, ?, ?)`,
+      [finalNick, dummyHash, email?.toLowerCase() || null, googleId]);
+    saveDb();
+
+    const newRows = db.exec(`SELECT id FROM users WHERE google_id = ?`, [googleId]);
+    const newId = newRows[0].values[0][0];
+
+    res.json({ ok: true, user: { id: newId, nickname: finalNick, email: email?.toLowerCase() }, isNew: true });
+  } catch (err) {
+    console.error('Google login error:', err);
+    res.status(500).json({ error: 'Google-kirjautuminen epäonnistui' });
+  }
+});
+
+// Endpoint to provide Google Client ID to frontend
+app.get('/api/google-client-id', (req, res) => {
+  res.json({ clientId: GOOGLE_CLIENT_ID || null });
 });
 
 // Save user settings

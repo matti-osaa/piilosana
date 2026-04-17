@@ -102,6 +102,7 @@ const T={
     openGames:"AVOIMET PELIT",roomFull:"Huone on täynnä",gameInProgress:"Peli on jo käynnissä",roomNotFound:"Huonetta ei löydy",
     someoneBeatYou:"Joku ehti ensin!",tooShort:"Liian lyhyt",notInGrid:"Ei löydy ruudukosta",wrongMode:"Väärä moodi",gameNotRunning:"Peli ei käynnissä",
     achievements:"SAAVUTUKSET",achievementUnlocked:"Uusi saavutus!",locked:"Lukittu",
+    share:"JAA TULOS",shareCopied:"Kopioitu!",shareText:"Piilosana — löysin {words} sanaa ja sain {score} pistettä! Pääsetkö parempaan?",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -133,6 +134,7 @@ const T={
     openGames:"OPEN GAMES",roomFull:"Room is full",gameInProgress:"Game already in progress",roomNotFound:"Room not found",
     someoneBeatYou:"Someone got it first!",tooShort:"Too short",notInGrid:"Not found in grid",wrongMode:"Wrong mode",gameNotRunning:"Game not running",
     achievements:"ACHIEVEMENTS",achievementUnlocked:"New achievement!",locked:"Locked",
+    share:"SHARE",shareCopied:"Copied!",shareText:"Piilosana — I found {words} words and scored {score} points! Can you beat me?",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -164,6 +166,7 @@ const T={
     openGames:"ÖPPNA SPEL",roomFull:"Rummet är fullt",gameInProgress:"Spelet pågår redan",roomNotFound:"Rummet hittades inte",
     someoneBeatYou:"Någon hann före!",tooShort:"För kort",notInGrid:"Finns inte i rutnätet",wrongMode:"Fel läge",gameNotRunning:"Spelet är inte igång",
     achievements:"PRESTATIONER",achievementUnlocked:"Ny prestation!",locked:"Låst",
+    share:"DELA",shareCopied:"Kopierat!",shareText:"Piilosana — jag hittade {words} ord och fick {score} poäng! Kan du slå mig?",
   },
 };
 
@@ -1237,6 +1240,35 @@ export default function Piilosana(){
       setShowAuth(false);setShowFirstTimeAuth(false);setAuthLoading(false);return true;
     }catch{setAuthError("Yhteysvirhe");setAuthLoading(false);return false;}
   },[]);
+
+  const[googleClientId,setGoogleClientId]=useState(null);
+  // Fetch Google Client ID on mount
+  useEffect(()=>{
+    fetch(`${SERVER_URL}/api/google-client-id`).then(r=>r.json()).then(d=>{
+      if(d.clientId){
+        setGoogleClientId(d.clientId);
+        // Load GSI script
+        if(!document.getElementById("gsi-script")){
+          const s=document.createElement("script");
+          s.id="gsi-script";s.src="https://accounts.google.com/gsi/client";s.async=true;
+          document.head.appendChild(s);
+        }
+      }
+    }).catch(()=>{});
+  },[]);
+
+  const doGoogleLogin=useCallback(async(credential)=>{
+    setAuthLoading(true);setAuthError("");
+    try{
+      const res=await fetch(`${SERVER_URL}/api/google-login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({credential})});
+      const data=await res.json();
+      if(!res.ok){setAuthError(data.error||"Virhe");setAuthLoading(false);return false;}
+      setAuthUser(data.user);localStorage.setItem("piilosana_auth",JSON.stringify(data.user));
+      localStorage.setItem("piilosana_auth_cred",JSON.stringify({nickname:data.user.nickname,google:true}));
+      if(data.user.settings)applySettings(data.user.settings);
+      setShowAuth(false);setShowFirstTimeAuth(false);setAuthLoading(false);return true;
+    }catch{setAuthError("Yhteysvirhe");setAuthLoading(false);return false;}
+  },[applySettings]);
 
   const doLogout=useCallback(()=>{
     setAuthUser(null);localStorage.removeItem("piilosana_auth");localStorage.removeItem("piilosana_auth_cred");
@@ -2646,6 +2678,26 @@ export default function Piilosana(){
                 )}
               </form>
               )}
+              {/* Google Sign-In */}
+              {googleClientId&&(
+                <div style={{marginTop:"12px",paddingTop:"12px",borderTop:`1px solid ${S.border}`,textAlign:"center"}}>
+                  <div style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,marginBottom:"8px"}}>
+                    {lang==="en"?"or":lang==="sv"?"eller":"tai"}
+                  </div>
+                  <div id="google-signin-btn" ref={(el)=>{
+                    if(el&&window.google?.accounts?.id){
+                      el.innerHTML="";
+                      window.google.accounts.id.initialize({
+                        client_id:googleClientId,
+                        callback:(response)=>doGoogleLogin(response.credential),
+                      });
+                      window.google.accounts.id.renderButton(el,{
+                        theme:"filled_black",size:"large",width:280,text:"signin_with",shape:"rectangular",
+                      });
+                    }
+                  }}/>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -3178,6 +3230,16 @@ export default function Piilosana(){
               </div>
             )}
             {hofSubmitted&&<div style={{fontSize:"11px",color:S.green,marginTop:"8px"}}>{t.saved}</div>}
+
+            {/* Share result */}
+            <button onClick={async()=>{
+              const text=t.shareText.replace("{words}",found.length).replace("{score}",score)+"\nhttps://piilosana.up.railway.app";
+              if(navigator.share){try{await navigator.share({text});return;}catch{}}
+              try{await navigator.clipboard.writeText(text);addPopup(t.shareCopied,S.green);}catch{}
+            }} style={{fontFamily:S.font,fontSize:"11px",color:"#44ddff",border:"2px solid #44ddff",background:"transparent",
+              padding:"8px 16px",cursor:"pointer",marginTop:"10px",width:"280px"}}>
+              {t.share}
+            </button>
 
             <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center",marginTop:"10px"}}>
               <button onClick={()=>{setHofSubmitted(false);start();}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>{t.newPractice}</button>
