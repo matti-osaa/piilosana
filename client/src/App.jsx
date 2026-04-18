@@ -526,66 +526,146 @@ function useSounds(soundTheme){
 // ============================================
 const MUSIC_TRACKS={
   electronic:[
-    // "Posliini" — warm descending melody with resolve, Cmaj/Am world
+    // "Posliini" — warm descending melody with resolve, Cmaj/Am world, ~90s loop
     {id:"porcelain",name:{fi:"Posliini",en:"Porcelain",sv:"Porslin"},bpm:74,sub:"8n",melDur:"4n",bassDur:"2m",
       melSynth:{oscillator:{type:"fatsine",count:3,spread:20},envelope:{attack:0.03,decay:0.8,sustain:0.2,release:1.5},volume:-16},
       bassSynth:{oscillator:{type:"fatsine",count:3,spread:25},envelope:{attack:2,decay:1.5,sustain:0.6,release:3},volume:-23},
       mel:[null,null,"E5",null,"G5",null,"A5",null,null,null,"G5",null,"E5",null,null,null,
            null,null,"D5",null,"E5",null,"G5",null,null,null,"E5",null,"D5",null,"C5",null,
            null,null,"A4",null,"C5",null,"E5",null,null,null,"D5",null,"C5",null,null,null,
-           null,null,"B4",null,"C5",null,"D5",null,null,null,"E5",null,null,null,null,null],
+           null,null,"B4",null,"C5",null,"D5",null,null,null,"E5",null,null,null,null,null,
+           null,null,"G5",null,"A5",null,null,null,"G5",null,"E5",null,"D5",null,"E5",null,
+           null,null,null,null,"C5",null,"D5",null,"E5",null,null,null,"G5",null,"A5",null,
+           null,null,"G5",null,"E5",null,null,null,"D5",null,"C5",null,"A4",null,null,null,
+           null,null,"C5",null,"D5",null,"E5",null,null,null,null,null,null,null,null,null,
+           null,null,"A5",null,null,null,"G5",null,"E5",null,null,null,"D5",null,"E5",null,
+           null,null,"C5",null,null,null,"A4",null,null,null,"G4",null,"A4",null,"C5",null,
+           null,null,"D5",null,"E5",null,"G5",null,null,null,"E5",null,"D5",null,null,null,
+           null,null,"C5",null,"B4",null,"C5",null,null,null,"E5",null,null,null,null,null],
       bass:[["A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["G3","B3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Aalto" — rising hopeful melody, Em→G→D→C, gentle pulse
+            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["E3","G3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D3","F3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G3","B3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+    // "Aalto" — rising hopeful melody, Em→G→D→C, ~90s loop
     {id:"aalto",name:{fi:"Aalto",en:"Wave",sv:"Våg"},bpm:70,sub:"8n",melDur:"4n",bassDur:"2m",
       melSynth:{oscillator:{type:"fatsine",count:2,spread:15},envelope:{attack:0.04,decay:0.9,sustain:0.15,release:1.8},volume:-17},
       bassSynth:{oscillator:{type:"fatsine",count:3,spread:22},envelope:{attack:2.5,decay:2,sustain:0.5,release:3.5},volume:-24},
       mel:[null,null,"B4",null,"D5",null,null,null,"E5",null,"G5",null,"F#5",null,"E5",null,
            null,null,"D5",null,null,null,"B4",null,"A4",null,null,null,"B4",null,"D5",null,
            null,null,"G5",null,"F#5",null,"E5",null,null,null,"D5",null,"E5",null,null,null,
-           null,null,"B4",null,"A4",null,null,null,"G4",null,null,null,"A4",null,"B4",null],
+           null,null,"B4",null,"A4",null,null,null,"G4",null,null,null,"A4",null,"B4",null,
+           null,null,"E5",null,"D5",null,"B4",null,null,null,"A4",null,"B4",null,"D5",null,
+           null,null,"E5",null,null,null,"G5",null,"F#5",null,null,null,"E5",null,null,null,
+           null,null,"D5",null,"B4",null,"A4",null,null,null,"G4",null,null,null,"A4",null,
+           null,null,"B4",null,"D5",null,"E5",null,null,null,null,null,null,null,null,null,
+           null,null,"G5",null,"A5",null,null,null,"G5",null,"F#5",null,"E5",null,"D5",null,
+           null,null,"E5",null,null,null,"G5",null,null,null,"F#5",null,"E5",null,null,null,
+           null,null,"D5",null,"E5",null,"F#5",null,null,null,"G5",null,null,null,"A5",null,
+           null,null,"G5",null,"E5",null,null,null,"D5",null,null,null,null,null,null,null],
       bass:[["E3","G3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["G3","B3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["D3","F#3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["E3","G3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D3","F#3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G2","B2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D3","F#3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["E3","G3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Horisontti" — wide cinematic, resolving phrases, F→C→Am→G
+    // "Horisontti" — wide cinematic, F→C→Am→G, ~90s loop
     {id:"horisontti",name:{fi:"Horisontti",en:"Horizon",sv:"Horisont"},bpm:66,sub:"8n",melDur:"4n",bassDur:"2m",
       melSynth:{oscillator:{type:"fatsine",count:2,spread:18},envelope:{attack:0.05,decay:1.2,sustain:0.2,release:2},volume:-16},
       bassSynth:{oscillator:{type:"fatsine",count:3,spread:28},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-22},
       mel:[null,null,"C5",null,"E5",null,"F5",null,null,null,"E5",null,"C5",null,"D5",null,
            null,null,"E5",null,null,null,"G5",null,"A5",null,null,null,"G5",null,"E5",null,
            null,null,"F5",null,"E5",null,"D5",null,null,null,"C5",null,"D5",null,"E5",null,
-           null,null,"D5",null,"B4",null,null,null,"C5",null,null,null,null,null,null,null],
+           null,null,"D5",null,"B4",null,null,null,"C5",null,null,null,null,null,null,null,
+           null,null,"E5",null,"F5",null,"G5",null,null,null,"A5",null,"G5",null,"F5",null,
+           null,null,"E5",null,null,null,"C5",null,"D5",null,null,null,"E5",null,null,null,
+           null,null,"G5",null,"F5",null,"E5",null,null,null,"D5",null,"C5",null,"D5",null,
+           null,null,"E5",null,"C5",null,null,null,"D5",null,null,null,null,null,null,null,
+           null,null,"A5",null,null,null,"G5",null,"F5",null,null,null,"E5",null,"D5",null,
+           null,null,"C5",null,"D5",null,"E5",null,null,null,"F5",null,null,null,"G5",null,
+           null,null,"E5",null,"D5",null,"C5",null,null,null,"B4",null,"C5",null,null,null,
+           null,null,"D5",null,"E5",null,null,null,"C5",null,null,null,null,null,null,null],
       bass:[["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G2","B2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Kaiku" — echo-like repeating motifs, Am pentatonic, hypnotic
+            ["G2","B2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["E3","G3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D3","F3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["F2","A2","C3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G2","B2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+    // "Kaiku" — echo-like repeating motifs, Am pentatonic, ~85s loop
     {id:"kaiku",name:{fi:"Kaiku",en:"Echo",sv:"Eko"},bpm:76,sub:"8n",melDur:"4n.",bassDur:"2m",
       melSynth:{oscillator:{type:"fatsine",count:2,spread:12},envelope:{attack:0.02,decay:0.7,sustain:0.1,release:1.5},volume:-17},
       bassSynth:{oscillator:{type:"fatsine",count:3,spread:20},envelope:{attack:2,decay:1.5,sustain:0.5,release:3},volume:-24},
       mel:["E5",null,"A5",null,"G5",null,"E5",null,null,null,"D5",null,"E5",null,null,null,
            "C5",null,"E5",null,"D5",null,"C5",null,null,null,"A4",null,"C5",null,null,null,
            "E5",null,"A5",null,"G5",null,"E5",null,null,null,"G5",null,"A5",null,null,null,
-           "C5",null,"D5",null,"E5",null,null,null,"D5",null,"C5",null,"A4",null,null,null],
+           "C5",null,"D5",null,"E5",null,null,null,"D5",null,"C5",null,"A4",null,null,null,
+           null,null,"E5",null,"G5",null,"A5",null,null,null,"C6",null,"A5",null,"G5",null,
+           null,null,"E5",null,null,null,"D5",null,"C5",null,null,null,"D5",null,"E5",null,
+           "A5",null,"G5",null,"E5",null,"D5",null,null,null,"C5",null,"A4",null,null,null,
+           null,null,"C5",null,"D5",null,"E5",null,null,null,"A5",null,null,null,null,null,
+           "G5",null,"E5",null,"D5",null,"E5",null,null,null,"G5",null,null,null,"A5",null,
+           null,null,"G5",null,"E5",null,"C5",null,null,null,"D5",null,"E5",null,null,null,
+           "A4",null,"C5",null,"E5",null,"G5",null,null,null,"A5",null,"G5",null,"E5",null,
+           null,null,"D5",null,"C5",null,null,null,"A4",null,null,null,null,null,null,null],
       bass:[["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["F2","A2","C3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G2","B2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Revontuli" — shimmering aurora, Dmaj7→Amaj7, dreamy resolution
+            ["G2","B2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D2","F2","A2"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["E2","G2","B2"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["F2","A2","C3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C2","E2","G2"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D2","F2","A2"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+    // "Revontuli" — shimmering aurora, Dmaj7→Amaj7, ~90s loop
     {id:"revontuli",name:{fi:"Revontuli",en:"Aurora",sv:"Norrsken"},bpm:64,sub:"8n",melDur:"4n",bassDur:"2m",
       melSynth:{oscillator:{type:"fatsine",count:3,spread:25},envelope:{attack:0.06,decay:1,sustain:0.2,release:2},volume:-16},
       bassSynth:{oscillator:{type:"fatsine",count:3,spread:30},envelope:{attack:3,decay:2,sustain:0.6,release:4},volume:-23},
       mel:[null,null,"F#5",null,"A5",null,null,null,"E5",null,"D5",null,null,null,"C#5",null,
            null,null,"D5",null,"E5",null,"F#5",null,null,null,"A5",null,"G5",null,"F#5",null,
            null,null,"E5",null,"C#5",null,"D5",null,null,null,"E5",null,null,null,"F#5",null,
-           null,null,"D5",null,"C#5",null,null,null,"D5",null,null,null,null,null,null,null],
+           null,null,"D5",null,"C#5",null,null,null,"D5",null,null,null,null,null,null,null,
+           null,null,"A5",null,"F#5",null,null,null,"E5",null,"D5",null,"E5",null,"F#5",null,
+           null,null,"G5",null,null,null,"A5",null,null,null,"F#5",null,"E5",null,null,null,
+           null,null,"D5",null,"E5",null,"F#5",null,null,null,"A5",null,"G5",null,null,null,
+           null,null,"F#5",null,"E5",null,null,null,"D5",null,null,null,null,null,null,null,
+           null,null,"C#5",null,"D5",null,"E5",null,null,null,"F#5",null,"A5",null,null,null,
+           null,null,"G5",null,"F#5",null,"E5",null,null,null,"D5",null,"C#5",null,"D5",null,
+           null,null,"E5",null,null,null,"F#5",null,"A5",null,null,null,"G5",null,null,null,
+           null,null,"F#5",null,"E5",null,null,null,"D5",null,null,null,null,null,null,null],
       bass:[["D3","F#3","A3","C#4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["A2","C#3","E3","G#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["B2","D3","F#3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G2","B2","D3","F#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+            ["G2","B2","D3","F#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D3","F#3","A3","C#4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["E2","G#2","B2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C#3","E3","G#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D3","F#3","A3","C#4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G2","B2","D3","F#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C#3","E3","G#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D3","F#3","A3","C#4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["B2","D3","F#3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
   ]
 };
 
@@ -594,8 +674,11 @@ function useMusic(category,isPlaying){
   const melSeqRef=useRef(null);const bassSeqRef=useRef(null);
   const gainRef=useRef(null);const activeRef=useRef(false);
   const trackIdx=useRef(Math.floor(Math.random()*10));
+  const timerRef=useRef(null);
+  const [tick,setTick]=useState(0);
 
   const cleanup=useCallback(()=>{
+    if(timerRef.current){clearTimeout(timerRef.current);timerRef.current=null;}
     try{Tone.Transport.stop();Tone.Transport.cancel();}catch{}
     try{melSeqRef.current?.stop();melSeqRef.current?.dispose();}catch{}melSeqRef.current=null;
     try{bassSeqRef.current?.stop();bassSeqRef.current?.dispose();}catch{}bassSeqRef.current=null;
@@ -635,9 +718,20 @@ function useMusic(category,isPlaying){
       Tone.Transport.start();
       activeRef.current=true;
       gainRef.current.gain.rampTo(0.7,2);
+      // Auto-advance: play 2 full loops then crossfade to next track
+      const stepsPerBeat=track.sub==="8n"?2:1;
+      const beatsPerLoop=track.mel.length/stepsPerBeat;
+      const loopSec=(beatsPerLoop/track.bpm)*60;
+      const playSec=loopSec*2; // 2 loops
+      timerRef.current=setTimeout(()=>{
+        if(!cancelled&&gainRef.current){
+          gainRef.current.gain.rampTo(0,3);
+          timerRef.current=setTimeout(()=>{if(!cancelled)setTick(t=>t+1);},3500);
+        }
+      },(playSec-3)*1000);
     })();
     return()=>{cancelled=true;cleanup();};
-  },[category,isPlaying,cleanup]);
+  },[category,isPlaying,cleanup,tick]);
 }
 
 // ============================================
