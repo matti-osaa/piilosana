@@ -1528,7 +1528,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
             cursor:"pointer",
             display:"inline-flex",alignItems:"center",justifyContent:"center",
             marginRight:"4px",
-          }}><PixelIcon icon="gear" color={isLit?dw.color:gearBlend?S.yellow:S.textSoft} size={1.7} style={{transition:"filter 2s ease"}}/></span>;
+          }}><PixelIcon icon="gear" color={isLit?dw.color:gearBlend?(titleTheme?.yellow||"#ffcc00"):(titleTheme?.textSoft||"#556677")} size={1.7} style={{transition:"filter 2s ease"}}/></span>;
         }
         return <span key={i} style={baseStyle}>{ch}</span>;
       })}
