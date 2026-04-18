@@ -2390,7 +2390,7 @@ export default function Piilosana(){
       onMouseMove={e=>onDragMove(e.clientX,e.clientY)} onMouseUp={onDragEnd} onTouchEnd={onDragEnd}>
       {/* Top bar: language selector + login button - only visible in main menu */}
       {mode===null&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",maxWidth:"600px",marginBottom:"4px"}}>
-        <div style={{display:"flex",gap:"6px",position:"relative"}}>
+        <div style={{display:"flex",gap:"6px"}}>
           {Object.entries(LANG_CONFIG).map(([code,lc])=>(
             <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
               style={{fontFamily:S.font,fontSize:"9px",background:lang===code?S.dark:"transparent",
@@ -2401,21 +2401,6 @@ export default function Piilosana(){
               <PixelFlag lang={code} size={2}/>
             </button>
           ))}
-          {flagBubble&&(
-            <div style={{position:"absolute",top:"100%",left:"0",marginTop:"8px",
-              animation:flagBubbleFading?"bubbleOut 0.6s ease-in forwards":"bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
-              whiteSpace:"normal",width:"max-content",maxWidth:"calc(100vw - 24px)",zIndex:50}}>
-              <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
-                fontSize:"9px",padding:"8px 14px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
-                border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",imageRendering:"pixelated"}}>
-                <div style={{position:"absolute",top:"-9px",left:"20px",
-                  width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderBottom:"8px solid #000000"}}/>
-                <div style={{position:"absolute",top:"-5px",left:"22px",
-                  width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #ffffff"}}/>
-                {lang==="en"?"Play in different languages!":lang==="sv"?"Spela på olika språk!":"Pelaa eri kielillä!"}
-              </div>
-            </div>
-          )}
         </div>
         <div style={{display:"flex",gap:"6px",alignItems:"center"}}>
           <button onClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} style={{fontFamily:S.font,fontSize:"9px",color:"#88aacc",
@@ -2438,6 +2423,22 @@ export default function Piilosana(){
           </button>
         </div>
       </div>}
+      {mode===null&&flagBubble&&(
+        <div style={{width:"100%",maxWidth:"600px",
+          animation:flagBubbleFading?"bubbleOut 0.6s ease-in forwards":"bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
+          zIndex:50,marginBottom:"4px"}}>
+          <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
+            fontSize:"8px",padding:"8px 12px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
+            border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",imageRendering:"pixelated",
+            width:"max-content",maxWidth:"100%"}}>
+            <div style={{position:"absolute",top:"-9px",left:"20px",
+              width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderBottom:"8px solid #000000"}}/>
+            <div style={{position:"absolute",top:"-5px",left:"22px",
+              width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #ffffff"}}/>
+            {lang==="en"?"Play in different languages!":lang==="sv"?"Spela på olika språk!":"Pelaa eri kielillä!"}
+          </div>
+        </div>
+      )}
       <style>{fontCSS}</style>
       <style>{`
         @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
