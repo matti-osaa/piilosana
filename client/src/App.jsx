@@ -2675,11 +2675,11 @@ export default function Piilosana(){
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
       {/* Main button — ARENA */}
-      <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"22px",color:S.bg,background:"#ff6644",border:"none",padding:"24px 32px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"4px 4px 0 #cc3311",borderRadius:S.btnRadius,width:"100%",minHeight:"70px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"10px"}}
+      <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"28px",color:S.bg,background:"#ff6644",border:"none",padding:"28px 32px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"4px 4px 0 #cc3311",borderRadius:S.btnRadius,width:"100%",minHeight:"80px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"10px"}}
         onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"6px 6px 0 #cc3311"}}
         onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"4px 4px 0 #cc3311"}}>
-        <span style={{display:"flex",alignItems:"center",gap:"8px"}}>{t.arena}<span style={{fontSize:"11px",display:"inline-flex",alignItems:"center",gap:"4px",opacity:0.7}}><PixelIcon icon="person" color={S.bg} size={1.3}/>{publicOnlineCount}</span></span>
-        <span style={{fontSize:"9px",opacity:0.8}}>{t.arenaDesc}</span>
+        <span style={{display:"flex",alignItems:"center",gap:"10px"}}>{t.arena}<span style={{fontSize:"14px",display:"inline-flex",alignItems:"center",gap:"5px",opacity:0.8}}><PixelIcon icon="person" color={S.bg} size={1.5}/>{publicOnlineCount} {t.online}</span></span>
+        <span style={{fontSize:"12px",opacity:0.8}}>{t.arenaDesc}</span>
       </button>
 
       {/* Two smaller buttons side by side */}
@@ -3483,7 +3483,7 @@ export default function Piilosana(){
       {/* AREENA - waiting for round */}
       {mode==="public"&&publicState==="waiting"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
-          <p style={{fontSize:"18px",color:"#ff6644"}}>{t.arena}</p>
+          <p style={{fontSize:"22px",color:"#ff6644"}}>{t.arena}</p>
           {publicNextCountdown>0?(
             <>
               <p style={{fontSize:"13px",color:S.textMuted,marginTop:"12px"}}>{t.nextRound}</p>
@@ -3492,7 +3492,7 @@ export default function Piilosana(){
           ):(
             <p style={{fontSize:"13px",color:S.textMuted,marginTop:"12px",animation:"pulse 1s infinite"}}>{lang==="en"?"Connecting...":lang==="sv"?"Ansluter...":"Yhdistetään..."}</p>
           )}
-          <p style={{fontSize:"11px",color:"#88ccaa",marginTop:"8px"}}>{publicPlayerCount} {t.playersInArena}</p>
+          <p style={{fontSize:"14px",color:"#88ccaa",marginTop:"8px"}}>{publicPlayerCount} {t.playersInArena}</p>
           <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",marginTop:"16px"}}>{t.back}</button>
         </div>
       )}
@@ -3500,8 +3500,8 @@ export default function Piilosana(){
       {/* PIILOSAUNA - countdown */}
       {mode==="public"&&publicState==="countdown"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{fontSize:"11px",color:"#ff6644",marginBottom:"24px"}}>{t.arena}</div>
-          <div style={{fontSize:"11px",color:S.green,marginBottom:"8px"}}>{publicPlayerCount} {t.players}</div>
+          <div style={{fontSize:"16px",color:"#ff6644",marginBottom:"24px"}}>{t.arena}</div>
+          <div style={{fontSize:"14px",color:S.green,marginBottom:"8px"}}>{publicPlayerCount} {t.playersInArena}</div>
           <div style={{fontSize:"18px",color:S.green}}>{t.getReady}</div>
         </div>
       )}
