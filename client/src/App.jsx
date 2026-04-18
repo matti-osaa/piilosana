@@ -73,7 +73,7 @@ function applyGravityClient(grid,removedCells,lang='fi'){
 // UI translations
 const T={
   fi:{
-    selectMode:"VALITSE PELIMUOTO",arena:"AREENA",arenaDesc:"24/7 nettipeli",arenaCta:"PELAA NYT",customGame:"OMA NETTIPELI",customDesc:"eri moodeja",practice:"HARJOITUS",practiceDesc:"yksinpeli",
+    selectMode:"VALITSE PELIMUOTO",arena:"AREENA",arenaDesc:"24/7 nettipeli",arenaCta:"PELAA NYT",arenaWelcome:"Tervetuloa — liity peliin!",customGame:"OMA NETTIPELI",customDesc:"eri moodeja",practice:"HARJOITUS",practiceDesc:"yksinpeli",
     findWords:"Etsi sanoja ruudukosta!",dragHint:"VEDÄ kirjaimien yli kaikkiin suuntiin. Aikaa 2 min.",comboHint:"Löydä sanoja nopeasti putkeen = kombo ja lisäpisteet!",
     scoring:"PISTEYTYS: 3kir=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"sanaa",
     nickname:"NIMIMERKKI",join:"LIITY",back:"TAKAISIN",exit:"POISTU",play:"PELAA",
@@ -122,7 +122,7 @@ const T={
     helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi yli 380 000, englanniksi ja ruotsiksi omat sanalistansa.",
   },
   en:{
-    selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
+    selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
     findWords:"Find words from the grid!",dragHint:"DRAG across letters in all directions. 2 min timer.",comboHint:"Find words quickly in a row = combo and bonus points!",
     scoring:"SCORING: 3let=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"COMBO x2 (3+) · COMBO x3 (5+)",words:"words",
     nickname:"NICKNAME",join:"JOIN",back:"BACK",exit:"EXIT",play:"PLAY",
@@ -171,7 +171,7 @@ const T={
     helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has over 380,000 words, English and Swedish have their own vocabularies.",
   },
   sv:{
-    selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
+    selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
     findWords:"Hitta ord i rutnätet!",dragHint:"DRA över bokstäverna i alla riktningar. 2 min tid.",comboHint:"Hitta ord snabbt i rad = kombo och bonuspoäng!",
     scoring:"POÄNG: 3bok=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"ord",
     nickname:"SMEKNAMN",join:"GÅ MED",back:"TILLBAKA",exit:"LÄMNA",play:"SPELA",
@@ -2677,13 +2677,17 @@ export default function Piilosana(){
   const S=theme;
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
-      {/* Main button — ARENA CTA */}
-      <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#fff",background:"linear-gradient(135deg,#ff6644 0%,#ff4422 100%)",border:"none",padding:"32px 32px 28px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #ff664466,${S.btnShadow}`:"4px 4px 0 #cc3311,0 0 20px #ff664433",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",marginBottom:"10px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
+      {/* Welcome text + ARENA CTA */}
+      <div style={{fontSize:"11px",color:S.textSoft,marginBottom:"10px",letterSpacing:"1px"}}>{t.arenaWelcome}</div>
+      <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#fff",background:"linear-gradient(135deg,#ff6644 0%,#ff4422 100%)",border:"none",padding:"28px 32px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #ff664466,${S.btnShadow}`:"4px 4px 0 #cc3311,0 0 20px #ff664433",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"6px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
         onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #ff664488":"6px 6px 0 #cc3311,0 0 30px #ff664455"}}
         onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #ff664466,${S.btnShadow}`:"4px 4px 0 #cc3311,0 0 20px #ff664433"}}>
-        <span style={{fontSize:"12px",letterSpacing:"3px",opacity:0.9,marginBottom:"2px"}}>{t.arenaDesc}</span>
-        <span style={{display:"flex",alignItems:"center",gap:"12px"}}>{t.arenaCta}<span style={{fontSize:"14px",display:"inline-flex",alignItems:"center",gap:"5px",opacity:0.8}}><PixelIcon icon="person" color="#fff" size={1.5}/>{publicOnlineCount} {t.online}</span></span>
+        <span style={{fontSize:"12px",letterSpacing:"3px",opacity:0.9}}>{t.arenaDesc}</span>
+        <span>{t.arenaCta}</span>
       </button>
+      <div style={{fontSize:"12px",color:S.textSoft,marginBottom:"10px",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>
+        <PixelIcon icon="person" color={S.green} size={1.5}/><span style={{color:S.green}}>{publicOnlineCount}</span> {t.playersInArena}
+      </div>
 
       {/* Two smaller buttons side by side */}
       <div style={{display:"flex",gap:"8px"}}>
