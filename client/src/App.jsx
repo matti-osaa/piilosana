@@ -2226,7 +2226,7 @@ export default function Piilosana(){
   },[socket]);
 
   // Render multiplayer screens
-  const ModeSelectScreen=()=>(
+  const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
       {/* Main button — ARENA */}
       <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"22px",color:S.bg,background:"#ff6644",border:"none",padding:"24px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"70px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"10px"}}
@@ -2660,7 +2660,7 @@ export default function Piilosana(){
                   <button onClick={()=>{doLogout();setShowAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:S.red||"#ff4444",background:"transparent",border:`2px solid ${S.red||"#ff4444"}`,padding:"6px 16px",cursor:"pointer"}}>
                     {lang==="en"?"LOG OUT":lang==="sv"?"LOGGA UT":"KIRJAUDU ULOS"}
                   </button>
-                  <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"11px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"6px 14px",cursor:"pointer",marginTop:"4px"}}>✕</button>
+                  <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,padding:"8px 18px",cursor:"pointer",marginTop:"8px",width:"100%"}}>✕</button>
                 </div>
               )}
             </div>
@@ -2675,7 +2675,7 @@ export default function Piilosana(){
                     {lang==="en"?"REGISTER":lang==="sv"?"REGISTRERA":"LUO TUNNUS"}
                   </button>
                 </div>
-                <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"4px 10px",cursor:"pointer"}}>✕</button>
+                <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer"}}>✕</button>
               </div>
               {authMode==="forgot"?(
                 <form onSubmit={async(e)=>{e.preventDefault();const fd=new FormData(e.target);await doForgotPassword(fd.get("email"));}}>
@@ -2782,14 +2782,14 @@ export default function Piilosana(){
               {lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"}
             </button>
             <button onClick={()=>{setShowFirstTimeAuth(false);sessionStorage.setItem("piilosana_auth_dismissed","1");}}
-              style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,background:"transparent",border:"none",padding:"6px",cursor:"pointer"}}>✕</button>
+              style={{fontFamily:S.font,fontSize:"14px",color:S.textMuted,background:"transparent",border:`2px solid ${S.border}`,padding:"4px 12px",cursor:"pointer"}}>✕</button>
           </div>
         </div>
       )}
 
       {/* MENU */}
       {/* MODE SELECT */}
-      {mode===null&&<ModeSelectScreen/>}
+      {mode===null&&modeSelectJSX}
       
       {/* MULTIPLAYER SCREENS - inline to prevent focus loss */}
       {mode==="multi"&&lobbyState==="enter_name"&&(
