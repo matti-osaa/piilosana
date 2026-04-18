@@ -73,7 +73,7 @@ function applyGravityClient(grid,removedCells,lang='fi'){
 // UI translations
 const T={
   fi:{
-    selectMode:"VALITSE PELIMUOTO",arena:"AREENA",arenaDesc:"24/7 nettipeli",customGame:"OMA NETTIPELI",customDesc:"eri moodeja",practice:"HARJOITUS",practiceDesc:"yksinpeli",
+    selectMode:"VALITSE PELIMUOTO",arena:"AREENA",arenaDesc:"24/7 nettipeli",arenaCta:"PELAA NYT",customGame:"OMA NETTIPELI",customDesc:"eri moodeja",practice:"HARJOITUS",practiceDesc:"yksinpeli",
     findWords:"Etsi sanoja ruudukosta!",dragHint:"VEDÄ kirjaimien yli kaikkiin suuntiin. Aikaa 2 min.",comboHint:"Löydä sanoja nopeasti putkeen = kombo ja lisäpisteet!",
     scoring:"PISTEYTYS: 3kir=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"sanaa",
     nickname:"NIMIMERKKI",join:"LIITY",back:"TAKAISIN",exit:"POISTU",play:"PELAA",
@@ -121,7 +121,7 @@ const T={
     helpMultiplier:"Kultaiset kirjaimet antavat 2× tai 3× pistekertoimen sanaan.",
   },
   en:{
-    selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
+    selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
     findWords:"Find words from the grid!",dragHint:"DRAG across letters in all directions. 2 min timer.",comboHint:"Find words quickly in a row = combo and bonus points!",
     scoring:"SCORING: 3let=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"COMBO x2 (3+) · COMBO x3 (5+)",words:"words",
     nickname:"NICKNAME",join:"JOIN",back:"BACK",exit:"EXIT",play:"PLAY",
@@ -169,7 +169,7 @@ const T={
     helpMultiplier:"Golden letters give a 2× or 3× score multiplier for the word.",
   },
   sv:{
-    selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
+    selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
     findWords:"Hitta ord i rutnätet!",dragHint:"DRA över bokstäverna i alla riktningar. 2 min tid.",comboHint:"Hitta ord snabbt i rad = kombo och bonuspoäng!",
     scoring:"POÄNG: 3bok=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"ord",
     nickname:"SMEKNAMN",join:"GÅ MED",back:"TILLBAKA",exit:"LÄMNA",play:"SPELA",
@@ -2674,12 +2674,12 @@ export default function Piilosana(){
   const S=theme;
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
-      {/* Main button — ARENA */}
-      <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"28px",color:S.bg,background:"#ff6644",border:"none",padding:"28px 32px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"4px 4px 0 #cc3311",borderRadius:S.btnRadius,width:"100%",minHeight:"80px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"10px"}}
-        onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"6px 6px 0 #cc3311"}}
-        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"4px 4px 0 #cc3311"}}>
-        <span style={{display:"flex",alignItems:"center",gap:"10px"}}>{t.arena}<span style={{fontSize:"14px",display:"inline-flex",alignItems:"center",gap:"5px",opacity:0.8}}><PixelIcon icon="person" color={S.bg} size={1.5}/>{publicOnlineCount} {t.online}</span></span>
-        <span style={{fontSize:"12px",opacity:0.8}}>{t.arenaDesc}</span>
+      {/* Main button — ARENA CTA */}
+      <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#fff",background:"linear-gradient(135deg,#ff6644 0%,#ff4422 100%)",border:"none",padding:"32px 32px 28px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #ff664466,${S.btnShadow}`:"4px 4px 0 #cc3311,0 0 20px #ff664433",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",marginBottom:"10px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
+        onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #ff664488":"6px 6px 0 #cc3311,0 0 30px #ff664455"}}
+        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #ff664466,${S.btnShadow}`:"4px 4px 0 #cc3311,0 0 20px #ff664433"}}>
+        <span style={{fontSize:"12px",letterSpacing:"3px",opacity:0.9,marginBottom:"2px"}}>{t.arenaDesc}</span>
+        <span style={{display:"flex",alignItems:"center",gap:"12px"}}>{t.arenaCta}<span style={{fontSize:"14px",display:"inline-flex",alignItems:"center",gap:"5px",opacity:0.8}}><PixelIcon icon="person" color="#fff" size={1.5}/>{publicOnlineCount} {t.online}</span></span>
       </button>
 
       {/* Two smaller buttons side by side */}
@@ -2941,6 +2941,7 @@ export default function Piilosana(){
         @keyframes snowfall{0%{transform:translateY(0);opacity:0.6}100%{transform:translateY(30px);opacity:0}}
         @keyframes fadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
         @keyframes pulse{0%,100%{text-shadow:0 0 5px #ff444444}50%{text-shadow:0 0 20px #ff444488}}
+        @keyframes arenaPulse{0%,100%{box-shadow:4px 4px 0 #cc3311,0 0 20px #ff664433}50%{box-shadow:4px 4px 0 #cc3311,0 0 35px #ff664466}}
         @keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}50%{opacity:1;transform:translate(-50%,-100%) scale(1.5)}100%{opacity:0;transform:translate(-50%,-180%) scale(1.8)}}
         @keyframes comboGlow{0%,100%{box-shadow:0 0 5px #ffcc0044}50%{box-shadow:0 0 25px #ffcc0088,0 0 50px #ff66ff44}}
         @keyframes epicPulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
