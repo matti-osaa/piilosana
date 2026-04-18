@@ -2226,6 +2226,7 @@ export default function Piilosana(){
   },[socket]);
 
   // Render multiplayer screens
+  const S=theme;
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
       {/* Main button — ARENA */}
@@ -2383,7 +2384,6 @@ export default function Piilosana(){
     </div>
   );
 
-  const S=theme;
 
   return(
     <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflow:"hidden"}}
