@@ -373,34 +373,151 @@ const ENDINGS = [
 // ============================================
 // SOUNDS
 // ============================================
-function useSounds(){
+const SOUND_THEMES={
+  retro:{
+    synth:{oscillator:{type:"square"},envelope:{attack:0.01,decay:0.15,sustain:0.05,release:0.15},volume:-14},
+    bass:{oscillator:{type:"triangle"},envelope:{attack:0.01,decay:0.3,sustain:0.1,release:0.3},volume:-10},
+    btn:{noise:{type:"brown"},envelope:{attack:0.003,decay:0.04,sustain:0,release:0.02},volume:-22},
+    btnFilter:400,
+    notes:{
+      find3:n=>[["C5","16n",n]],
+      find4:n=>[["E5","16n",n],["G5","16n",n+0.08]],
+      find5:n=>[["C5","16n",n],["E5","16n",n+0.07],["G5","8n",n+0.14]],
+      find6:n=>({synth:[["C5","16n",n],["E5","16n",n+0.06],["G5","16n",n+0.12],["C6","8n",n+0.18]],bass:[["C3","4n",n]]}),
+      find7:n=>({synth:[["C5","16n",n],["E5","16n",n+0.05],["G5","16n",n+0.1],["C6","16n",n+0.15],["E6","16n",n+0.2],["G6","4n",n+0.25]],bass:[["C3","8n",n],["G2","4n",n+0.15]]}),
+      combo3:n=>[["C5","8n"],["E5","8n"],["G5","8n"],["C6","8n"]],
+      combo5:n=>[["C5","8n"],["E5","8n"],["G5","8n"],["B5","8n"],["D6","8n"]],
+      wrong:n=>[["E3","16n",n],["Eb3","8n",n+0.1]],
+      tick:n=>[["A5","32n",n]],
+      countdown:n=>[["G4","16n",n]],
+      go:n=>[["C5","16n",n],["E5","16n",n+0.06],["G5","8n",n+0.12]],
+      ending:n=>({bass:[["E2","8n",n],["C2","8n",n+0.2],["A1","4n",n+0.4]]}),
+      chomp:n=>[["G3","32n",n]],
+      btnBass:n=>[["A2","32n",n]],
+    }
+  },
+  soft:{
+    synth:{oscillator:{type:"sine"},envelope:{attack:0.05,decay:0.3,sustain:0.1,release:0.4},volume:-20},
+    bass:{oscillator:{type:"sine"},envelope:{attack:0.05,decay:0.4,sustain:0.1,release:0.5},volume:-18},
+    btn:{noise:{type:"pink"},envelope:{attack:0.01,decay:0.06,sustain:0,release:0.04},volume:-30},
+    btnFilter:300,
+    notes:{
+      find3:n=>[["E5","8n",n]],
+      find4:n=>[["G5","8n",n],["B5","8n",n+0.12]],
+      find5:n=>[["E5","8n",n],["G5","8n",n+0.1],["B5","4n",n+0.2]],
+      find6:n=>({synth:[["E5","8n",n],["G5","8n",n+0.09],["B5","8n",n+0.18],["E6","4n",n+0.27]],bass:[["E3","4n",n]]}),
+      find7:n=>({synth:[["E5","8n",n],["G5","8n",n+0.08],["B5","8n",n+0.16],["E6","8n",n+0.24],["G6","4n",n+0.32]],bass:[["E3","8n",n],["B2","4n",n+0.2]]}),
+      combo3:n=>[["E5","4n"],["G5","4n"],["B5","4n"],["E6","4n"]],
+      combo5:n=>[["E5","4n"],["G5","4n"],["B5","4n"],["D6","4n"],["E6","4n"]],
+      wrong:n=>[["D4","8n",n],["Db4","4n",n+0.15]],
+      tick:n=>[["B5","32n",n]],
+      countdown:n=>[["A4","8n",n]],
+      go:n=>[["E5","8n",n],["G5","8n",n+0.1],["B5","4n",n+0.2]],
+      ending:n=>({bass:[["G2","4n",n],["E2","4n",n+0.3],["C2","2n",n+0.6]]}),
+      chomp:n=>[["A3","32n",n]],
+      btnBass:n=>[["E3","32n",n]],
+    }
+  },
+  modern:{
+    synth:{oscillator:{type:"triangle"},envelope:{attack:0.02,decay:0.2,sustain:0.08,release:0.25},volume:-16},
+    bass:{oscillator:{type:"sawtooth4"},envelope:{attack:0.02,decay:0.25,sustain:0.1,release:0.3},volume:-14},
+    btn:{noise:{type:"white"},envelope:{attack:0.002,decay:0.03,sustain:0,release:0.02},volume:-26},
+    btnFilter:500,
+    notes:{
+      find3:n=>[["D5","16n",n]],
+      find4:n=>[["F5","16n",n],["A5","16n",n+0.06]],
+      find5:n=>[["D5","16n",n],["F5","16n",n+0.05],["A5","8n",n+0.1]],
+      find6:n=>({synth:[["D5","16n",n],["F5","16n",n+0.05],["A5","16n",n+0.1],["D6","8n",n+0.15]],bass:[["D3","4n",n]]}),
+      find7:n=>({synth:[["D5","16n",n],["F5","16n",n+0.04],["A5","16n",n+0.08],["D6","16n",n+0.12],["F6","16n",n+0.16],["A6","4n",n+0.2]],bass:[["D3","8n",n],["A2","4n",n+0.12]]}),
+      combo3:n=>[["D5","8n"],["F5","8n"],["A5","8n"],["D6","8n"]],
+      combo5:n=>[["D5","8n"],["F5","8n"],["A5","8n"],["C#6","8n"],["E6","8n"]],
+      wrong:n=>[["F3","16n",n],["E3","8n",n+0.08]],
+      tick:n=>[["B5","32n",n]],
+      countdown:n=>[["A4","16n",n]],
+      go:n=>[["D5","16n",n],["F5","16n",n+0.05],["A5","8n",n+0.1]],
+      ending:n=>({bass:[["F2","8n",n],["D2","8n",n+0.15],["A1","4n",n+0.3]]}),
+      chomp:n=>[["A3","32n",n]],
+      btnBass:n=>[["D3","32n",n]],
+    }
+  }
+};
+
+function useSounds(soundTheme){
   const synthRef=useRef(null);const bassRef=useRef(null);const btnNoiseRef=useRef(null);const initRef=useRef(false);
+  const themeRef=useRef(soundTheme);themeRef.current=soundTheme;
+  const lastInitTheme=useRef(null);
 
   const init=useCallback(async()=>{
-    if(initRef.current)return;await Tone.start();initRef.current=true;
-    synthRef.current=new Tone.PolySynth(Tone.Synth,{oscillator:{type:"square"},envelope:{attack:0.01,decay:0.15,sustain:0.05,release:0.15},volume:-14}).toDestination();
-    bassRef.current=new Tone.Synth({oscillator:{type:"triangle"},envelope:{attack:0.01,decay:0.3,sustain:0.1,release:0.3},volume:-10}).toDestination();
-    const btnFilter=new Tone.Filter({frequency:400,type:"lowpass"}).toDestination();
-    btnNoiseRef.current=new Tone.NoiseSynth({noise:{type:"brown"},envelope:{attack:0.003,decay:0.04,sustain:0,release:0.02},volume:-22}).connect(btnFilter);
+    const st=SOUND_THEMES[themeRef.current]||SOUND_THEMES.retro;
+    if(initRef.current&&lastInitTheme.current===themeRef.current)return;
+    await Tone.start();
+    // Dispose old synths if theme changed
+    if(initRef.current){
+      try{synthRef.current?.dispose();}catch{}
+      try{bassRef.current?.dispose();}catch{}
+      try{btnNoiseRef.current?.dispose();}catch{}
+    }
+    initRef.current=true;lastInitTheme.current=themeRef.current;
+    synthRef.current=new Tone.PolySynth(Tone.Synth,st.synth).toDestination();
+    bassRef.current=new Tone.Synth(st.bass).toDestination();
+    const btnFilter=new Tone.Filter({frequency:st.btnFilter,type:"lowpass"}).toDestination();
+    btnNoiseRef.current=new Tone.NoiseSynth(st.btn).connect(btnFilter);
   },[]);
 
-  const play3=useCallback(()=>{if(!synthRef.current)return;synthRef.current.triggerAttackRelease("C5","16n");},[]);
-  const play4=useCallback(()=>{if(!synthRef.current)return;const n=Tone.now();synthRef.current.triggerAttackRelease("E5","16n",n);synthRef.current.triggerAttackRelease("G5","16n",n+0.08);},[]);
-  const play5=useCallback(()=>{if(!synthRef.current)return;const n=Tone.now();synthRef.current.triggerAttackRelease("C5","16n",n);synthRef.current.triggerAttackRelease("E5","16n",n+0.07);synthRef.current.triggerAttackRelease("G5","8n",n+0.14);},[]);
-  const play6=useCallback(()=>{if(!synthRef.current)return;const n=Tone.now();synthRef.current.triggerAttackRelease("C5","16n",n);synthRef.current.triggerAttackRelease("E5","16n",n+0.06);synthRef.current.triggerAttackRelease("G5","16n",n+0.12);synthRef.current.triggerAttackRelease("C6","8n",n+0.18);if(bassRef.current)bassRef.current.triggerAttackRelease("C3","4n",n);},[]);
-  const play7=useCallback(()=>{if(!synthRef.current)return;const n=Tone.now();synthRef.current.triggerAttackRelease("C5","16n",n);synthRef.current.triggerAttackRelease("E5","16n",n+0.05);synthRef.current.triggerAttackRelease("G5","16n",n+0.1);synthRef.current.triggerAttackRelease("C6","16n",n+0.15);synthRef.current.triggerAttackRelease("E6","16n",n+0.2);synthRef.current.triggerAttackRelease("G6","4n",n+0.25);if(bassRef.current){bassRef.current.triggerAttackRelease("C3","8n",n);bassRef.current.triggerAttackRelease("G2","4n",n+0.15);}},[]);
+  // Re-init when theme changes
+  const reinit=useCallback(async()=>{
+    if(!initRef.current)return;
+    lastInitTheme.current=null;
+    await init();
+  },[init]);
 
-  const playByLength=useCallback((len)=>{if(len<=3)play3();else if(len===4)play4();else if(len===5)play5();else if(len===6)play6();else play7();},[play3,play4,play5,play6,play7]);
-  const playCombo=useCallback((combo)=>{if(!synthRef.current)return;const n=Tone.now();const notes=combo>=5?["C5","E5","G5","B5","D6"]:combo>=3?["C5","E5","G5","C6"]:["C5","G5"];notes.forEach((note,i)=>synthRef.current.triggerAttackRelease(note,"8n",n+i*0.04));if(bassRef.current&&combo>=3)bassRef.current.triggerAttackRelease("C2","8n",n);},[]);
-  const playWrong=useCallback(()=>{if(!synthRef.current)return;const n=Tone.now();synthRef.current.triggerAttackRelease("E3","16n",n);synthRef.current.triggerAttackRelease("Eb3","8n",n+0.1);},[]);
-  const playTick=useCallback(()=>{if(!synthRef.current)return;synthRef.current.triggerAttackRelease("A5","32n");},[]);
-  const playCountdown=useCallback((n)=>{if(!synthRef.current)return;synthRef.current.triggerAttackRelease("G4","16n");},[]);
-  const playGo=useCallback(()=>{if(!synthRef.current)return;const n=Tone.now();synthRef.current.triggerAttackRelease("C5","16n",n);synthRef.current.triggerAttackRelease("E5","16n",n+0.06);synthRef.current.triggerAttackRelease("G5","8n",n+0.12);},[]);
-  const playEnding=useCallback(()=>{if(!bassRef.current)return;const n=Tone.now();bassRef.current.triggerAttackRelease("E2","8n",n);bassRef.current.triggerAttackRelease("C2","8n",n+0.2);bassRef.current.triggerAttackRelease("A1","4n",n+0.4);},[]);
-  const playChomp=useCallback(()=>{if(!synthRef.current)return;synthRef.current.triggerAttackRelease("G3","32n");},[]);
-  const playBtn=useCallback(()=>{if(!btnNoiseRef.current||!bassRef.current)return;btnNoiseRef.current.triggerAttackRelease("32n");bassRef.current.triggerAttackRelease("A2","32n");},[]);
+  const playSynthNotes=useCallback((notesFn)=>{
+    if(!synthRef.current)return;
+    const n=Tone.now();const result=notesFn(n);
+    if(Array.isArray(result)){
+      result.forEach(args=>synthRef.current.triggerAttackRelease(...args));
+    }else if(result){
+      if(result.synth)result.synth.forEach(args=>synthRef.current.triggerAttackRelease(...args));
+      if(result.bass&&bassRef.current)result.bass.forEach(args=>bassRef.current.triggerAttackRelease(...args));
+    }
+  },[]);
 
-  return{init,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn};
+  const getNotes=useCallback(()=>(SOUND_THEMES[themeRef.current]||SOUND_THEMES.retro).notes,[]);
+
+  const playByLength=useCallback((len)=>{
+    const notes=getNotes();
+    if(len<=3)playSynthNotes(notes.find3);
+    else if(len===4)playSynthNotes(notes.find4);
+    else if(len===5)playSynthNotes(notes.find5);
+    else if(len===6)playSynthNotes(notes.find6);
+    else playSynthNotes(notes.find7);
+  },[playSynthNotes,getNotes]);
+
+  const playCombo=useCallback((combo)=>{
+    if(!synthRef.current)return;const n=Tone.now();const notes=getNotes();
+    const arr=combo>=5?notes.combo5(n):notes.combo3(n);
+    arr.forEach((args,i)=>synthRef.current.triggerAttackRelease(args[0],args[1],n+i*0.04));
+    if(bassRef.current&&combo>=3)bassRef.current.triggerAttackRelease("C2","8n",n);
+  },[getNotes]);
+
+  const playWrong=useCallback(()=>{playSynthNotes(getNotes().wrong);},[playSynthNotes,getNotes]);
+  const playTick=useCallback(()=>{playSynthNotes(getNotes().tick);},[playSynthNotes,getNotes]);
+  const playCountdown=useCallback(()=>{playSynthNotes(getNotes().countdown);},[playSynthNotes,getNotes]);
+  const playGo=useCallback(()=>{playSynthNotes(getNotes().go);},[playSynthNotes,getNotes]);
+  const playEnding=useCallback(()=>{
+    const notes=getNotes();const n=Tone.now();const result=notes.ending(n);
+    if(result.bass&&bassRef.current)result.bass.forEach(args=>bassRef.current.triggerAttackRelease(...args));
+    else if(Array.isArray(result)&&synthRef.current)result.forEach(args=>synthRef.current.triggerAttackRelease(...args));
+  },[getNotes]);
+  const playChomp=useCallback(()=>{playSynthNotes(getNotes().chomp);},[playSynthNotes,getNotes]);
+  const playBtn=useCallback(()=>{
+    if(!btnNoiseRef.current||!bassRef.current)return;
+    const n=Tone.now();const notes=getNotes();
+    btnNoiseRef.current.triggerAttackRelease("32n");
+    notes.btnBass(n).forEach(args=>bassRef.current.triggerAttackRelease(...args));
+  },[getNotes]);
+
+  return{init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn};
 }
 
 // ============================================
@@ -1222,6 +1339,7 @@ export default function Piilosana(){
   const[themeId,setThemeId]=useState(()=>localStorage.getItem("piilosana_theme")||"dark");
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
+  const[soundTheme,setSoundTheme]=useState(()=>localStorage.getItem("piilosana_sound")||"retro");
   const[showSettings,setShowSettings]=useState(false);
   const[showMenuOptions,setShowMenuOptions]=useState(false);
   const[settingsBubble,setSettingsBubble]=useState(false);
@@ -1249,6 +1367,7 @@ export default function Piilosana(){
     if(s.lang){setLang(s.lang);localStorage.setItem("piilosana_lang",s.lang);}
     if(s.size){setUiSize(s.size);localStorage.setItem("piilosana_size",s.size);}
     if(typeof s.confetti==="boolean"){setConfettiOn(s.confetti);localStorage.setItem("piilosana_confetti",s.confetti?"on":"off");}
+    if(s.sound){setSoundTheme(s.sound);localStorage.setItem("piilosana_sound",s.sound);}
   },[]);
   const doLogin=useCallback(async(nickname,password)=>{
     setAuthLoading(true);setAuthError("");
@@ -1317,9 +1436,9 @@ export default function Piilosana(){
   },[]);
   const syncSettings=useCallback((overrides={})=>{
     if(!authUser)return;
-    const s={theme:themeId,lang,size:uiSize,confetti:confettiOn,...overrides};
+    const s={theme:themeId,lang,size:uiSize,confetti:confettiOn,sound:soundTheme,...overrides};
     saveSettingsToServer(s);
-  },[authUser,themeId,lang,uiSize,confettiOn,saveSettingsToServer]);
+  },[authUser,themeId,lang,uiSize,confettiOn,soundTheme,saveSettingsToServer]);
 
   const doChangePassword=useCallback(async(currentPassword,newPassword)=>{
     setAuthLoading(true);setAuthError("");setAuthSuccess("");
@@ -1453,7 +1572,16 @@ export default function Piilosana(){
   const WORDS_SET=langConf.words;
   const trie=useMemo(()=>langConf.trie,[lang]);
   const t=T[lang]||T.fi;
-  const sounds=useSounds();
+  const rawSounds=useSounds(soundTheme);
+  // Wrap sounds with mute check
+  const sounds=useMemo(()=>{
+    if(soundTheme==="off")return{
+      init:async()=>{},playByLength:()=>{},playCombo:()=>{},playWrong:()=>{},
+      playTick:()=>{},playCountdown:()=>{},playGo:()=>{},playEnding:()=>{},
+      playChomp:()=>{},playBtn:()=>{},reinit:async()=>{}
+    };
+    return rawSounds;
+  },[soundTheme,rawSounds]);
   const isLarge=uiSize==="large";
 
   // Game settings (must be declared before states that reference them)
@@ -1624,6 +1752,8 @@ export default function Piilosana(){
   const startTimeRef=useRef(null);
   const soundsRef=useRef(sounds);
   soundsRef.current=sounds;
+  // Re-init synths when sound theme changes
+  useEffect(()=>{if(soundTheme!=="off")rawSounds.reinit();},[soundTheme,rawSounds]);
   useEffect(()=>{
     if(state!=="play"||mode==="multi"||mode==="public"||gameTime===0)return;
     startTimeRef.current=Date.now();
@@ -2673,6 +2803,23 @@ export default function Piilosana(){
                   border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
                 {lang==="en"?"LARGE":lang==="sv"?"STOR":"ISO"}
               </button>
+            </div>
+          </div>
+          {/* Sound */}
+          <div style={{marginBottom:"12px"}}>
+            <div style={{fontFamily:S.font,fontSize:"9px",color:S.green,marginBottom:"6px"}}>
+              {lang==="en"?"SOUNDS":lang==="sv"?"LJUD":"ÄÄNET"}
+            </div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
+              {[["retro",{fi:"RETRO",en:"RETRO",sv:"RETRO"}],["soft",{fi:"PEHMEÄ",en:"SOFT",sv:"MJUK"}],["modern",{fi:"MODERNI",en:"MODERN",sv:"MODERN"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
+                <button key={id} onClick={()=>{setSoundTheme(id);localStorage.setItem("piilosana_sound",id);syncSettings({sound:id});}}
+                  style={{fontFamily:S.font,fontSize:"8px",
+                    color:soundTheme===id?S.bg:S.green,background:soundTheme===id?S.green:"transparent",
+                    border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer",
+                    boxShadow:soundTheme===id?`0 0 8px ${S.green}66`:"none"}}>
+                  {names[lang]||names.en}
+                </button>
+              ))}
             </div>
           </div>
           {/* Confetti */}
