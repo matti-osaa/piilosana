@@ -572,38 +572,38 @@ const MUSIC_TRACKS={
             ["G3","B3","D4","F4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Horisontti" — intro→build→climax→resolve, F/C/Am world
-    {id:"horisontti",name:{fi:"Horisontti",en:"Horizon",sv:"Horisont"},bpm:66,sub:"8n",melDur:"4n",bassDur:"2m",
-      melSynth:{oscillator:{type:"fatsine",count:2,spread:18},envelope:{attack:0.05,decay:1.2,sustain:0.2,release:2},volume:-16},
-      bassSynth:{oscillator:{type:"fatsine",count:3,spread:28},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-22},
-      mel:[null,null,null,null,"C5",null,null,null,null,null,null,null,null,null,null,null,
-           null,null,"E5",null,null,null,null,null,null,null,"D5",null,null,null,null,null,
-           null,null,null,null,null,null,"F5",null,null,null,null,null,"E5",null,null,null,
-           null,null,null,null,"C5",null,null,null,null,null,null,null,null,null,null,null,
-           null,null,"C5",null,"E5",null,"F5",null,null,null,"E5",null,"C5",null,"D5",null,
-           null,null,"E5",null,null,null,"G5",null,"A5",null,null,null,"G5",null,"E5",null,
-           null,null,"F5",null,"G5",null,"A5",null,"C6",null,null,null,"A5",null,"G5",null,
-           null,null,"A5",null,"C6",null,"D6",null,null,null,"C6",null,"A5",null,"G5",null,
-           "D6",null,"E6",null,"C6",null,"A5",null,"C6",null,"D6",null,"E6",null,"F6",null,
-           "E6",null,"C6",null,"A5",null,"G5",null,"A5",null,"C6",null,"E6",null,"D6",null,
-           null,null,"A5",null,null,null,"G5",null,null,null,"E5",null,null,null,"C5",null,
-           null,null,"D5",null,null,null,"C5",null,null,null,null,null,null,null,null,null],
-      bass:[["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G2","B2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+    // "Posliini II" — sama Am/C mutta climaxissa nopea tiluliii-kulku
+    {id:"posliini2",name:{fi:"Posliini II",en:"Porcelain II",sv:"Porslin II"},bpm:74,sub:"8n",melDur:"4n",bassDur:"2m",
+      melSynth:{oscillator:{type:"fatsine",count:3,spread:20},envelope:{attack:0.03,decay:0.8,sustain:0.2,release:1.5},volume:-16},
+      bassSynth:{oscillator:{type:"fatsine",count:3,spread:25},envelope:{attack:2,decay:1.5,sustain:0.6,release:3},volume:-23},
+      mel:[null,null,"E5",null,null,null,null,null,null,null,"G5",null,null,null,null,null,
+           null,null,null,null,"D5",null,"E5",null,null,null,null,null,null,null,null,null,
+           null,null,"A4",null,null,null,"C5",null,null,null,null,null,null,null,null,null,
+           null,null,"E5",null,null,null,"D5",null,null,null,null,null,null,null,null,null,
+           null,null,"E5",null,"G5",null,"A5",null,null,null,"G5",null,"E5",null,null,null,
+           null,null,"D5",null,"E5",null,"G5",null,null,null,"E5",null,"D5",null,"C5",null,
+           null,null,"A4",null,"C5",null,"E5",null,"G5",null,null,null,"E5",null,"D5",null,
+           null,null,"E5",null,"G5",null,"A5",null,null,null,"B5",null,"A5",null,"G5",null,
+           "E5","G5","A5","B5","C6",null,"A5","G5","A5","B5","C6","D6","E6",null,"D6","C6",
+           "A5","C6","D6","E6",null,"D6","C6","A5","G5","A5","C6",null,"A5",null,"G5",null,
+           null,null,"E5",null,null,null,null,null,"D5",null,null,null,null,null,"C5",null,
+           null,null,null,null,"A4",null,null,null,null,null,null,null,null,null,null,null],
+      bass:[["A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G3","B3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["D3","F3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["E3","G3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["F3","A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["G3","B3","D4","F4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Kirkko I" — Em/G, rauhallinen, kaikuisa
+            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+    // "Kirkko I" — Em/G, rauhallinen, kaikuisa — ambient pad
     {id:"kirkko1",name:{fi:"Kirkko",en:"Church",sv:"Kyrka"},bpm:56,sub:"8n",melDur:"4n.",bassDur:"2m",
-      melSynth:{oscillator:{type:"fatsine",count:2,spread:20},envelope:{attack:0.06,decay:1.5,sustain:0.15,release:2.5},volume:-16},
-      bassSynth:{oscillator:{type:"fatsine",count:2,spread:15},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-24},
+      melSynth:{oscillator:{type:"sine"},envelope:{attack:0.4,decay:2,sustain:0.3,release:4},volume:-18},
+      bassSynth:{oscillator:{type:"sine"},envelope:{attack:4,decay:3,sustain:0.6,release:5},volume:-26},
       mel:[null,null,"E5",null,null,null,null,null,"B4",null,null,null,null,null,null,null,
            null,null,null,null,"A4",null,null,null,"G4",null,null,null,null,null,"E4",null,
            null,null,"B4",null,null,null,"C5",null,null,null,null,null,"E5",null,null,null,
@@ -612,10 +612,10 @@ const MUSIC_TRACKS={
             ["A2","E3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["C3","G3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["G2","D3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Kirkko II" — E/C#m, kirkkaampi, eläväisempi
+    // "Kirkko II" — E/C#m, kirkkaampi — pehmeä fattriangle
     {id:"kirkko2",name:{fi:"Valo",en:"Light",sv:"Ljus"},bpm:62,sub:"8n",melDur:"4n",bassDur:"2m",
-      melSynth:{oscillator:{type:"fatsine",count:2,spread:15},envelope:{attack:0.05,decay:1.2,sustain:0.1,release:2},volume:-16},
-      bassSynth:{oscillator:{type:"fatsine",count:2,spread:12},envelope:{attack:2.5,decay:2,sustain:0.5,release:3.5},volume:-24},
+      melSynth:{oscillator:{type:"fattriangle",count:2,spread:12},envelope:{attack:0.1,decay:1.5,sustain:0.2,release:2.5},volume:-17},
+      bassSynth:{oscillator:{type:"sine"},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-25},
       mel:[null,null,"B4",null,null,null,"C#5",null,"E5",null,null,null,null,null,"C#5",null,
            null,null,"A4",null,null,null,"B4",null,null,null,null,null,"E5",null,null,null,
            null,null,"B4",null,"A4",null,null,null,"G#4",null,null,null,"A4",null,"B4",null,
@@ -624,34 +624,50 @@ const MUSIC_TRACKS={
             ["A2","E3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["C#3","G#3","C#4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["B2","F#3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Pimeä" — F#m/Ebm, tumma, kromaattinen
-    {id:"pimea",name:{fi:"Pimeä",en:"Dark",sv:"Mörk"},bpm:58,sub:"8n",melDur:"4n.",bassDur:"2m",
-      melSynth:{oscillator:{type:"fatsawtooth",count:2,spread:15},envelope:{attack:0.02,decay:1.5,sustain:0.05,release:2},volume:-18},
-      bassSynth:{oscillator:{type:"fatsine",count:3,spread:25},envelope:{attack:3,decay:2,sustain:0.6,release:4},volume:-22},
-      mel:["F5",null,null,null,"Eb5",null,null,null,null,null,"C#5",null,null,null,null,null,
-           null,null,"Ab4",null,null,null,"F4",null,null,null,"Eb4",null,null,null,"F4",null,
-           "Ab4",null,null,null,"C#5",null,"Eb5",null,null,null,"F5",null,null,null,null,null,
-           null,null,"Eb5",null,null,null,"C#5",null,null,null,null,null,null,null,null,null],
-      bass:[["F#2","C#3","F#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["Ab2","Eb3","Ab3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C#3","Ab3","C#4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["Eb2","Bb2","Eb3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Ilta" — Gm/Bb, lämmin molli, melodinen
-    {id:"ilta",name:{fi:"Ilta",en:"Evening",sv:"Kväll"},bpm:58,sub:"8n",melDur:"4n",bassDur:"2m",
-      melSynth:{oscillator:{type:"fatsine",count:2,spread:18},envelope:{attack:0.03,decay:1,sustain:0.15,release:1.8},volume:-16},
-      bassSynth:{oscillator:{type:"fatsine",count:3,spread:22},envelope:{attack:2.5,decay:2,sustain:0.5,release:3.5},volume:-23},
-      mel:[null,null,"G4",null,null,null,"Bb4",null,"D5",null,null,null,null,null,"C5",null,
-           null,null,"Bb4",null,null,null,"A4",null,null,null,"G4",null,null,null,"F4",null,
-           null,null,"G4",null,"A4",null,"Bb4",null,null,null,"D5",null,"C5",null,"Bb4",null,
-           null,null,"G5",null,null,null,"F5",null,"D5",null,null,null,null,null,null,null],
+    // "Kevät" — A-duuri, iloinen, leikkisä fattriangle
+    {id:"kevat",name:{fi:"Kevät",en:"Spring",sv:"Vår"},bpm:72,sub:"8n",melDur:"4n",bassDur:"2m",
+      melSynth:{oscillator:{type:"fattriangle",count:2,spread:14},envelope:{attack:0.04,decay:0.8,sustain:0.2,release:1.5},volume:-16},
+      bassSynth:{oscillator:{type:"fatsine",count:2,spread:12},envelope:{attack:2,decay:1.5,sustain:0.5,release:3},volume:-24},
+      mel:[null,null,"A4",null,null,null,"C#5",null,"E5",null,null,null,null,null,"D5",null,
+           null,null,"C#5",null,"B4",null,null,null,null,null,"A4",null,null,null,null,null,
+           null,null,"E5",null,null,null,"F#5",null,"E5",null,null,null,"D5",null,"C#5",null,
+           null,null,"B4",null,null,null,"A4",null,null,null,null,null,null,null,null,null,
+           null,null,"A4",null,"B4",null,"C#5",null,"E5",null,null,null,"F#5",null,"E5",null,
+           null,null,"D5",null,"E5",null,"F#5",null,null,null,"A5",null,null,null,"F#5",null,
+           null,null,"E5",null,null,null,"D5",null,"C#5",null,null,null,"B4",null,"A4",null,
+           null,null,"B4",null,null,null,"C#5",null,null,null,null,null,null,null,null,null],
+      bass:[["A2","E3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D3","A3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["E2","B2","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","E3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["F#2","C#3","F#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D3","A3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["E2","B2","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","E3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+    // "Aamu" — G-duuri, lämmin ja iloinen, laulava fatsine
+    {id:"aamu",name:{fi:"Aamu",en:"Morning",sv:"Morgon"},bpm:66,sub:"8n",melDur:"4n.",bassDur:"2m",
+      melSynth:{oscillator:{type:"fatsine",count:2,spread:10},envelope:{attack:0.06,decay:1,sustain:0.25,release:2},volume:-16},
+      bassSynth:{oscillator:{type:"fatsine",count:2,spread:18},envelope:{attack:2.5,decay:2,sustain:0.5,release:3.5},volume:-24},
+      mel:[null,null,"G4",null,null,null,null,null,"B4",null,null,null,"D5",null,null,null,
+           null,null,null,null,"E5",null,null,null,null,null,"D5",null,null,null,"B4",null,
+           null,null,"A4",null,null,null,"B4",null,null,null,null,null,"D5",null,null,null,
+           null,null,"G5",null,null,null,null,null,"F#5",null,null,null,"E5",null,null,null,
+           null,null,"D5",null,"E5",null,"G5",null,null,null,null,null,"A5",null,null,null,
+           null,null,"G5",null,null,null,"F#5",null,"E5",null,null,null,"D5",null,null,null,
+           null,null,"B4",null,null,null,"D5",null,"E5",null,null,null,"D5",null,"B4",null,
+           null,null,"A4",null,null,null,"G4",null,null,null,null,null,null,null,null,null],
       bass:[["G2","D3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["Bb2","F3","Bb3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["Eb2","Bb2","Eb3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C3","G3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D2","A2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["E2","B2","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C3","G3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D2","A2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G2","D3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
             ["D2","A2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Kulta" — D-duuri, lämmin, rikas
+    // "Kulta" — D-duuri, lämmin — fattriangle, rikas
     {id:"kulta",name:{fi:"Kulta",en:"Gold",sv:"Guld"},bpm:60,sub:"8n",melDur:"4n",bassDur:"2m",
-      melSynth:{oscillator:{type:"fatsine",count:3,spread:20},envelope:{attack:0.04,decay:1.2,sustain:0.1,release:2},volume:-16},
-      bassSynth:{oscillator:{type:"fatsine",count:3,spread:28},envelope:{attack:3,decay:2,sustain:0.6,release:4},volume:-22},
+      melSynth:{oscillator:{type:"fattriangle",count:3,spread:18},envelope:{attack:0.08,decay:1.5,sustain:0.15,release:2.5},volume:-17},
+      bassSynth:{oscillator:{type:"fatsine",count:2,spread:15},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-24},
       mel:[null,null,"D5",null,null,null,null,null,"F#5",null,null,null,null,null,"A5",null,
            null,null,null,null,"G5",null,"F#5",null,null,null,"E5",null,null,null,"D5",null,
            null,null,"A4",null,null,null,"B4",null,"D5",null,null,null,"F#5",null,null,null,
@@ -663,11 +679,12 @@ const MUSIC_TRACKS={
   ]
 };
 
-function useMusic(category,isPlaying){
+function useMusic(category,isPlaying,shuffle){
   const melSynthRef=useRef(null);const bassSynthRef=useRef(null);
   const melSeqRef=useRef(null);const bassSeqRef=useRef(null);
   const gainRef=useRef(null);const activeRef=useRef(false);
   const trackIdx=useRef(Math.floor(Math.random()*10));
+  const lastPlayedRef=useRef(-1);
   const timerRef=useRef(null);
   const [tick,setTick]=useState(0);
 
@@ -686,8 +703,16 @@ function useMusic(category,isPlaying){
     if(category==="off"||!isPlaying){cleanup();return;}
     const tracks=MUSIC_TRACKS[category];
     if(!tracks||!tracks.length)return;
-    const track=tracks[trackIdx.current%tracks.length];
-    trackIdx.current++;
+    let idx;
+    if(shuffle){
+      // Pick random track, avoid repeating the same one
+      do{idx=Math.floor(Math.random()*tracks.length);}while(tracks.length>1&&idx===lastPlayedRef.current);
+    }else{
+      idx=trackIdx.current%tracks.length;
+      trackIdx.current++;
+    }
+    lastPlayedRef.current=idx;
+    const track=tracks[idx];
     let cancelled=false;
     (async()=>{
       await Tone.start();
@@ -1549,6 +1574,7 @@ export default function Piilosana(){
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[soundTheme,setSoundTheme]=useState(()=>localStorage.getItem("piilosana_sound")||"retro");
   const[musicTheme,setMusicTheme]=useState(()=>localStorage.getItem("piilosana_music")||"electronic");
+  const[musicShuffle,setMusicShuffle]=useState(()=>localStorage.getItem("piilosana_music_shuffle")!=="off");
   const[audioStarted,setAudioStarted]=useState(false);
   const[showSettings,setShowSettings]=useState(false);
   const[showMenuOptions,setShowMenuOptions]=useState(false);
@@ -1968,7 +1994,7 @@ export default function Piilosana(){
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(()=>{if(soundTheme!=="off")rawSounds.reinit();},[soundTheme]);
   // Background music — plays whenever user has interacted (audio context unlocked)
-  useMusic(musicTheme,audioStarted);
+  useMusic(musicTheme,audioStarted,musicShuffle);
   useEffect(()=>{
     if(state!=="play"||mode==="multi"||mode==="public"||gameTime===0)return;
     startTimeRef.current=Date.now();
@@ -3073,8 +3099,17 @@ export default function Piilosana(){
               ))}
             </div>
             {musicTheme!=="off"&&(
-              <div style={{fontFamily:S.font,fontSize:"7px",color:"#556",marginTop:"4px"}}>
-                {lang==="en"?"Plays during game":lang==="sv"?"Spelas under spelet":"Soi pelin aikana"}
+              <div style={{display:"flex",gap:"4px",marginTop:"6px"}}>
+                {[["shuffle",{fi:"SEKOITUS",en:"SHUFFLE",sv:"BLANDA"}],["order",{fi:"JÄRJESTYS",en:"IN ORDER",sv:"I ORDNING"}]].map(([id,names])=>(
+                  <button key={id} onClick={()=>{const v=id==="shuffle";setMusicShuffle(v);localStorage.setItem("piilosana_music_shuffle",v?"on":"off");}}
+                    style={{fontFamily:S.font,fontSize:"7px",
+                      color:(musicShuffle?id==="shuffle":id==="order")?S.bg:S.green,
+                      background:(musicShuffle?id==="shuffle":id==="order")?S.green:"transparent",
+                      border:`1px solid ${S.green}`,padding:"3px 6px",cursor:"pointer",
+                      boxShadow:(musicShuffle?id==="shuffle":id==="order")?`0 0 6px ${S.green}44`:"none"}}>
+                    {names[lang]||names.en}
+                  </button>
+                ))}
               </div>
             )}
           </div>
