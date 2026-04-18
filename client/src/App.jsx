@@ -232,7 +232,7 @@ function getLetterValues(lang){return getLangConf(lang).letterValues;}
 function ptsLetters(word,lang='fi'){const lv=getLetterValues(lang);let s=0;for(const ch of word)s+=(lv[ch]||1);return s;}
 function letterColor(ch,lang='fi'){const lv=getLetterValues(lang);return LETTER_VALUE_COLORS[lv[ch]||1]||"#88bbcc";}
 
-const fontCSS=`@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');`;
+const fontCSS=`@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Inter:wght@400;500;600;700&display=swap');`;
 
 // ============================================
 // THEMES
@@ -278,8 +278,32 @@ const THEMES={
     gridBg:"#001800",textMuted:"#338833",textSoft:"#44cc44",
     inputBg:"#002200",
   },
+  modern:{
+    name:"MODERNI",nameEn:"MODERN",nameSv:"MODERN",
+    bg:"#1a1520",green:"#7dd3b8",yellow:"#f0c060",red:"#e8706a",purple:"#b88adc",
+    dark:"#231e2a",border:"#3a3342",cell:"#2a2435",cellBorder:"#3d3548",
+    font:"'Inter','Segoe UI',system-ui,sans-serif",
+    gridBg:"#211c28",textMuted:"#6b6078",textSoft:"#9a8daa",
+    inputBg:"#231e2a",
+    cellRadius:"12px",btnRadius:"10px",
+    cellShadow:"inset 0 2px 6px #00000040, 0 1px 3px #00000020",
+    btnShadow:"0 4px 14px #00000033",
+    cellGradient:true,
+    panelRadius:"16px",panelShadow:"0 8px 32px #00000044",
+    titleFont:"'Inter','Segoe UI',system-ui,sans-serif",
+    gridGap:"6px",
+    letterFont:"'Inter','Segoe UI',system-ui,sans-serif",
+  },
 };
-function getTheme(id){return THEMES[id]||THEMES.dark;}
+function getTheme(id){
+  const t=THEMES[id]||THEMES.dark;
+  return {
+    cellRadius:"0px",btnRadius:"0px",cellShadow:"none",btnShadow:"none",
+    cellGradient:false,panelRadius:"0px",panelShadow:"none",
+    titleFont:t.font,gridGap:"0px",letterFont:"'VT323',monospace",
+    ...t
+  };
+}
 
 // ============================================
 // ENDINGS - 10 different game over animations
@@ -1406,7 +1430,7 @@ function PixelIcon({icon,color="currentColor",size=2,style={},badge=false}){
   );
 }
 
-function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear}){
+function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,theme:titleTheme}){
   const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;
   const titleChars=tc.title.split("");
   const demoWords=tc.demos;
@@ -1492,7 +1516,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear}){
             :"3px 3px 0 #cc6600, 0 0 20px #ffcc0066",
           transition:scramble?"none":"text-shadow 0.25s ease, transform 0.25s ease",
           transform:scramble?`translateY(${Math.random()>0.5?-2:2}px)`:isLit?"translateY(-2px)":"none",
-          fontFamily:"'Press Start 2P',monospace",
+          fontFamily:titleTheme?.titleFont||"'Press Start 2P',monospace",
           lineHeight:1,
         };
         if(isGear&&!hideGear){
@@ -2651,24 +2675,24 @@ export default function Piilosana(){
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
       {/* Main button — ARENA */}
-      <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"22px",color:S.bg,background:"#ff6644",border:"none",padding:"24px 32px",cursor:"pointer",boxShadow:"4px 4px 0 #cc3311",width:"100%",minHeight:"70px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"10px"}}
-        onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="6px 6px 0 #cc3311"}}
-        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="4px 4px 0 #cc3311"}}>
+      <button onClick={async()=>{await sounds.init();setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"22px",color:S.bg,background:"#ff6644",border:"none",padding:"24px 32px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"4px 4px 0 #cc3311",borderRadius:S.btnRadius,width:"100%",minHeight:"70px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"10px"}}
+        onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"6px 6px 0 #cc3311"}}
+        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"4px 4px 0 #cc3311"}}>
         <span style={{display:"flex",alignItems:"center",gap:"8px"}}>{t.arena}<span style={{fontSize:"11px",display:"inline-flex",alignItems:"center",gap:"4px",opacity:0.7}}><PixelIcon icon="person" color={S.bg} size={1.3}/>{publicOnlineCount}</span></span>
         <span style={{fontSize:"9px",opacity:0.8}}>{t.arenaDesc}</span>
       </button>
 
       {/* Two smaller buttons side by side */}
       <div style={{display:"flex",gap:"8px"}}>
-        <button onClick={()=>startSolo("normal",120)} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.green,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="5px 5px 0 #008844"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="3px 3px 0 #008844"}}>
+        <button onClick={()=>startSolo("normal",120)} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.green,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #008844"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844"}}>
           <span>{t.practice}</span>
           <span style={{fontSize:"8px",opacity:0.7}}>{t.practiceDesc}</span>
         </button>
-        <button onClick={async()=>{await sounds.init();setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.yellow,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translate(-2px,-2px)";e.currentTarget.style.boxShadow="5px 5px 0 #cc8800"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="3px 3px 0 #cc8800"}}>
+        <button onClick={async()=>{await sounds.init();setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.yellow,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #cc8800",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #cc8800"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #cc8800"}}>
           <span>{t.customGame}</span>
           <span style={{fontSize:"8px",opacity:0.7}}>{t.customDesc}</span>
         </button>
@@ -2680,7 +2704,7 @@ export default function Piilosana(){
         {t.advancedOptions}
       </button>
       {showMenuOptions&&(
-        <div style={{padding:"16px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"4px",animation:"fadeIn 0.3s ease"}}>
+        <div style={{padding:"16px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"4px",animation:"fadeIn 0.3s ease",borderRadius:S.panelRadius}}>
           <div style={{marginBottom:"12px"}}>
             <div style={{fontSize:"9px",color:S.green,marginBottom:"6px"}}>{t.gameMode}</div>
             <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap"}}>
@@ -2701,7 +2725,7 @@ export default function Piilosana(){
               {letterMult?"✓ ":""}{t.letterMultBtn}
             </button>
           </div>
-          <button onClick={()=>startSolo()} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 24px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",marginTop:"14px"}}>{t.practice}</button>
+          <button onClick={()=>startSolo()} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844",borderRadius:S.btnRadius,marginTop:"14px"}}>{t.practice}</button>
         </div>
       )}
 
@@ -2867,8 +2891,8 @@ export default function Piilosana(){
       {/* Word info modal */}
       {showWordInfo&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}} onClick={()=>setShowWordInfo(false)}>
-          <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"500px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative"}} onClick={e=>e.stopPropagation()}>
-            <button onClick={()=>setShowWordInfo(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+          <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"500px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative",borderRadius:S.panelRadius,boxShadow:S.panelShadow}} onClick={e=>e.stopPropagation()}>
+            <button onClick={()=>setShowWordInfo(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius}}>✕</button>
             <div style={{fontSize:"14px",color:S.green,marginBottom:"16px"}}>{t.wordInfoTitle}</div>
             <div style={{fontSize:"9px",color:S.green,lineHeight:"1.8",marginBottom:"12px"}}>{t.wordInfoBody1}</div>
             <div style={{fontSize:"9px",color:S.green,lineHeight:"1.8",marginBottom:"12px"}}>{t.wordInfoBody2}</div>
@@ -2899,8 +2923,8 @@ export default function Piilosana(){
       {/* Help / How to play modal */}
       {showHelp&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}} onClick={()=>setShowHelp(false)}>
-          <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"440px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative"}} onClick={e=>e.stopPropagation()}>
-            <button onClick={()=>setShowHelp(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+          <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"440px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative",borderRadius:S.panelRadius,boxShadow:S.panelShadow}} onClick={e=>e.stopPropagation()}>
+            <button onClick={()=>setShowHelp(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius}}>✕</button>
             <div style={{fontSize:"14px",color:S.green,marginBottom:"16px"}}>{t.howToPlay?.toUpperCase()}</div>
             <div style={{display:"flex",flexDirection:"column",gap:"14px",fontSize:"9px",color:S.green,lineHeight:"1.8"}}>
               <div><span style={{color:S.yellow}}>☝</span> {t.helpDrag}</div>
@@ -2950,7 +2974,7 @@ export default function Piilosana(){
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
 
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
-        <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={mode!==null&&settingsBubble} bubbleFading={bubbleFading} hideGear={mode===null}/>
+        <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={mode!==null&&settingsBubble} bubbleFading={bubbleFading} hideGear={mode===null} theme={S}/>
       ):(
         <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
           animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
@@ -2959,7 +2983,7 @@ export default function Piilosana(){
               cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",
               marginRight:"4px"}}>
               <PixelIcon icon="gear" color={gearBlend?S.yellow:"#88aacc"} size={1.7} style={{transition:"filter 2s ease"}}/></span>;
-            return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:"'Press Start 2P',monospace"}}>{ch}</span>;
+            return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:S.titleFont}}>{ch}</span>;
           });})()}
         </h1>
       )}
@@ -2986,7 +3010,7 @@ export default function Piilosana(){
           display:"flex",justifyContent:"center",alignItems:"flex-start",padding:"40px 16px",overflowY:"auto"}}
           onClick={(e)=>{if(e.target===e.currentTarget)setShowAchievements(false);}}>
           <div style={{width:"100%",maxWidth:"500px",background:S.dark,border:`2px solid #ffcc00`,
-            boxShadow:"0 0 30px #ffcc0033",padding:"20px",animation:"fadeIn 0.3s ease"}}>
+            boxShadow:S.panelShadow!=="none"?S.panelShadow:"0 0 30px #ffcc0033",borderRadius:S.panelRadius,padding:"20px",animation:"fadeIn 0.3s ease"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
               <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
                 <PixelIcon icon="trophy" color="#ffcc00" size={3} badge={true}/>
@@ -3042,7 +3066,7 @@ export default function Piilosana(){
       {/* Settings panel - overlay below title */}
       {showSettings&&(
         <div style={{width:"100%",maxWidth:"500px",padding:"18px",border:`2px solid ${S.green}`,background:S.dark,
-          boxShadow:`0 0 20px ${S.green}33`,animation:"fadeIn 0.3s ease",marginBottom:"8px",zIndex:100,position:"relative"}}>
+          boxShadow:S.panelShadow!=="none"?S.panelShadow:`0 0 20px ${S.green}33`,borderRadius:S.panelRadius,animation:"fadeIn 0.3s ease",marginBottom:"8px",zIndex:100,position:"relative"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
             <div style={{fontFamily:S.font,fontSize:"11px",color:S.yellow}}>
               {lang==="en"?"SETTINGS":lang==="sv"?"INSTÄLLNINGAR":"ASETUKSET"}
@@ -3061,7 +3085,8 @@ export default function Piilosana(){
                     color:themeId===id?th.bg:th.green,
                     background:themeId===id?th.green:"transparent",
                     border:`2px solid ${th.green}`,padding:"5px 8px",cursor:"pointer",
-                    boxShadow:themeId===id?`0 0 8px ${th.green}66`:"none"}}>
+                    boxShadow:themeId===id?`0 0 8px ${th.green}66`:"none",
+                    borderRadius:S.btnRadius}}>
                   {lang==="en"?th.nameEn:lang==="sv"?th.nameSv:th.name}
                 </button>
               ))}
@@ -3695,11 +3720,12 @@ export default function Piilosana(){
           <div style={{position:"relative"}}>
             <div ref={gRef}
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
-              style={{display:"grid",gridTemplateColumns:`repeat(${SZ},1fr)`,gap:isLarge?"6px":"4px",padding:isLarge?"8px":"6px",background:S.gridBg||"#111133",
+              style={{display:"grid",gridTemplateColumns:`repeat(${SZ},1fr)`,gap:S.gridGap!=="0px"?S.gridGap:isLarge?"6px":"4px",padding:isLarge?"8px":"6px",background:S.gridBg||"#111133",
                 border:`3px solid ${combo>=3&&state==="play"?S.yellow:ending?ending.color+"88":S.border}`,
                 boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:`0 0 30px ${S.green}22`,
                 touchAction:"none",
-                position:"relative"}}>
+                position:"relative",
+                borderRadius:S.cellRadius!=="0px"?"16px":"0px"}}>
               {(mode==="multi"?currentMultiGrid:grid).map((row,r)=>row.map((letter,c)=>{
                 const s=isSel(r,c);
                 const last=sel.length>0&&sel[sel.length-1].r===r&&sel[sel.length-1].c===c;
@@ -3728,12 +3754,13 @@ export default function Piilosana(){
                     onTouchStart={e=>{e.preventDefault();onDragStart(r,c);}}
                     style={{
                       width:"100%",aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",
-                      fontSize:isLarge?"clamp(34px,10vw,56px)":"clamp(28px,8vw,48px)",fontFamily:"'VT323',monospace",fontWeight:"normal",
+                      fontSize:isLarge?"clamp(34px,10vw,56px)":"clamp(28px,8vw,48px)",fontFamily:S.letterFont,fontWeight:S.cellGradient?"600":"normal",
                       color:eaten?endColor||"transparent":s?S.bg:otherSelColor||(letterMult?letterColor(letter,lang):S.green),
-                      background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":S.cell,
+                      background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":S.cellGradient?`linear-gradient(145deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
                       border:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
+                      borderRadius:S.cellRadius,
                       cursor:state==="play"?"pointer":"default",transition:"all 0.1s",
-                      boxShadow:eaten?"none":s?`0 0 12px ${S.green}66`:otherSelColor?`0 0 8px ${otherSelColor}44`:"none",
+                      boxShadow:eaten?"none":s?`0 0 12px ${S.green}66`:otherSelColor?`0 0 8px ${otherSelColor}44`:S.cellShadow,
                       textTransform:"uppercase",textShadow:s||eaten?"none":`0 0 8px ${otherSelColor||(letterMult?letterColor(letter,lang):S.green)}44`,
                       animation:eaten?endAnim:useDropAnim?`cellDrop 0.3s ${c*0.03}s ease-out`:"none",
                       "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
