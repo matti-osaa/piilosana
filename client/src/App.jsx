@@ -1565,7 +1565,7 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
       .catch(()=>{setScores([]);setLoading(false);});
   },[gameMode,gameTime,currentScore,lang]);
   if(!gameMode||!gameTime||gameTime===0)return null;
-  const label=gameMode==="tetris"?"Tetris":lang==="en"?"Normal":lang==="sv"?"Normal":"Normaali";
+  const label=gameMode==="tetris"?(lang==="en"?"Drop":lang==="sv"?"Fall":"Pudotus"):lang==="en"?"Normal":lang==="sv"?"Normal":"Normaali";
   const timeLabel=gameTime===120?"2 min":lang==="en"?"6.7 min":"6,7 min";
   const hofTitle=lang==="en"?"RECORDS":lang==="sv"?"REKORD":"ENNÄTYKSET";
   const hofLoading=lang==="en"?"Loading...":lang==="sv"?"Laddar...":"Ladataan...";
