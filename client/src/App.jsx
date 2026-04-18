@@ -525,65 +525,67 @@ function useSounds(soundTheme){
 // BACKGROUND MUSIC
 // ============================================
 const MUSIC_TRACKS={
-  ambient:[
-    // Gleba/Factorio inspired — slow evolving pads, atmospheric
-    {id:"sumu",name:{fi:"Sumu",en:"Fog",sv:"Dimma"},bpm:30,sub:"1n",melDur:"4m",bassDur:"4m",
-      melSynth:{oscillator:{type:"fatsine",count:3,spread:30},envelope:{attack:3,decay:2,sustain:0.7,release:4},volume:-20},
-      bassSynth:{oscillator:{type:"sine"},envelope:{attack:4,decay:2,sustain:0.6,release:5},volume:-26},
-      mel:[["A3","C4","E4"],null,null,null,["F3","A3","C4"],null,null,null,["C3","E3","G3"],null,null,null,["G3","B3","D4"],null,null,null,["A3","C4","E4"],null,null,null,["E3","G3","B3"],null,null,null,["F3","A3","C4"],null,null,null,["E3","G#3","B3"],null,null,null],
-      bass:["A1",null,null,null,"F1",null,null,null,"C2",null,null,null,"G1",null,null,null,"A1",null,null,null,"E2",null,null,null,"F1",null,null,null,"E1",null,null,null]},
-    // Deep space — ethereal, wider chords
-    {id:"avaruus",name:{fi:"Avaruus",en:"Space",sv:"Rymd"},bpm:25,sub:"1n",melDur:"4m",bassDur:"4m",
-      melSynth:{oscillator:{type:"fatsine",count:3,spread:40},envelope:{attack:4,decay:3,sustain:0.6,release:5},volume:-21},
-      bassSynth:{oscillator:{type:"sine"},envelope:{attack:5,decay:3,sustain:0.5,release:6},volume:-27},
-      mel:[["E3","G3","B3","F#4"],null,null,null,["D3","F#3","A3","C#4"],null,null,null,["C3","E3","G3","B3"],null,null,null,["B2","D3","F#3","A3"],null,null,null,["E3","G3","B3","D4"],null,null,null,["A2","C#3","E3","G#3"],null,null,null,["D3","F#3","A3","C#4"],null,null,null,["E3","G3","B3","F#4"],null,null,null],
-      bass:["E1",null,null,null,"D1",null,null,null,"C1",null,null,null,"B0",null,null,null,"E1",null,null,null,"A0",null,null,null,"D1",null,null,null,"E1",null,null,null]},
-    // Depths — minimal dark drone
-    {id:"syvyys",name:{fi:"Syvyys",en:"Depths",sv:"Djup"},bpm:22,sub:"1n",melDur:"4m",bassDur:"4m",
-      melSynth:{oscillator:{type:"fatsine",count:2,spread:15},envelope:{attack:5,decay:4,sustain:0.5,release:6},volume:-22},
-      bassSynth:{oscillator:{type:"sine"},envelope:{attack:6,decay:4,sustain:0.4,release:8},volume:-25},
-      mel:[["A2","E3"],null,null,null,null,null,["A2","C3"],null,null,null,null,null,["E2","B2"],null,null,null,null,null,["E2","G2"],null,null,null,null,null,["A2","E3"],null,null,null,null,null,["D2","A2"],null,null,null,null,null],
-      bass:["A0",null,null,null,null,null,"A0",null,null,null,null,null,"E0",null,null,null,null,null,"E0",null,null,null,null,null,"A0",null,null,null,null,null,"D0",null,null,null,null,null]},
-  ],
-  acoustic:[
-    // Kitaro / Mandala inspired — pentatonic meditation, plucked strings
-    {id:"mandala",name:{fi:"Mandala",en:"Mandala",sv:"Mandala"},bpm:50,sub:"4n",melDur:"2n",bassDur:"4m",
-      melSynth:{oscillator:{type:"triangle"},envelope:{attack:0.01,decay:1.8,sustain:0,release:2.5},volume:-18},
-      bassSynth:{oscillator:{type:"sine"},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-26},
-      mel:["A4",null,null,null,"C5",null,null,null,null,null,"E5",null,"D5",null,null,null,null,null,"C5",null,"A4",null,null,null,null,null,"G4",null,null,null,"A4",null,null,null,null,null,"E5",null,null,null,"D5",null,null,null,"C5",null,null,null],
-      bass:["A2",null,null,null,null,null,null,null,null,null,null,null,"A2",null,null,null,null,null,null,null,null,null,null,null,"E2",null,null,null,null,null,null,null,null,null,null,null,"A2",null,null,null,null,null,null,null,null,null,null,null]},
-    // Zen garden — D pentatonic, very sparse
-    {id:"zen",name:{fi:"Zen",en:"Zen",sv:"Zen"},bpm:44,sub:"4n",melDur:"2n",bassDur:"4m",
-      melSynth:{oscillator:{type:"triangle"},envelope:{attack:0.01,decay:2.2,sustain:0,release:3},volume:-17},
-      bassSynth:{oscillator:{type:"sine"},envelope:{attack:4,decay:2,sustain:0.4,release:5},volume:-27},
-      mel:[null,null,"D5",null,null,null,null,null,"A4",null,null,null,null,null,null,null,"G4",null,null,null,"F4",null,null,null,null,null,"D4",null,null,null,null,null,null,null,"A4",null,null,null,null,null,"D5",null,null,null,null,null,"C5",null],
-      bass:["D2",null,null,null,null,null,null,null,null,null,null,null,"D2",null,null,null,null,null,null,null,null,null,null,null,"A1",null,null,null,null,null,null,null,null,null,null,null,"D2",null,null,null,null,null,null,null,null,null,null,null]},
-    // Silk Road — eastern pentatonic with harmonics
-    {id:"silkki",name:{fi:"Silkkitie",en:"Silk Road",sv:"Sidenvägen"},bpm:48,sub:"4n",melDur:"2n",bassDur:"4m",
-      melSynth:{oscillator:{type:"triangle"},envelope:{attack:0.02,decay:2,sustain:0,release:2.5},volume:-17},
-      bassSynth:{oscillator:{type:"fatsine",count:2,spread:10},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-25},
-      mel:["E5",null,null,null,"B4",null,null,null,null,null,"A4",null,"E4",null,null,null,null,null,"G4",null,null,null,"A4",null,"B4",null,null,null,null,null,null,null,"E5",null,null,null,"D5",null,null,null,"B4",null,null,null,"A4",null,null,null],
-      bass:["E2",null,null,null,null,null,null,null,null,null,null,null,"E2",null,null,null,null,null,null,null,null,null,null,null,"A1",null,null,null,null,null,null,null,null,null,null,null,"E2",null,null,null,null,null,null,null,null,null,null,null]},
-  ],
   electronic:[
-    // Moby "Porcelain" inspired — warm pads + sparse emotional melody
-    {id:"porcelain",name:{fi:"Posliini",en:"Porcelain",sv:"Porslin"},bpm:72,sub:"4n",melDur:"2n",bassDur:"4m",
-      melSynth:{oscillator:{type:"fatsine",count:2,spread:15},envelope:{attack:0.05,decay:1.5,sustain:0.1,release:2},volume:-18},
-      bassSynth:{oscillator:{type:"fatsine",count:3,spread:25},envelope:{attack:3,decay:2,sustain:0.6,release:4},volume:-23},
-      mel:[null,null,null,null,"E5",null,null,null,null,null,"D5",null,"C5",null,null,null,null,null,null,null,"B4",null,null,null,null,null,"A4",null,null,null,null,null,"G4",null,null,null,null,null,null,null,"A4",null,null,null,null,null,null,null],
-      bass:[["A3","C4","E4"],null,null,null,null,null,null,null,["E3","G3","B3"],null,null,null,null,null,null,null,["F3","A3","C4"],null,null,null,null,null,null,null,["C3","E3","G3"],null,null,null,null,null,null,null,["A3","C4","E4"],null,null,null,null,null,null,null,["E3","G3","B3"],null,null,null,null,null,null,null]},
-    // Moby "Everloving" style — gentle pulse + floating notes
-    {id:"aalto",name:{fi:"Aalto",en:"Wave",sv:"Våg"},bpm:68,sub:"4n",melDur:"2n",bassDur:"4m",
-      melSynth:{oscillator:{type:"fatsine",count:2,spread:12},envelope:{attack:0.08,decay:1.2,sustain:0.15,release:2},volume:-19},
-      bassSynth:{oscillator:{type:"fatsine",count:3,spread:20},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-24},
-      mel:[null,null,"E4",null,null,null,null,null,"G4",null,null,null,"A4",null,null,null,null,null,null,null,"B4",null,null,null,null,null,"A4",null,"G4",null,null,null,null,null,"E4",null,null,null,null,null,"D4",null,null,null,null,null,null,null],
-      bass:[["D3","F3","A3"],null,null,null,null,null,null,null,null,null,null,null,["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,["Bb2","D3","F3"],null,null,null,null,null,null,null,null,null,null,null,["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null]},
-    // Natural ambient electronic — Moby "God Moving Over the Face of the Waters" style
-    {id:"horisontti",name:{fi:"Horisontti",en:"Horizon",sv:"Horisont"},bpm:60,sub:"4n",melDur:"2n",bassDur:"4m",
-      melSynth:{oscillator:{type:"sine"},envelope:{attack:0.1,decay:2,sustain:0.2,release:3},volume:-17},
-      bassSynth:{oscillator:{type:"fatsine",count:3,spread:30},envelope:{attack:4,decay:3,sustain:0.5,release:5},volume:-22},
-      mel:[null,null,null,null,"C5",null,null,null,null,null,null,null,"G4",null,null,null,null,null,"A4",null,null,null,null,null,null,null,null,null,"F4",null,null,null,null,null,null,null,"G4",null,null,null,null,null,null,null,"C5",null,null,null],
-      bass:[["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,["D3","F3","A3"],null,null,null,null,null,null,null,null,null,null,null,["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null]},
+    // "Posliini" — warm descending melody with resolve, Cmaj/Am world
+    {id:"porcelain",name:{fi:"Posliini",en:"Porcelain",sv:"Porslin"},bpm:74,sub:"8n",melDur:"4n",bassDur:"2m",
+      melSynth:{oscillator:{type:"fatsine",count:3,spread:20},envelope:{attack:0.03,decay:0.8,sustain:0.2,release:1.5},volume:-16},
+      bassSynth:{oscillator:{type:"fatsine",count:3,spread:25},envelope:{attack:2,decay:1.5,sustain:0.6,release:3},volume:-23},
+      mel:[null,null,"E5",null,"G5",null,"A5",null,null,null,"G5",null,"E5",null,null,null,
+           null,null,"D5",null,"E5",null,"G5",null,null,null,"E5",null,"D5",null,"C5",null,
+           null,null,"A4",null,"C5",null,"E5",null,null,null,"D5",null,"C5",null,null,null,
+           null,null,"B4",null,"C5",null,"D5",null,null,null,"E5",null,null,null,null,null],
+      bass:[["A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G3","B3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+    // "Aalto" — rising hopeful melody, Em→G→D→C, gentle pulse
+    {id:"aalto",name:{fi:"Aalto",en:"Wave",sv:"Våg"},bpm:70,sub:"8n",melDur:"4n",bassDur:"2m",
+      melSynth:{oscillator:{type:"fatsine",count:2,spread:15},envelope:{attack:0.04,decay:0.9,sustain:0.15,release:1.8},volume:-17},
+      bassSynth:{oscillator:{type:"fatsine",count:3,spread:22},envelope:{attack:2.5,decay:2,sustain:0.5,release:3.5},volume:-24},
+      mel:[null,null,"B4",null,"D5",null,null,null,"E5",null,"G5",null,"F#5",null,"E5",null,
+           null,null,"D5",null,null,null,"B4",null,"A4",null,null,null,"B4",null,"D5",null,
+           null,null,"G5",null,"F#5",null,"E5",null,null,null,"D5",null,"E5",null,null,null,
+           null,null,"B4",null,"A4",null,null,null,"G4",null,null,null,"A4",null,"B4",null],
+      bass:[["E3","G3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G3","B3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["D3","F#3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+    // "Horisontti" — wide cinematic, resolving phrases, F→C→Am→G
+    {id:"horisontti",name:{fi:"Horisontti",en:"Horizon",sv:"Horisont"},bpm:66,sub:"8n",melDur:"4n",bassDur:"2m",
+      melSynth:{oscillator:{type:"fatsine",count:2,spread:18},envelope:{attack:0.05,decay:1.2,sustain:0.2,release:2},volume:-16},
+      bassSynth:{oscillator:{type:"fatsine",count:3,spread:28},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-22},
+      mel:[null,null,"C5",null,"E5",null,"F5",null,null,null,"E5",null,"C5",null,"D5",null,
+           null,null,"E5",null,null,null,"G5",null,"A5",null,null,null,"G5",null,"E5",null,
+           null,null,"F5",null,"E5",null,"D5",null,null,null,"C5",null,"D5",null,"E5",null,
+           null,null,"D5",null,"B4",null,null,null,"C5",null,null,null,null,null,null,null],
+      bass:[["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G2","B2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+    // "Kaiku" — echo-like repeating motifs, Am pentatonic, hypnotic
+    {id:"kaiku",name:{fi:"Kaiku",en:"Echo",sv:"Eko"},bpm:76,sub:"8n",melDur:"4n.",bassDur:"2m",
+      melSynth:{oscillator:{type:"fatsine",count:2,spread:12},envelope:{attack:0.02,decay:0.7,sustain:0.1,release:1.5},volume:-17},
+      bassSynth:{oscillator:{type:"fatsine",count:3,spread:20},envelope:{attack:2,decay:1.5,sustain:0.5,release:3},volume:-24},
+      mel:["E5",null,"A5",null,"G5",null,"E5",null,null,null,"D5",null,"E5",null,null,null,
+           "C5",null,"E5",null,"D5",null,"C5",null,null,null,"A4",null,"C5",null,null,null,
+           "E5",null,"A5",null,"G5",null,"E5",null,null,null,"G5",null,"A5",null,null,null,
+           "C5",null,"D5",null,"E5",null,null,null,"D5",null,"C5",null,"A4",null,null,null],
+      bass:[["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["F2","A2","C3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G2","B2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+    // "Revontuli" — shimmering aurora, Dmaj7→Amaj7, dreamy resolution
+    {id:"revontuli",name:{fi:"Revontuli",en:"Aurora",sv:"Norrsken"},bpm:64,sub:"8n",melDur:"4n",bassDur:"2m",
+      melSynth:{oscillator:{type:"fatsine",count:3,spread:25},envelope:{attack:0.06,decay:1,sustain:0.2,release:2},volume:-16},
+      bassSynth:{oscillator:{type:"fatsine",count:3,spread:30},envelope:{attack:3,decay:2,sustain:0.6,release:4},volume:-23},
+      mel:[null,null,"F#5",null,"A5",null,null,null,"E5",null,"D5",null,null,null,"C#5",null,
+           null,null,"D5",null,"E5",null,"F#5",null,null,null,"A5",null,"G5",null,"F#5",null,
+           null,null,"E5",null,"C#5",null,"D5",null,null,null,"E5",null,null,null,"F#5",null,
+           null,null,"D5",null,"C#5",null,null,null,"D5",null,null,null,null,null,null,null],
+      bass:[["D3","F#3","A3","C#4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["A2","C#3","E3","G#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["B2","D3","F#3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+            ["G2","B2","D3","F#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
   ]
 };
 
@@ -2952,7 +2954,7 @@ export default function Piilosana(){
               {lang==="en"?"MUSIC":lang==="sv"?"MUSIK":"MUSIIKKI"}
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
-              {[["ambient",{fi:"AMBIENT",en:"AMBIENT",sv:"AMBIENT"}],["acoustic",{fi:"AKUSTINEN",en:"ACOUSTIC",sv:"AKUSTISK"}],["electronic",{fi:"ELEKTRONINEN",en:"ELECTRONIC",sv:"ELEKTRONISK"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
+              {[["electronic",{fi:"PÄÄLLÄ",en:"ON",sv:"PÅ"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
                 <button key={id} onClick={()=>{setMusicTheme(id);localStorage.setItem("piilosana_music",id);syncSettings({music:id});}}
                   style={{fontFamily:S.font,fontSize:"8px",
                     color:musicTheme===id?S.bg:S.green,background:musicTheme===id?S.green:"transparent",
