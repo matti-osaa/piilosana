@@ -2425,7 +2425,7 @@ export default function Piilosana(){
       </div>}
       {mode===null&&flagBubble&&(
         <div style={{width:"100%",maxWidth:"600px",
-          animation:flagBubbleFading?"bubbleOut 0.6s ease-in forwards":"bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
+          animation:flagBubbleFading?"flagBubbleOut 0.6s ease-in forwards":"flagBubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
           zIndex:50,marginBottom:"4px"}}>
           <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
             fontSize:"8px",padding:"8px 12px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
@@ -2466,6 +2466,8 @@ export default function Piilosana(){
         @keyframes cellPop{0%{transform:scale(1)}50%{transform:scale(0);opacity:0}100%{transform:scale(0);opacity:0}}
         @keyframes bubbleIn{0%{opacity:0;transform:translateX(-50%) translateY(8px) scale(0.3)}30%{opacity:1;transform:translateX(-50%) translateY(-4px) scale(1.05)}50%{transform:translateX(-50%) translateY(2px) scale(0.97)}70%{transform:translateX(-50%) translateY(-1px) scale(1.01)}100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
         @keyframes bubbleOut{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}40%{opacity:0.8;transform:translateX(-50%) translateY(-3px) scale(1.03)}100%{opacity:0;transform:translateX(-50%) translateY(10px) scale(0.3)}}
+        @keyframes flagBubbleIn{0%{opacity:0;transform:translateY(8px) scale(0.3)}30%{opacity:1;transform:translateY(-4px) scale(1.05)}50%{transform:translateY(2px) scale(0.97)}70%{transform:translateY(-1px) scale(1.01)}100%{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes flagBubbleOut{0%{opacity:1;transform:translateY(0) scale(1)}40%{opacity:0.8;transform:translateY(-3px) scale(1.03)}100%{opacity:0;transform:translateY(10px) scale(0.3)}}
         @keyframes bubbleFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
         @keyframes floatUnicorn{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-20px) rotate(5deg)}}
         @keyframes scanlines{0%,100%{opacity:1}}
