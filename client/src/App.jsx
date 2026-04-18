@@ -104,6 +104,15 @@ const T={
     achievements:"SAAVUTUKSET",achievementUnlocked:"Uusi saavutus!",locked:"Lukittu",
     share:"JAA TULOS",shareCopied:"Kopioitu!",shareText:"Piilosana — löysin {words} sanaa ja sain {score} pistettä! Pääsetkö parempaan?",
     options:"ASETUKSET",quickPlay:"PELAA",or:"tai",advancedOptions:"Lisävalinnat",
+    readMoreWords:"Lue lisää sanoista",
+    wordInfoTitle:"SANALISTASTA",
+    wordInfoBody1:"Sanalistassa on perusmuotoja, taivutuksia, yhdyssanoja, erisnimiä ja lyhenteitä.",
+    wordInfoBody2:"Suomen kielelle sanoja on paljon, koska suomen rikas taivutusjärjestelmä tuottaa saman sanan monessa muodossa (esim. talo → taloa, talossa, talojen, taloihin...).",
+    wordInfoBody3:"Lyhenteet kuten SDP, NATO tai EU ovat mukana pienaakkosina.",
+    wordInfoSources:"Lähteet",
+    wordInfoSourceFi:"Kotus — Kotimaisten kielten keskus (nykysuomen sanalista)",
+    wordInfoSourceEn:"SOWPODS / Collins Scrabble Words",
+    wordInfoSourceSv:"SAOL — Svenska Akademiens ordlista",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -137,6 +146,15 @@ const T={
     achievements:"ACHIEVEMENTS",achievementUnlocked:"New achievement!",locked:"Locked",
     share:"SHARE",shareCopied:"Copied!",shareText:"Piilosana — I found {words} words and scored {score} points! Can you beat me?",
     options:"SETTINGS",quickPlay:"PLAY",or:"or",advancedOptions:"More options",
+    readMoreWords:"Read more about the words",
+    wordInfoTitle:"ABOUT THE WORD LIST",
+    wordInfoBody1:"The word list includes base forms, inflections, compound words, proper nouns and abbreviations.",
+    wordInfoBody2:"The Finnish list is especially large because Finnish has a rich inflection system that produces many forms of each word (e.g. talo → taloa, talossa, talojen, taloihin...).",
+    wordInfoBody3:"Abbreviations like SDP, NATO or EU are included in lowercase.",
+    wordInfoSources:"Sources",
+    wordInfoSourceFi:"Kotus — Institute for the Languages of Finland (modern Finnish word list)",
+    wordInfoSourceEn:"SOWPODS / Collins Scrabble Words",
+    wordInfoSourceSv:"SAOL — Swedish Academy Glossary",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -170,6 +188,15 @@ const T={
     achievements:"PRESTATIONER",achievementUnlocked:"Ny prestation!",locked:"Låst",
     share:"DELA",shareCopied:"Kopierat!",shareText:"Piilosana — jag hittade {words} ord och fick {score} poäng! Kan du slå mig?",
     options:"INSTÄLLNINGAR",quickPlay:"SPELA",or:"eller",advancedOptions:"Fler alternativ",
+    readMoreWords:"Läs mer om orden",
+    wordInfoTitle:"OM ORDLISTAN",
+    wordInfoBody1:"Ordlistan innehåller grundformer, böjningar, sammansatta ord, egennamn och förkortningar.",
+    wordInfoBody2:"Den finska listan är särskilt stor eftersom finska har ett rikt böjningssystem som ger många former av varje ord (t.ex. talo → taloa, talossa, talojen, taloihin...).",
+    wordInfoBody3:"Förkortningar som SDP, NATO eller EU ingår med små bokstäver.",
+    wordInfoSources:"Källor",
+    wordInfoSourceFi:"Kotus — Institutet för de inhemska språken (modern finsk ordlista)",
+    wordInfoSourceEn:"SOWPODS / Collins Scrabble Words",
+    wordInfoSourceSv:"SAOL — Svenska Akademiens ordlista",
   },
 };
 
@@ -1201,6 +1228,7 @@ export default function Piilosana(){
   const[bubbleFading,setBubbleFading]=useState(false);
   const[flagBubble,setFlagBubble]=useState(false);
   const[flagBubbleFading,setFlagBubbleFading]=useState(false);
+  const[showWordInfo,setShowWordInfo]=useState(false);
   const[gearBlend,setGearBlend]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
 
@@ -2287,7 +2315,8 @@ export default function Piilosana(){
       {/* Footer */}
       <div style={{marginTop:"24px"}}>
         <div style={{fontSize:"12px",color:"#445",marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString()} {t.words}</div>
-        <div style={{fontSize:"9px",color:"#334"}}>v{VERSION} · © Matti Kuokkanen 2026</div>
+        <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
+        <div style={{fontSize:"9px",color:"#334",marginTop:"4px"}}>v{VERSION} · © Matti Kuokkanen 2026</div>
         <div style={{fontSize:"9px",marginTop:"4px",display:"flex",gap:"10px",justifyContent:"center"}}>
           <a href="mailto:info@piilosana.com" style={{color:"#445",textDecoration:"none"}}>{lang==="en"?"Feedback":lang==="sv"?"Feedback":"Palaute"}</a>
           <a href="/privacy" style={{color:"#445",textDecoration:"none"}}>{lang==="en"?"Privacy":lang==="sv"?"Integritet":"Tietosuoja"}</a>
@@ -2436,6 +2465,38 @@ export default function Piilosana(){
             <div style={{position:"absolute",top:"-5px",left:"22px",
               width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #ffffff"}}/>
             {lang==="en"?"Play in different languages!":lang==="sv"?"Spela på olika språk!":"Pelaa eri kielillä!"}
+          </div>
+        </div>
+      )}
+      {/* Word info modal */}
+      {showWordInfo&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}} onClick={()=>setShowWordInfo(false)}>
+          <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"500px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative"}} onClick={e=>e.stopPropagation()}>
+            <button onClick={()=>setShowWordInfo(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+            <div style={{fontSize:"14px",color:S.green,marginBottom:"16px"}}>{t.wordInfoTitle}</div>
+            <div style={{fontSize:"9px",color:S.green,lineHeight:"1.8",marginBottom:"12px"}}>{t.wordInfoBody1}</div>
+            <div style={{fontSize:"9px",color:S.green,lineHeight:"1.8",marginBottom:"12px"}}>{t.wordInfoBody2}</div>
+            <div style={{fontSize:"9px",color:S.green,lineHeight:"1.8",marginBottom:"16px"}}>{t.wordInfoBody3}</div>
+            <div style={{fontSize:"9px",color:S.green,marginBottom:"8px",borderTop:`1px solid ${S.border}`,paddingTop:"12px"}}>
+              <div style={{marginBottom:"8px",color:S.yellow}}>{t.wordInfoSources}:</div>
+              <div style={{display:"flex",flexDirection:"column",gap:"6px"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}>
+                  <span>🇫🇮</span>
+                  <span style={{flex:1,marginLeft:"8px"}}>{t.wordInfoSourceFi}</span>
+                  <span style={{color:"#556",marginLeft:"8px"}}>{LANG_CONFIG.fi.words.size.toLocaleString()}</span>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}>
+                  <span>🇬🇧</span>
+                  <span style={{flex:1,marginLeft:"8px"}}>{t.wordInfoSourceEn}</span>
+                  <span style={{color:"#556",marginLeft:"8px"}}>{LANG_CONFIG.en.words.size.toLocaleString()}</span>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}>
+                  <span>🇸🇪</span>
+                  <span style={{flex:1,marginLeft:"8px"}}>{t.wordInfoSourceSv}</span>
+                  <span style={{color:"#556",marginLeft:"8px"}}>{LANG_CONFIG.sv.words.size.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
