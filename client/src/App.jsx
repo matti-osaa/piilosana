@@ -1989,7 +1989,7 @@ export default function Piilosana(){
 
   // Global button sound — plays on any <button> tap
   useEffect(()=>{
-    const handler=async(e)=>{if(e.target.closest("button")){setAudioStarted(true);await sounds.init();sounds.playBtn();}};
+    const handler=(e)=>{if(e.target.closest("button")){setAudioStarted(true);sounds.init().then(()=>sounds.playBtn()).catch(()=>{});}};
     document.addEventListener("pointerdown",handler,true);
     return()=>document.removeEventListener("pointerdown",handler,true);
   },[sounds]);
@@ -2007,7 +2007,7 @@ export default function Piilosana(){
   },[]);
 
   const startSolo=useCallback(async(overrideMode,overrideTime)=>{
-    await sounds.init();
+    sounds.init().catch(()=>{});
     const gt=overrideTime!==undefined?overrideTime:gameTime;
     let bg=null,bw=new Set();
     for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=findWords(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
@@ -2640,7 +2640,7 @@ export default function Piilosana(){
   const switchToMulti=useCallback(async()=>{
     if(socket)socket.disconnect();
     setSocket(null);
-    await sounds.init();
+    sounds.init().catch(()=>{});
     setMode("multi");
     setPlayers([]);
     setRoomCode("");
