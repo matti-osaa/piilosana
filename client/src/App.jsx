@@ -113,6 +113,12 @@ const T={
     wordInfoSourceFi:"Kotus — nykysuomen sanalista + Joukahainen/Voikko (taivutusmuodot)",
     wordInfoSourceEn:"SOWPODS / Collins Scrabble Words",
     wordInfoSourceSv:"SAOL — Svenska Akademiens ordlista",
+    howToPlay:"Näin pelaat",
+    helpDrag:"Vedä sormella tai hiirellä kirjainten yli muodostaaksesi sanoja. Voit liikkua kaikkiin suuntiin, myös vinottain.",
+    helpTime:"Sinulla on 2 minuuttia aikaa löytää mahdollisimman monta sanaa.",
+    helpScoring:"Pisteytys: 3 kirjainta = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7+ = 10p",
+    helpCombo:"Löydä sanoja nopeasti peräkkäin → combo! 3+ peräkkäin = x2, 5+ = x3 pisteet.",
+    helpMultiplier:"Kultaiset kirjaimet antavat 2× tai 3× pistekertoimen sanaan.",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -155,6 +161,12 @@ const T={
     wordInfoSourceFi:"Kotus — modern Finnish word list + Joukahainen/Voikko (inflections)",
     wordInfoSourceEn:"SOWPODS / Collins Scrabble Words",
     wordInfoSourceSv:"SAOL — Swedish Academy Glossary",
+    howToPlay:"How to play",
+    helpDrag:"Drag your finger or mouse across letters to form words. You can move in all directions, including diagonally.",
+    helpTime:"You have 2 minutes to find as many words as possible.",
+    helpScoring:"Scoring: 3 letters = 1pt · 4 = 2pt · 5 = 4pt · 6 = 6pt · 7+ = 10pt",
+    helpCombo:"Find words quickly in a row → combo! 3+ in a row = x2, 5+ = x3 points.",
+    helpMultiplier:"Golden letters give a 2× or 3× score multiplier for the word.",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -197,6 +209,12 @@ const T={
     wordInfoSourceFi:"Kotus — modern finsk ordlista + Joukahainen/Voikko (böjningsformer)",
     wordInfoSourceEn:"SOWPODS / Collins Scrabble Words",
     wordInfoSourceSv:"SAOL — Svenska Akademiens ordlista",
+    howToPlay:"Så spelar du",
+    helpDrag:"Dra fingret eller musen över bokstäver för att bilda ord. Du kan röra dig i alla riktningar, även diagonalt.",
+    helpTime:"Du har 2 minuter på dig att hitta så många ord som möjligt.",
+    helpScoring:"Poäng: 3 bokstäver = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7+ = 10p",
+    helpCombo:"Hitta ord snabbt i rad → kombo! 3+ i rad = x2, 5+ = x3 poäng.",
+    helpMultiplier:"Gyllene bokstäver ger 2× eller 3× poängmultiplikator för ordet.",
   },
 };
 
@@ -1583,6 +1601,7 @@ export default function Piilosana(){
   const[flagBubble,setFlagBubble]=useState(false);
   const[flagBubbleFading,setFlagBubbleFading]=useState(false);
   const[showWordInfo,setShowWordInfo]=useState(false);
+  const[showHelp,setShowHelp]=useState(false);
   const[gearBlend,setGearBlend]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
 
@@ -2685,7 +2704,10 @@ export default function Piilosana(){
       {/* Footer */}
       <div style={{marginTop:"24px"}}>
         <div style={{fontSize:"12px",color:"#445",marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString()} {t.words}</div>
-        <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
+        <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
+          <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.howToPlay}</button>
+          <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
+        </div>
         <div style={{fontSize:"9px",color:"#334",marginTop:"4px"}}>v{VERSION} · © Matti Kuokkanen 2026</div>
         <div style={{fontSize:"9px",marginTop:"4px",display:"flex",gap:"10px",justifyContent:"center"}}>
           <a href="mailto:info@piilosana.com" style={{color:"#445",textDecoration:"none"}}>{lang==="en"?"Feedback":lang==="sv"?"Feedback":"Palaute"}</a>
@@ -2866,6 +2888,22 @@ export default function Piilosana(){
                   <span style={{color:"#556",marginLeft:"8px"}}>{LANG_CONFIG.sv.words.size.toLocaleString()}</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Help / How to play modal */}
+      {showHelp&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}} onClick={()=>setShowHelp(false)}>
+          <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"440px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative"}} onClick={e=>e.stopPropagation()}>
+            <button onClick={()=>setShowHelp(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+            <div style={{fontSize:"14px",color:S.green,marginBottom:"16px"}}>{t.howToPlay?.toUpperCase()}</div>
+            <div style={{display:"flex",flexDirection:"column",gap:"14px",fontSize:"9px",color:S.green,lineHeight:"1.8"}}>
+              <div><span style={{color:S.yellow}}>☝</span> {t.helpDrag}</div>
+              <div><span style={{color:S.yellow}}>⏱</span> {t.helpTime}</div>
+              <div><span style={{color:S.yellow}}>⭐</span> {t.helpScoring}</div>
+              <div><span style={{color:S.yellow}}>🔥</span> {t.helpCombo}</div>
+              <div><span style={{color:S.yellow}}>✦</span> {t.helpMultiplier}</div>
             </div>
           </div>
         </div>
