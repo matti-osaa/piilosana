@@ -521,6 +521,97 @@ function useSounds(soundTheme){
 }
 
 // ============================================
+// BACKGROUND MUSIC
+// ============================================
+const MUSIC_TRACKS={
+  classical:[
+    {id:"furelise",name:{fi:"Für Elise",en:"Für Elise",sv:"Für Elise"},bpm:72,sub:"8n",melDur:"4n",bassDur:"2n",
+      melSynth:{oscillator:{type:"sine"},envelope:{attack:0.08,decay:0.4,sustain:0.3,release:0.8},volume:-18},
+      bassSynth:{oscillator:{type:"sine"},envelope:{attack:0.1,decay:0.5,sustain:0.2,release:1},volume:-24},
+      mel:["E5","D#5","E5","D#5","E5","B4","D5","C5","A4",null,"C4","E4","A4",null,null,null,"B4",null,"E4","G#4","B4",null,null,null,"C5",null,null,"E5","D#5","E5","D#5","E5","B4","D5","C5","A4",null,"C4","E4","A4","B4",null,"E4","C5","B4","A4",null,null,null],
+      bass:["A2",null,null,"E3",null,null,"A2",null,null,"E3",null,null,"E2",null,null,"B2",null,null,"A2",null,null,"E3",null,null,"A2",null,null,"E3",null,null,"A2",null,null,"E3",null,null,"E2",null,null,"B2",null,null,"A2",null,null,"E2",null,null]},
+    {id:"gymnopedie",name:{fi:"Gymnopédie",en:"Gymnopédie",sv:"Gymnopédie"},bpm:70,sub:"4n",melDur:"2n.",bassDur:"4n",
+      melSynth:{oscillator:{type:"sine"},envelope:{attack:0.15,decay:0.6,sustain:0.4,release:1.2},volume:-16},
+      bassSynth:{oscillator:{type:"sine"},envelope:{attack:0.08,decay:0.4,sustain:0.15,release:0.6},volume:-22},
+      mel:[null,null,null,null,null,null,"F#5",null,null,"E5",null,null,null,"F#5","E5","D5",null,null,"C#5",null,null,null,null,null,"D5",null,null,"E5",null,null,"F#5",null,null,"A5",null,null,"G5",null,null,"F#5",null,null,"E5",null,null,"D5",null,null],
+      bass:["D3",["F#3","A3"],["F#3","A3"],"G3",["B3","D4"],["B3","D4"],"D3",["F#3","A3"],["F#3","A3"],"G3",["B3","D4"],["B3","D4"],"D3",["F#3","A3"],["F#3","A3"],"G3",["B3","D4"],["B3","D4"],"B2",["D3","F#3"],["D3","F#3"],"A2",["C#3","E3"],["C#3","E3"],"D3",["F#3","A3"],["F#3","A3"],"G3",["B3","D4"],["B3","D4"],"D3",["F#3","A3"],["F#3","A3"],"G3",["B3","D4"],["B3","D4"],"B2",["D3","F#3"],["D3","F#3"],"A2",["C#3","E3"],["C#3","E3"],"D3",["F#3","A3"],["F#3","A3"],"G3",["B3","D4"],["B3","D4"]]},
+    {id:"canon",name:{fi:"Kaanon D-duuri",en:"Canon in D",sv:"Kanon i D"},bpm:58,sub:"8n",melDur:"4n",bassDur:"2n",
+      melSynth:{oscillator:{type:"sine"},envelope:{attack:0.1,decay:0.4,sustain:0.3,release:0.8},volume:-17},
+      bassSynth:{oscillator:{type:"sine"},envelope:{attack:0.08,decay:0.5,sustain:0.2,release:0.8},volume:-23},
+      mel:["F#5",null,"E5",null,"D5",null,"C#5",null,"B4",null,"A4",null,"B4",null,"C#5",null,"D5",null,"C#5",null,"B4",null,"A4",null,"G4",null,"F#4",null,"G4",null,"A4",null,"F#5",null,"A5",null,"G5",null,"F#5",null,"E5",null,"D5",null,"E5",null,"F#5",null,"D5",null,"E5",null,"C#5",null,"D5",null,"B4",null,"A4",null,"B4",null,"G4",null,"A4",null],
+      bass:["D3",null,null,null,"A2",null,null,null,"B2",null,null,null,"F#2",null,null,null,"G2",null,null,null,"D2",null,null,null,"G2",null,null,null,"A2",null,null,null,"D3",null,null,null,"A2",null,null,null,"B2",null,null,null,"F#2",null,null,null,"G2",null,null,null,"D2",null,null,null,"G2",null,null,null,"A2",null,null,null]},
+  ],
+  electronic:[
+    {id:"pixelpop",name:{fi:"Pixel Pop",en:"Pixel Pop",sv:"Pixel Pop"},bpm:128,sub:"8n",melDur:"8n",bassDur:"4n",
+      melSynth:{oscillator:{type:"square"},envelope:{attack:0.01,decay:0.15,sustain:0.1,release:0.2},volume:-20},
+      bassSynth:{oscillator:{type:"sawtooth4"},envelope:{attack:0.01,decay:0.2,sustain:0.1,release:0.2},volume:-24},
+      mel:["C5","Eb5","G5","Eb5","F5","D5","Eb5","C5","Bb4",null,"C5","D5","Eb5","D5","C5","Bb4","Ab4","Bb4","C5","Eb5","D5","C5","Bb4","Ab4","G4",null,null,null,"G4","Bb4","C5","D5","C5","Eb5","G5","Eb5","F5","D5","Eb5","C5","Bb4",null,"C5","D5","Eb5","F5","G5",null,"Ab5","G5","F5","Eb5","D5","C5","Bb4","C5","C5",null,null,null,null,null,null,null],
+      bass:["C3",null,null,null,"G3",null,null,null,"Ab3",null,null,null,"Bb3",null,null,null,"C3",null,null,null,"G3",null,null,null,"Ab3",null,null,null,"G3",null,null,null,"C3",null,null,null,"G3",null,null,null,"Ab3",null,null,null,"Bb3",null,null,null,"F3",null,null,null,"G3",null,null,null,"Ab3",null,"G3",null,"C3",null,null,null]},
+    {id:"neon",name:{fi:"Neon",en:"Neon",sv:"Neon"},bpm:110,sub:"8n",melDur:"8n",bassDur:"4n",
+      melSynth:{oscillator:{type:"triangle"},envelope:{attack:0.03,decay:0.25,sustain:0.15,release:0.35},volume:-19},
+      bassSynth:{oscillator:{type:"sawtooth4"},envelope:{attack:0.02,decay:0.3,sustain:0.1,release:0.3},volume:-25},
+      mel:["A4","C5","E5","C5","D5","B4","C5","A4","G4",null,"A4","B4","C5","B4","A4","G4","F4","G4","A4","C5","B4","A4","G4","F4","E4",null,null,null,"E4","G4","A4","B4","A4","C5","E5","C5","D5","B4","C5","A4","G4",null,"A4","B4","C5","D5","E5",null,"F5","E5","D5","C5","B4","A4","G4","A4","A4",null,null,null,null,null,null,null],
+      bass:["A2",null,null,null,"E3",null,null,null,"F2",null,null,null,"G2",null,null,null,"A2",null,null,null,"E3",null,null,null,"F2",null,null,null,"G2",null,null,null,"A2",null,null,null,"E3",null,null,null,"F2",null,null,null,"C3",null,null,null,"D3",null,null,null,"E3",null,null,null,"F3",null,"E3",null,"A2",null,null,null]},
+    {id:"chiptune",name:{fi:"Chiptune",en:"Chiptune",sv:"Chiptune"},bpm:140,sub:"8n",melDur:"16n",bassDur:"4n",
+      melSynth:{oscillator:{type:"square"},envelope:{attack:0.005,decay:0.1,sustain:0.05,release:0.1},volume:-22},
+      bassSynth:{oscillator:{type:"triangle"},envelope:{attack:0.01,decay:0.15,sustain:0.1,release:0.15},volume:-25},
+      mel:["G5",null,"E5","G5","A5",null,"G5","E5","C5","D5","E5",null,"D5","C5",null,null,"F5",null,"D5","F5","G5",null,"F5","D5","B4","C5","D5",null,"C5","B4",null,null,"G5",null,"A5","B5","C6",null,"B5","A5","G5",null,"E5","G5","A5","G5","E5","C5","D5","E5","F5","E5","D5",null,"C5",null,"C5",null,null,null,null,null,null,null,null,null],
+      bass:["C3",null,"G3",null,"C3",null,"G3",null,"F3",null,"C3",null,"G3",null,"C3",null,"F3",null,"C3",null,"G3",null,"C3",null,"G3",null,"D3",null,"G3",null,"D3",null,"C3",null,"G3",null,"C3",null,"G3",null,"Ab3",null,"Eb3",null,"Bb3",null,"F3",null,"G3",null,"D3",null,"C3",null,"G2",null,"F2",null,"G2",null,"C3",null,null,null]},
+  ]
+};
+
+function useMusic(category,isPlaying){
+  const melSynthRef=useRef(null);const bassSynthRef=useRef(null);
+  const melSeqRef=useRef(null);const bassSeqRef=useRef(null);
+  const gainRef=useRef(null);const activeRef=useRef(false);
+  const trackIdx=useRef(Math.floor(Math.random()*10));
+
+  const cleanup=useCallback(()=>{
+    try{Tone.Transport.stop();Tone.Transport.cancel();}catch{}
+    try{melSeqRef.current?.stop();melSeqRef.current?.dispose();}catch{}melSeqRef.current=null;
+    try{bassSeqRef.current?.stop();bassSeqRef.current?.dispose();}catch{}bassSeqRef.current=null;
+    try{melSynthRef.current?.dispose();}catch{}melSynthRef.current=null;
+    try{bassSynthRef.current?.dispose();}catch{}bassSynthRef.current=null;
+    try{gainRef.current?.dispose();}catch{}gainRef.current=null;
+    activeRef.current=false;
+  },[]);
+
+  useEffect(()=>{
+    if(category==="off"||!isPlaying){cleanup();return;}
+    const tracks=MUSIC_TRACKS[category];
+    if(!tracks||!tracks.length)return;
+    const track=tracks[trackIdx.current%tracks.length];
+    trackIdx.current++;
+    let cancelled=false;
+    (async()=>{
+      await Tone.start();
+      if(cancelled)return;
+      cleanup();
+      Tone.Transport.bpm.value=track.bpm;
+      gainRef.current=new Tone.Gain(0).toDestination();
+      melSynthRef.current=new Tone.PolySynth(Tone.Synth,track.melSynth).connect(gainRef.current);
+      bassSynthRef.current=new Tone.PolySynth(Tone.Synth,track.bassSynth).connect(gainRef.current);
+      melSeqRef.current=new Tone.Sequence((time,note)=>{
+        if(note)melSynthRef.current?.triggerAttackRelease(note,track.melDur,time);
+      },track.mel,track.sub);
+      melSeqRef.current.loop=true;
+      if(track.bass){
+        bassSeqRef.current=new Tone.Sequence((time,note)=>{
+          if(note)bassSynthRef.current?.triggerAttackRelease(note,track.bassDur,time);
+        },track.bass,track.sub);
+        bassSeqRef.current.loop=true;
+        bassSeqRef.current.start(0);
+      }
+      melSeqRef.current.start(0);
+      Tone.Transport.start();
+      activeRef.current=true;
+      gainRef.current.gain.rampTo(0.7,2);
+    })();
+    return()=>{cancelled=true;cleanup();};
+  },[category,isPlaying,cleanup]);
+}
+
+// ============================================
 // ENDING OVERLAY COMPONENT
 // ============================================
 function EndingOverlay({ending, progress, gridRect}){
@@ -1340,6 +1431,7 @@ export default function Piilosana(){
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[soundTheme,setSoundTheme]=useState(()=>localStorage.getItem("piilosana_sound")||"retro");
+  const[musicTheme,setMusicTheme]=useState(()=>localStorage.getItem("piilosana_music")||"off");
   const[showSettings,setShowSettings]=useState(false);
   const[showMenuOptions,setShowMenuOptions]=useState(false);
   const[settingsBubble,setSettingsBubble]=useState(false);
@@ -1368,6 +1460,7 @@ export default function Piilosana(){
     if(s.size){setUiSize(s.size);localStorage.setItem("piilosana_size",s.size);}
     if(typeof s.confetti==="boolean"){setConfettiOn(s.confetti);localStorage.setItem("piilosana_confetti",s.confetti?"on":"off");}
     if(s.sound){setSoundTheme(s.sound);localStorage.setItem("piilosana_sound",s.sound);}
+    if(s.music){setMusicTheme(s.music);localStorage.setItem("piilosana_music",s.music);}
   },[]);
   const doLogin=useCallback(async(nickname,password)=>{
     setAuthLoading(true);setAuthError("");
@@ -1436,9 +1529,9 @@ export default function Piilosana(){
   },[]);
   const syncSettings=useCallback((overrides={})=>{
     if(!authUser)return;
-    const s={theme:themeId,lang,size:uiSize,confetti:confettiOn,sound:soundTheme,...overrides};
+    const s={theme:themeId,lang,size:uiSize,confetti:confettiOn,sound:soundTheme,music:musicTheme,...overrides};
     saveSettingsToServer(s);
-  },[authUser,themeId,lang,uiSize,confettiOn,soundTheme,saveSettingsToServer]);
+  },[authUser,themeId,lang,uiSize,confettiOn,soundTheme,musicTheme,saveSettingsToServer]);
 
   const doChangePassword=useCallback(async(currentPassword,newPassword)=>{
     setAuthLoading(true);setAuthError("");setAuthSuccess("");
@@ -1754,6 +1847,9 @@ export default function Piilosana(){
   soundsRef.current=sounds;
   // Re-init synths when sound theme changes
   useEffect(()=>{if(soundTheme!=="off")rawSounds.reinit();},[soundTheme,rawSounds]);
+  // Background music — plays during gameplay
+  const musicActive=state==="play"||state==="countdown";
+  useMusic(musicTheme,musicActive);
   useEffect(()=>{
     if(state!=="play"||mode==="multi"||mode==="public"||gameTime===0)return;
     startTimeRef.current=Date.now();
@@ -2821,6 +2917,28 @@ export default function Piilosana(){
                 </button>
               ))}
             </div>
+          </div>
+          {/* Music */}
+          <div style={{marginBottom:"12px"}}>
+            <div style={{fontFamily:S.font,fontSize:"9px",color:S.green,marginBottom:"6px"}}>
+              {lang==="en"?"MUSIC":lang==="sv"?"MUSIK":"MUSIIKKI"}
+            </div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
+              {[["classical",{fi:"KLASSINEN",en:"CLASSICAL",sv:"KLASSISK"}],["electronic",{fi:"ELEKTRONINEN",en:"ELECTRONIC",sv:"ELEKTRONISK"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
+                <button key={id} onClick={()=>{setMusicTheme(id);localStorage.setItem("piilosana_music",id);syncSettings({music:id});}}
+                  style={{fontFamily:S.font,fontSize:"8px",
+                    color:musicTheme===id?S.bg:S.green,background:musicTheme===id?S.green:"transparent",
+                    border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer",
+                    boxShadow:musicTheme===id?`0 0 8px ${S.green}66`:"none"}}>
+                  {names[lang]||names.en}
+                </button>
+              ))}
+            </div>
+            {musicTheme!=="off"&&(
+              <div style={{fontFamily:S.font,fontSize:"7px",color:"#556",marginTop:"4px"}}>
+                {lang==="en"?"Plays during game":lang==="sv"?"Spelas under spelet":"Soi pelin aikana"}
+              </div>
+            )}
           </div>
           {/* Confetti */}
           <div>
