@@ -406,7 +406,7 @@ const SOUND_THEMES={
       combo3:n=>[["C5","8n"],["E5","8n"],["G5","8n"],["C6","8n"]],
       combo5:n=>[["C5","8n"],["E5","8n"],["G5","8n"],["B5","8n"],["D6","8n"]],
       wrong:n=>[["E3","16n",n],["Eb3","8n",n+0.1]],
-      tick:n=>[["A5","32n",n]],
+      tick:n=>[["E5","32n",n],["G5","32n",n+0.06]],
       countdown:n=>[["G4","16n",n]],
       go:n=>[["C5","16n",n],["E5","16n",n+0.06],["G5","8n",n+0.12]],
       ending:n=>({bass:[["E2","8n",n],["C2","8n",n+0.2],["A1","4n",n+0.4]]}),
@@ -428,7 +428,7 @@ const SOUND_THEMES={
       combo3:n=>[["E5","4n"],["G5","4n"],["B5","4n"],["E6","4n"]],
       combo5:n=>[["E5","4n"],["G5","4n"],["B5","4n"],["D6","4n"],["E6","4n"]],
       wrong:n=>[["D4","8n",n],["Db4","4n",n+0.15]],
-      tick:n=>[["B5","32n",n]],
+      tick:n=>[["G5","32n",n],["B5","32n",n+0.08]],
       countdown:n=>[["A4","8n",n]],
       go:n=>[["E5","8n",n],["G5","8n",n+0.1],["B5","4n",n+0.2]],
       ending:n=>({bass:[["G2","4n",n],["E2","4n",n+0.3],["C2","2n",n+0.6]]}),
@@ -450,7 +450,7 @@ const SOUND_THEMES={
       combo3:n=>[["D5","8n"],["F5","8n"],["A5","8n"],["D6","8n"]],
       combo5:n=>[["D5","8n"],["F5","8n"],["A5","8n"],["C#6","8n"],["E6","8n"]],
       wrong:n=>[["F3","16n",n],["E3","8n",n+0.08]],
-      tick:n=>[["B5","32n",n]],
+      tick:n=>[["F#5","32n",n],["A5","32n",n+0.05]],
       countdown:n=>[["A4","16n",n]],
       go:n=>[["D5","16n",n],["F5","16n",n+0.05],["A5","8n",n+0.1]],
       ending:n=>({bass:[["F2","8n",n],["D2","8n",n+0.15],["A1","4n",n+0.3]]}),
@@ -519,7 +519,16 @@ function useSounds(soundTheme){
   },[getNotes]);
 
   const playWrong=useCallback(()=>{playSynthNotes(getNotes().wrong);},[playSynthNotes,getNotes]);
-  const playTick=useCallback(()=>{playSynthNotes(getNotes().tick);},[playSynthNotes,getNotes]);
+  const playTick=useCallback((remaining)=>{
+    const notes=getNotes();
+    if(remaining!==undefined&&remaining<=5){
+      // Last 5 seconds: double tick, rising pitch
+      const pitch=["C6","D6","E6","F#6","G#6"][5-remaining]||"G#6";
+      playSynthNotes(n=>[["E5","32n",n],[pitch,"32n",n+0.08]]);
+    }else{
+      playSynthNotes(notes.tick);
+    }
+  },[playSynthNotes,getNotes]);
   const playCountdown=useCallback(()=>{playSynthNotes(getNotes().countdown);},[playSynthNotes,getNotes]);
   const playGo=useCallback(()=>{playSynthNotes(getNotes().go);},[playSynthNotes,getNotes]);
   const playEnding=useCallback(()=>{
@@ -687,6 +696,8 @@ function useMusic(category,isPlaying,shuffle){
   const lastPlayedRef=useRef(-1);
   const timerRef=useRef(null);
   const [tick,setTick]=useState(0);
+  const [currentTrackName,setCurrentTrackName]=useState("");
+  const directionRef=useRef(0); // -1=prev, 0=normal, 1=next
 
   const cleanup=useCallback(()=>{
     if(timerRef.current){clearTimeout(timerRef.current);timerRef.current=null;}
@@ -699,13 +710,22 @@ function useMusic(category,isPlaying,shuffle){
     activeRef.current=false;
   },[]);
 
+  const skipNext=useCallback(()=>{directionRef.current=1;setTick(t=>t+1);},[]);
+  const skipPrev=useCallback(()=>{directionRef.current=-1;setTick(t=>t+1);},[]);
+
   useEffect(()=>{
-    if(category==="off"||!isPlaying){cleanup();return;}
+    if(category==="off"||!isPlaying){cleanup();setCurrentTrackName("");return;}
     const tracks=MUSIC_TRACKS[category];
     if(!tracks||!tracks.length)return;
     let idx;
-    if(shuffle){
-      // Pick random track, avoid repeating the same one
+    const dir=directionRef.current;
+    directionRef.current=0;
+    if(dir===-1){
+      // Previous: go back 2 (because trackIdx was already incremented)
+      trackIdx.current=((trackIdx.current-2)%tracks.length+tracks.length)%tracks.length;
+      idx=trackIdx.current;
+      trackIdx.current++;
+    }else if(shuffle&&dir===0){
       do{idx=Math.floor(Math.random()*tracks.length);}while(tracks.length>1&&idx===lastPlayedRef.current);
     }else{
       idx=trackIdx.current%tracks.length;
@@ -713,6 +733,7 @@ function useMusic(category,isPlaying,shuffle){
     }
     lastPlayedRef.current=idx;
     const track=tracks[idx];
+    setCurrentTrackName(typeof track.name==="object"?track.name:track.name);
     let cancelled=false;
     (async()=>{
       await Tone.start();
@@ -737,11 +758,10 @@ function useMusic(category,isPlaying,shuffle){
       Tone.Transport.start();
       activeRef.current=true;
       gainRef.current.gain.rampTo(0.7,2);
-      // Auto-advance: play 2 full loops then crossfade to next track
       const stepsPerBeat=track.sub==="8n"?2:1;
       const beatsPerLoop=track.mel.length/stepsPerBeat;
       const loopSec=(beatsPerLoop/track.bpm)*60;
-      const playSec=loopSec*2; // 2 loops
+      const playSec=loopSec*2;
       timerRef.current=setTimeout(()=>{
         if(!cancelled&&gainRef.current){
           gainRef.current.gain.rampTo(0,3);
@@ -751,6 +771,8 @@ function useMusic(category,isPlaying,shuffle){
     })();
     return()=>{cancelled=true;cleanup();};
   },[category,isPlaying,cleanup,tick]);
+
+  return{trackName:currentTrackName,skipNext,skipPrev};
 }
 
 // ============================================
@@ -1994,7 +2016,7 @@ export default function Piilosana(){
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(()=>{if(soundTheme!=="off")rawSounds.reinit();},[soundTheme]);
   // Background music — plays whenever user has interacted (audio context unlocked)
-  useMusic(musicTheme,audioStarted,musicShuffle);
+  const{trackName:currentTrack,skipNext:musicNext,skipPrev:musicPrev}=useMusic(musicTheme,audioStarted,musicShuffle);
   useEffect(()=>{
     if(state!=="play"||mode==="multi"||mode==="public"||gameTime===0)return;
     startTimeRef.current=Date.now();
@@ -2005,7 +2027,7 @@ export default function Piilosana(){
       setTime(remaining);
       if(remaining!==lastSecond){
         lastSecond=remaining;
-        if(remaining<=15&&remaining>0)soundsRef.current.playTick();
+        if(remaining<=15&&remaining>0)soundsRef.current.playTick(remaining);
       }
       if(remaining<=0){
         clearInterval(tRef.current);
@@ -2342,7 +2364,7 @@ export default function Piilosana(){
     
     newSocket.on("timer_tick",({remaining})=>{
       setTime(remaining);
-      if(remaining<=15&&remaining>0)sounds.playTick();
+      if(remaining<=15&&remaining>0)sounds.playTick(remaining);
     });
     
     newSocket.on("score_update",({scores})=>{
@@ -2434,7 +2456,7 @@ export default function Piilosana(){
     });
     newSocket.on("public_timer_tick",({remaining})=>{
       setTime(remaining);
-      if(remaining<=15&&remaining>0)soundsRef.current.playTick();
+      if(remaining<=15&&remaining>0)soundsRef.current.playTick(remaining);
     });
     newSocket.on("public_score_update",({scores})=>{
       setPublicScores(scores);
@@ -3099,6 +3121,14 @@ export default function Piilosana(){
               ))}
             </div>
             {musicTheme!=="off"&&(
+              <>
+              <div style={{display:"flex",alignItems:"center",gap:"6px",marginTop:"8px"}}>
+                <button onClick={musicPrev} style={{fontFamily:S.font,fontSize:"10px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"2px 7px",cursor:"pointer"}}>◀</button>
+                <div style={{fontFamily:S.font,fontSize:"8px",color:S.green,minWidth:"70px",textAlign:"center"}}>
+                  {currentTrack?(currentTrack[lang]||currentTrack.en||currentTrack):"—"}
+                </div>
+                <button onClick={musicNext} style={{fontFamily:S.font,fontSize:"10px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"2px 7px",cursor:"pointer"}}>▶</button>
+              </div>
               <div style={{display:"flex",gap:"4px",marginTop:"6px"}}>
                 {[["shuffle",{fi:"SEKOITUS",en:"SHUFFLE",sv:"BLANDA"}],["order",{fi:"JÄRJESTYS",en:"IN ORDER",sv:"I ORDNING"}]].map(([id,names])=>(
                   <button key={id} onClick={()=>{const v=id==="shuffle";setMusicShuffle(v);localStorage.setItem("piilosana_music_shuffle",v?"on":"off");}}
@@ -3111,6 +3141,7 @@ export default function Piilosana(){
                   </button>
                 ))}
               </div>
+              </>
             )}
           </div>
           {/* Confetti */}
