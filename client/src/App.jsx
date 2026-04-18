@@ -1459,6 +1459,7 @@ export default function Piilosana(){
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[soundTheme,setSoundTheme]=useState(()=>localStorage.getItem("piilosana_sound")||"retro");
   const[musicTheme,setMusicTheme]=useState(()=>localStorage.getItem("piilosana_music")||"off");
+  const[audioStarted,setAudioStarted]=useState(false);
   const[showSettings,setShowSettings]=useState(false);
   const[showMenuOptions,setShowMenuOptions]=useState(false);
   const[settingsBubble,setSettingsBubble]=useState(false);
@@ -1822,7 +1823,7 @@ export default function Piilosana(){
 
   // Global button sound — plays on any <button> tap
   useEffect(()=>{
-    const handler=async(e)=>{if(e.target.closest("button")){await sounds.init();sounds.playBtn();}};
+    const handler=async(e)=>{if(e.target.closest("button")){setAudioStarted(true);await sounds.init();sounds.playBtn();}};
     document.addEventListener("pointerdown",handler,true);
     return()=>document.removeEventListener("pointerdown",handler,true);
   },[sounds]);
@@ -1875,9 +1876,8 @@ export default function Piilosana(){
   // Re-init synths when sound theme changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(()=>{if(soundTheme!=="off")rawSounds.reinit();},[soundTheme]);
-  // Background music — plays during gameplay
-  const musicActive=state==="play"||state==="countdown";
-  useMusic(musicTheme,musicActive);
+  // Background music — plays whenever user has interacted (audio context unlocked)
+  useMusic(musicTheme,audioStarted);
   useEffect(()=>{
     if(state!=="play"||mode==="multi"||mode==="public"||gameTime===0)return;
     startTimeRef.current=Date.now();
