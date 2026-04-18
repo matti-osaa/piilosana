@@ -1007,7 +1007,7 @@ function PixelIcon({icon,color="currentColor",size=2,style={},badge=false}){
   );
 }
 
-function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
+function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear}){
   const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;
   const titleChars=tc.title.split("");
   const demoWords=tc.demos;
@@ -1096,7 +1096,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading}){
           fontFamily:"'Press Start 2P',monospace",
           lineHeight:1,
         };
-        if(isGear){
+        if(isGear&&!hideGear){
           return <span key={i} onClick={onGearClick} style={{...baseStyle,
             textShadow:"none",
             cursor:"pointer",
@@ -2474,7 +2474,7 @@ export default function Piilosana(){
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
 
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
-        <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={settingsBubble} bubbleFading={bubbleFading}/>
+        <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={mode!==null&&settingsBubble} bubbleFading={bubbleFading} hideGear={mode===null}/>
       ):(
         <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
           animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
