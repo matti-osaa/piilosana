@@ -517,7 +517,8 @@ function useSounds(soundTheme){
     notes.btnBass(n).forEach(args=>bassRef.current.triggerAttackRelease(...args));
   },[getNotes]);
 
-  return{init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn};
+  const api=useMemo(()=>({init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn}),[init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn]);
+  return api;
 }
 
 // ============================================
@@ -1846,7 +1847,8 @@ export default function Piilosana(){
   const soundsRef=useRef(sounds);
   soundsRef.current=sounds;
   // Re-init synths when sound theme changes
-  useEffect(()=>{if(soundTheme!=="off")rawSounds.reinit();},[soundTheme,rawSounds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(()=>{if(soundTheme!=="off")rawSounds.reinit();},[soundTheme]);
   // Background music — plays during gameplay
   const musicActive=state==="play"||state==="countdown";
   useMusic(musicTheme,musicActive);
