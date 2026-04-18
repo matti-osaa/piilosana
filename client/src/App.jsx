@@ -119,6 +119,7 @@ const T={
     helpScoring:"Pisteytys: 3 kirjainta = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7+ = 10p",
     helpCombo:"Löydä sanoja nopeasti peräkkäin → combo! 3+ peräkkäin = x2, 5+ = x3 pisteet.",
     helpMultiplier:"Kultaiset kirjaimet antavat 2× tai 3× pistekertoimen sanaan.",
+    helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi yli 380 000, englanniksi ja ruotsiksi omat sanalistansa.",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -167,6 +168,7 @@ const T={
     helpScoring:"Scoring: 3 letters = 1pt · 4 = 2pt · 5 = 4pt · 6 = 6pt · 7+ = 10pt",
     helpCombo:"Find words quickly in a row → combo! 3+ in a row = x2, 5+ = x3 points.",
     helpMultiplier:"Golden letters give a 2× or 3× score multiplier for the word.",
+    helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has over 380,000 words, English and Swedish have their own vocabularies.",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -215,6 +217,7 @@ const T={
     helpScoring:"Poäng: 3 bokstäver = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7+ = 10p",
     helpCombo:"Hitta ord snabbt i rad → kombo! 3+ i rad = x2, 5+ = x3 poäng.",
     helpMultiplier:"Gyllene bokstäver ger 2× eller 3× poängmultiplikator för ordet.",
+    helpLang:"Du kan byta språk från huvudmenyn. Varje språk har sin egen ordlista — finska har över 380 000 ord, engelska och svenska har egna vokabulär.",
   },
 };
 
@@ -1503,7 +1506,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
   }
   return(
     <div style={{position:"relative",display:"inline-block"}}>
-    <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px"}}>
+    <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"0 0 10px 0",paddingTop:"12px",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px"}}>
       {displayChars.map((ch,i)=>{
         const isLit=lit.has(i);
         const isGear=!scramble&&i===tc.gearIdx;
@@ -2930,6 +2933,7 @@ export default function Piilosana(){
               <div><span style={{color:S.yellow}}>⭐</span> {t.helpScoring}</div>
               <div><span style={{color:S.yellow}}>🔥</span> {t.helpCombo}</div>
               <div><span style={{color:S.yellow}}>✦</span> {t.helpMultiplier}</div>
+              <div><span style={{color:S.yellow}}>🌐</span> {t.helpLang}</div>
             </div>
           </div>
         </div>
