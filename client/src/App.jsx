@@ -86,7 +86,7 @@ const T={
     time:"AIKA",unlimited:"RAJATON",unlimitedDesc:"Ei aikarajaa! Vaihda ruudukko kun haluat.",
     letterMult:"PISTEYTYS",letterMultBtn:"KIRJAINARVOT",letterMultDesc:"Harvinaiset kirjaimet = enemmän pisteitä! (D,Ö=7 V,J,H,Y,P,U=4 ...)",
     otherOptions:"MUUT VALINNAT",nickForHof:"NIMIMERKKI (ennätystauluun)",optional:"VAPAAEHTOINEN",scoresSaved:"Pisteesi tallennetaan nimellä",
-    modeNormal:"NORMAALI",modeTetris:"TETRIS",tetrisDesc:"Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä!",
+    modeNormal:"NORMAALI",modeTetris:"PUDOTUS",tetrisDesc:"Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä!",
     waiting:"ODOTETAAN PELAAJIA",playersCount:"PELAAJAT",youTag:"SINÄ",createGame:"LUO PELI",connecting:"YHDISTETÄÄN...",
     startGame:"ALOITA PELI",waitForPlayers:"Odota, että joku liittyy peliisi...",waitForHost:"Odota, että isäntä aloittaa pelin...",
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
@@ -2729,9 +2729,41 @@ export default function Piilosana(){
         </div>
       )}
 
-      {/* Footer */}
-      <div style={{marginTop:"24px"}}>
-        <div style={{fontSize:"12px",color:S.textMuted,marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString()} {t.words}</div>
+      {/* Footer with buttons + info */}
+      <div style={{marginTop:"24px",width:"100%",maxWidth:"600px"}}>
+        {/* Action buttons row */}
+        <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap",marginBottom:"12px"}}>
+          {Object.entries(LANG_CONFIG).map(([code,lc])=>(
+            <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
+              style={{fontFamily:S.font,fontSize:"9px",background:lang===code?S.dark:"transparent",
+                border:lang===code?`2px solid ${S.green}`:`2px solid ${S.border}`,
+                padding:"6px 10px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
+                boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
+                transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px",minHeight:"36px",borderRadius:S.btnRadius}}>
+              <PixelFlag lang={code} size={2}/>
+            </button>
+          ))}
+          <button onClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} style={{fontFamily:S.font,fontSize:"9px",color:S.textSoft,
+            background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",minHeight:"36px",borderRadius:S.btnRadius}}>
+            <PixelIcon icon="gear" color={S.textSoft} size={2}/>
+          </button>
+          <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"9px",color:S.yellow,
+            background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",position:"relative",minHeight:"36px",borderRadius:S.btnRadius}}>
+            <PixelIcon icon="trophy" color={S.yellow} size={2} badge={true}/>
+            {Object.keys(achUnlocked).length>0&&<span style={{fontSize:"8px"}}>{Object.keys(achUnlocked).length}/{Object.keys(ACHIEVEMENTS).length}</span>}
+          </button>
+          <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:authUser?S.green:S.yellow,
+            background:authUser?S.dark:"transparent",border:`2px solid ${authUser?S.green:S.border}`,padding:"6px 10px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",
+            boxShadow:authUser?`0 0 8px ${S.green}44`:"none",minHeight:"36px",borderRadius:S.btnRadius}}>
+            <PixelIcon icon="person" color={authUser?S.green:S.yellow} size={2}/>
+            {authUser&&authUser.nickname}
+          </button>
+        </div>
+        {/* Info links */}
+        <div style={{fontSize:"12px",color:S.textMuted,marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString("fi-FI")} {t.words}</div>
         <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
           <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.howToPlay}</button>
           <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"9px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
@@ -2837,41 +2869,7 @@ export default function Piilosana(){
   return(
     <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflow:"hidden"}}
       onMouseMove={e=>onDragMove(e.clientX,e.clientY)} onMouseUp={onDragEnd} onTouchEnd={onDragEnd}>
-      {/* Top bar: language selector + login button - only visible in main menu */}
-      {mode===null&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",maxWidth:"600px",marginBottom:"4px"}}>
-        <div style={{display:"flex",gap:"6px"}}>
-          {Object.entries(LANG_CONFIG).map(([code,lc])=>(
-            <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
-              style={{fontFamily:S.font,fontSize:"9px",background:lang===code?S.dark:"transparent",
-                border:lang===code?`2px solid ${S.green}`:`2px solid ${S.border}`,
-                padding:"6px 10px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
-                boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
-                transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px",minHeight:"36px"}}>
-              <PixelFlag lang={code} size={2}/>
-            </button>
-          ))}
-        </div>
-        <div style={{display:"flex",gap:"6px",alignItems:"center"}}>
-          <button onClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} style={{fontFamily:S.font,fontSize:"9px",color:S.textSoft,
-            background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
-            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",minHeight:"36px"}}>
-            <PixelIcon icon="gear" color={S.textSoft} size={2}/>
-          </button>
-          <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"9px",color:S.yellow,
-            background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
-            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",position:"relative",minHeight:"36px"}}>
-            <PixelIcon icon="trophy" color={S.yellow} size={2} badge={true}/>
-            {Object.keys(achUnlocked).length>0&&<span style={{fontSize:"8px"}}>{Object.keys(achUnlocked).length}/{Object.keys(ACHIEVEMENTS).length}</span>}
-          </button>
-          <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:authUser?S.green:S.yellow,
-            background:authUser?S.dark:"transparent",border:`2px solid ${authUser?S.green:S.border}`,padding:"6px 10px",cursor:"pointer",
-            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",
-            boxShadow:authUser?`0 0 8px ${S.green}44`:"none",minHeight:"36px"}}>
-            <PixelIcon icon="person" color={authUser?S.green:S.yellow} size={2}/>
-            {authUser&&authUser.nickname}
-          </button>
-        </div>
-      </div>}
+      {/* Top bar removed — buttons moved to footer */}
       {mode===null&&flagBubble&&(
         <div style={{width:"100%",maxWidth:"600px",
           animation:flagBubbleFading?"flagBubbleOut 0.6s ease-in forwards":"flagBubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
