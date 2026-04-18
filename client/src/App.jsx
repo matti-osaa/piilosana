@@ -2844,29 +2844,29 @@ export default function Piilosana(){
             <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
               style={{fontFamily:S.font,fontSize:"9px",background:lang===code?S.dark:"transparent",
                 border:lang===code?`2px solid ${S.green}`:`2px solid ${S.border}`,
-                padding:"4px 8px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
+                padding:"6px 10px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
                 boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
-                transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px"}}>
+                transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px",minHeight:"36px"}}>
               <PixelFlag lang={code} size={2}/>
             </button>
           ))}
         </div>
         <div style={{display:"flex",gap:"6px",alignItems:"center"}}>
           <button onClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} style={{fontFamily:S.font,fontSize:"9px",color:S.textSoft,
-            background:"transparent",border:`2px solid ${S.border}`,padding:"4px 8px",cursor:"pointer",
-            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s"}}>
+            background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",minHeight:"36px"}}>
             <PixelIcon icon="gear" color={S.textSoft} size={2}/>
           </button>
           <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"9px",color:S.yellow,
-            background:"transparent",border:`2px solid ${S.border}`,padding:"4px 8px",cursor:"pointer",
-            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",position:"relative"}}>
+            background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",position:"relative",minHeight:"36px"}}>
             <PixelIcon icon="trophy" color={S.yellow} size={2} badge={true}/>
             {Object.keys(achUnlocked).length>0&&<span style={{fontSize:"8px"}}>{Object.keys(achUnlocked).length}/{Object.keys(ACHIEVEMENTS).length}</span>}
           </button>
           <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"9px",color:authUser?S.green:S.yellow,
-            background:authUser?S.dark:"transparent",border:`2px solid ${authUser?S.green:S.border}`,padding:"4px 8px",cursor:"pointer",
+            background:authUser?S.dark:"transparent",border:`2px solid ${authUser?S.green:S.border}`,padding:"6px 10px",cursor:"pointer",
             display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",
-            boxShadow:authUser?`0 0 8px ${S.green}44`:"none"}}>
+            boxShadow:authUser?`0 0 8px ${S.green}44`:"none",minHeight:"36px"}}>
             <PixelIcon icon="person" color={authUser?S.green:S.yellow} size={2}/>
             {authUser&&authUser.nickname}
           </button>
