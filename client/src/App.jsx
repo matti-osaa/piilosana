@@ -3757,6 +3757,10 @@ export default function Piilosana(){
                     }
                   }
                 }
+                // Tilt animation for modern theme
+                const selIdx = s ? sel.findIndex(p=>p.r===r&&p.c===c) : -1;
+                const selDir = selIdx > 0 ? {dr:r-sel[selIdx-1].r, dc:c-sel[selIdx-1].c} : null;
+                const cellTransform = S.cellGradient && s ? (selDir ? `perspective(300px) rotateY(${selDir.dc*10}deg) rotateX(${-selDir.dr*10}deg) scale(1.06)` : `perspective(300px) scale(1.06)`) : "none";
                 // In tetris/battle mode, use dropKey in key to re-mount and animate
                 const useDropAnim=(soloMode==="tetris"||gameMode==="battle")&&dropKey>0&&!eaten&&!s;
                 return(
@@ -3771,7 +3775,7 @@ export default function Piilosana(){
                       background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
                       border:S.cellGradient?`1px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
                       borderRadius:S.cellRadius,
-                      cursor:state==="play"?"pointer":"default",transition:"all 0.15s ease",
+                      cursor:state==="play"?"pointer":"default",transition:S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s",transform:cellTransform,
                       boxShadow:eaten?"none":s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:S.cellShadow,
                       textTransform:"uppercase",textShadow:s||eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${otherSelColor||(letterMult?letterColor(letter,lang):S.green)}44`,
                       animation:eaten?endAnim:useDropAnim?`cellDrop 0.3s ${c*0.03}s ease-out`:"none",
