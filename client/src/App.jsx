@@ -70,6 +70,60 @@ function applyGravityClient(grid,removedCells,lang='fi'){
   return ng;
 }
 
+// Rotate grid: shift a row left/right or column up/down (wrap-around)
+function rotateRow(grid,row,dir){// dir: 1=right, -1=left
+  const sz=grid.length;const ng=grid.map(r=>[...r]);
+  for(let c=0;c<sz;c++){ng[row][(c+dir+sz)%sz]=grid[row][c];}
+  return ng;
+}
+function rotateCol(grid,col,dir){// dir: 1=down, -1=up
+  const sz=grid.length;const ng=grid.map(r=>[...r]);
+  for(let r=0;r<sz;r++){ng[(r+dir+sz)%sz][col]=grid[r][col];}
+  return ng;
+}
+
+// Theme word categories
+const WORD_THEMES={
+  fi:[
+    {name:"Eläimet",emoji:"🐾",words:["kissa","koira","karhu","hirvi","lintu","orava","kettu","jänis","susi","kotka","hauki","ahven","sorsa","tikka","haukka"]},
+    {name:"Ruoka",emoji:"🍽️",words:["leipä","juusto","kakku","liha","kala","riisi","pasta","keitto","salaatti","peruna","tomaatti","sipuli","porkkana","omena","marja"]},
+    {name:"Luonto",emoji:"🌿",words:["metsä","järvi","joki","puu","kukka","taivas","pilvi","sade","tuuli","lumi","kallio","niitty","suo","lahti","saari"]},
+    {name:"Koti",emoji:"🏠",words:["tuoli","pöytä","sänky","ovi","ikkuna","lattia","seinä","katto","lampu","peili","matto","tyyny","lakana","hylly","kaappi"]},
+    {name:"Keho",emoji:"🫀",words:["käsi","jalka","pää","silmä","korva","nenä","suu","sormi","polvi","olka","rinta","selkä","vatsa","sydän","luut"]},
+  ],
+  en:[
+    {name:"Animals",emoji:"🐾",words:["cat","dog","bear","bird","fish","deer","wolf","fox","hawk","eagle","snake","mouse","frog","duck","owl"]},
+    {name:"Food",emoji:"🍽️",words:["bread","cheese","cake","meat","fish","rice","pasta","soup","salad","apple","grape","lemon","peach","plum","corn"]},
+    {name:"Nature",emoji:"🌿",words:["tree","lake","river","cloud","rain","wind","snow","rock","hill","field","leaf","bloom","shore","wave","sand"]},
+    {name:"Home",emoji:"🏠",words:["chair","table","bed","door","wall","floor","lamp","shelf","desk","couch","rug","towel","plate","glass","cup"]},
+    {name:"Body",emoji:"🫀",words:["hand","foot","head","eye","ear","nose","mouth","arm","leg","knee","back","neck","chest","heart","bone"]},
+  ],
+  sv:[
+    {name:"Djur",emoji:"🐾",words:["katt","hund","björn","fågel","fisk","rådjur","varg","räv","hök","örn","orm","mus","groda","anka","uggla"]},
+    {name:"Mat",emoji:"🍽️",words:["bröd","ost","kaka","kött","fisk","ris","soppa","sallad","äpple","druva","citron","majs","plommon","päron","banan"]},
+    {name:"Natur",emoji:"🌿",words:["träd","sjö","flod","moln","regn","vind","snö","sten","kulle","fält","löv","strand","våg","sand","skog"]},
+    {name:"Hem",emoji:"🏠",words:["stol","bord","säng","dörr","vägg","golv","lampa","hylla","soffa","matta","kudde","glas","kopp","skål","fat"]},
+    {name:"Kropp",emoji:"🫀",words:["hand","fot","huvud","öga","öra","näsa","mun","arm","ben","knä","rygg","nacke","bröst","hjärta","blod"]},
+  ],
+};
+
+// Pick random mystery cell
+function pickMysteryCell(sz){return{r:Math.floor(Math.random()*sz),c:Math.floor(Math.random()*sz)};}
+
+// Pick random bomb cell
+function pickBombCell(sz){return{r:Math.floor(Math.random()*sz),c:Math.floor(Math.random()*sz)};}
+
+// Scramble a section of the grid (for bomb explosion)
+function scrambleArea(grid,centerR,centerC,radius,lang){
+  const sz=grid.length;const ng=grid.map(r=>[...r]);
+  for(let r=Math.max(0,centerR-radius);r<=Math.min(sz-1,centerR+radius);r++){
+    for(let c=Math.max(0,centerC-radius);c<=Math.min(sz-1,centerC+radius);c++){
+      ng[r][c]=randLetterLang(lang);
+    }
+  }
+  return ng;
+}
+
 // UI translations
 const T={
   fi:{
@@ -87,6 +141,10 @@ const T={
     letterMult:"PISTEYTYS",letterMultBtn:"KIRJAINARVOT",letterMultDesc:"Harvinaiset kirjaimet = enemmän pisteitä! (D,Ö=7 V,J,H,Y,P,U=4 ...)",
     otherOptions:"MUUT VALINNAT",nickForHof:"NIMIMERKKI (ennätystauluun)",optional:"VAPAAEHTOINEN",scoresSaved:"Pisteesi tallennetaan nimellä",
     modeNormal:"NORMAALI",modeTetris:"PUDOTUS",tetrisDesc:"Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä!",
+    modeRotate:"PYÖRITYS",rotateDesc:"Pyöritä rivejä ja sarakkeita löytääksesi uusia sanoja!",rotateStarts:"PYÖRITYS ALKAA",rotateLabel:"PYÖRITYS",movesLeft:"siirtoa jäljellä",
+    modeTheme:"TEEMAT",themeDesc:"Löydä teemaan kuuluvia sanoja bonuspisteillä!",themeStarts:"TEEMAT ALKAA",themeLabel:"TEEMAT",themeBonus:"TEEMABONUS",themeHint:"Teema",
+    modeBomb:"POMMI",bombDesc:"Käytä tikittävä kirjain sanassa ennen kuin se räjähtää!",bombStarts:"POMMI ALKAA",bombLabel:"POMMI",bombExploded:"POMMI RÄJÄHTI!",
+    modeMystery:"MYSTEERI",mysteryDesc:"Piilotettu kirjain paljastuu kun löydät sanan sen kautta!",mysteryStarts:"MYSTEERI ALKAA",mysteryLabel:"MYSTEERI",mysteryRevealed:"PALJASTETTU!",
     waiting:"ODOTETAAN PELAAJIA",playersCount:"PELAAJAT",youTag:"SINÄ",createGame:"LUO PELI",connecting:"YHDISTETÄÄN...",
     startGame:"ALOITA PELI",waitForPlayers:"Odota, että joku liittyy peliisi...",waitForHost:"Odota, että isäntä aloittaa pelin...",
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
@@ -94,7 +152,7 @@ const T={
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
     notValid:"Ei kelpaa",alreadyFound:"Jo löydetty",
-    arenaLabel:"MONINPELI",battleLabel:"TAISTELU",tetrisLabel:"PUDOTUS",unlimitedLabel:"RAJATON",letterMultLabel:"KIRJAINARVOT",
+    arenaLabel:"MONINPELI",battleLabel:"TAISTELU",tetrisLabel:"PUDOTUS",rotateLabel:"PYÖRITYS",themeLabel:"TEEMAT",bombLabel:"POMMI",mysteryLabel:"MYSTEERI",unlimitedLabel:"RAJATON",letterMultLabel:"KIRJAINARVOT",
     newLetters:"UUDET KIRJAIMET",stop:"LOPETA",
     saveAs:"TALLENNA NIMELLÄ",save:"TALLENNA",saved:"✓ Tallennettu!",saveToHof:"TALLENNA ENNÄTYSTAULULLE",
     gameStarts:"PELI ALKAA",battleStarts:"TAISTELU ALKAA",tetrisStarts:"PUDOTUS ALKAA",comboStreak:"putkeen!",
@@ -136,6 +194,10 @@ const T={
     letterMult:"SCORING",letterMultBtn:"LETTER VALUES",letterMultDesc:"Rare letters = more points! (Q,Z=10 J,X=8 K=5 ...)",
     otherOptions:"OTHER OPTIONS",nickForHof:"NICKNAME (for leaderboard)",optional:"OPTIONAL",scoresSaved:"Your score will be saved as",
     modeNormal:"NORMAL",modeTetris:"DROP",tetrisDesc:"Found letters disappear and new ones drop from above!",
+    modeRotate:"ROTATE",rotateDesc:"Rotate rows and columns to find new words!",rotateStarts:"ROTATE STARTS",rotateLabel:"ROTATE",movesLeft:"moves left",
+    modeTheme:"THEMES",themeDesc:"Find themed words for bonus points!",themeStarts:"THEMES START",themeLabel:"THEMES",themeBonus:"THEME BONUS",themeHint:"Theme",
+    modeBomb:"BOMB",bombDesc:"Use the ticking letter in a word before it explodes!",bombStarts:"BOMB STARTS",bombLabel:"BOMB",bombExploded:"BOMB EXPLODED!",
+    modeMystery:"MYSTERY",mysteryDesc:"A hidden letter is revealed when you find a word through it!",mysteryStarts:"MYSTERY STARTS",mysteryLabel:"MYSTERY",mysteryRevealed:"REVEALED!",
     waiting:"WAITING FOR PLAYERS",playersCount:"PLAYERS",youTag:"YOU",createGame:"CREATE GAME",connecting:"CONNECTING...",
     startGame:"START GAME",waitForPlayers:"Wait for someone to join...",waitForHost:"Waiting for host to start...",
     joinGame:"JOIN GAME",roomCode:"ROOM CODE",noRooms:"No open rooms",orJoinRoom:"or join with code",
@@ -143,7 +205,7 @@ const T={
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
     notValid:"Not valid",alreadyFound:"Already found",
-    arenaLabel:"MULTIPLAYER",battleLabel:"BATTLE",tetrisLabel:"DROP",unlimitedLabel:"UNLIMITED",letterMultLabel:"LETTER VALUES",
+    arenaLabel:"MULTIPLAYER",battleLabel:"BATTLE",tetrisLabel:"DROP",rotateLabel:"ROTATE",themeLabel:"THEMES",bombLabel:"BOMB",mysteryLabel:"MYSTERY",unlimitedLabel:"UNLIMITED",letterMultLabel:"LETTER VALUES",
     newLetters:"NEW LETTERS",stop:"STOP",
     saveAs:"SAVE AS",save:"SAVE",saved:"✓ Saved!",saveToHof:"SAVE TO LEADERBOARD",
     gameStarts:"GAME STARTS",battleStarts:"BATTLE STARTS",tetrisStarts:"DROP STARTS",comboStreak:"in a row!",
@@ -185,6 +247,10 @@ const T={
     letterMult:"POÄNGSÄTTNING",letterMultBtn:"BOKSTAVSVÄRDEN",letterMultDesc:"Ovanliga bokstäver = mer poäng! (Z=10 X=8 J=7 ...)",
     otherOptions:"ANDRA VAL",nickForHof:"SMEKNAMN (för topplistan)",optional:"VALFRITT",scoresSaved:"Dina poäng sparas som",
     modeNormal:"NORMAL",modeTetris:"FALL",tetrisDesc:"Hittade bokstäver försvinner och nya faller uppifrån!",
+    modeRotate:"ROTERA",rotateDesc:"Rotera rader och kolumner för att hitta nya ord!",rotateStarts:"ROTERA BÖRJAR",rotateLabel:"ROTERA",movesLeft:"drag kvar",
+    modeTheme:"TEMAN",themeDesc:"Hitta temaord för bonuspoäng!",themeStarts:"TEMAN BÖRJAR",themeLabel:"TEMAN",themeBonus:"TEMABONUS",themeHint:"Tema",
+    modeBomb:"BOMB",bombDesc:"Använd den tickande bokstaven i ett ord innan den exploderar!",bombStarts:"BOMB BÖRJAR",bombLabel:"BOMB",bombExploded:"BOMBEN EXPLODERADE!",
+    modeMystery:"MYSTERIUM",mysteryDesc:"En dold bokstav avslöjas när du hittar ett ord genom den!",mysteryStarts:"MYSTERIUM BÖRJAR",mysteryLabel:"MYSTERIUM",mysteryRevealed:"AVSLÖJAD!",
     waiting:"VÄNTAR PÅ SPELARE",playersCount:"SPELARE",youTag:"DU",createGame:"SKAPA SPEL",connecting:"ANSLUTER...",
     startGame:"STARTA SPEL",waitForPlayers:"Vänta tills någon går med...",waitForHost:"Väntar på att värden startar...",
     joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
@@ -192,7 +258,7 @@ const T={
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
     notValid:"Ogiltigt",alreadyFound:"Redan hittat",
-    arenaLabel:"FLERSPELARE",battleLabel:"STRID",tetrisLabel:"FALL",unlimitedLabel:"OBEGRÄNSAD",letterMultLabel:"BOKSTAVSVÄRDEN",
+    arenaLabel:"FLERSPELARE",battleLabel:"STRID",tetrisLabel:"FALL",rotateLabel:"ROTERA",themeLabel:"TEMAN",bombLabel:"BOMB",mysteryLabel:"MYSTERIUM",unlimitedLabel:"OBEGRÄNSAD",letterMultLabel:"BOKSTAVSVÄRDEN",
     newLetters:"NYA BOKSTÄVER",stop:"STOPPA",
     saveAs:"SPARA SOM",save:"SPARA",saved:"✓ Sparat!",saveToHof:"SPARA TILL TOPPLISTAN",
     gameStarts:"SPELET BÖRJAR",battleStarts:"STRIDEN BÖRJAR",tetrisStarts:"FALL BÖRJAR",comboStreak:"i rad!",
@@ -1820,9 +1886,24 @@ export default function Piilosana(){
   // Game settings (must be declared before states that reference them)
   const[gameTime,setGameTime]=useState(120); // 120 (2min) or 402 (6min 42s = "6,7")
   const[letterMult,setLetterMult]=useState(false); // scrabble-style letter values
-  const[soloMode,setSoloMode]=useState("normal"); // 'normal' or 'tetris'
+  const[soloMode,setSoloMode]=useState("normal"); // 'normal','tetris','rotate','theme','bomb','mystery'
   const[dropKey,setDropKey]=useState(0); // increments on gravity to trigger drop animation
   const[gameMode,setGameMode]=useState("classic"); // 'classic' or 'battle'
+
+  // Rotate mode state
+  const[rotatesLeft,setRotatesLeft]=useState(0);
+
+  // Theme mode state
+  const[activeTheme,setActiveTheme]=useState(null); // {name, words}
+  const[themeFound,setThemeFound]=useState([]); // theme words found
+
+  // Bomb mode state
+  const[bombCell,setBombCell]=useState(null); // {r,c}
+  const[bombTimer,setBombTimer]=useState(0);
+
+  // Mystery mode state
+  const[mysteryCell,setMysteryCell]=useState(null); // {r,c}
+  const[mysteryRevealed,setMysteryRevealed]=useState(false);
 
   const[state,setState]=useState("menu");
   const[grid,setGrid]=useState([]);
@@ -1977,16 +2058,35 @@ export default function Piilosana(){
   const startSolo=useCallback(async(overrideMode,overrideTime)=>{
     sounds.init().catch(()=>{});
     const gt=overrideTime!==undefined?overrideTime:gameTime;
+    const sm=overrideMode!==undefined?overrideMode:soloMode;
     let bg=null,bw=new Set();
     for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=findWords(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(gt);setScore(0);setMsg(null);
     setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);
     setEnding(null);setEndingProgress(0);setDropKey(0);
+
+    // Mode-specific initialization
+    if(sm==="rotate"){setRotatesLeft(5);}
+    if(sm==="theme"){
+      const themes=WORD_THEMES[lang]||WORD_THEMES.fi;
+      const theme=themes[Math.floor(Math.random()*themes.length)];
+      // Filter to words that exist in trie and are in valid set
+      const validThemeWords=theme.words.filter(w=>bw.has(w));
+      setActiveTheme({name:theme.name,emoji:theme.emoji,words:validThemeWords.length>0?validThemeWords:theme.words});
+      setThemeFound([]);
+    }else{setActiveTheme(null);setThemeFound([]);}
+    if(sm==="bomb"){
+      setBombCell(pickBombCell(SZ));setBombTimer(15);
+    }else{setBombCell(null);setBombTimer(0);}
+    if(sm==="mystery"){
+      setMysteryCell(pickMysteryCell(SZ));setMysteryRevealed(false);
+    }else{setMysteryCell(null);setMysteryRevealed(false);}
+
     setMode("solo");setCountdown(5);setState("countdown");
     if(overrideMode!==undefined)setSoloMode(overrideMode);
     if(overrideTime!==undefined)setGameTime(overrideTime);
     window.scrollTo(0,0);
-  },[trie,sounds,gameTime,soloMode]);
+  },[trie,sounds,gameTime,soloMode,lang]);
 
   const start=useCallback(async()=>{
     if(mode==="solo"){
@@ -2112,6 +2212,33 @@ export default function Piilosana(){
     return()=>music.stop();
   },[state,musicOn,music]);
 
+  // Bomb mode timer
+  useEffect(()=>{
+    if(state!=="play"||soloMode!=="bomb"||!bombCell)return;
+    const iv=setInterval(()=>{
+      setBombTimer(t=>{
+        if(t<=1){
+          // BOOM! Scramble area around bomb
+          setGrid(g=>{
+            const ng=scrambleArea(g,bombCell.r,bombCell.c,1,lang);
+            const nv=findWords(ng,trie);
+            setValid(nv);
+            return ng;
+          });
+          addPopup(T[lang]?.bombExploded||"💥","#ff4444");
+          setScore(s=>Math.max(0,s-5));
+          sounds.playWrong();
+          // New bomb
+          setBombCell(pickBombCell(SZ));
+          return 15;
+        }
+        if(t<=5)sounds.playTick();
+        return t-1;
+      });
+    },1000);
+    return()=>clearInterval(iv);
+  },[state,soloMode,bombCell,lang,trie,sounds,addPopup]);
+
   // Track achievements when game ends
   useEffect(()=>{
     if(state!=="end")return;
@@ -2125,7 +2252,7 @@ export default function Piilosana(){
     // Count 6+ letter words found this game
     const longWordsThisGame=found.filter(w=>w.length>=6).length;
     // Perfect game check (solo non-unlimited only)
-    const isPerfect=mode==="solo"&&gameTime!==0&&soloMode!=="tetris"&&valid.size>0&&wordsFound>=valid.size;
+    const isPerfect=mode==="solo"&&gameTime!==0&&soloMode==="normal"&&valid.size>0&&wordsFound>=valid.size;
     // Daily games tracking
     const today=new Date().toISOString().slice(0,10);
     const updates={addWords:wordsFound,addGames:1,bestScore:score,longestWord:longestFound,bestWordsPerMin:wordsPerMin,
@@ -2267,12 +2394,44 @@ export default function Piilosana(){
         const newValid=findWords(newGrid,trie);
         setValid(newValid);
       }
+      // Theme mode: check if word is a theme word
+      if(soloMode==="theme"&&activeTheme){
+        if(activeTheme.words.includes(currentWord)&&!themeFound.includes(currentWord)){
+          const bonus=5;
+          setScore(s=>s+bonus);
+          setThemeFound(f=>[...f,currentWord]);
+          addPopup(`${t.themeBonus} +${bonus}`,`#44bb66`);
+        }
+      }
+      // Bomb mode: check if word uses bomb cell
+      if(soloMode==="bomb"&&bombCell){
+        const usesBomb=currentSel.some(s=>s.r===bombCell.r&&s.c===bombCell.c);
+        if(usesBomb){
+          // Defused! Pick new bomb
+          const bonus=3;
+          setScore(s=>s+bonus);
+          addPopup(`💣 +${bonus}`,"#ff4444");
+          setBombCell(pickBombCell(SZ));setBombTimer(15);
+        }
+      }
+      // Mystery mode: check if word passes through mystery cell
+      if(soloMode==="mystery"&&mysteryCell&&!mysteryRevealed){
+        const usesMystery=currentSel.some(s=>s.r===mysteryCell.r&&s.c===mysteryCell.c);
+        if(usesMystery){
+          setMysteryRevealed(true);
+          const bonus=3;
+          setScore(s=>s+bonus);
+          addPopup(`${t.mysteryRevealed} +${bonus}`,"#aa66ff");
+          // After a delay, pick new mystery cell
+          setTimeout(()=>{setMysteryCell(pickMysteryCell(SZ));setMysteryRevealed(false);},2000);
+        }
+      }
     }else if(found.includes(currentWord)){
       setMsg({t:currentWord,ok:false,m:"Jo löydetty!"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
     }else{
       setMsg({t:currentWord,ok:false,m:T[lang]?.notValid||"Ei kelpaa"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
     }
-  },[valid,found,lastFoundTime,combo,sounds,addPopup,mode,socket,gameMode,soloMode,grid,trie,letterMult]);
+  },[valid,found,lastFoundTime,combo,sounds,addPopup,mode,socket,gameMode,soloMode,grid,trie,letterMult,activeTheme,themeFound,bombCell,mysteryCell,mysteryRevealed,lang]);
 
   // Active grid: use currentMultiGrid in multi mode, grid in solo
   const activeGrid=mode==="multi"?currentMultiGrid:grid;
@@ -2738,9 +2897,17 @@ export default function Piilosana(){
           <div style={{marginBottom:"12px"}}>
             <div style={{fontSize:"13px",color:S.green,marginBottom:"6px"}}>{t.gameMode}</div>
             <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap"}}>
-              <button onClick={()=>setSoloMode("normal")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="normal"?S.bg:S.green,background:soloMode==="normal"?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer"}}>{t.modeNormal}</button>
-              <button onClick={()=>setSoloMode("tetris")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="tetris"?S.bg:S.purple,background:soloMode==="tetris"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"6px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}><Icon icon="arrow" color={soloMode==="tetris"?S.bg:S.purple} size={1.5}/>{t.modeTetris}</button>
+              <button onClick={()=>setSoloMode("normal")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="normal"?S.bg:S.green,background:soloMode==="normal"?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>{t.modeNormal}</button>
+              <button onClick={()=>setSoloMode("tetris")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="tetris"?S.bg:S.purple,background:soloMode==="tetris"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"6px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px",borderRadius:S.btnRadius}}><Icon icon="arrow" color={soloMode==="tetris"?S.bg:S.purple} size={1.5}/>{t.modeTetris}</button>
+              <button onClick={()=>setSoloMode("rotate")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="rotate"?S.bg:"#ff9900",background:soloMode==="rotate"?"#ff9900":"transparent",border:"2px solid #ff9900",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>🔄 {t.modeRotate}</button>
+              <button onClick={()=>setSoloMode("theme")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="theme"?S.bg:"#44bb66",background:soloMode==="theme"?"#44bb66":"transparent",border:"2px solid #44bb66",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>📚 {t.modeTheme}</button>
+              <button onClick={()=>setSoloMode("bomb")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="bomb"?S.bg:"#ff4444",background:soloMode==="bomb"?"#ff4444":"transparent",border:"2px solid #ff4444",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>💣 {t.modeBomb}</button>
+              <button onClick={()=>setSoloMode("mystery")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="mystery"?S.bg:"#aa66ff",background:soloMode==="mystery"?"#aa66ff":"transparent",border:"2px solid #aa66ff",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>❓ {t.modeMystery}</button>
             </div>
+            {soloMode==="rotate"&&<p style={{fontSize:"13px",color:"#ff9900",marginTop:"8px",lineHeight:"1.8"}}>{t.rotateDesc}</p>}
+            {soloMode==="theme"&&<p style={{fontSize:"13px",color:"#44bb66",marginTop:"8px",lineHeight:"1.8"}}>{t.themeDesc}</p>}
+            {soloMode==="bomb"&&<p style={{fontSize:"13px",color:"#ff4444",marginTop:"8px",lineHeight:"1.8"}}>{t.bombDesc}</p>}
+            {soloMode==="mystery"&&<p style={{fontSize:"13px",color:"#aa66ff",marginTop:"8px",lineHeight:"1.8"}}>{t.mysteryDesc}</p>}
           </div>
           <div style={{marginBottom:"12px"}}>
             <div style={{fontSize:"13px",color:S.green,marginBottom:"6px"}}>{t.time}</div>
@@ -3677,7 +3844,7 @@ export default function Piilosana(){
       {/* COUNTDOWN */}
       {state==="countdown"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{fontSize:"13px",color:S.green,marginBottom:"24px"}}>{mode==="multi"?(gameMode==="battle"?t.battleStarts:t.gameStarts):(soloMode==="tetris"?t.tetrisStarts:t.getReady)}</div>
+          <div style={{fontSize:"13px",color:S.green,marginBottom:"24px"}}>{mode==="multi"?(gameMode==="battle"?t.battleStarts:t.gameStarts):(soloMode==="tetris"?t.tetrisStarts:soloMode==="rotate"?t.rotateStarts:soloMode==="theme"?t.themeStarts:soloMode==="bomb"?t.bombStarts:soloMode==="mystery"?t.mysteryStarts:t.getReady)}</div>
           <div key={countdown} style={{fontSize:"72px",color:countdown<=2?S.red:countdown<=3?S.yellow:S.green,textShadow:`0 0 40px ${countdown<=2?"#ff444488":countdown<=3?"#ffcc0088":"#00ff8888"}`,animation:"pop 0.3s ease",lineHeight:"1"}}>
             {countdown>0?countdown:t.play+"!"}
           </div>
@@ -3693,6 +3860,10 @@ export default function Piilosana(){
             {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {publicPlayerCount===1?t.player:t.players}</div>}
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
+            {mode==="solo"&&soloMode==="rotate"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff9900",background:"#ff990011",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>🔄 {t.rotateLabel} — {rotatesLeft} {t.movesLeft}</div>}
+            {mode==="solo"&&soloMode==="theme"&&activeTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44bb66",background:"#44bb6611",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>{activeTheme.emoji} {t.themeHint}: {activeTheme.name} — {themeFound.length}/{activeTheme.words.length}</div>}
+            {mode==="solo"&&soloMode==="bomb"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff4444",background:"#ff444411",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>💣 {t.bombLabel} — {bombTimer}s</div>}
+            {mode==="solo"&&soloMode==="mystery"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#aa66ff",background:"#aa66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>❓ {t.mysteryLabel}</div>}
             {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="infinity" color="#44ddff" size={1}/>{t.unlimitedLabel}</div>}
             {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
             <div className="piilosana-hud" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 14px"}}>
@@ -3793,7 +3964,7 @@ export default function Piilosana(){
                       fontSize:isLarge?"clamp(34px,10vw,56px)":"clamp(28px,8vw,48px)",fontFamily:S.letterFont,fontWeight:S.cellGradient?"700":"normal",
                       letterSpacing:S.cellGradient?"1px":"0",
                       color:eaten?endColor||"transparent":scrambleColor||(s?(S.cellTextSel||"#0f1720"):otherSelColor||(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":S.green)))),
-                      background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
+                      background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":(soloMode==="bomb"&&bombCell&&r===bombCell.r&&c===bombCell.c)?`linear-gradient(135deg, #ff444433 0%, #ff880033 100%)`:(soloMode==="mystery"&&mysteryCell&&r===mysteryCell.r&&c===mysteryCell.c&&!mysteryRevealed)?`linear-gradient(135deg, #aa66ff33 0%, #6644ff33 100%)`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
                       border:S.cellGradient?`1px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
                       borderRadius:S.cellRadius,
                       cursor:state==="play"?"pointer":"default",transition:isScrambling?"color 0.07s, transform 0.15s":(S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s"),transform:cellTransform,
@@ -3804,19 +3975,49 @@ export default function Piilosana(){
                       position:"relative",
                     }}>
                     {eaten?"":<>
-                      {displayLetter}
+                      {/* Mystery mode: show ? for hidden cell */}
+                      {soloMode==="mystery"&&mysteryCell&&r===mysteryCell.r&&c===mysteryCell.c&&!mysteryRevealed&&!isScrambling?"?":displayLetter}
                       {letterMult&&!isScrambling&&<span style={{position:"absolute",bottom:"1px",right:"3px",fontSize:"clamp(9px,2.5vw,13px)",fontFamily:"'Press Start 2P',monospace",color:letterColor(letter,lang),opacity:0.7,lineHeight:1}}>{getLetterValues(lang)[letter]||1}</span>}
+                      {/* Bomb indicator */}
+                      {soloMode==="bomb"&&bombCell&&r===bombCell.r&&c===bombCell.c&&!isScrambling&&<span style={{position:"absolute",top:"-2px",right:"-2px",fontSize:"clamp(10px,3vw,16px)",animation:bombTimer<=5?"epicPulse 0.4s infinite":"none",lineHeight:1}}>💣</span>}
+                      {/* Mystery sparkle on revealed */}
+                      {soloMode==="mystery"&&mysteryCell&&r===mysteryCell.r&&c===mysteryCell.c&&mysteryRevealed&&!isScrambling&&<span style={{position:"absolute",top:"-2px",right:"-2px",fontSize:"clamp(10px,3vw,16px)",animation:"pop 0.3s ease",lineHeight:1}}>✨</span>}
                     </>}
                   </div>
                 );
               }))}
             </div>
             {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true}/>}
+            {/* Rotate mode: arrow buttons on edges */}
+            {soloMode==="rotate"&&state==="play"&&rotatesLeft>0&&(
+              <>
+                {/* Right side: arrows to shift rows right */}
+                {Array.from({length:SZ}).map((_,r)=>(
+                  <button key={`rr${r}`} onClick={()=>{
+                    const ng=rotateRow(grid,r,1);setGrid(ng);
+                    const nv=findWords(ng,trie);setValid(nv);setFound([]);
+                    setRotatesLeft(n=>n-1);sounds.playBtn();
+                  }} style={{position:"absolute",right:"-28px",top:`${(r/SZ)*100+100/(SZ*2)}%`,transform:"translateY(-50%)",
+                    background:"#ff990044",border:"1px solid #ff990066",borderRadius:"50%",width:"22px",height:"22px",
+                    display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:"13px",color:"#ff9900",padding:0,lineHeight:1}}>→</button>
+                ))}
+                {/* Bottom: arrows to shift columns down */}
+                {Array.from({length:SZ}).map((_,c)=>(
+                  <button key={`rc${c}`} onClick={()=>{
+                    const ng=rotateCol(grid,c,1);setGrid(ng);
+                    const nv=findWords(ng,trie);setValid(nv);setFound([]);
+                    setRotatesLeft(n=>n-1);sounds.playBtn();
+                  }} style={{position:"absolute",bottom:"-28px",left:`${(c/SZ)*100+100/(SZ*2)}%`,transform:"translateX(-50%)",
+                    background:"#ff990044",border:"1px solid #ff990066",borderRadius:"50%",width:"22px",height:"22px",
+                    display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:"13px",color:"#ff9900",padding:0,lineHeight:1}}>↓</button>
+                ))}
+              </>
+            )}
           </div>
 
           {state==="play"&&(
             <div className="piilosana-found" style={{marginTop:"8px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,maxHeight:"120px",overflowY:"auto"}}>
-              <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"4px"}}>{(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?`${t.found} (${found.length})`:`${t.found} (${found.length}/${valid.size}) ${valid.size>0?Math.round(found.length/valid.size*100):0}%`}</div>
+              <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"4px"}}>{(gameMode==="battle"||(mode==="solo"&&(soloMode==="tetris"||soloMode==="rotate")))?`${t.found} (${found.length})`:`${t.found} (${found.length}/${valid.size}) ${valid.size>0?Math.round(found.length/valid.size*100):0}%`}</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {found.length===0?<span style={{fontSize:"18px",color:S.textMuted}}>{t.dragWords}</span>:
                   found.map((w,i)=>(
@@ -3918,8 +4119,8 @@ export default function Piilosana(){
           <div style={{position:"relative",zIndex:1,border:`3px solid ${ending?.color||S.yellow}`,padding:"20px",marginBottom:"12px",boxShadow:`0 0 30px ${ending?.color||S.yellow}33`,background:S.dark}}>
             <div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.score}</div>
-            <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",animation:"pop 0.3s ease"}}>{score}{(soloMode!=="tetris"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted}}> / {totalPossible}</span>:null}</div>
-            {(soloMode==="tetris"||gameTime===0)?<div style={{fontSize:"13px",color:S.textMuted,marginTop:"6px"}}>{found.length} {t.words}</div>:<>
+            <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",animation:"pop 0.3s ease"}}>{score}{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted}}> / {totalPossible}</span>:null}</div>
+            {(soloMode!=="normal"||gameTime===0)?<div style={{fontSize:"13px",color:S.textMuted,marginTop:"6px"}}>{found.length} {t.words}</div>:<>
             <div style={{fontSize:"13px",color:S.textSoft,marginTop:"6px"}}>{found.length} / {valid.size} {t.words} ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>
             </>}
 
@@ -3986,7 +4187,7 @@ export default function Piilosana(){
             </div>
           )}
 
-          {soloMode!=="tetris"&&gameTime!==0&&missed.length>0&&(
+          {soloMode==="normal"&&gameTime!==0&&missed.length>0&&(
             <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
               <div style={{fontSize:"13px",color:"#ff6666",marginBottom:"6px"}}>{t.missed} ({missed.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
