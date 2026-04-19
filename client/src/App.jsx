@@ -423,6 +423,16 @@ const ENDINGS = [
       particles:Array.from({length:8},(_,i)=>({x:Math.random()*100,y:Math.random()*100,size:Math.random()*100,color:`#${Math.floor(Math.random()*16777215).toString(16)}`,opacity:0.1+Math.random()*0.2}))
     })
   },
+  { name:"SULJETTU", emoji:"🚪", color:"#8b6914",
+    desc:"Putiikki menee kiinni!",
+    cellAnim:(i,total)=>{const c=i%5;const fromLeft=c;const fromRight=4-c;const delay=Math.min(fromLeft,fromRight)*0.12;return `cellShutterClose 0.5s ${delay}s ease-in forwards`;},
+    cellColor:(i)=>"#5c3a0a",
+    overlay:(progress)=>({
+      bg:`linear-gradient(to right, #3a2208${Math.floor(Math.min(1,progress*1.5)*200).toString(16).padStart(2,'0')} 0%, transparent ${Math.max(0,50-progress*50)}%, transparent ${Math.min(100,50+progress*50)}%, #3a2208${Math.floor(Math.min(1,progress*1.5)*200).toString(16).padStart(2,'0')} 100%)`,
+      text:progress>0.3?"SULJETTU!":"",textColor:"#d4a832",
+      particles:[]
+    })
+  },
 ];
 
 // ============================================
@@ -1981,6 +1991,7 @@ export default function Piilosana(){
         clearInterval(t);
         setState("end");
         if(mode==="multi")setLobbyState("results");
+        if(mode==="public")setPublicState("end");
       }
     },80);
     return()=>clearInterval(t);
@@ -2393,11 +2404,12 @@ export default function Piilosana(){
       }
     });
     newSocket.on("public_game_over",({rankings,validWords:vw,allFoundWords:afw})=>{
-      setPublicState("end");setPublicRankings(rankings);setState("end");
+      setPublicRankings(rankings);
       setValid(new Set(vw));
       setPublicAllFound(afw||[]);
       const e=ENDINGS[Math.floor(Math.random()*ENDINGS.length)];
       setEnding(e);soundsRef.current.playEnding();
+      setState("ending");
     });
     newSocket.on("public_player_count",({count})=>{
       setPublicPlayerCount(count);
@@ -2849,6 +2861,7 @@ export default function Piilosana(){
         @keyframes bubbleIn{0%{opacity:0;transform:scale(0.3) translateY(10px)}40%{opacity:1;transform:scale(1.08) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
         @keyframes bubbleOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.6) translateY(-10px)}}
         @keyframes chatSlideIn{0%{opacity:0;transform:translateX(-30px) scale(0.7)}30%{opacity:1;transform:translateX(4px) scale(1.04)}60%{transform:translateX(-2px) scale(0.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
+        @keyframes chatFadeOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.92);max-height:0;margin:0;padding:0}}
         @keyframes pulse{0%,100%{text-shadow:0 0 5px #ff444444}50%{text-shadow:0 0 20px #ff444488}}
         @keyframes arenaPulse{0%,100%{box-shadow:4px 4px 0 #cc3311,0 0 20px #ff664433}50%{box-shadow:4px 4px 0 #cc3311,0 0 35px #ff664466}}
         @keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}50%{opacity:1;transform:translate(-50%,-100%) scale(1.5)}100%{opacity:0;transform:translate(-50%,-180%) scale(1.8)}}
@@ -2868,6 +2881,7 @@ export default function Piilosana(){
         @keyframes cellFreeze{0%{opacity:1;filter:hue-rotate(0)}30%{filter:hue-rotate(180deg) brightness(1.5)}60%{transform:scale(1.1)}100%{transform:scale(0.8) rotate(5deg);opacity:0;filter:hue-rotate(180deg) brightness(2)}}
         @keyframes cellDragonFire{0%{opacity:1;filter:brightness(1)}30%{filter:brightness(3) saturate(3)}100%{opacity:0;transform:scale(0.5);filter:brightness(0.1)}}
         @keyframes cellGlitch{0%{opacity:1;transform:translate(0,0)}25%{transform:translate(5px,-3px);filter:hue-rotate(90deg)}50%{transform:translate(-5px,3px);filter:hue-rotate(180deg)}75%{transform:translate(3px,5px);filter:hue-rotate(270deg)}100%{opacity:0;transform:translate(-10px,-10px);filter:hue-rotate(360deg)}}
+        @keyframes cellShutterClose{0%{opacity:1;transform:scaleX(1)}30%{opacity:1;transform:scaleX(1.05)}60%{opacity:0.8;transform:scaleX(0.3)}100%{opacity:0;transform:scaleX(0);background:#3a2208}}
         @keyframes cellDrop{0%{transform:translateY(-100%);opacity:0.5}60%{transform:translateY(5%);opacity:1}80%{transform:translateY(-2%)}100%{transform:translateY(0)}}
         @keyframes cellPop{0%{transform:scale(1)}50%{transform:scale(0);opacity:0}100%{transform:scale(0);opacity:0}}
         @keyframes bubbleIn{0%{opacity:0;transform:translateX(-50%) translateY(8px) scale(0.3)}30%{opacity:1;transform:translateX(-50%) translateY(-4px) scale(1.05)}50%{transform:translateX(-50%) translateY(2px) scale(0.97)}70%{transform:translateX(-50%) translateY(-1px) scale(1.01)}100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
@@ -3682,7 +3696,7 @@ export default function Piilosana(){
           {(mode==="public"||mode==="multi")&&state==="play"&&socket&&(
             <div style={{marginTop:"8px"}}>
               {/* Speech bubble toggle button */}
-              <div style={{display:"flex",justifyContent:"center",marginBottom:"6px"}}>
+              <div style={{display:"flex",justifyContent:"center",marginBottom:"6px",position:"relative"}}>
                 <button onClick={()=>emojiOpen==="open"?closeEmojiPicker():setEmojiOpen("open")}
                   style={{fontSize:"22px",padding:"8px 18px",background:emojiOpen?S.border:S.dark,border:`2px solid ${S.border}`,borderRadius:"16px",cursor:"pointer",lineHeight:1,
                   transition:"transform 0.15s, background 0.15s",display:"flex",alignItems:"center",gap:"6px",fontFamily:S.font,color:S.green}}
@@ -3695,32 +3709,35 @@ export default function Piilosana(){
               </div>
               {/* Emoji picker - speech bubble with tail */}
               {emojiOpen&&(
-                <div style={{display:"flex",justifyContent:"center",marginBottom:"8px"}}>
-                  <div style={{position:"relative",width:"240px",
-                    animation:emojiOpen==="closing"?"bubbleOut 0.25s ease forwards":"bubbleIn 0.25s ease-out"}}>
-                    {/* Bubble tail pointing up */}
-                    <div style={{position:"absolute",top:"-8px",left:"50%",transform:"translateX(-50%)",
-                      width:0,height:0,borderLeft:"10px solid transparent",borderRight:"10px solid transparent",
-                      borderBottom:`10px solid ${S.border}`}}/>
-                    <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
-                      width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",
-                      borderBottom:`8px solid ${S.cellGradient?S.dark:S.dark}`}}/>
-                    <div style={{
-                      display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"4px",
-                      padding:"10px",marginTop:"2px",
-                      background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
-                      border:`2px solid ${S.border}`,borderRadius:"16px",
-                      boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044"}}>
-                      {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
-                        <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});closeEmojiPicker();}}
-                          style={{fontSize:"26px",padding:"8px",background:"transparent",border:"none",borderRadius:"10px",cursor:"pointer",lineHeight:1,
-                          transition:"transform 0.12s, background 0.12s"}}
-                          onMouseDown={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
-                          onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
-                          onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
-                          onTouchStart={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
-                          onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}>{em}</button>
-                      ))}
+                <div style={{overflow:"hidden",marginBottom:"8px",
+                  maxHeight:emojiOpen==="closing"?0:"400px",opacity:emojiOpen==="closing"?0:1,
+                  transition:"max-height 0.25s ease, opacity 0.2s ease"}}>
+                  <div style={{display:"flex",justifyContent:"center"}}>
+                    <div style={{position:"relative",width:"240px"}}>
+                      {/* Bubble tail pointing up */}
+                      <div style={{position:"absolute",top:"-8px",left:"50%",transform:"translateX(-50%)",
+                        width:0,height:0,borderLeft:"10px solid transparent",borderRight:"10px solid transparent",
+                        borderBottom:`10px solid ${S.border}`}}/>
+                      <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
+                        width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",
+                        borderBottom:`8px solid ${S.cellGradient?S.dark:S.dark}`}}/>
+                      <div style={{
+                        display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"4px",
+                        padding:"10px",marginTop:"2px",
+                        background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
+                        border:`2px solid ${S.border}`,borderRadius:"16px",
+                        boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044"}}>
+                        {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
+                          <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});closeEmojiPicker();}}
+                            style={{fontSize:"26px",padding:"8px",background:"transparent",border:"none",borderRadius:"10px",cursor:"pointer",lineHeight:1,
+                            transition:"transform 0.12s, background 0.12s"}}
+                            onMouseDown={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
+                            onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
+                            onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
+                            onTouchStart={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
+                            onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}>{em}</button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -3734,7 +3751,7 @@ export default function Piilosana(){
                       background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
                       border:`2px solid ${S.border}`,borderRadius:"20px",
                       padding:"10px 18px",position:"relative",
-                      animation:e.fading?"bubbleOut 0.8s ease forwards":"chatSlideIn 0.35s ease-out",
+                      animation:e.fading?"chatFadeOut 0.8s ease forwards":"chatSlideIn 0.35s ease-out",
                       boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044",
                       maxWidth:"100%"}}>
                       <span style={{fontSize:"14px",fontWeight:"700",color:S.green,fontFamily:S.font,whiteSpace:"nowrap"}}>{e.nickname}</span>
