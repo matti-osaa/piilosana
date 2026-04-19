@@ -3005,7 +3005,7 @@ export default function Piilosana(){
             if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
               cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",
               marginRight:"4px"}}>
-              <Icon icon="gear" color={gearBlend?S.yellow:S.textSoft} size={1.7} style={{transition:"filter 2s ease"}}/></span>;
+              <Icon icon="gear" color={gearBlend?S.yellow:S.textSoft} size={S.cellGradient?3.5:1.7} style={{transition:"filter 2s ease"}}/></span>;
             return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:S.titleFont}}>{ch}</span>;
           });})()}
         </h1>
