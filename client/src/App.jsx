@@ -1841,6 +1841,8 @@ export default function Piilosana(){
   const[combo,setCombo]=useState(0);
   const[lastFoundTime,setLastFoundTime]=useState(0);
   const[flashKey,setFlashKey]=useState(0);
+  const[scrambleGrid,setScrambleGrid]=useState(null); // grid of random letters shown during scramble
+  const[scrambleStep,setScrambleStep]=useState(0); // how many letters have "settled" into final position
   // Solo nickname for hall of fame
   const[soloNickname,setSoloNickname]=useState(()=>{
     try{const a=JSON.parse(localStorage.getItem("piilosana_auth")||"null");if(a?.nickname)return a.nickname;}catch{}
@@ -1977,11 +1979,39 @@ export default function Piilosana(){
   // Countdown timer (shared for solo + multi)
   useEffect(()=>{
     if(state!=="countdown")return;
-    if(countdown<=0){sounds.playGo();setState("play");return;}
+    if(countdown<=0){
+      if(mode==="public"){sounds.playGo();setState("play");return;}
+      setState("scramble");setScrambleStep(0);setScrambleGrid(makeGrid(SZ,lang));return;
+    }
     sounds.playCountdown(countdown);
     const t=setTimeout(()=>setCountdown(c=>c-1),1000);
     return()=>clearTimeout(t);
   },[state,countdown,sounds]);
+
+  // Scramble animation — letters randomize then settle into final grid
+  useEffect(()=>{
+    if(state!=="scramble")return;
+    const totalCells=SZ*SZ;
+    let step=0;
+    const interval=setInterval(()=>{
+      step++;
+      if(step<=12){
+        // Phase 1: pure randomization (12 steps × 70ms ≈ 840ms)
+        setScrambleGrid(makeGrid(SZ,lang));
+        setScrambleStep(0);
+      }else if(step<=12+totalCells){
+        // Phase 2: letters settle one by one into real grid (fast)
+        setScrambleStep(step-12);
+        if(step===13)sounds.playGo(); // play GO sound when settling starts
+      }else{
+        // Done — transition to play
+        clearInterval(interval);
+        setScrambleGrid(null);setScrambleStep(0);
+        setState("play");
+      }
+    },70);
+    return()=>clearInterval(interval);
+  },[state,lang,sounds]);
 
   // Timer (solo mode only — multiplayer uses server timer_tick + game_over)
   const startTimeRef=useRef(null);
@@ -2016,20 +2046,31 @@ export default function Piilosana(){
     return()=>clearInterval(tRef.current);
   },[state,mode,gameTime,soloMode]);
 
-  // Ending animation (solo + multi)
+  // Ending animation (solo + multi) — now with scramble phase
   useEffect(()=>{
     if(state!=="ending")return;
     let progress=0;
-    // Phase 1: show name/emoji big (progress 0-0.35, ~1s) - no cells eaten yet
-    // Phase 2: cells start disappearing (progress 0.35-1.0, ~1.5s)
+    let scrambleCount=0;
+    // Phase 0: scramble letters (progress 0-0.25, ~0.7s)
+    // Phase 1: show name/emoji big (progress 0.25-0.45, ~0.6s) - no cells eaten yet
+    // Phase 2: cells start disappearing (progress 0.45-1.0, ~1.5s)
     // Phase 3: linger (1.0-1.3) then end (~0.5s)
-    // Total ~3s
     const t=setInterval(()=>{
-      progress+=0.043;
+      progress+=0.04;
       setEndingProgress(progress);
-      // Only start eating cells after intro phase
-      if(progress>0.35){
-        const eatProgress=(progress-0.35)/0.65; // 0 to 1
+      // Phase 0: scramble letters rapidly
+      if(progress<=0.25){
+        scrambleCount++;
+        setScrambleGrid(makeGrid(SZ,lang));
+        setScrambleStep(0);
+      }else if(progress>0.25&&scrambleCount>0){
+        // End scramble phase — clear it
+        setScrambleGrid(null);setScrambleStep(0);
+        scrambleCount=0;
+      }
+      // Phase 2: start eating cells
+      if(progress>0.45){
+        const eatProgress=(progress-0.45)/0.55; // 0 to 1
         const cellCount=Math.min(SZ*SZ, Math.floor(eatProgress * SZ * SZ));
         setEatenCells(prev=>{
           const n=new Set(prev);
@@ -2043,7 +2084,7 @@ export default function Piilosana(){
         setState("end");
         if(mode==="multi")setLobbyState("results");
       }
-    },100);
+    },80);
     return()=>clearInterval(t);
   },[state,mode]);
 
@@ -3622,8 +3663,8 @@ export default function Piilosana(){
         </div>
       )}
 
-      {/* PLAYING + ENDING */}
-      {(state==="play"||state==="ending")&&(
+      {/* PLAYING + ENDING + SCRAMBLE */}
+      {(state==="play"||state==="ending"||state==="scramble")&&(
         <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD */}
           <div style={{marginBottom:"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
@@ -3707,6 +3748,11 @@ export default function Piilosana(){
                 const eaten=eatenCells.has(cellIdx);
                 const endAnim=eaten&&ending?ending.cellAnim(cellIdx,SZ*SZ):"none";
                 const endColor=eaten&&ending?ending.cellColor(cellIdx):null;
+                // Scramble: show random letter or settled real letter
+                const isScrambling=state==="scramble"||(state==="ending"&&scrambleGrid);
+                const settled=state==="scramble"&&scrambleStep>cellIdx;
+                const scrambleLetter=isScrambling&&scrambleGrid?scrambleGrid[r]?.[c]||letter:letter;
+                const displayLetter=isScrambling&&!settled&&scrambleGrid?scrambleLetter:letter;
                 // Battle mode: check if other players are selecting this cell
                 const BATTLE_COLORS=["#ff66aa","#66aaff","#ffaa44","#aa66ff","#66ffaa","#ff4444","#44ffff"];
                 let otherSelColor=null;
@@ -3723,31 +3769,33 @@ export default function Piilosana(){
                 // Tilt animation for modern theme
                 const selIdx = s ? sel.findIndex(p=>p.r===r&&p.c===c) : -1;
                 const selDir = selIdx > 0 ? {dr:r-sel[selIdx-1].r, dc:c-sel[selIdx-1].c} : null;
-                const cellTransform = S.cellGradient && s ? (selDir ? `perspective(300px) rotateY(${selDir.dc*10}deg) rotateX(${-selDir.dr*10}deg) scale(1.06)` : `perspective(300px) scale(1.06)`) : "none";
+                const cellTransform = S.cellGradient && s ? (selDir ? `perspective(300px) rotateY(${selDir.dc*10}deg) rotateX(${-selDir.dr*10}deg) scale(1.06)` : `perspective(300px) scale(1.06)`) : isScrambling&&settled?"scale(1.1)":"none";
                 // In tetris/battle mode, use dropKey in key to re-mount and animate
                 const useDropAnim=(soloMode==="tetris"||gameMode==="battle")&&dropKey>0&&!eaten&&!s;
+                // Scramble color: random hue for unsettled, green flash for just-settled
+                const scrambleColor=isScrambling&&!settled?`hsl(${(cellIdx*37+scrambleStep*73)%360},70%,65%)`:null;
                 return(
                   <div key={`${r}-${c}-${dropKey}`} data-c={`${r},${c}`}
-                    onMouseDown={e=>{e.preventDefault();onDragStart(r,c);}}
-                    onTouchStart={e=>{e.preventDefault();onDragStart(r,c);}}
+                    onMouseDown={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
+                    onTouchStart={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                     style={{
                       width:"100%",aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",
                       fontSize:isLarge?"clamp(34px,10vw,56px)":"clamp(28px,8vw,48px)",fontFamily:S.letterFont,fontWeight:S.cellGradient?"700":"normal",
                       letterSpacing:S.cellGradient?"1px":"0",
-                      color:eaten?endColor||"transparent":s?(S.cellGradient?"#0f1720":S.bg):otherSelColor||(letterMult?letterColor(letter,lang):(S.cellGradient?"#e6eef8":S.green)),
+                      color:eaten?endColor||"transparent":scrambleColor||(s?(S.cellGradient?"#0f1720":S.bg):otherSelColor||(letterMult?letterColor(letter,lang):(S.cellGradient?"#e6eef8":S.green))),
                       background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
                       border:S.cellGradient?`1px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
                       borderRadius:S.cellRadius,
-                      cursor:state==="play"?"pointer":"default",transition:S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s",transform:cellTransform,
-                      boxShadow:eaten?"none":s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:S.cellShadow,
-                      textTransform:"uppercase",textShadow:s||eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${otherSelColor||(letterMult?letterColor(letter,lang):S.green)}44`,
-                      animation:eaten?endAnim:useDropAnim?`cellDrop 0.3s ${c*0.03}s ease-out`:"none",
+                      cursor:state==="play"?"pointer":"default",transition:isScrambling?"color 0.07s, transform 0.15s":(S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s"),transform:cellTransform,
+                      boxShadow:eaten?"none":isScrambling&&settled?`0 0 12px ${S.green}66`:(s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:S.cellShadow),
+                      textTransform:"uppercase",textShadow:isScrambling&&!settled?`0 0 8px ${scrambleColor}88`:(s||eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${otherSelColor||(letterMult?letterColor(letter,lang):S.green)}44`),
+                      animation:eaten?endAnim:useDropAnim?`cellDrop 0.3s ${c*0.03}s ease-out`:(isScrambling&&settled?"pop 0.2s ease":"none"),
                       "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
                       position:"relative",
                     }}>
                     {eaten?"":<>
-                      {letter}
-                      {letterMult&&<span style={{position:"absolute",bottom:"1px",right:"3px",fontSize:"clamp(9px,2.5vw,13px)",fontFamily:"'Press Start 2P',monospace",color:letterColor(letter,lang),opacity:0.7,lineHeight:1}}>{getLetterValues(lang)[letter]||1}</span>}
+                      {displayLetter}
+                      {letterMult&&!isScrambling&&<span style={{position:"absolute",bottom:"1px",right:"3px",fontSize:"clamp(9px,2.5vw,13px)",fontFamily:"'Press Start 2P',monospace",color:letterColor(letter,lang),opacity:0.7,lineHeight:1}}>{getLetterValues(lang)[letter]||1}</span>}
                     </>}
                   </div>
                 );
