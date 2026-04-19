@@ -3205,7 +3205,7 @@ export default function Piilosana(){
                 <PixelIcon icon="person" color={S.green} size={2}/>
                 {authUser.nickname}
               </div>
-              {authUser.email&&<div style={{fontFamily:S.font,fontSize:"8px",color:S.textMuted,marginBottom:"12px"}}>{authUser.email}</div>}
+              {authUser.email&&<div style={{fontFamily:S.font,fontSize:"11px",color:S.textMuted,marginBottom:"12px"}}>{authUser.email}</div>}
               {authMode==="changePassword"?(
                 <form onSubmit={async(e)=>{e.preventDefault();const fd=new FormData(e.target);await doChangePassword(fd.get("currentPassword"),fd.get("newPassword"));}} style={{textAlign:"left"}}>
                   <input name="currentPassword" type="password" autoComplete="current-password" placeholder={lang==="en"?"CURRENT PASSWORD":lang==="sv"?"NUVARANDE LÖSENORD":"NYKYINEN SALASANA"}
