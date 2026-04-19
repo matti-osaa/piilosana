@@ -258,6 +258,7 @@ const THEMES={
     dark:"#f0ece4",border:"#d4cbbf",cell:"#ffffff",cellBorder:"#e0d8ce",
     gridBg:"#f5f0e8",textMuted:"#8b7e6e",textSoft:"#5c4f3d",
     inputBg:"#ffffff",
+    cellText:"#2c2416",cellTextSel:"#ffffff",
     ...MODERN_BASE,
     cellShadow:"inset 0 1px 3px #00000012, 0 1px 4px #00000008",
     panelShadow:"0 4px 16px #00000012",
@@ -646,6 +647,26 @@ const MUSIC_TRACKS={
             null,null,null,"Bb1",null,"Bb1",null,null,null,null,null,"Bb1",null,"Bb1",null,null,
             null,null,null,"F1",null,"F1",null,null,null,null,null,"F1",null,"F1",null,null,
             null,null,null,"C2",null,"C2",null,null,null,null,null,"C2",null,"C2",null,null]},
+    // "Gentle Flow" — 100 BPM, C major, rauhallinen ja miellyttävä
+    {id:"gentle_flow",name:{fi:"Gentle Flow",en:"Gentle Flow",sv:"Gentle Flow"},bpm:100,sub:"8n",melDur:"4n",bassDur:"8n",
+      melSynth:{oscillator:{type:"triangle"},envelope:{attack:0.08,decay:0.6,sustain:0.15,release:1.2},volume:-16},
+      bassSynth:{oscillator:{type:"sine"},envelope:{attack:0.02,decay:0.3,sustain:0.25,release:0.4},volume:-14},
+      mel:[null,"E5",null,null,"G5",null,"C5",null,null,"D5",null,null,"E5",null,null,null,
+           null,"F5",null,null,"A5",null,"G5",null,null,"E5",null,null,"D5",null,null,null,
+           null,"G5",null,null,"E5",null,"C5",null,null,"D5",null,"E5",null,"D5",null,null,
+           null,"C5",null,null,"E5",null,"D5",null,null,"C5",null,null,null,null,null,null,
+           null,"E5",null,"G5",null,null,"A5",null,null,"G5",null,"E5",null,null,"D5",null,
+           null,"F5",null,"A5",null,null,"G5",null,null,"F5",null,"E5",null,"D5",null,null,
+           null,"G5",null,null,"A5",null,"G5",null,null,"E5",null,null,"D5",null,"C5",null,
+           null,"D5",null,null,"E5",null,null,null,null,"C5",null,null,null,null,null,null],
+      bass:["C2",null,null,null,"C2",null,"G2",null,"C2",null,null,null,"G2",null,"C2",null,
+            "F2",null,null,null,"F2",null,"C3",null,"F2",null,null,null,"A2",null,"F2",null,
+            "G2",null,null,null,"G2",null,"D3",null,"G2",null,null,null,"B2",null,"G2",null,
+            "C2",null,null,null,"G2",null,"E2",null,"C2",null,null,null,null,null,null,null,
+            "A1",null,null,null,"A1",null,"E2",null,"A1",null,null,null,"C2",null,"A1",null,
+            "F2",null,null,null,"F2",null,"A2",null,"F2",null,null,null,"C3",null,"F2",null,
+            "G2",null,null,null,"G2",null,"B2",null,"G2",null,null,null,"D3",null,"G2",null,
+            "C2",null,null,null,"E2",null,"G2",null,"C2",null,null,null,null,null,null,null]},
   ]
 };
 
@@ -3673,21 +3694,21 @@ export default function Piilosana(){
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
             {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="infinity" color="#44ddff" size={1}/>{t.unlimitedLabel}</div>}
             {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
-            <div className="piilosana-hud" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 10px"}}>
+            <div className="piilosana-hud" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 14px"}}>
               {gameTime!==0?(
-              <div style={{textAlign:"center",flex:1}}>
-                <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"2px"}}>{t.time}</div>
-                <div style={{fontSize:"18px",color:time<=15?S.red:time<=30?S.yellow:S.green}}>{fmt(time)}</div>
+              <div style={{display:"flex",alignItems:"baseline",gap:"8px",flex:1}}>
+                <span style={{fontSize:"14px",color:S.textMuted,fontWeight:"600"}}>{t.time}</span>
+                <span style={{fontSize:"28px",fontWeight:"700",color:time<=15?S.red:time<=30?S.yellow:S.green,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{fmt(time)}</span>
               </div>
               ):(
-              <div style={{textAlign:"center",flex:1}}>
-                <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"2px"}}>{t.words.toUpperCase()}</div>
-                <div style={{fontSize:"18px",color:"#44ddff"}}>{found.length}</div>
+              <div style={{display:"flex",alignItems:"baseline",gap:"8px",flex:1}}>
+                <span style={{fontSize:"14px",color:S.textMuted,fontWeight:"600"}}>{t.words.toUpperCase()}</span>
+                <span style={{fontSize:"28px",fontWeight:"700",color:"#44ddff",lineHeight:1}}>{found.length}</span>
               </div>
               )}
-              <div style={{textAlign:"center",flex:1}}>
-                <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"2px"}}>{t.score}</div>
-                <div style={{fontSize:"18px",color:S.yellow}}>{score}</div>
+              <div style={{display:"flex",alignItems:"baseline",gap:"8px",justifyContent:"flex-end",flex:1}}>
+                <span style={{fontSize:"14px",color:S.textMuted,fontWeight:"600"}}>{t.score}</span>
+                <span style={{fontSize:"28px",fontWeight:"700",color:S.yellow,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{score}</span>
               </div>
             </div>
             <div ref={wordBarRef} key={flashKey} style={{borderTop:S.cellGradient?`1px solid ${S.border}`:`1px solid ${S.border}`,padding:S.cellGradient?"10px 14px":"4px 10px",textAlign:"center",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
@@ -3782,7 +3803,7 @@ export default function Piilosana(){
                       width:"100%",aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",
                       fontSize:isLarge?"clamp(34px,10vw,56px)":"clamp(28px,8vw,48px)",fontFamily:S.letterFont,fontWeight:S.cellGradient?"700":"normal",
                       letterSpacing:S.cellGradient?"1px":"0",
-                      color:eaten?endColor||"transparent":scrambleColor||(s?(S.cellGradient?"#0f1720":S.bg):otherSelColor||(letterMult?letterColor(letter,lang):(S.cellGradient?"#e6eef8":S.green))),
+                      color:eaten?endColor||"transparent":scrambleColor||(s?(S.cellTextSel||"#0f1720"):otherSelColor||(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":S.green)))),
                       background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
                       border:S.cellGradient?`1px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
                       borderRadius:S.cellRadius,
