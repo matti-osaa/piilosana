@@ -1336,7 +1336,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
         animation:bubbleFading?"bubbleOut 0.6s ease-in forwards":`bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards`,
         whiteSpace:"nowrap",zIndex:50}}>
         <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
-          fontSize:"9px",padding:"8px 14px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
+          fontSize:"13px",padding:"8px 14px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
           border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",
           imageRendering:"pixelated"}}>
           <div style={{position:"absolute",top:"-9px",left:"50%",transform:"translateX(-50%)",
@@ -1373,8 +1373,8 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
   return(
     <div style={{border:`2px solid ${S.border}`,padding:"8px",background:S.dark,marginTop:"10px",animation:"fadeIn 0.8s ease"}}>
       <div style={{fontSize:"13px",color:S.yellow,marginBottom:"6px",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><PixelFlag lang={lang||"fi"} size={2}/>{hofTitle} — {label} {timeLabel}</div>
-      {loading?<div style={{fontSize:"11px",color:S.textMuted,textAlign:"center"}}>{hofLoading}</div>:
-      !scores||scores.length===0?<div style={{fontSize:"11px",color:S.textMuted,textAlign:"center"}}>{hofEmpty}</div>:
+      {loading?<div style={{fontSize:"13px",color:S.textMuted,textAlign:"center"}}>{hofLoading}</div>:
+      !scores||scores.length===0?<div style={{fontSize:"13px",color:S.textMuted,textAlign:"center"}}>{hofEmpty}</div>:
       <div style={{display:"flex",flexDirection:"column",gap:"2px"}}>
         {scores.map((s,i)=>{
           const isHighlight=currentScore&&s.score===currentScore&&i<10;
@@ -1382,12 +1382,12 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
             background:i===0?"#ffcc0011":isHighlight?"#44ff8811":"transparent",
             border:i===0?`1px solid ${S.yellow}33`:isHighlight?`1px solid ${S.green}33`:"1px solid transparent"}}>
             <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
-              <span style={{fontSize:"11px",color:i===0?S.yellow:i<3?"#cccccc":S.textMuted,minWidth:"20px"}}>{i+1}.</span>
+              <span style={{fontSize:"13px",color:i===0?S.yellow:i<3?"#cccccc":S.textMuted,minWidth:"20px"}}>{i+1}.</span>
               <span style={{fontSize:"13px",color:i===0?S.yellow:S.green}}>{s.nickname}</span>
             </div>
             <div style={{display:"flex",gap:"12px",alignItems:"center"}}>
               <span style={{fontSize:"13px",color:S.yellow}}>{s.score}p</span>
-              <span style={{fontSize:"11px",color:S.textSoft||"#88ccaa"}}>{s.percentage}%</span>
+              <span style={{fontSize:"13px",color:S.textSoft||"#88ccaa"}}>{s.percentage}%</span>
             </div>
           </div>;
         })}
@@ -2556,32 +2556,32 @@ export default function Piilosana(){
           onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #008844"}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844"}}>
           <span>{t.practice}</span>
-          <span style={{fontSize:"11px",opacity:0.7}}>{t.practiceDesc}</span>
+          <span style={{fontSize:"13px",opacity:0.7}}>{t.practiceDesc}</span>
         </button>
         <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.yellow,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #cc8800",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
           onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #cc8800"}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #cc8800"}}>
           <span>{t.customGame}</span>
-          <span style={{fontSize:"11px",opacity:0.7}}>{t.customDesc}</span>
+          <span style={{fontSize:"13px",opacity:0.7}}>{t.customDesc}</span>
         </button>
       </div>
 
       {/* Expandable solo options under the smaller buttons */}
-      <button onClick={()=>setShowMenuOptions(v=>!v)} style={{fontFamily:S.font,fontSize:"12px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",display:"flex",alignItems:"center",gap:"4px",margin:"0 auto",marginTop:"4px"}}>
+      <button onClick={()=>setShowMenuOptions(v=>!v)} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",display:"flex",alignItems:"center",gap:"4px",margin:"0 auto",marginTop:"4px"}}>
         <span style={{transform:showMenuOptions?"rotate(90deg)":"rotate(0deg)",transition:"transform 0.2s",display:"inline-block"}}>▶</span>
         {t.advancedOptions}
       </button>
       {showMenuOptions&&(
         <div style={{padding:"16px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"4px",animation:"fadeIn 0.3s ease",borderRadius:S.panelRadius}}>
           <div style={{marginBottom:"12px"}}>
-            <div style={{fontSize:"12px",color:S.green,marginBottom:"6px"}}>{t.gameMode}</div>
+            <div style={{fontSize:"13px",color:S.green,marginBottom:"6px"}}>{t.gameMode}</div>
             <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap"}}>
               <button onClick={()=>setSoloMode("normal")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="normal"?S.bg:S.green,background:soloMode==="normal"?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer"}}>{t.modeNormal}</button>
               <button onClick={()=>setSoloMode("tetris")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="tetris"?S.bg:S.purple,background:soloMode==="tetris"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"6px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}><Icon icon="arrow" color={soloMode==="tetris"?S.bg:S.purple} size={1.5}/>{t.modeTetris}</button>
             </div>
           </div>
           <div style={{marginBottom:"12px"}}>
-            <div style={{fontSize:"12px",color:S.green,marginBottom:"6px"}}>{t.time}</div>
+            <div style={{fontSize:"13px",color:S.green,marginBottom:"6px"}}>{t.time}</div>
             <div style={{display:"flex",gap:"6px",justifyContent:"center"}}>
               <button onClick={()=>setGameTime(120)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===120?S.bg:S.green,background:gameTime===120?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer"}}>2 MIN</button>
               <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"6px 14px",cursor:"pointer"}}>{lang==="en"?"6.7":"6,7"} MIN</button>
@@ -2621,7 +2621,7 @@ export default function Piilosana(){
         <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap",marginBottom:"12px"}}>
           {Object.entries(LANG_CONFIG).map(([code,lc])=>(
             <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
-              style={{fontFamily:S.font,fontSize:"12px",background:lang===code?S.dark:"transparent",
+              style={{fontFamily:S.font,fontSize:"13px",background:lang===code?S.dark:"transparent",
                 border:lang===code?`2px solid ${S.green}`:`2px solid ${S.border}`,
                 padding:"6px 10px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
                 boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
@@ -2629,18 +2629,18 @@ export default function Piilosana(){
               <PixelFlag lang={code} size={2}/>
             </button>
           ))}
-          <button onClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} style={{fontFamily:S.font,fontSize:"12px",color:S.textSoft,
+          <button onClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} style={{fontFamily:S.font,fontSize:"13px",color:S.textSoft,
             background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
             display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",minHeight:"36px",borderRadius:S.btnRadius}}>
             <Icon icon="gear" color={S.textSoft} size={2}/>
           </button>
-          <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"12px",color:S.yellow,
+          <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,
             background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
             display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",position:"relative",minHeight:"36px",borderRadius:S.btnRadius}}>
             <Icon icon="trophy" color={S.yellow} size={2} badge={true}/>
-            {Object.keys(achUnlocked).length>0&&<span style={{fontSize:"11px"}}>{Object.keys(achUnlocked).length}/{Object.keys(ACHIEVEMENTS).length}</span>}
+            {Object.keys(achUnlocked).length>0&&<span style={{fontSize:"13px"}}>{Object.keys(achUnlocked).length}/{Object.keys(ACHIEVEMENTS).length}</span>}
           </button>
-          <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"12px",color:authUser?S.green:S.yellow,
+          <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"13px",color:authUser?S.green:S.yellow,
             background:authUser?S.dark:"transparent",border:`2px solid ${authUser?S.green:S.border}`,padding:"6px 10px",cursor:"pointer",
             display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",
             boxShadow:authUser?`0 0 8px ${S.green}44`:"none",minHeight:"36px",borderRadius:S.btnRadius}}>
@@ -2651,11 +2651,11 @@ export default function Piilosana(){
         {/* Info links */}
         <div style={{fontSize:"14px",color:S.textMuted,marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString("fi-FI")} {t.words}</div>
         <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
-          <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"12px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.howToPlay}</button>
-          <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"12px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
+          <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.howToPlay}</button>
+          <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
         </div>
-        <div style={{fontSize:"11px",color:S.textMuted,marginTop:"4px"}}>v{VERSION} · © Matti Kuokkanen 2026</div>
-        <div style={{fontSize:"11px",marginTop:"4px",display:"flex",gap:"10px",justifyContent:"center"}}>
+        <div style={{fontSize:"13px",color:S.textMuted,marginTop:"4px"}}>v{VERSION} · © Matti Kuokkanen 2026</div>
+        <div style={{fontSize:"13px",marginTop:"4px",display:"flex",gap:"10px",justifyContent:"center"}}>
           <a href="mailto:info@piilosana.com" style={{color:S.textMuted,textDecoration:"none"}}>{lang==="en"?"Feedback":lang==="sv"?"Feedback":"Palaute"}</a>
           <a href="/privacy" style={{color:S.textMuted,textDecoration:"none"}}>{lang==="en"?"Privacy":lang==="sv"?"Integritet":"Tietosuoja"}</a>
         </div>
@@ -2673,19 +2673,19 @@ export default function Piilosana(){
         {myRank===1&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🥈</div>}
         {myRank===2&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🥉</div>}
         <div style={{fontSize:"16px",color:isWinner?S.yellow:myRank<=2?"#cccccc":S.green,marginBottom:"4px",animation:myRank<=2?"pop 0.6s ease":"none"}}>{isWinner?t.youWon:myRank===1?"2.":myRank===2?"3.":t.gameOver}</div>
-        <p style={{fontSize:"11px",color:S.green,marginBottom:"12px"}}>{t.results}</p>
+        <p style={{fontSize:"13px",color:S.green,marginBottom:"12px"}}>{t.results}</p>
         {multiRankings&&multiRankings.slice(0,5).map((p,i)=>{
           const medals=["🥇","🥈","🥉"];
           const isMe=p.playerId===playerId;
           return(
-            <div key={i} style={{fontSize:"11px",color:isMe?S.yellow:S.green,padding:"6px 10px",borderBottom:`1px solid ${S.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:isMe?"#ffcc0011":"transparent",animation:isMe?"pop 0.4s ease":"none"}}>
+            <div key={i} style={{fontSize:"13px",color:isMe?S.yellow:S.green,padding:"6px 10px",borderBottom:`1px solid ${S.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:isMe?"#ffcc0011":"transparent",animation:isMe?"pop 0.4s ease":"none"}}>
               <span>{medals[i]||`${i+1}.`} {p.nickname}</span>
               <span>{p.score}p ({p.wordsFound} {t.words})</span>
             </div>
           );
         })}
         {gameMode==="classic"&&multiValidWords.length>0&&(
-          <div style={{fontSize:"11px",color:S.textSoft||"#88ccaa",marginTop:"8px"}}>{(() => {const allF=new Set();Object.values(multiAllFoundWords).forEach(ws=>ws.forEach(w=>allF.add(w)));return `${allF.size} / ${multiValidWords.length} ${t.words} (${Math.round(allF.size/multiValidWords.length*100)}%)`;})()}</div>
+          <div style={{fontSize:"13px",color:S.textSoft||"#88ccaa",marginTop:"8px"}}>{(() => {const allF=new Set();Object.values(multiAllFoundWords).forEach(ws=>ws.forEach(w=>allF.add(w)));return `${allF.size} / ${multiValidWords.length} ${t.words} (${Math.round(allF.size/multiValidWords.length*100)}%)`;})()}</div>
         )}
         {/* Word summary for multiplayer - separate boxes */}
         {gameMode==="battle"&&multiRankings&&(()=>{
@@ -2745,7 +2745,7 @@ export default function Piilosana(){
         <div style={{marginTop:"16px",display:"flex",flexDirection:"column",gap:"8px",alignItems:"center"}}>
           {isHost&&<button onClick={playAgain} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>{t.newCustom}</button>}
           <button onClick={switchToSolo} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>{t.practice}</button>
-          <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",width:"280px"}}>{t.menu}</button>
+          <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",width:"280px"}}>{t.menu}</button>
         </div>
       </div>
     </div>
@@ -2762,10 +2762,10 @@ export default function Piilosana(){
           <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"500px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative",borderRadius:S.panelRadius,boxShadow:S.panelShadow}} onClick={e=>e.stopPropagation()}>
             <button onClick={()=>setShowWordInfo(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius}}>✕</button>
             <div style={{fontSize:"14px",color:S.green,marginBottom:"16px"}}>{t.wordInfoTitle}</div>
-            <div style={{fontSize:"12px",color:S.green,lineHeight:"1.8",marginBottom:"12px"}}>{t.wordInfoBody1}</div>
-            <div style={{fontSize:"12px",color:S.green,lineHeight:"1.8",marginBottom:"12px"}}>{t.wordInfoBody2}</div>
-            <div style={{fontSize:"12px",color:S.green,lineHeight:"1.8",marginBottom:"16px"}}>{t.wordInfoBody3}</div>
-            <div style={{fontSize:"12px",color:S.green,marginBottom:"8px",borderTop:`1px solid ${S.border}`,paddingTop:"12px"}}>
+            <div style={{fontSize:"13px",color:S.green,lineHeight:"1.8",marginBottom:"12px"}}>{t.wordInfoBody1}</div>
+            <div style={{fontSize:"13px",color:S.green,lineHeight:"1.8",marginBottom:"12px"}}>{t.wordInfoBody2}</div>
+            <div style={{fontSize:"13px",color:S.green,lineHeight:"1.8",marginBottom:"16px"}}>{t.wordInfoBody3}</div>
+            <div style={{fontSize:"13px",color:S.green,marginBottom:"8px",borderTop:`1px solid ${S.border}`,paddingTop:"12px"}}>
               <div style={{marginBottom:"8px",color:S.yellow}}>{t.wordInfoSources}:</div>
               <div style={{display:"flex",flexDirection:"column",gap:"6px"}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}>
@@ -2794,7 +2794,7 @@ export default function Piilosana(){
           <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"440px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative",borderRadius:S.panelRadius,boxShadow:S.panelShadow}} onClick={e=>e.stopPropagation()}>
             <button onClick={()=>setShowHelp(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius}}>✕</button>
             <div style={{fontSize:"14px",color:S.green,marginBottom:"16px"}}>{t.howToPlay?.toUpperCase()}</div>
-            <div style={{display:"flex",flexDirection:"column",gap:"14px",fontSize:"12px",color:S.green,lineHeight:"1.8"}}>
+            <div style={{display:"flex",flexDirection:"column",gap:"14px",fontSize:"13px",color:S.green,lineHeight:"1.8"}}>
               <div><span style={{color:S.yellow}}>☝</span> {t.helpDrag}</div>
               <div><span style={{color:S.yellow}}>⏱</span> {t.helpTime}</div>
               <div><span style={{color:S.yellow}}>⭐</span> {t.helpScoring}</div>
@@ -2933,7 +2933,7 @@ export default function Piilosana(){
                     <div style={{fontSize:"13px",color:unlocked?(S.textSoft||"#88ccaa"):S.textMuted,lineHeight:"1.4"}}>
                       {ach[lang+"_d"]||ach.fi_d}
                     </div>
-                    {unlocked&&<div style={{fontSize:"10px",color:S.textMuted,marginTop:"4px"}}>
+                    {unlocked&&<div style={{fontSize:"13px",color:S.textMuted,marginTop:"4px"}}>
                       {new Date(achUnlocked[id]).toLocaleDateString()}
                     </div>}
                   </div>
@@ -2966,13 +2966,13 @@ export default function Piilosana(){
           </div>
           {/* Theme */}
           <div style={{marginBottom:"14px"}}>
-            <div style={{fontFamily:S.font,fontSize:"11px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
+            <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
               {lang==="en"?"Color Theme":lang==="sv"?"Färgtema":"Väriteema"}
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
               {Object.entries(THEMES).map(([id,th])=>(
                 <button key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);syncSettings({theme:id});}}
-                  style={{fontFamily:S.font,fontSize:"12px",
+                  style={{fontFamily:S.font,fontSize:"13px",
                     color:themeId===id?th.bg:th.green,
                     background:themeId===id?th.green:"transparent",
                     border:`2px solid ${th.green}`,padding:"5px 8px",cursor:"pointer",
@@ -2985,18 +2985,18 @@ export default function Piilosana(){
           </div>
           {/* Size */}
           <div style={{marginBottom:"14px"}}>
-            <div style={{fontFamily:S.font,fontSize:"11px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
+            <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
               {lang==="en"?"Grid Size":lang==="sv"?"Rutstorlek":"Ruudukon koko"}
             </div>
             <div style={{display:"flex",gap:"4px"}}>
               <button onClick={()=>{setUiSize("normal");localStorage.setItem("piilosana_size","normal");syncSettings({size:"normal"});}}
-                style={{fontFamily:S.font,fontSize:"12px",
+                style={{fontFamily:S.font,fontSize:"13px",
                   color:uiSize==="normal"?S.bg:S.green,background:uiSize==="normal"?S.green:"transparent",
                   border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
                 {lang==="en"?"NORMAL":lang==="sv"?"NORMAL":"NORMAALI"}
               </button>
               <button onClick={()=>{setUiSize("large");localStorage.setItem("piilosana_size","large");syncSettings({size:"large"});}}
-                style={{fontFamily:S.font,fontSize:"12px",
+                style={{fontFamily:S.font,fontSize:"13px",
                   color:uiSize==="large"?S.bg:S.green,background:uiSize==="large"?S.green:"transparent",
                   border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
                 {lang==="en"?"LARGE":lang==="sv"?"STOR":"ISO"}
@@ -3005,13 +3005,13 @@ export default function Piilosana(){
           </div>
           {/* Sound */}
           <div style={{marginBottom:"14px"}}>
-            <div style={{fontFamily:S.font,fontSize:"11px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
+            <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
               {lang==="en"?"Sound Effects":lang==="sv"?"Ljudeffekter":"Ääniefektit"}
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
               {[["retro",{fi:"RETRO",en:"RETRO",sv:"RETRO"}],["soft",{fi:"PEHMEÄ",en:"SOFT",sv:"MJUK"}],["modern",{fi:"MODERNI",en:"MODERN",sv:"MODERN"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
                 <button key={id} onClick={()=>{setSoundTheme(id);localStorage.setItem("piilosana_sound",id);syncSettings({sound:id});}}
-                  style={{fontFamily:S.font,fontSize:"12px",
+                  style={{fontFamily:S.font,fontSize:"13px",
                     color:soundTheme===id?S.bg:S.green,background:soundTheme===id?S.green:"transparent",
                     border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer",
                     boxShadow:soundTheme===id?`0 0 8px ${S.green}66`:"none"}}>
@@ -3022,11 +3022,11 @@ export default function Piilosana(){
           </div>
           {/* Confetti */}
           <div>
-            <div style={{fontFamily:S.font,fontSize:"11px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
+            <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
               {lang==="en"?"Visual Effects":lang==="sv"?"Visuella effekter":"Visuaaliset tehosteet"}
             </div>
             <button onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");syncSettings({confetti:v});}}
-              style={{fontFamily:S.font,fontSize:"12px",
+              style={{fontFamily:S.font,fontSize:"13px",
                 color:confettiOn?S.bg:S.green,background:confettiOn?S.green:"transparent",
                 border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
               {confettiOn?"✓ ":""}{lang==="en"?"CONFETTI ON WIN":lang==="sv"?"KONFETTI VID VINST":"KONFETTI VOITOSTA"}
@@ -3041,32 +3041,32 @@ export default function Piilosana(){
           boxShadow:`0 0 20px ${S.yellow}33`,animation:"fadeIn 0.3s ease",marginBottom:"8px",zIndex:100,position:"relative"}}>
           {authUser?(
             <div style={{textAlign:"center"}}>
-              <div style={{fontFamily:S.font,fontSize:"11px",color:S.green,marginBottom:"12px",display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}>
+              <div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"12px",display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}>
                 <Icon icon="person" color={S.green} size={2}/>
                 {authUser.nickname}
               </div>
-              {authUser.email&&<div style={{fontFamily:S.font,fontSize:"11px",color:S.textMuted,marginBottom:"12px"}}>{authUser.email}</div>}
+              {authUser.email&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"12px"}}>{authUser.email}</div>}
               {authMode==="changePassword"?(
                 <form onSubmit={async(e)=>{e.preventDefault();const fd=new FormData(e.target);await doChangePassword(fd.get("currentPassword"),fd.get("newPassword"));}} style={{textAlign:"left"}}>
                   <input name="currentPassword" type="password" autoComplete="current-password" placeholder={lang==="en"?"CURRENT PASSWORD":lang==="sv"?"NUVARANDE LÖSENORD":"NYKYINEN SALASANA"}
-                    style={{fontFamily:S.font,fontSize:"11px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
+                    style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
                   <input name="newPassword" type="password" autoComplete="new-password" minLength="4" placeholder={lang==="en"?"NEW PASSWORD":lang==="sv"?"NYTT LÖSENORD":"UUSI SALASANA"}
                     style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
-                  {authError&&<div style={{fontFamily:S.font,fontSize:"12px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
-                  {authSuccess&&<div style={{fontFamily:S.font,fontSize:"12px",color:S.green,marginBottom:"8px"}}>{authSuccess}</div>}
+                  {authError&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
+                  {authSuccess&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"8px"}}>{authSuccess}</div>}
                   <button type="submit" disabled={authLoading} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"8px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"100%"}}>
                     {authLoading?"...":(lang==="en"?"CHANGE PASSWORD":lang==="sv"?"ÄNDRA LÖSENORD":"VAIHDA SALASANA")}
                   </button>
-                  <button type="button" onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"12px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
+                  <button type="button" onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
                     ← {lang==="en"?"Back":lang==="sv"?"Tillbaka":"Takaisin"}
                   </button>
                 </form>
               ):(
                 <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center"}}>
-                  <button onClick={()=>{setAuthMode("changePassword");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"12px",color:S.yellow,background:"transparent",border:`2px solid ${S.yellow}`,padding:"6px 16px",cursor:"pointer"}}>
+                  <button onClick={()=>{setAuthMode("changePassword");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,background:"transparent",border:`2px solid ${S.yellow}`,padding:"6px 16px",cursor:"pointer"}}>
                     {lang==="en"?"CHANGE PASSWORD":lang==="sv"?"ÄNDRA LÖSENORD":"VAIHDA SALASANA"}
                   </button>
-                  <button onClick={()=>{doLogout();setShowAuth(false);}} style={{fontFamily:S.font,fontSize:"12px",color:S.red||"#ff4444",background:"transparent",border:`2px solid ${S.red||"#ff4444"}`,padding:"6px 16px",cursor:"pointer"}}>
+                  <button onClick={()=>{doLogout();setShowAuth(false);}} style={{fontFamily:S.font,fontSize:"13px",color:S.red||"#ff4444",background:"transparent",border:`2px solid ${S.red||"#ff4444"}`,padding:"6px 16px",cursor:"pointer"}}>
                     {lang==="en"?"LOG OUT":lang==="sv"?"LOGGA UT":"KIRJAUDU ULOS"}
                   </button>
                   <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,padding:"8px 18px",cursor:"pointer",marginTop:"8px",width:"100%"}}>✕</button>
@@ -3077,10 +3077,10 @@ export default function Piilosana(){
             <div>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
                 <div style={{display:"flex",gap:"8px"}}>
-                  <button onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"12px",color:authMode==="login"?S.bg:S.yellow,background:authMode==="login"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
+                  <button onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:authMode==="login"?S.bg:S.yellow,background:authMode==="login"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
                     {lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"}
                   </button>
-                  <button onClick={()=>{setAuthMode("register");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"12px",color:authMode==="register"?S.bg:S.yellow,background:authMode==="register"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
+                  <button onClick={()=>{setAuthMode("register");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:authMode==="register"?S.bg:S.yellow,background:authMode==="register"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
                     {lang==="en"?"REGISTER":lang==="sv"?"REGISTRERA":"LUO TUNNUS"}
                   </button>
                 </div>
@@ -3088,17 +3088,17 @@ export default function Piilosana(){
               </div>
               {authMode==="forgot"?(
                 <form onSubmit={async(e)=>{e.preventDefault();const fd=new FormData(e.target);await doForgotPassword(fd.get("email"));}}>
-                  <div style={{fontFamily:S.font,fontSize:"12px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
+                  <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
                     {lang==="en"?"Enter your email and we'll send a new password.":lang==="sv"?"Ange din e-post så skickar vi ett nytt lösenord.":"Syötä sähköpostisi niin lähetämme uuden salasanan."}
                   </div>
                   <input name="email" type="email" autoComplete="email" placeholder={lang==="en"?"EMAIL":lang==="sv"?"E-POST":"SÄHKÖPOSTI"}
                     style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
-                  {authError&&<div style={{fontFamily:S.font,fontSize:"12px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
-                  {authSuccess&&<div style={{fontFamily:S.font,fontSize:"12px",color:S.green,marginBottom:"8px"}}>{authSuccess}</div>}
+                  {authError&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
+                  {authSuccess&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"8px"}}>{authSuccess}</div>}
                   <button type="submit" disabled={authLoading} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"8px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"100%"}}>
                     {authLoading?"...":(lang==="en"?"SEND NEW PASSWORD":lang==="sv"?"SKICKA NYTT LÖSENORD":"LÄHETÄ UUSI SALASANA")}
                   </button>
-                  <button type="button" onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"12px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
+                  <button type="button" onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
                     ← {lang==="en"?"Back to login":lang==="sv"?"Tillbaka till inloggning":"Takaisin kirjautumiseen"}
                   </button>
                 </form>
@@ -3118,20 +3118,20 @@ export default function Piilosana(){
                 {authMode==="register"&&(
                   <>
                     <input name="email" type="email" autoComplete="email" placeholder={`${lang==="en"?"EMAIL":lang==="sv"?"E-POST":"SÄHKÖPOSTI"} (${lang==="en"?"optional":lang==="sv"?"valfritt":"vapaaehtoinen"})`}
-                      style={{fontFamily:S.font,fontSize:"12px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
+                      style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
                     <input name="email2" type="email" autoComplete="email" placeholder={lang==="en"?"CONFIRM EMAIL":lang==="sv"?"BEKRÄFTA E-POST":"VAHVISTA SÄHKÖPOSTI"}
-                      style={{fontFamily:S.font,fontSize:"12px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
-                    <div style={{fontFamily:S.font,fontSize:"12px",color:S.textMuted,marginBottom:"8px",lineHeight:"1.6"}}>
+                      style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
+                    <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"8px",lineHeight:"1.6"}}>
                       {lang==="en"?"Password will be sent to your email for safekeeping":lang==="sv"?"Lösenordet skickas till din e-post":"Salasana lähetetään sähköpostiisi muistiksi"}
                     </div>
                   </>
                 )}
-                {authError&&<div style={{fontFamily:S.font,fontSize:"12px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
+                {authError&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
                 <button type="submit" disabled={authLoading} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"8px 20px",cursor:"pointer",boxShadow:`3px 3px 0 #cc8800`,width:"100%"}}>
                   {authLoading?"...":(authMode==="login"?(lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"):(lang==="en"?"CREATE ACCOUNT":lang==="sv"?"SKAPA KONTO":"LUO TUNNUS"))}
                 </button>
                 {authMode==="login"&&(
-                  <button type="button" onClick={()=>{setAuthMode("forgot");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"12px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
+                  <button type="button" onClick={()=>{setAuthMode("forgot");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
                     {lang==="en"?"Forgot password?":lang==="sv"?"Glömt lösenord?":"Unohtuiko salasana?"}
                   </button>
                 )}
@@ -3140,7 +3140,7 @@ export default function Piilosana(){
               {/* Google Sign-In */}
               {googleClientId&&(
                 <div style={{marginTop:"12px",paddingTop:"12px",borderTop:`1px solid ${S.border}`,textAlign:"center"}}>
-                  <div style={{fontFamily:S.font,fontSize:"12px",color:S.textMuted,marginBottom:"8px"}}>
+                  <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"8px"}}>
                     {lang==="en"?"or":lang==="sv"?"eller":"tai"}
                   </div>
                   <div id="google-signin-btn" ref={(el)=>{
@@ -3155,7 +3155,7 @@ export default function Piilosana(){
                       });
                     }
                   }}/>
-                  <div style={{fontFamily:S.font,fontSize:"12px",color:S.textMuted,marginTop:"10px",lineHeight:"1.8",maxWidth:"280px",textAlign:"center"}}>
+                  <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginTop:"10px",lineHeight:"1.8",maxWidth:"280px",textAlign:"center"}}>
                     {lang==="en"?"Google only shares your name and email. We never see your password or access your Google account. "
                     :lang==="sv"?"Google delar bara ditt namn och e-post. Vi ser aldrig ditt lösenord eller kommer åt ditt Google-konto. "
                     :"Google jakaa vain nimesi ja sähköpostisi. Emme näe salasanaasi emmekä pääse Google-tilillesi. "}
@@ -3178,7 +3178,7 @@ export default function Piilosana(){
             <Icon icon="person" color={S.yellow} size={2}/>
             {lang==="en"?"Save your nickname?":lang==="sv"?"Spara ditt smeknamn?":"Tallenna nimimerkkisi?"}
           </div>
-          <div style={{fontFamily:S.font,fontSize:"12px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
+          <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
             {lang==="en"?"Create an account to save your progress":lang==="sv"?"Skapa ett konto för att spara dina framsteg":"Luo tunnus — nimimerkkisi ja saavutuksesi tallentuvat"}
           </div>
           <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
@@ -3491,7 +3491,7 @@ export default function Piilosana(){
       {/* COUNTDOWN */}
       {state==="countdown"&&(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{fontSize:"11px",color:S.green,marginBottom:"24px"}}>{mode==="multi"?(gameMode==="battle"?t.battleStarts:t.gameStarts):(soloMode==="tetris"?t.tetrisStarts:t.getReady)}</div>
+          <div style={{fontSize:"13px",color:S.green,marginBottom:"24px"}}>{mode==="multi"?(gameMode==="battle"?t.battleStarts:t.gameStarts):(soloMode==="tetris"?t.tetrisStarts:t.getReady)}</div>
           <div key={countdown} style={{fontSize:"72px",color:countdown<=2?S.red:countdown<=3?S.yellow:S.green,textShadow:`0 0 40px ${countdown<=2?"#ff444488":countdown<=3?"#ffcc0088":"#00ff8888"}`,animation:"pop 0.3s ease",lineHeight:"1"}}>
             {countdown>0?countdown:t.play+"!"}
           </div>
@@ -3504,11 +3504,11 @@ export default function Piilosana(){
         <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD */}
           <div style={{marginBottom:"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
-            {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {publicPlayerCount===1?t.player:t.players}</div>}
-            {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
-            {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
-            {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="infinity" color="#44ddff" size={1}/>{t.unlimitedLabel}</div>}
-            {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
+            {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {publicPlayerCount===1?t.player:t.players}</div>}
+            {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
+            {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
+            {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="infinity" color="#44ddff" size={1}/>{t.unlimitedLabel}</div>}
+            {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
             <div className="piilosana-hud" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 14px"}}>
               {gameTime!==0?(
               <div style={{display:"flex",alignItems:"baseline",gap:"8px",flex:1}}>
@@ -3537,13 +3537,13 @@ export default function Piilosana(){
 
           {/* Battle mode: flash when someone finds a word */}
           {gameMode==="battle"&&battleMsg&&state==="play"&&(
-            <div style={{textAlign:"center",fontSize:"11px",padding:"4px 8px",marginBottom:"4px",background:battleMsg.finderId===playerId?"#00ff8822":"#ff66aa22",border:`1px solid ${battleMsg.finderId===playerId?S.green:"#ff66aa"}`,color:battleMsg.finderId===playerId?S.green:"#ff66aa",animation:"fadeIn 0.5s ease"}}>
+            <div style={{textAlign:"center",fontSize:"13px",padding:"4px 8px",marginBottom:"4px",background:battleMsg.finderId===playerId?"#00ff8822":"#ff66aa22",border:`1px solid ${battleMsg.finderId===playerId?S.green:"#ff66aa"}`,color:battleMsg.finderId===playerId?S.green:"#ff66aa",animation:"fadeIn 0.5s ease"}}>
               {battleMsg.finder}: {battleMsg.word.toUpperCase()} +{battleMsg.points}p
             </div>
           )}
 
           {combo>=2&&state==="play"&&(
-            <div style={{textAlign:"center",fontSize:"11px",color:combo>=5?S.purple:combo>=3?S.yellow:S.green,marginBottom:"4px",animation:combo>=3?"epicPulse 0.5s infinite":"none"}}>
+            <div style={{textAlign:"center",fontSize:"13px",color:combo>=5?S.purple:combo>=3?S.yellow:S.green,marginBottom:"4px",animation:combo>=3?"epicPulse 0.5s infinite":"none"}}>
               {combo>=5?`${t.megaCombo} x${combo}!`:combo>=3?`${t.combo} x${combo}! (x2)`:`${combo} ${t.comboStreak}`}
             </div>
           )}
@@ -3730,15 +3730,15 @@ export default function Piilosana(){
                     await submitToHallOfFame({nickname:soloNickname.trim(),score,wordsFound:found.length,
                       wordsTotal:valid.size,gameMode:soloMode,gameTime,lang});
                     setHofSubmitted(true);
-                  }} style={{fontFamily:S.font,fontSize:"11px",color:S.bg,background:S.yellow,border:"none",padding:"8px 16px",cursor:"pointer"}}>
+                  }} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"8px 16px",cursor:"pointer"}}>
                     {t.saveAs} {soloNickname.trim()}
                   </button>
                 ):(
                   <>
-                    <div style={{fontSize:"11px",color:S.yellow,marginBottom:"6px"}}>{t.saveToHof}</div>
+                    <div style={{fontSize:"13px",color:S.yellow,marginBottom:"6px"}}>{t.saveToHof}</div>
                     <div style={{display:"flex",gap:"6px",justifyContent:"center",alignItems:"center"}}>
                       <input type="text" maxLength="12" value={soloNickname} onChange={e=>{setSoloNickname(e.target.value.toUpperCase());localStorage.setItem("piilosana_nick",e.target.value.toUpperCase());}}
-                        placeholder={t.nickname} style={{fontFamily:S.font,fontSize:"11px",color:S.green,background:S.dark,
+                        placeholder={t.nickname} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:S.dark,
                         border:`2px solid ${S.green}`,padding:"8px",width:"140px",textAlign:"center",outline:"none"}}/>
                       <button onClick={async()=>{
                         if(!soloNickname.trim())return;
@@ -3746,7 +3746,7 @@ export default function Piilosana(){
                           wordsTotal:valid.size,gameMode:soloMode,gameTime,lang});
                         setHofSubmitted(true);
                       }} disabled={!soloNickname.trim()}
-                        style={{fontFamily:S.font,fontSize:"11px",color:soloNickname.trim()?S.bg:S.textMuted,
+                        style={{fontFamily:S.font,fontSize:"13px",color:soloNickname.trim()?S.bg:S.textMuted,
                         background:soloNickname.trim()?S.yellow:S.border,border:"none",padding:"8px 12px",cursor:soloNickname.trim()?"pointer":"default"}}>
                         {t.save}
                       </button>
@@ -3755,14 +3755,14 @@ export default function Piilosana(){
                 )}
               </div>
             )}
-            {hofSubmitted&&<div style={{fontSize:"11px",color:S.green,marginTop:"8px"}}>{t.saved}</div>}
+            {hofSubmitted&&<div style={{fontSize:"13px",color:S.green,marginTop:"8px"}}>{t.saved}</div>}
 
             {/* Share result */}
             <button onClick={async()=>{
               const text=t.shareText.replace("{words}",found.length).replace("{score}",score)+"\nhttps://piilosana.up.railway.app";
               if(navigator.share){try{await navigator.share({text});return;}catch{}}
               try{await navigator.clipboard.writeText(text);addPopup(t.shareCopied,S.green);}catch{}
-            }} style={{fontFamily:S.font,fontSize:"11px",color:"#44ddff",border:"2px solid #44ddff",background:"transparent",
+            }} style={{fontFamily:S.font,fontSize:"13px",color:"#44ddff",border:"2px solid #44ddff",background:"transparent",
               padding:"8px 16px",cursor:"pointer",marginTop:"10px",width:"280px"}}>
               {t.share}
             </button>
@@ -3770,7 +3770,7 @@ export default function Piilosana(){
             <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center",marginTop:"10px"}}>
               <button onClick={()=>{setHofSubmitted(false);start();}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>{t.newPractice}</button>
               <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>{t.customGame}</button>
-              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"11px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",width:"280px"}}>{t.menu}</button>
+              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",width:"280px"}}>{t.menu}</button>
             </div>
           </div>
 
