@@ -73,7 +73,7 @@ function applyGravityClient(grid,removedCells,lang='fi'){
 // UI translations
 const T={
   fi:{
-    selectMode:"VALITSE PELIMUOTO",arena:"AREENA",arenaDesc:"24/7 nettipeli",arenaCta:"PELAA NYT",arenaWelcome:"Tervetuloa — liity peliin!",customGame:"OMA NETTIPELI",customDesc:"eri moodeja",practice:"HARJOITUS",practiceDesc:"yksinpeli",
+    selectMode:"VALITSE PELIMUOTO",arena:"AREENA",arenaDesc:"24/7 nonstop-moninpeli",arenaCta:"PELAA NYT",arenaWelcome:"Tervetuloa — liity peliin!",customGame:"OMA MONINPELI",customDesc:"kutsu kaverit",practice:"HARJOITTELU",practiceDesc:"yksinpeli",
     findWords:"Etsi sanoja ruudukosta!",dragHint:"VEDÄ kirjaimien yli kaikkiin suuntiin. Aikaa 2 min.",comboHint:"Löydä sanoja nopeasti putkeen = kombo ja lisäpisteet!",
     scoring:"PISTEYTYS: 3kir=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"sanaa",
     nickname:"NIMIMERKKI",join:"LIITY",back:"TAKAISIN",exit:"POISTU",play:"PELAA",
@@ -106,11 +106,11 @@ const T={
     options:"ASETUKSET",quickPlay:"PELAA",or:"tai",advancedOptions:"Lisävalinnat",
     readMoreWords:"Lue lisää sanoista",
     wordInfoTitle:"SANALISTASTA",
-    wordInfoBody1:"Sanalistassa on perusmuotoja, taivutuksia, yhdyssanoja, erisnimiä ja lyhenteitä.",
+    wordInfoBody1:"Sanalistassa on perusmuotoja, taivutuksia ja yhdyssanoja — yhteensä noin 138 000 sanaa.",
     wordInfoBody2:"Suomen kielelle sanoja on paljon, koska suomen rikas taivutusjärjestelmä tuottaa saman sanan monessa muodossa (esim. talo → taloa, talossa, talojen, taloihin...).",
-    wordInfoBody3:"Myös lyhenteitä on mukana, kuten nato, dna tai wifi.",
+    wordInfoBody3:"Sanalista perustuu Wiktionary-sanakirjaan (kaikki.org). Sanat ovat 3–7 kirjainta pitkiä.",
     wordInfoSources:"Lähteet",
-    wordInfoSourceFi:"Kotus — nykysuomen sanalista + Joukahainen/Voikko (taivutusmuodot)",
+    wordInfoSourceFi:"Wiktionary (kaikki.org) — perusmuodot ja taivutukset, ~138 000 sanaa",
     wordInfoSourceEn:"SOWPODS / Collins Scrabble Words",
     wordInfoSourceSv:"SAOL — Svenska Akademiens ordlista",
     howToPlay:"Näin pelaat",
@@ -119,7 +119,7 @@ const T={
     helpScoring:"Pisteytys: 3 kirjainta = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7+ = 10p",
     helpCombo:"Löydä sanoja nopeasti peräkkäin → combo! 3+ peräkkäin = x2, 5+ = x3 pisteet.",
     helpMultiplier:"Kultaiset kirjaimet antavat 2× tai 3× pistekertoimen sanaan.",
-    helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi yli 380 000, englanniksi ja ruotsiksi omat sanalistansa.",
+    helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi noin 138 000, englanniksi ja ruotsiksi omat sanalistansa.",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -155,11 +155,11 @@ const T={
     options:"SETTINGS",quickPlay:"PLAY",or:"or",advancedOptions:"More options",
     readMoreWords:"Read more about the words",
     wordInfoTitle:"ABOUT THE WORD LIST",
-    wordInfoBody1:"The word list includes base forms, inflections, compound words, proper nouns and abbreviations.",
+    wordInfoBody1:"The word list includes base forms, inflections and compound words — about 138,000 words in total.",
     wordInfoBody2:"The Finnish list is especially large because Finnish has a rich inflection system that produces many forms of each word (e.g. talo → taloa, talossa, talojen, taloihin...).",
-    wordInfoBody3:"Abbreviations are also included, such as nato, dna or wifi.",
+    wordInfoBody3:"The word list is based on the Wiktionary dictionary (kaikki.org). Words are 3–7 letters long.",
     wordInfoSources:"Sources",
-    wordInfoSourceFi:"Kotus — modern Finnish word list + Joukahainen/Voikko (inflections)",
+    wordInfoSourceFi:"Wiktionary (kaikki.org) — base forms and inflections, ~138,000 words",
     wordInfoSourceEn:"SOWPODS / Collins Scrabble Words",
     wordInfoSourceSv:"SAOL — Swedish Academy Glossary",
     howToPlay:"How to play",
@@ -168,7 +168,7 @@ const T={
     helpScoring:"Scoring: 3 letters = 1pt · 4 = 2pt · 5 = 4pt · 6 = 6pt · 7+ = 10pt",
     helpCombo:"Find words quickly in a row → combo! 3+ in a row = x2, 5+ = x3 points.",
     helpMultiplier:"Golden letters give a 2× or 3× score multiplier for the word.",
-    helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has over 380,000 words, English and Swedish have their own vocabularies.",
+    helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has about 138,000 words, English and Swedish have their own vocabularies.",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -204,11 +204,11 @@ const T={
     options:"INSTÄLLNINGAR",quickPlay:"SPELA",or:"eller",advancedOptions:"Fler alternativ",
     readMoreWords:"Läs mer om orden",
     wordInfoTitle:"OM ORDLISTAN",
-    wordInfoBody1:"Ordlistan innehåller grundformer, böjningar, sammansatta ord, egennamn och förkortningar.",
+    wordInfoBody1:"Ordlistan innehåller grundformer, böjningar och sammansatta ord — totalt cirka 138 000 ord.",
     wordInfoBody2:"Den finska listan är särskilt stor eftersom finska har ett rikt böjningssystem som ger många former av varje ord (t.ex. talo → taloa, talossa, talojen, taloihin...).",
-    wordInfoBody3:"Förkortningar ingår också, som nato, dna eller wifi.",
+    wordInfoBody3:"Ordlistan baseras på Wiktionary (kaikki.org). Orden är 3–7 bokstäver långa.",
     wordInfoSources:"Källor",
-    wordInfoSourceFi:"Kotus — modern finsk ordlista + Joukahainen/Voikko (böjningsformer)",
+    wordInfoSourceFi:"Wiktionary (kaikki.org) — grundformer och böjningar, ~138 000 ord",
     wordInfoSourceEn:"SOWPODS / Collins Scrabble Words",
     wordInfoSourceSv:"SAOL — Svenska Akademiens ordlista",
     howToPlay:"Så spelar du",
@@ -217,7 +217,7 @@ const T={
     helpScoring:"Poäng: 3 bokstäver = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7+ = 10p",
     helpCombo:"Hitta ord snabbt i rad → kombo! 3+ i rad = x2, 5+ = x3 poäng.",
     helpMultiplier:"Gyllene bokstäver ger 2× eller 3× poängmultiplikator för ordet.",
-    helpLang:"Du kan byta språk från huvudmenyn. Varje språk har sin egen ordlista — finska har över 380 000 ord, engelska och svenska har egna vokabulär.",
+    helpLang:"Du kan byta språk från huvudmenyn. Varje språk har sin egen ordlista — finska har cirka 138 000 ord, engelska och svenska har egna vokabulär.",
   },
 };
 
@@ -252,56 +252,43 @@ const MODERN_BASE={
   letterFont:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
 };
 const THEMES={
-  modern:{
-    name:"MODERNI",nameEn:"MODERN",nameSv:"MODERN",
-    bg:"#0f1720",green:"#4ade80",yellow:"#ffcb3c",red:"#f87171",purple:"#a78bfa",
-    dark:"#1b2533",border:"#2a3a4f",cell:"#1b2533",cellBorder:"#344d6a",
-    gridBg:"#0b121a",textMuted:"#8aa0b4",textSoft:"#b0c4d8",
-    inputBg:"#0b121a",
-    ...MODERN_BASE,
-  },
-  pink:{
-    name:"PINKKI",nameEn:"PINK",nameSv:"ROSA",
-    bg:"#1a0e18",green:"#f472b6",yellow:"#fbbf24",red:"#fb7185",purple:"#e879f9",
-    dark:"#261222",border:"#4a2040",cell:"#261222",cellBorder:"#5a2a50",
-    gridBg:"#150a14",textMuted:"#b06090",textSoft:"#e0a0c0",
-    inputBg:"#150a14",
-    ...MODERN_BASE,
-  },
-  electric:{
-    name:"SÄHKÖ",nameEn:"ELECTRIC",nameSv:"ELEKTRO",
-    bg:"#060e1f",green:"#38bdf8",yellow:"#22d3ee",red:"#f43f5e",purple:"#818cf8",
-    dark:"#0c1830",border:"#1e3a5f",cell:"#0c1830",cellBorder:"#264a70",
-    gridBg:"#040a18",textMuted:"#5588bb",textSoft:"#7ec8e3",
-    inputBg:"#040a18",
-    ...MODERN_BASE,
-  },
-  neon:{
-    name:"NEON",nameEn:"NEON",nameSv:"NEON",
-    bg:"#0a1a0e",green:"#4afa50",yellow:"#a3e635",red:"#ef4444",purple:"#34d399",
-    dark:"#102818",border:"#1a4a28",cell:"#102818",cellBorder:"#2a5a38",
-    gridBg:"#061208",textMuted:"#4a9a5a",textSoft:"#7ae890",
-    inputBg:"#061208",
-    ...MODERN_BASE,
-  },
   light:{
-    name:"KLASSINEN",nameEn:"CLASSIC",nameSv:"KLASSISK",
-    bg:"#f5f3f0",green:"#166534",yellow:"#b45309",red:"#dc2626",purple:"#7c3aed",
-    dark:"#e8e5e0",border:"#c0b8ae",cell:"#ffffff",cellBorder:"#d5cec5",
-    gridBg:"#ece8e2",textMuted:"#78716c",textSoft:"#57534e",
+    name:"IVORY LIGHT",nameEn:"IVORY LIGHT",nameSv:"IVORY LIGHT",
+    bg:"#faf8f4",green:"#2d6a4f",yellow:"#b8860b",red:"#c0392b",purple:"#6c5ce7",
+    dark:"#f0ece4",border:"#d4cbbf",cell:"#ffffff",cellBorder:"#e0d8ce",
+    gridBg:"#f5f0e8",textMuted:"#8b7e6e",textSoft:"#5c4f3d",
     inputBg:"#ffffff",
     ...MODERN_BASE,
-    cellShadow:"inset 0 1px 3px #00000015, 0 1px 4px #00000010",
-    panelShadow:"0 4px 16px #00000015",
+    cellShadow:"inset 0 1px 3px #00000012, 0 1px 4px #00000008",
+    panelShadow:"0 4px 16px #00000012",
+    flavor:"ivory",
   },
-  rainbow:{
-    name:"SATEENKAARI",nameEn:"RAINBOW",nameSv:"REGNBÅGE",
-    bg:"#0f1720",green:"#4ade80",yellow:"#ffcb3c",red:"#f87171",purple:"#a78bfa",
-    dark:"#1b2533",border:"#2a3a4f",cell:"#1b2533",cellBorder:"#344d6a",
-    gridBg:"#0b121a",textMuted:"#8aa0b4",textSoft:"#b0c4d8",
-    inputBg:"#0b121a",
+  dark:{
+    name:"DARK VELVET",nameEn:"DARK VELVET",nameSv:"DARK VELVET",
+    bg:"#12101a",green:"#b39ddb",yellow:"#f0c674",red:"#ef5350",purple:"#ce93d8",
+    dark:"#1c1828",border:"#342e48",cell:"#1c1828",cellBorder:"#3e3658",
+    gridBg:"#0e0c16",textMuted:"#7e6fa0",textSoft:"#c4b5e0",
+    inputBg:"#0e0c16",
     ...MODERN_BASE,
-    rainbow:true,
+    flavor:"velvet",
+  },
+  pink:{
+    name:"PINK BLUSH",nameEn:"PINK BLUSH",nameSv:"PINK BLUSH",
+    bg:"#1e0c1a",green:"#ff6eb4",yellow:"#ffb7d5",red:"#ff4081",purple:"#ea80fc",
+    dark:"#2a1224",border:"#5c2048",cell:"#2a1224",cellBorder:"#6e2a58",
+    gridBg:"#180816",textMuted:"#c06090",textSoft:"#ffb0d0",
+    inputBg:"#180816",
+    ...MODERN_BASE,
+    flavor:"blush",
+  },
+  electric:{
+    name:"ELECTRIC BLUE",nameEn:"ELECTRIC BLUE",nameSv:"ELECTRIC BLUE",
+    bg:"#04080f",green:"#00e5ff",yellow:"#76ff03",red:"#ff1744",purple:"#448aff",
+    dark:"#0a1220",border:"#0d3b66",cell:"#0a1220",cellBorder:"#1a4a7a",
+    gridBg:"#020610",textMuted:"#3080bb",textSoft:"#60d0ff",
+    inputBg:"#020610",
+    ...MODERN_BASE,
+    flavor:"electric",
   },
   retro:{
     name:"RETRO",nameEn:"RETRO",nameSv:"RETRO",
@@ -310,10 +297,11 @@ const THEMES={
     font:"'Press Start 2P',monospace",
     gridBg:"#111133",textMuted:"#556",textSoft:"#88ccaa",
     inputBg:"#0d0d22",
+    flavor:"retro",
   },
 };
 function getTheme(id){
-  const t=THEMES[id]||THEMES.modern;
+  const t=THEMES[id]||THEMES.dark;
   return {
     cellRadius:"0px",btnRadius:"0px",cellShadow:"none",btnShadow:"none",
     cellGradient:false,panelRadius:"0px",panelShadow:"none",
@@ -1575,7 +1563,7 @@ async function submitToHallOfFame({nickname,score,wordsFound,wordsTotal,gameMode
 export default function Piilosana(){
   const SZ=5,COMBO_WINDOW=4000;
   const[lang,setLang]=useState(()=>localStorage.getItem("piilosana_lang")||"fi");
-  const[themeId,setThemeId]=useState(()=>localStorage.getItem("piilosana_theme")||"modern");
+  const[themeId,setThemeId]=useState(()=>{const saved=localStorage.getItem("piilosana_theme");return saved&&THEMES[saved]?saved:"dark";});
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[soundTheme,setSoundTheme]=useState(()=>localStorage.getItem("piilosana_sound")||"modern");
@@ -3661,7 +3649,7 @@ export default function Piilosana(){
                 <div style={{fontSize:"18px",color:S.yellow}}>{score}</div>
               </div>
             </div>
-            <div ref={wordBarRef} key={flashKey} style={{borderTop:S.cellGradient?`1px solid ${S.border}`:`1px solid ${S.border}`,padding:S.cellGradient?"10px 14px":"4px 10px",textAlign:"center",animation:flashKey>0&&!word&&msg?.ok?"wordFlash 0.6s ease-out":"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
+            <div ref={wordBarRef} key={flashKey} style={{borderTop:S.cellGradient?`1px solid ${S.border}`:`1px solid ${S.border}`,padding:S.cellGradient?"10px 14px":"4px 10px",textAlign:"center",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
               <div style={{fontSize:S.cellGradient?"28px":"18px",minHeight:S.cellGradient?"36px":"20px",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
                 {state==="ending"?<span style={{color:ending?.color,fontSize:S.cellGradient?"22px":"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
                  word?word.toUpperCase():
@@ -3888,7 +3876,29 @@ export default function Piilosana(){
       <div style={{width:"100%",maxWidth:"600px",minHeight:"60px",marginTop:"16px",flexShrink:0}}/>
 
 
-      {/* Pink theme floating decorations */}
+      {/* Ivory Light — warm golden shimmer */}
+      {themeId==="light"&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
+          <div style={{position:"absolute",top:"-20%",right:"-10%",width:"60%",height:"60%",
+            background:"radial-gradient(ellipse at center,rgba(184,134,11,0.06) 0%,transparent 70%)",
+            animation:"floatUnicorn 12s ease-in-out infinite"}}/>
+          <div style={{position:"absolute",bottom:"-10%",left:"-10%",width:"50%",height:"50%",
+            background:"radial-gradient(ellipse at center,rgba(45,106,79,0.04) 0%,transparent 70%)",
+            animation:"floatUnicorn 10s ease-in-out infinite 3s"}}/>
+        </div>
+      )}
+
+      {/* Dark Velvet — subtle purple mist */}
+      {themeId==="dark"&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
+          <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",
+            width:"130%",height:"130%",
+            background:"radial-gradient(ellipse at 30% 40%,rgba(179,157,219,0.05) 0%,transparent 55%),radial-gradient(ellipse at 70% 60%,rgba(206,147,216,0.04) 0%,transparent 50%)",
+            animation:"electricPulse 8s ease-in-out infinite"}}/>
+        </div>
+      )}
+
+      {/* Pink Blush — floating hearts & sparkles */}
       {themeId==="pink"&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
           <div style={{position:"absolute",top:"10%",left:"5%",fontSize:"28px",opacity:0.08,animation:"floatUnicorn 8s ease-in-out infinite"}}>💖</div>
@@ -3898,17 +3908,20 @@ export default function Piilosana(){
         </div>
       )}
 
-      {/* Electric theme glow */}
+      {/* Electric Blue — pulsing cyan glow */}
       {themeId==="electric"&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
           <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",
             width:"120%",height:"120%",
-            background:"radial-gradient(ellipse at center,rgba(56,189,248,0.06) 0%,transparent 70%)",
-            animation:"electricPulse 4s ease-in-out infinite"}}/>
+            background:"radial-gradient(ellipse at center,rgba(0,229,255,0.06) 0%,transparent 60%)",
+            animation:"electricPulse 3s ease-in-out infinite"}}/>
+          <div style={{position:"absolute",top:"20%",left:"10%",width:"40%",height:"40%",
+            background:"radial-gradient(ellipse at center,rgba(118,255,3,0.03) 0%,transparent 60%)",
+            animation:"electricPulse 5s ease-in-out infinite 1.5s"}}/>
         </div>
       )}
 
-      {/* Retro theme neon glow */}
+      {/* Retro — scanlines + neon glow */}
       {themeId==="retro"&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
           <div style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",
@@ -3916,15 +3929,6 @@ export default function Piilosana(){
           <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",
             width:"100%",height:"100%",
             background:"radial-gradient(ellipse at center,rgba(0,255,136,0.05) 0%,transparent 65%)"}}/>
-        </div>
-      )}
-
-      {/* Rainbow theme animated border glow */}
-      {themeId==="rainbow"&&(
-        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
-          <div style={{position:"absolute",inset:0,
-            background:"conic-gradient(from var(--rainbow-angle, 0deg),#ff000015,#ff880015,#ffff0015,#00ff0015,#0088ff0015,#8800ff0015,#ff000015)",
-            animation:"rainbowSpin 6s linear infinite"}}/>
         </div>
       )}
     </div>
