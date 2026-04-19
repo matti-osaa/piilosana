@@ -240,66 +240,80 @@ const fontCSS=`@import url('https://fonts.googleapis.com/css2?family=Press+Start
 // ============================================
 // THEMES
 // ============================================
+const MODERN_BASE={
+  font:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
+  cellRadius:"10px",btnRadius:"10px",
+  cellShadow:"inset 0 1px 4px #00000060, 0 2px 8px #00000030",
+  btnShadow:"0 4px 16px #00000040",
+  cellGradient:true,
+  panelRadius:"12px",panelShadow:"0 8px 32px #00000055",
+  titleFont:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
+  gridGap:"6px",
+  letterFont:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
+};
 const THEMES={
-  dark:{
-    name:"TUMMA",nameEn:"DARK",nameSv:"MÖRK",
+  modern:{
+    name:"MODERNI",nameEn:"MODERN",nameSv:"MODERN",
+    bg:"#0f1720",green:"#4ade80",yellow:"#ffcb3c",red:"#f87171",purple:"#a78bfa",
+    dark:"#1b2533",border:"#2a3a4f",cell:"#1b2533",cellBorder:"#344d6a",
+    gridBg:"#0b121a",textMuted:"#8aa0b4",textSoft:"#b0c4d8",
+    inputBg:"#0b121a",
+    ...MODERN_BASE,
+  },
+  pink:{
+    name:"PINKKI",nameEn:"PINK",nameSv:"ROSA",
+    bg:"#1a0e18",green:"#f472b6",yellow:"#fbbf24",red:"#fb7185",purple:"#e879f9",
+    dark:"#261222",border:"#4a2040",cell:"#261222",cellBorder:"#5a2a50",
+    gridBg:"#150a14",textMuted:"#b06090",textSoft:"#e0a0c0",
+    inputBg:"#150a14",
+    ...MODERN_BASE,
+  },
+  electric:{
+    name:"SÄHKÖ",nameEn:"ELECTRIC",nameSv:"ELEKTRO",
+    bg:"#060e1f",green:"#38bdf8",yellow:"#22d3ee",red:"#f43f5e",purple:"#818cf8",
+    dark:"#0c1830",border:"#1e3a5f",cell:"#0c1830",cellBorder:"#264a70",
+    gridBg:"#040a18",textMuted:"#5588bb",textSoft:"#7ec8e3",
+    inputBg:"#040a18",
+    ...MODERN_BASE,
+  },
+  neon:{
+    name:"NEON",nameEn:"NEON",nameSv:"NEON",
+    bg:"#0a1a0e",green:"#4afa50",yellow:"#a3e635",red:"#ef4444",purple:"#34d399",
+    dark:"#102818",border:"#1a4a28",cell:"#102818",cellBorder:"#2a5a38",
+    gridBg:"#061208",textMuted:"#4a9a5a",textSoft:"#7ae890",
+    inputBg:"#061208",
+    ...MODERN_BASE,
+  },
+  light:{
+    name:"KLASSINEN",nameEn:"CLASSIC",nameSv:"KLASSISK",
+    bg:"#f5f3f0",green:"#166534",yellow:"#b45309",red:"#dc2626",purple:"#7c3aed",
+    dark:"#e8e5e0",border:"#c0b8ae",cell:"#ffffff",cellBorder:"#d5cec5",
+    gridBg:"#ece8e2",textMuted:"#78716c",textSoft:"#57534e",
+    inputBg:"#ffffff",
+    ...MODERN_BASE,
+    cellShadow:"inset 0 1px 3px #00000015, 0 1px 4px #00000010",
+    panelShadow:"0 4px 16px #00000015",
+  },
+  rainbow:{
+    name:"SATEENKAARI",nameEn:"RAINBOW",nameSv:"REGNBÅGE",
+    bg:"#0f1720",green:"#4ade80",yellow:"#ffcb3c",red:"#f87171",purple:"#a78bfa",
+    dark:"#1b2533",border:"#2a3a4f",cell:"#1b2533",cellBorder:"#344d6a",
+    gridBg:"#0b121a",textMuted:"#8aa0b4",textSoft:"#b0c4d8",
+    inputBg:"#0b121a",
+    ...MODERN_BASE,
+    rainbow:true,
+  },
+  retro:{
+    name:"RETRO",nameEn:"RETRO",nameSv:"RETRO",
     bg:"#0a0a1a",green:"#00ff88",yellow:"#ffcc00",red:"#ff4444",purple:"#ff66ff",
     dark:"#0d0d22",border:"#334",cell:"#1a1a3a",cellBorder:"#2a2a4a",
     font:"'Press Start 2P',monospace",
     gridBg:"#111133",textMuted:"#556",textSoft:"#88ccaa",
     inputBg:"#0d0d22",
   },
-  light:{
-    name:"VAALEA",nameEn:"LIGHT",nameSv:"LJUS",
-    bg:"#f0f0f5",green:"#007744",yellow:"#aa6600",red:"#cc2222",purple:"#8833aa",
-    dark:"#e0e0ea",border:"#999",cell:"#ffffff",cellBorder:"#bbb",
-    font:"'Press Start 2P',monospace",
-    gridBg:"#d8d8e8",textMuted:"#666",textSoft:"#335544",
-    inputBg:"#ffffff",
-  },
-  pink:{
-    name:"PINKKI",nameEn:"PINK",nameSv:"ROSA",
-    bg:"#1a0a1a",green:"#ff66cc",yellow:"#ffaadd",red:"#ff4488",purple:"#ff99ff",
-    dark:"#220d22",border:"#553",cell:"#2a1a2a",cellBorder:"#4a2a4a",
-    font:"'Press Start 2P',monospace",
-    gridBg:"#1a0a2a",textMuted:"#886",textSoft:"#cc88aa",
-    inputBg:"#220d22",
-  },
-  electric:{
-    name:"SÄHKÖ",nameEn:"ELECTRIC",nameSv:"ELEKTRO",
-    bg:"#000820",green:"#00eeff",yellow:"#44ff44",red:"#ff2244",purple:"#8844ff",
-    dark:"#001030",border:"#0055aa",cell:"#001848",cellBorder:"#0066cc",
-    font:"'Press Start 2P',monospace",
-    gridBg:"#000c30",textMuted:"#336699",textSoft:"#44aacc",
-    inputBg:"#001030",
-  },
-  neon:{
-    name:"NEON",nameEn:"NEON",nameSv:"NEON",
-    bg:"#001a00",green:"#00ff44",yellow:"#88ff00",red:"#ff2200",purple:"#00ff88",
-    dark:"#002200",border:"#005500",cell:"#003300",cellBorder:"#006600",
-    font:"'Press Start 2P',monospace",
-    gridBg:"#001800",textMuted:"#338833",textSoft:"#44cc44",
-    inputBg:"#002200",
-  },
-  modern:{
-    name:"MODERNI",nameEn:"MODERN",nameSv:"MODERN",
-    bg:"#0f1720",green:"#4ade80",yellow:"#ffcb3c",red:"#f87171",purple:"#a78bfa",
-    dark:"#1b2533",border:"#2a3a4f",cell:"#1b2533",cellBorder:"#344d6a",
-    font:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
-    gridBg:"#0b121a",textMuted:"#8aa0b4",textSoft:"#b0c4d8",
-    inputBg:"#0b121a",
-    cellRadius:"10px",btnRadius:"10px",
-    cellShadow:"inset 0 1px 4px #00000060, 0 2px 8px #00000030",
-    btnShadow:"0 4px 16px #00000040",
-    cellGradient:true,
-    panelRadius:"12px",panelShadow:"0 8px 32px #00000055",
-    titleFont:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
-    gridGap:"6px",
-    letterFont:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
-  },
 };
 function getTheme(id){
-  const t=THEMES[id]||THEMES.dark;
+  const t=THEMES[id]||THEMES.modern;
   return {
     cellRadius:"0px",btnRadius:"0px",cellShadow:"none",btnShadow:"none",
     cellGradient:false,panelRadius:"0px",panelShadow:"none",
@@ -580,138 +594,70 @@ function useSounds(soundTheme){
 // ============================================
 const MUSIC_TRACKS={
   electronic:[
-    // "Posliini" — intro→build→climax→resolve, Am/C world
-    {id:"porcelain",name:{fi:"Posliini",en:"Porcelain",sv:"Porslin"},bpm:74,sub:"8n",melDur:"4n",bassDur:"2m",
-      melSynth:{oscillator:{type:"fatsine",count:3,spread:20},envelope:{attack:0.03,decay:0.8,sustain:0.2,release:1.5},volume:-16},
-      bassSynth:{oscillator:{type:"fatsine",count:3,spread:25},envelope:{attack:2,decay:1.5,sustain:0.6,release:3},volume:-23},
-      mel:[null,null,"E5",null,null,null,null,null,null,null,"G5",null,null,null,null,null,
-           null,null,null,null,"D5",null,"E5",null,null,null,null,null,null,null,null,null,
-           null,null,"A4",null,null,null,"C5",null,null,null,null,null,null,null,null,null,
-           null,null,"E5",null,null,null,"D5",null,null,null,null,null,null,null,null,null,
-           null,null,"E5",null,"G5",null,"A5",null,null,null,"G5",null,"E5",null,null,null,
-           null,null,"D5",null,"E5",null,"G5",null,null,null,"E5",null,"D5",null,"C5",null,
-           null,null,"A4",null,"C5",null,"E5",null,"G5",null,null,null,"E5",null,"D5",null,
-           null,null,"E5",null,"G5",null,"A5",null,null,null,"B5",null,"A5",null,"G5",null,
-           null,null,"A5",null,null,null,null,null,"G5",null,null,null,null,null,null,null,
-           "C6",null,null,null,null,null,null,null,null,null,"A5",null,null,null,"G5",null,
-           null,null,"E5",null,null,null,null,null,"D5",null,null,null,null,null,"C5",null,
-           null,null,null,null,"A4",null,null,null,null,null,null,null,null,null,null,null],
-      bass:[["A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G3","B3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["D3","F3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["E3","G3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["F3","A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G3","B3","D4","F4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Posliini II" — sama Am/C mutta climaxissa nopea tiluliii-kulku
-    {id:"posliini2",name:{fi:"Posliini II",en:"Porcelain II",sv:"Porslin II"},bpm:74,sub:"8n",melDur:"4n",bassDur:"2m",
-      melSynth:{oscillator:{type:"fatsine",count:3,spread:20},envelope:{attack:0.03,decay:0.8,sustain:0.2,release:1.5},volume:-16},
-      bassSynth:{oscillator:{type:"fatsine",count:3,spread:25},envelope:{attack:2,decay:1.5,sustain:0.6,release:3},volume:-23},
-      mel:[null,null,"E5",null,null,null,null,null,null,null,"G5",null,null,null,null,null,
-           null,null,null,null,"D5",null,"E5",null,null,null,null,null,null,null,null,null,
-           null,null,"A4",null,null,null,"C5",null,null,null,null,null,null,null,null,null,
-           null,null,"E5",null,null,null,"D5",null,null,null,null,null,null,null,null,null,
-           null,null,"E5",null,"G5",null,"A5",null,null,null,"G5",null,"E5",null,null,null,
-           null,null,"D5",null,"E5",null,"G5",null,null,null,"E5",null,"D5",null,"C5",null,
-           null,null,"A4",null,"C5",null,"E5",null,"G5",null,null,null,"E5",null,"D5",null,
-           null,null,"E5",null,"G5",null,"A5",null,null,null,"B5",null,"A5",null,"G5",null,
-           "E5","G5","A5","B5","C6",null,"A5","G5","A5","B5","C6","D6","E6",null,"D6","C6",
-           "A5","C6","D6","E6",null,"D6","C6","A5","G5","A5","C6",null,"A5",null,"G5",null,
-           null,null,"E5",null,null,null,null,null,"D5",null,null,null,null,null,"C5",null,
-           null,null,null,null,"A4",null,null,null,null,null,null,null,null,null,null,null],
-      bass:[["A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G3","B3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["F3","A3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["D3","F3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["E3","G3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["F3","A3","C4","E4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G3","B3","D4","F4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["A2","C3","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C3","E3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Kirkko I" — Em/G, rauhallinen, kaikuisa — ambient pad
-    {id:"kirkko1",name:{fi:"Kirkko",en:"Church",sv:"Kyrka"},bpm:56,sub:"8n",melDur:"4n.",bassDur:"2m",
-      melSynth:{oscillator:{type:"sine"},envelope:{attack:0.4,decay:2,sustain:0.3,release:4},volume:-18},
-      bassSynth:{oscillator:{type:"sine"},envelope:{attack:4,decay:3,sustain:0.6,release:5},volume:-26},
-      mel:[null,null,"E5",null,null,null,null,null,"B4",null,null,null,null,null,null,null,
-           null,null,null,null,"A4",null,null,null,"G4",null,null,null,null,null,"E4",null,
-           null,null,"B4",null,null,null,"C5",null,null,null,null,null,"E5",null,null,null,
-           null,null,null,null,"B5",null,null,null,null,null,"A5",null,null,null,"G5",null],
-      bass:[["E2","B2","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["A2","E3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C3","G3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G2","D3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Kirkko II" — E/C#m, kirkkaampi — pehmeä fattriangle
-    {id:"kirkko2",name:{fi:"Valo",en:"Light",sv:"Ljus"},bpm:62,sub:"8n",melDur:"4n",bassDur:"2m",
-      melSynth:{oscillator:{type:"fattriangle",count:2,spread:12},envelope:{attack:0.1,decay:1.5,sustain:0.2,release:2.5},volume:-17},
-      bassSynth:{oscillator:{type:"sine"},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-25},
-      mel:[null,null,"B4",null,null,null,"C#5",null,"E5",null,null,null,null,null,"C#5",null,
-           null,null,"A4",null,null,null,"B4",null,null,null,null,null,"E5",null,null,null,
-           null,null,"B4",null,"A4",null,null,null,"G#4",null,null,null,"A4",null,"B4",null,
-           "E5",null,null,null,"D5",null,"C#5",null,null,null,"B4",null,null,null,null,null],
-      bass:[["E2","B2","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["A2","E3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C#3","G#3","C#4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["B2","F#3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Kevät" — A-duuri, iloinen, leikkisä fattriangle
-    {id:"kevat",name:{fi:"Kevät",en:"Spring",sv:"Vår"},bpm:72,sub:"8n",melDur:"4n",bassDur:"2m",
-      melSynth:{oscillator:{type:"fattriangle",count:2,spread:14},envelope:{attack:0.04,decay:0.8,sustain:0.2,release:1.5},volume:-16},
-      bassSynth:{oscillator:{type:"fatsine",count:2,spread:12},envelope:{attack:2,decay:1.5,sustain:0.5,release:3},volume:-24},
-      mel:[null,null,"A4",null,null,null,"C#5",null,"E5",null,null,null,null,null,"D5",null,
-           null,null,"C#5",null,"B4",null,null,null,null,null,"A4",null,null,null,null,null,
-           null,null,"E5",null,null,null,"F#5",null,"E5",null,null,null,"D5",null,"C#5",null,
-           null,null,"B4",null,null,null,"A4",null,null,null,null,null,null,null,null,null,
-           null,null,"A4",null,"B4",null,"C#5",null,"E5",null,null,null,"F#5",null,"E5",null,
-           null,null,"D5",null,"E5",null,"F#5",null,null,null,"A5",null,null,null,"F#5",null,
-           null,null,"E5",null,null,null,"D5",null,"C#5",null,null,null,"B4",null,"A4",null,
-           null,null,"B4",null,null,null,"C#5",null,null,null,null,null,null,null,null,null],
-      bass:[["A2","E3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["D3","A3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["E2","B2","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["A2","E3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["F#2","C#3","F#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["D3","A3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["E2","B2","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["A2","E3","A3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Aamu" — G-duuri, lämmin ja iloinen, laulava fatsine
-    {id:"aamu",name:{fi:"Aamu",en:"Morning",sv:"Morgon"},bpm:66,sub:"8n",melDur:"4n.",bassDur:"2m",
-      melSynth:{oscillator:{type:"fatsine",count:2,spread:10},envelope:{attack:0.06,decay:1,sustain:0.25,release:2},volume:-16},
-      bassSynth:{oscillator:{type:"fatsine",count:2,spread:18},envelope:{attack:2.5,decay:2,sustain:0.5,release:3.5},volume:-24},
-      mel:[null,null,"G4",null,null,null,null,null,"B4",null,null,null,"D5",null,null,null,
-           null,null,null,null,"E5",null,null,null,null,null,"D5",null,null,null,"B4",null,
-           null,null,"A4",null,null,null,"B4",null,null,null,null,null,"D5",null,null,null,
-           null,null,"G5",null,null,null,null,null,"F#5",null,null,null,"E5",null,null,null,
-           null,null,"D5",null,"E5",null,"G5",null,null,null,null,null,"A5",null,null,null,
-           null,null,"G5",null,null,null,"F#5",null,"E5",null,null,null,"D5",null,null,null,
-           null,null,"B4",null,null,null,"D5",null,"E5",null,null,null,"D5",null,"B4",null,
-           null,null,"A4",null,null,null,"G4",null,null,null,null,null,null,null,null,null],
-      bass:[["G2","D3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C3","G3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["D2","A2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["E2","B2","E3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["C3","G3","C4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["D2","A2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G2","D3","G3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["D2","A2","D3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
-    // "Kulta" — D-duuri, lämmin — fattriangle, rikas
-    {id:"kulta",name:{fi:"Kulta",en:"Gold",sv:"Guld"},bpm:60,sub:"8n",melDur:"4n",bassDur:"2m",
-      melSynth:{oscillator:{type:"fattriangle",count:3,spread:18},envelope:{attack:0.08,decay:1.5,sustain:0.15,release:2.5},volume:-17},
-      bassSynth:{oscillator:{type:"fatsine",count:2,spread:15},envelope:{attack:3,decay:2,sustain:0.5,release:4},volume:-24},
-      mel:[null,null,"D5",null,null,null,null,null,"F#5",null,null,null,null,null,"A5",null,
-           null,null,null,null,"G5",null,"F#5",null,null,null,"E5",null,null,null,"D5",null,
-           null,null,"A4",null,null,null,"B4",null,"D5",null,null,null,"F#5",null,null,null,
-           null,null,"G5",null,null,null,"F#5",null,null,null,"D5",null,null,null,null,null],
-      bass:[["D2","A2","D3","F#3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["G2","D3","G3","B3"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["A2","E3","A3","C#4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-            ["B2","F#3","B3","D4"],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]},
+    // "Neon Drive" — 122 BPM, Am, energinen synth-pop
+    {id:"neon_drive",name:{fi:"Neon Drive",en:"Neon Drive",sv:"Neon Drive"},bpm:122,sub:"8n",melDur:"8n",bassDur:"8n",
+      melSynth:{oscillator:{type:"fatsawtooth",count:3,spread:30},envelope:{attack:0.01,decay:0.3,sustain:0.2,release:0.5},volume:-14},
+      bassSynth:{oscillator:{type:"fatsquare",count:2,spread:10},envelope:{attack:0.005,decay:0.2,sustain:0.3,release:0.3},volume:-12},
+      mel:["C5","E5","A5",null,"G5","E5","C5",null,"A4","C5","F5",null,"E5","C5","A4",null,
+           "G4","C5","E5","G5","E5","C5","G4",null,"B4","D5","G5",null,"F5","D5","B4",null,
+           "C5","E5","A5","C6","A5","E5","C5",null,"A4","C5","F5","A5","G5","F5","E5",null,
+           "D5","F5","A5",null,"G5","F5","D5",null,"E5","G5","B5",null,"A5","G5","E5",null],
+      bass:["A2",null,"A2","A3","A2",null,"A2",null,"F2",null,"F2","F3","F2",null,"F2",null,
+            "C2",null,"C2","C3","C2",null,"C3",null,"G2",null,"G2","G3","G2",null,"G2",null,
+            "A2",null,"A2","A3","A2",null,"A3",null,"F2",null,"F2","F3","F2",null,"F3",null,
+            "D2",null,"D2","D3","D2",null,"D3",null,"E2",null,"E2","E3","E2",null,"E2",null]},
+    // "Pixel Rush" — 136 BPM, Em, retro chiptune
+    {id:"pixel_rush",name:{fi:"Pixel Rush",en:"Pixel Rush",sv:"Pixel Rush"},bpm:136,sub:"8n",melDur:"16n",bassDur:"16n",
+      melSynth:{oscillator:{type:"square"},envelope:{attack:0.005,decay:0.15,sustain:0.3,release:0.2},volume:-12},
+      bassSynth:{oscillator:{type:"pulse",width:0.25},envelope:{attack:0.005,decay:0.1,sustain:0.4,release:0.15},volume:-10},
+      mel:["E5",null,"G5",null,"B5",null,"A5","G5","E5",null,"D5",null,"E5",null,null,null,
+           "C5",null,"E5",null,"G5",null,"A5","G5","E5",null,"C5",null,"D5",null,null,null,
+           "D5",null,"F#5",null,"A5",null,"B5","A5","F#5",null,"D5",null,"F#5",null,null,null,
+           "B4",null,"D#5",null,"F#5",null,"B5","A5","F#5",null,"D#5",null,"B4",null,null,null,
+           "E5","G5","B5",null,"E6",null,"D6","B5","G5",null,"E5",null,"G5","B5","D6",null,
+           "C5","E5","G5",null,"C6",null,"B5","A5","G5",null,"E5",null,"D5",null,null,null,
+           "D5","F#5","A5",null,"D6",null,"C6","A5","F#5",null,"D5",null,"F#5","A5","D6",null,
+           "B4","D#5","F#5","B5","D#6",null,"F#5","B5","F#5",null,"E5",null,null,null,null,null],
+      bass:["E2","E2","E3","E2","E2","E2","E3","E2","E2","E2","E3","E2","G2","G2","A2","B2",
+            "C2","C2","C3","C2","C2","C2","C3","C2","C2","C2","E2","E2","G2","G2","A2","B2",
+            "D2","D2","D3","D2","D2","D2","D3","D2","D2","D2","F#2","F#2","A2","A2","B2","D3",
+            "B1","B1","B2","B1","B1","B1","B2","B1","B1","B1","D#2","D#2","F#2","F#2","A2","B2",
+            "E2","E2","E3","E2","E2","E2","E3","E2","E2","E2","G2","G2","B2","B2","D3","E3",
+            "C2","C2","C3","C2","C2","C2","C3","C2","C2","C2","E2","E2","G2","A2","B2","C3",
+            "D2","D2","D3","D2","D2","D2","D3","D2","D2","D2","F#2","A2","D3","D2","A2","F#2",
+            "B1","B1","B2","B1","D#2","F#2","B2","F#2","B1","B1","B2",null,null,null,null,null]},
+    // "Tropical Bounce" — 115 BPM, D major, trooppinen pop
+    {id:"tropical_bounce",name:{fi:"Tropical Bounce",en:"Tropical Bounce",sv:"Tropical Bounce"},bpm:115,sub:"8n",melDur:"8n",bassDur:"8n",
+      melSynth:{oscillator:{type:"fattriangle",count:2,spread:20},envelope:{attack:0.01,decay:0.25,sustain:0.1,release:0.5},volume:-12},
+      bassSynth:{oscillator:{type:"fatsine",count:2,spread:10},envelope:{attack:0.01,decay:0.2,sustain:0.35,release:0.3},volume:-10},
+      mel:["D5",null,"F#5",null,"A5",null,null,"G5","F#5",null,"D5",null,null,null,null,null,
+           "A4",null,"C#5",null,"E5",null,null,"F#5","E5",null,"C#5",null,"A4",null,null,null,
+           "B4",null,"D5",null,"F#5",null,"A5",null,"G5",null,"F#5",null,"D5",null,null,null,
+           "G4",null,"B4",null,"D5",null,"G5",null,"F#5",null,"E5",null,"D5",null,null,null,
+           "D5","F#5","A5",null,"D6",null,"A5","F#5","A5",null,"F#5",null,"D5",null,null,null,
+           "C#5","E5","A5",null,"C#6",null,"A5","E5","F#5",null,"E5",null,"D5",null,null,null,
+           "B4","D5","F#5",null,"B5",null,"A5","G5","F#5",null,"D5",null,"F#5","A5","B5",null,
+           "G5",null,"A5",null,"B5",null,"A5","G5","F#5",null,"D5",null,null,null,null,null],
+      bass:["D2",null,null,null,"D2",null,"D3",null,"D2",null,null,"D2",null,null,"A2",null,
+            "A1",null,null,null,"A1",null,"A2",null,"A1",null,null,"A1",null,null,"E2",null,
+            "B1",null,null,null,"B1",null,"B2",null,"B1",null,null,"B1",null,null,"F#2",null,
+            "G1",null,null,null,"G1",null,"G2",null,"G1",null,null,"G1",null,null,"D2",null,
+            "D2",null,null,null,"D2",null,"D3",null,"D2",null,"A2",null,"D2",null,"A2",null,
+            "F#1",null,null,null,"F#1",null,"F#2",null,"F#1",null,"C#2",null,"F#1",null,"A1",null,
+            "G1",null,null,null,"G1",null,"G2",null,"G1",null,"D2",null,"G1",null,"B1",null,
+            "A1",null,null,null,"A1",null,"A2",null,"A1",null,"E2",null,"A1",null,null,null]},
+    // "Ethereal Pulse" — 128 BPM, Dm, ethereal trance + Enya-tyylinen
+    {id:"ethereal_pulse",name:{fi:"Ethereal Pulse",en:"Ethereal Pulse",sv:"Ethereal Pulse"},bpm:128,sub:"8n",melDur:"4n.",bassDur:"16n",
+      melSynth:{oscillator:{type:"fatsine",count:4,spread:35},envelope:{attack:0.3,decay:1.5,sustain:0.4,release:2.5},volume:-10},
+      bassSynth:{oscillator:{type:"fatsine",count:2,spread:5},envelope:{attack:0.01,decay:0.15,sustain:0.2,release:0.15},volume:-8},
+      mel:[null,null,"D5",null,null,null,"F5",null,null,null,null,null,"A5",null,null,null,
+           null,null,"G5",null,null,null,"F5",null,null,null,"E5",null,null,null,"D5",null,
+           null,null,"D5",null,"F5",null,"A5",null,null,null,"C6",null,null,null,"Bb5",null,
+           null,null,"A5",null,null,null,"G5",null,null,null,"F5",null,null,null,null,null],
+      bass:[null,null,null,"D2",null,"D2",null,null,null,null,null,"D2",null,"D2",null,null,
+            null,null,null,"Bb1",null,"Bb1",null,null,null,null,null,"Bb1",null,"Bb1",null,null,
+            null,null,null,"F1",null,"F1",null,null,null,null,null,"F1",null,"F1",null,null,
+            null,null,null,"C2",null,"C2",null,null,null,null,null,"C2",null,"C2",null,null]},
   ]
 };
 
@@ -2753,6 +2699,24 @@ export default function Piilosana(){
 
       {/* Footer with buttons + info */}
       <div style={{marginTop:"24px",width:"100%",maxWidth:"600px"}}>
+        {/* Flag language bubble — positioned above flag buttons */}
+        {mode===null&&flagBubble&&(
+          <div style={{width:"100%",
+            animation:flagBubbleFading?"flagBubbleOut 0.6s ease-in forwards":"flagBubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
+            zIndex:50,marginBottom:"6px"}}>
+            <div style={{background:"#ffffff",color:"#000000",fontFamily:S.font,
+              fontSize:S.cellGradient?"12px":"8px",padding:"8px 12px",borderRadius:S.btnRadius||"0px",position:"relative",lineHeight:"1.6",
+              border:S.cellGradient?`2px solid ${S.border}`:"3px solid #000000",boxShadow:S.cellGradient?S.panelShadow:"4px 4px 0 #00000044",
+              width:"max-content",maxWidth:"100%",
+              background:S.cellGradient?S.dark:"#ffffff",color:S.cellGradient?S.green:"#000000"}}>
+              <div style={{position:"absolute",bottom:"-9px",left:"20px",
+                width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderTop:S.cellGradient?`8px solid ${S.border}`:"8px solid #000000"}}/>
+              <div style={{position:"absolute",bottom:"-5px",left:"22px",
+                width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:S.cellGradient?`6px solid ${S.dark}`:"6px solid #ffffff"}}/>
+              {lang==="en"?"Play in different languages!":lang==="sv"?"Spela på olika språk!":"Pelaa eri kielillä!"}
+            </div>
+          </div>
+        )}
         {/* Action buttons row */}
         <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap",marginBottom:"12px"}}>
           {Object.entries(LANG_CONFIG).map(([code,lc])=>(
@@ -2889,25 +2853,9 @@ export default function Piilosana(){
 
 
   return(
-    <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflowX:"hidden",animation:themeTransition?"themeResolve 0.6s ease-out":"none"}}
+    <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100dvh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflowX:"hidden",animation:themeTransition?"themeResolve 0.6s ease-out":"none"}}
       onMouseMove={e=>onDragMove(e.clientX,e.clientY)} onMouseUp={onDragEnd} onTouchEnd={onDragEnd}>
       {/* Top bar removed — buttons moved to footer */}
-      {mode===null&&flagBubble&&(
-        <div style={{width:"100%",maxWidth:"600px",
-          animation:flagBubbleFading?"flagBubbleOut 0.6s ease-in forwards":"flagBubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
-          zIndex:50,marginBottom:"4px"}}>
-          <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
-            fontSize:"8px",padding:"8px 12px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
-            border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",imageRendering:"pixelated",
-            width:"max-content",maxWidth:"100%"}}>
-            <div style={{position:"absolute",top:"-9px",left:"20px",
-              width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderBottom:"8px solid #000000"}}/>
-            <div style={{position:"absolute",top:"-5px",left:"22px",
-              width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #ffffff"}}/>
-            {lang==="en"?"Play in different languages!":lang==="sv"?"Spela på olika språk!":"Pelaa eri kielillä!"}
-          </div>
-        </div>
-      )}
       {/* Word info modal */}
       {showWordInfo&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}} onClick={()=>setShowWordInfo(false)}>
@@ -2992,6 +2940,21 @@ export default function Piilosana(){
         @keyframes floatUnicorn{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-20px) rotate(5deg)}}
         @keyframes scanlines{0%,100%{opacity:1}}
         @keyframes electricPulse{0%,100%{opacity:0.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}}
+        @property --rainbow-angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+        @keyframes rainbowSpin{from{--rainbow-angle:0deg}to{--rainbow-angle:360deg}}
+        @keyframes rainbowText{0%{color:#ff4444}14%{color:#ff8844}28%{color:#ffcc44}42%{color:#44dd88}57%{color:#44aaff}71%{color:#8866ff}85%{color:#ff44cc}100%{color:#ff4444}}
+        @media(max-height:750px){
+          .piilosana-title{font-size:22px!important;margin:4px 0!important;}
+          .piilosana-grid{gap:4px!important;padding:5px!important;}
+          .piilosana-hud{padding:3px 8px!important;}
+          .piilosana-found{max-height:70px!important;padding:4px!important;}
+        }
+        @media(max-height:650px){
+          .piilosana-title{font-size:18px!important;margin:2px 0!important;}
+          .piilosana-grid{gap:3px!important;padding:4px!important;}
+          .piilosana-hud{padding:2px 6px!important;}
+          .piilosana-found{max-height:50px!important;padding:3px!important;}
+        }
       `}</style>
 
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
@@ -2999,7 +2962,7 @@ export default function Piilosana(){
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
         <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={mode!==null&&settingsBubble} bubbleFading={bubbleFading} hideGear={mode===null} theme={S}/>
       ):(
-        <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
+        <h1 className="piilosana-title" style={{fontSize:"28px",letterSpacing:"4px",margin:"6px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
           animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
           {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>{
             if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
@@ -3090,16 +3053,16 @@ export default function Piilosana(){
       {showSettings&&(
         <div style={{width:"100%",maxWidth:"500px",padding:"18px",border:`2px solid ${S.green}`,background:S.dark,
           boxShadow:S.panelShadow!=="none"?S.panelShadow:`0 0 20px ${S.green}33`,borderRadius:S.panelRadius,animation:"fadeIn 0.3s ease",marginBottom:"8px",zIndex:100,position:"relative"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
-            <div style={{fontFamily:S.font,fontSize:"14px",color:S.yellow}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px",borderBottom:`1px solid ${S.border}`,paddingBottom:"10px"}}>
+            <div style={{fontFamily:S.font,fontSize:"16px",fontWeight:"700",color:S.yellow,letterSpacing:"1px"}}>
               {lang==="en"?"SETTINGS":lang==="sv"?"INSTÄLLNINGAR":"ASETUKSET"}
             </div>
-            <button onClick={()=>setShowSettings(false)} style={{fontFamily:S.font,fontSize:"12px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"4px 10px",cursor:"pointer"}}>✕</button>
+            <button onClick={()=>setShowSettings(false)} style={{fontFamily:S.font,fontSize:"14px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"4px 12px",cursor:"pointer",borderRadius:S.btnRadius}}>✕</button>
           </div>
           {/* Theme */}
-          <div style={{marginBottom:"12px"}}>
-            <div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"6px"}}>
-              {lang==="en"?"THEME":lang==="sv"?"TEMA":"TEEMA"}
+          <div style={{marginBottom:"14px"}}>
+            <div style={{fontFamily:S.font,fontSize:"11px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
+              {lang==="en"?"Color Theme":lang==="sv"?"Färgtema":"Väriteema"}
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
               {Object.entries(THEMES).map(([id,th])=>(
@@ -3116,9 +3079,9 @@ export default function Piilosana(){
             </div>
           </div>
           {/* Size */}
-          <div style={{marginBottom:"12px"}}>
-            <div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"6px"}}>
-              {lang==="en"?"SIZE":lang==="sv"?"STORLEK":"KOKO"}
+          <div style={{marginBottom:"14px"}}>
+            <div style={{fontFamily:S.font,fontSize:"11px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
+              {lang==="en"?"Grid Size":lang==="sv"?"Rutstorlek":"Ruudukon koko"}
             </div>
             <div style={{display:"flex",gap:"4px"}}>
               <button onClick={()=>{setUiSize("normal");localStorage.setItem("piilosana_size","normal");syncSettings({size:"normal"});}}
@@ -3136,9 +3099,9 @@ export default function Piilosana(){
             </div>
           </div>
           {/* Sound */}
-          <div style={{marginBottom:"12px"}}>
-            <div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"6px"}}>
-              {lang==="en"?"SOUNDS":lang==="sv"?"LJUD":"ÄÄNET"}
+          <div style={{marginBottom:"14px"}}>
+            <div style={{fontFamily:S.font,fontSize:"11px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
+              {lang==="en"?"Sound Effects":lang==="sv"?"Ljudeffekter":"Ääniefektit"}
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
               {[["retro",{fi:"RETRO",en:"RETRO",sv:"RETRO"}],["soft",{fi:"PEHMEÄ",en:"SOFT",sv:"MJUK"}],["modern",{fi:"MODERNI",en:"MODERN",sv:"MODERN"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
@@ -3153,9 +3116,9 @@ export default function Piilosana(){
             </div>
           </div>
           {/* Music */}
-          <div style={{marginBottom:"12px"}}>
-            <div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"6px"}}>
-              {lang==="en"?"MUSIC":lang==="sv"?"MUSIK":"MUSIIKKI"}
+          <div style={{marginBottom:"14px"}}>
+            <div style={{fontFamily:S.font,fontSize:"11px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
+              {lang==="en"?"Background Music":lang==="sv"?"Bakgrundsmusik":"Taustamusiikki"}
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
               {[["electronic",{fi:"PÄÄLLÄ",en:"ON",sv:"PÅ"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
@@ -3194,8 +3157,8 @@ export default function Piilosana(){
           </div>
           {/* Confetti */}
           <div>
-            <div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"6px"}}>
-              {lang==="en"?"EFFECTS":lang==="sv"?"EFFEKTER":"TEHOSTEET"}
+            <div style={{fontFamily:S.font,fontSize:"11px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
+              {lang==="en"?"Visual Effects":lang==="sv"?"Visuella effekter":"Visuaaliset tehosteet"}
             </div>
             <button onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");syncSettings({confetti:v});}}
               style={{fontFamily:S.font,fontSize:"12px",
@@ -3673,7 +3636,7 @@ export default function Piilosana(){
 
       {/* PLAYING + ENDING */}
       {(state==="play"||state==="ending")&&(
-        <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:"0 2px"}}>
+        <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD */}
           <div style={{marginBottom:"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
             {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {t.players}</div>}
@@ -3681,7 +3644,7 @@ export default function Piilosana(){
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
             {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="infinity" color="#44ddff" size={1}/>{t.unlimitedLabel}</div>}
             {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"10px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 10px"}}>
+            <div className="piilosana-hud" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 10px"}}>
               {gameTime!==0?(
               <div style={{textAlign:"center",flex:1}}>
                 <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"2px"}}>{t.time}</div>
@@ -3741,7 +3704,7 @@ export default function Piilosana(){
 
           {/* GRID */}
           <div style={{position:"relative"}}>
-            <div ref={gRef}
+            <div ref={gRef} className="piilosana-grid"
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
               style={{display:"grid",gridTemplateColumns:`repeat(${SZ},1fr)`,gap:S.gridGap!=="0px"?S.gridGap:isLarge?"6px":"4px",padding:isLarge?"8px":"6px",background:S.gridBg||"#111133",
                 border:`3px solid ${combo>=3&&state==="play"?S.yellow:ending?ending.color+"88":S.border}`,
@@ -3806,7 +3769,7 @@ export default function Piilosana(){
           </div>
 
           {state==="play"&&(
-            <div style={{marginTop:"8px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,maxHeight:"120px",overflowY:"auto"}}>
+            <div className="piilosana-found" style={{marginTop:"8px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,maxHeight:"120px",overflowY:"auto"}}>
               <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"4px"}}>{(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?`${t.found} (${found.length})`:`${t.found} (${found.length}/${valid.size})`}</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {found.length===0?<span style={{fontSize:"18px",color:S.textMuted}}>{t.dragWords}</span>:
@@ -3925,28 +3888,43 @@ export default function Piilosana(){
       <div style={{width:"100%",maxWidth:"600px",minHeight:"60px",marginTop:"16px",flexShrink:0}}/>
 
 
-      {/* Pink theme unicorn decorations */}
+      {/* Pink theme floating decorations */}
       {themeId==="pink"&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
-          <div style={{position:"absolute",top:"10%",left:"5%",fontSize:"32px",opacity:0.12,animation:"floatUnicorn 8s ease-in-out infinite"}}>🦄</div>
-          <div style={{position:"absolute",top:"30%",right:"8%",fontSize:"24px",opacity:0.10,animation:"floatUnicorn 10s ease-in-out infinite 2s"}}>🌸</div>
-          <div style={{position:"absolute",bottom:"20%",left:"10%",fontSize:"28px",opacity:0.10,animation:"floatUnicorn 9s ease-in-out infinite 4s"}}>✨</div>
-          <div style={{position:"absolute",top:"60%",right:"5%",fontSize:"26px",opacity:0.08,animation:"floatUnicorn 11s ease-in-out infinite 1s"}}>🦄</div>
-          <div style={{position:"absolute",bottom:"35%",left:"45%",fontSize:"20px",opacity:0.08,animation:"floatUnicorn 7s ease-in-out infinite 3s"}}>💖</div>
-          <div style={{position:"absolute",top:"5%",right:"30%",fontSize:"18px",opacity:0.10,animation:"floatUnicorn 12s ease-in-out infinite 5s"}}>🌈</div>
+          <div style={{position:"absolute",top:"10%",left:"5%",fontSize:"28px",opacity:0.08,animation:"floatUnicorn 8s ease-in-out infinite"}}>💖</div>
+          <div style={{position:"absolute",top:"30%",right:"8%",fontSize:"22px",opacity:0.06,animation:"floatUnicorn 10s ease-in-out infinite 2s"}}>🌸</div>
+          <div style={{position:"absolute",bottom:"20%",left:"10%",fontSize:"24px",opacity:0.06,animation:"floatUnicorn 9s ease-in-out infinite 4s"}}>✨</div>
+          <div style={{position:"absolute",top:"60%",right:"5%",fontSize:"22px",opacity:0.05,animation:"floatUnicorn 11s ease-in-out infinite 1s"}}>💗</div>
         </div>
       )}
 
-      {/* Electric theme scanline / glow effects */}
+      {/* Electric theme glow */}
       {themeId==="electric"&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
-          <div style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",
-            background:"repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,100,255,0.03) 2px,rgba(0,100,255,0.03) 4px)",
-            animation:"scanlines 0.1s steps(1) infinite"}}/>
           <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",
             width:"120%",height:"120%",
-            background:"radial-gradient(ellipse at center,rgba(0,100,255,0.08) 0%,transparent 70%)",
+            background:"radial-gradient(ellipse at center,rgba(56,189,248,0.06) 0%,transparent 70%)",
             animation:"electricPulse 4s ease-in-out infinite"}}/>
+        </div>
+      )}
+
+      {/* Retro theme neon glow */}
+      {themeId==="retro"&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
+          <div style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",
+            background:"repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,255,136,0.015) 3px,rgba(0,255,136,0.015) 4px)"}}/>
+          <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",
+            width:"100%",height:"100%",
+            background:"radial-gradient(ellipse at center,rgba(0,255,136,0.05) 0%,transparent 65%)"}}/>
+        </div>
+      )}
+
+      {/* Rainbow theme animated border glow */}
+      {themeId==="rainbow"&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
+          <div style={{position:"absolute",inset:0,
+            background:"conic-gradient(from var(--rainbow-angle, 0deg),#ff000015,#ff880015,#ffff0015,#00ff0015,#0088ff0015,#8800ff0015,#ff000015)",
+            animation:"rainbowSpin 6s linear infinite"}}/>
         </div>
       )}
     </div>
