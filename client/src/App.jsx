@@ -3844,30 +3844,30 @@ export default function Piilosana(){
                   onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
                 >💬</button>
               </div>
-              {/* Emoji picker - speech bubble with tail */}
+              {/* Emoji picker - opens below button, overlays chat feed */}
               {emojiOpen&&(
-                <div style={{position:"absolute",left:"50%",transform:"translateX(-50%)",bottom:"100%",marginBottom:"6px",zIndex:50,
+                <div style={{position:"absolute",left:"50%",transform:"translateX(-50%)",top:"100%",marginTop:"6px",zIndex:50,
                   overflow:"hidden",
                   maxHeight:emojiOpen==="closing"?0:"400px",opacity:emojiOpen==="closing"?0:1,
                   transition:"max-height 0.25s ease, opacity 0.2s ease"}}>
                   <div style={{display:"flex",justifyContent:"center"}}>
                     <div style={{position:"relative",width:"240px"}}>
-                      {/* Bubble tail pointing down */}
-                      <div style={{position:"absolute",bottom:"-8px",left:"50%",transform:"translateX(-50%)",
+                      {/* Bubble tail pointing up */}
+                      <div style={{position:"absolute",top:"-8px",left:"50%",transform:"translateX(-50%)",
                         width:0,height:0,borderLeft:"10px solid transparent",borderRight:"10px solid transparent",
-                        borderTop:`10px solid ${S.border}`}}/>
-                      <div style={{position:"absolute",bottom:"-5px",left:"50%",transform:"translateX(-50%)",
+                        borderBottom:`10px solid ${S.border}`}}/>
+                      <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
                         width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",
-                        borderTop:`8px solid ${S.cellGradient?S.dark:S.dark}`}}/>
+                        borderBottom:`8px solid ${S.cellGradient?S.dark:S.dark}`}}/>
                       <div style={{
-                        display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"4px",
-                        padding:"10px",marginTop:"2px",
+                        display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"3px",
+                        padding:"8px",marginTop:"2px",
                         background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
                         border:`2px solid ${S.border}`,borderRadius:"16px",
                         boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044"}}>
                         {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
                           <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});closeEmojiPicker();}}
-                            style={{fontSize:"26px",padding:"8px",background:"transparent",border:"none",borderRadius:"10px",cursor:"pointer",lineHeight:1,
+                            style={{fontSize:"22px",padding:"6px",background:"transparent",border:"none",borderRadius:"10px",cursor:"pointer",lineHeight:1,
                             transition:"transform 0.12s, background 0.12s"}}
                             onMouseDown={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
                             onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
