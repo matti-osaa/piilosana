@@ -596,7 +596,7 @@ function useSounds(soundTheme){
 }
 
 // ============================================
-// BACKGROUND MUSIC - "Two Letters"
+// BACKGROUND MUSIC - "Dreamy Ambient"
 // ============================================
 function useMusic(){
   const partsRef=useRef(null);
@@ -3206,7 +3206,7 @@ export default function Piilosana(){
                   color:musicOn?S.bg:S.green,background:musicOn?S.green:"transparent",
                   border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer",
                   boxShadow:musicOn?`0 0 8px ${S.green}66`:"none"}}>
-                {lang==="en"?"TWO LETTERS":lang==="sv"?"TWO LETTERS":"TWO LETTERS"}
+                {lang==="en"?"ON":lang==="sv"?"PÅ":"PÄÄLLÄ"}
               </button>
               <button onClick={()=>{setMusicOn(false);localStorage.setItem("piilosana_music","off");music.stop();}}
                 style={{fontFamily:S.font,fontSize:"13px",
@@ -3857,18 +3857,19 @@ export default function Piilosana(){
               </div>
               {/* Emoji picker - speech bubble with tail */}
               {emojiOpen&&(
-                <div style={{overflow:"hidden",marginBottom:"8px",
+                <div style={{position:"absolute",left:"50%",transform:"translateX(-50%)",bottom:"100%",marginBottom:"6px",zIndex:50,
+                  overflow:"hidden",
                   maxHeight:emojiOpen==="closing"?0:"400px",opacity:emojiOpen==="closing"?0:1,
                   transition:"max-height 0.25s ease, opacity 0.2s ease"}}>
                   <div style={{display:"flex",justifyContent:"center"}}>
                     <div style={{position:"relative",width:"240px"}}>
-                      {/* Bubble tail pointing up */}
-                      <div style={{position:"absolute",top:"-8px",left:"50%",transform:"translateX(-50%)",
+                      {/* Bubble tail pointing down */}
+                      <div style={{position:"absolute",bottom:"-8px",left:"50%",transform:"translateX(-50%)",
                         width:0,height:0,borderLeft:"10px solid transparent",borderRight:"10px solid transparent",
-                        borderBottom:`10px solid ${S.border}`}}/>
-                      <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
+                        borderTop:`10px solid ${S.border}`}}/>
+                      <div style={{position:"absolute",bottom:"-5px",left:"50%",transform:"translateX(-50%)",
                         width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",
-                        borderBottom:`8px solid ${S.cellGradient?S.dark:S.dark}`}}/>
+                        borderTop:`8px solid ${S.cellGradient?S.dark:S.dark}`}}/>
                       <div style={{
                         display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"4px",
                         padding:"10px",marginTop:"2px",
