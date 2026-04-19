@@ -73,7 +73,7 @@ function applyGravityClient(grid,removedCells,lang='fi'){
 // UI translations
 const T={
   fi:{
-    selectMode:"VALITSE PELIMUOTO",arena:"MONINPELI",arenaDesc:"24/7 nonstop-moninpeli",arenaCta:"PELAA NYT",arenaWelcome:"Tervetuloa — liity peliin!",customGame:"OMA MONINPELI",customDesc:"kutsu kaverit",practice:"HARJOITTELU",practiceDesc:"yksinpeli",
+    selectMode:"VALITSE PELIMUOTO",arena:"MONINPELI",arenaDesc:"24/7 nonstop-moninpeli",arenaCta:"PELAA NYT",arenaWelcome:"Tervetuloa — liity peliin!",customGame:"OMA MONINPELI",customDesc:"kutsu kavereita",practice:"HARJOITTELU",practiceDesc:"yksinpeli",
     findWords:"Etsi sanoja ruudukosta!",dragHint:"VEDÄ kirjaimien yli kaikkiin suuntiin. Aikaa 2 min.",comboHint:"Löydä sanoja nopeasti putkeen = kombo ja lisäpisteet!",
     scoring:"PISTEYTYS: 3kir=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"sanaa",
     nickname:"NIMIMERKKI",join:"LIITY",back:"TAKAISIN",exit:"POISTU",play:"PELAA",
@@ -2086,7 +2086,7 @@ export default function Piilosana(){
         let text=`+${totalPts}`;
         if(newCombo>=3)text+=` x${comboMult}`;
         addPopup(text,color,popX,popY);
-        addWordPopup(currentWord,color,popX,popY-20);
+        {const bar=wordBarRef.current;if(bar){const br=bar.getBoundingClientRect();addWordPopup(currentWord,color,br.left+br.width/2,br.top+br.height/2);}else{addWordPopup(currentWord,color,popX,popY-20);}}
       }
       // Tetris mode: remove used cells, apply gravity, recompute valid words
       if(soloMode==="tetris"){
@@ -2262,7 +2262,7 @@ export default function Piilosana(){
             let text=`+${points}`;
             if(c>=3)text+=` x${Math.floor(points/(pts(w.length)))}`;
             addPopup(text,color,popX,popY);
-            addWordPopup(w,color,popX,popY-20);
+            {const bar=wordBarRef.current;if(bar){const br=bar.getBoundingClientRect();addWordPopup(w,color,br.left+br.width/2,br.top+br.height/2);}else{addWordPopup(w,color,popX,popY-20);}}
           }
         }
       }else{
@@ -2873,16 +2873,16 @@ export default function Piilosana(){
 
       {/* Achievement unlock popup */}
       {newAchPopup&&ACHIEVEMENTS[newAchPopup]&&(
-        <div style={{position:"fixed",top:"20%",left:"50%",transform:"translateX(-50%)",zIndex:200,
+        <div style={{position:"fixed",top:"18%",left:"50%",transform:"translateX(-50%)",zIndex:200,
           animation:"pop 0.5s ease",pointerEvents:"none",textAlign:"center"}}>
           <div style={{background:S.dark,border:`3px solid ${ACHIEVEMENTS[newAchPopup].color}`,
-            padding:"16px 24px",boxShadow:`0 0 40px ${ACHIEVEMENTS[newAchPopup].color}66`,minWidth:"200px"}}>
-            <div style={{fontSize:"11px",color:ACHIEVEMENTS[newAchPopup].color,marginBottom:"8px"}}>{t.achievementUnlocked}</div>
-            <div style={{display:"flex",justifyContent:"center",marginBottom:"8px"}}>
-              <Icon icon={ACHIEVEMENTS[newAchPopup].icon} color={ACHIEVEMENTS[newAchPopup].color} size={4} badge={true}/>
+            padding:"24px 36px",boxShadow:`0 0 60px ${ACHIEVEMENTS[newAchPopup].color}66`,minWidth:"280px",borderRadius:S.panelRadius}}>
+            <div style={{fontSize:"16px",color:ACHIEVEMENTS[newAchPopup].color,marginBottom:"12px",fontWeight:"700",letterSpacing:"1px"}}>{t.achievementUnlocked}</div>
+            <div style={{display:"flex",justifyContent:"center",marginBottom:"12px"}}>
+              <Icon icon={ACHIEVEMENTS[newAchPopup].icon} color={ACHIEVEMENTS[newAchPopup].color} size={6} badge={true}/>
             </div>
-            <div style={{fontSize:"13px",color:"#fff"}}>{ACHIEVEMENTS[newAchPopup][lang]||ACHIEVEMENTS[newAchPopup].fi}</div>
-            <div style={{fontSize:"9px",color:S.textSoft||"#88ccaa",marginTop:"4px"}}>{ACHIEVEMENTS[newAchPopup][lang+"_d"]||ACHIEVEMENTS[newAchPopup].fi_d}</div>
+            <div style={{fontSize:"20px",color:"#fff",fontWeight:"700"}}>{ACHIEVEMENTS[newAchPopup][lang]||ACHIEVEMENTS[newAchPopup].fi}</div>
+            <div style={{fontSize:"14px",color:S.textSoft||"#88ccaa",marginTop:"6px"}}>{ACHIEVEMENTS[newAchPopup][lang+"_d"]||ACHIEVEMENTS[newAchPopup].fi_d}</div>
           </div>
         </div>
       )}
@@ -2892,40 +2892,40 @@ export default function Piilosana(){
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:150,
           display:"flex",justifyContent:"center",alignItems:"flex-start",padding:"40px 16px",overflowY:"auto"}}
           onClick={(e)=>{if(e.target===e.currentTarget)setShowAchievements(false);}}>
-          <div style={{width:"100%",maxWidth:"500px",background:S.dark,border:`2px solid #ffcc00`,
-            boxShadow:S.panelShadow!=="none"?S.panelShadow:"0 0 30px #ffcc0033",borderRadius:S.panelRadius,padding:"20px",animation:"fadeIn 0.3s ease"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
-              <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
-                <Icon icon="trophy" color="#ffcc00" size={3} badge={true}/>
-                <span style={{fontFamily:S.font,fontSize:"14px",color:"#ffcc00"}}>{t.achievements}</span>
+          <div style={{width:"100%",maxWidth:"600px",background:S.dark,border:`2px solid #ffcc00`,
+            boxShadow:S.panelShadow!=="none"?S.panelShadow:"0 0 30px #ffcc0033",borderRadius:S.panelRadius,padding:"24px",animation:"fadeIn 0.3s ease"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"20px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
+                <Icon icon="trophy" color="#ffcc00" size={4} badge={true}/>
+                <span style={{fontFamily:S.font,fontSize:"20px",fontWeight:"700",color:"#ffcc00"}}>{t.achievements}</span>
               </div>
-              <span style={{fontSize:"11px",color:S.textSoft||"#88ccaa"}}>{Object.keys(achUnlocked).length} / {Object.keys(ACHIEVEMENTS).length}</span>
-              <button onClick={()=>setShowAchievements(false)} style={{fontFamily:S.font,fontSize:"14px",color:S.green,
-                background:"transparent",border:`2px solid ${S.green}`,padding:"4px 10px",cursor:"pointer"}}>X</button>
+              <span style={{fontSize:"15px",color:S.textSoft||"#88ccaa",fontWeight:"600"}}>{Object.keys(achUnlocked).length} / {Object.keys(ACHIEVEMENTS).length}</span>
+              <button onClick={()=>setShowAchievements(false)} style={{fontFamily:S.font,fontSize:"18px",color:S.green,
+                background:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer",borderRadius:"8px"}}>X</button>
             </div>
             {/* Progress bar */}
-            <div style={{width:"100%",height:"6px",background:S.border,marginBottom:"16px",border:`1px solid ${S.border}`}}>
+            <div style={{width:"100%",height:"8px",background:S.border,marginBottom:"20px",borderRadius:"4px"}}>
               <div style={{width:`${Object.keys(achUnlocked).length/Object.keys(ACHIEVEMENTS).length*100}%`,height:"100%",
-                background:"linear-gradient(90deg, #ffcc00, #ff6644)",transition:"width 0.5s ease"}}/>
+                background:"linear-gradient(90deg, #ffcc00, #ff6644)",transition:"width 0.5s ease",borderRadius:"4px"}}/>
             </div>
             {/* Achievement grid */}
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(130px, 1fr))",gap:"8px"}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(160px, 1fr))",gap:"10px"}}>
               {Object.entries(ACHIEVEMENTS).map(([id,ach])=>{
                 const unlocked=!!achUnlocked[id];
                 return(
                   <div key={id} style={{border:`2px solid ${unlocked?ach.color+"88":S.border}`,
-                    padding:"10px",textAlign:"center",background:unlocked?"#ffffff08":"#00000044",
-                    opacity:unlocked?1:0.5,transition:"all 0.3s"}}>
-                    <div style={{display:"flex",justifyContent:"center",marginBottom:"6px"}}>
-                      <Icon icon={ach.icon} color={unlocked?ach.color:"#444"} size={3} badge={true}/>
+                    padding:"14px",textAlign:"center",background:unlocked?"#ffffff08":"#00000044",
+                    opacity:unlocked?1:0.5,transition:"all 0.3s",borderRadius:"10px"}}>
+                    <div style={{display:"flex",justifyContent:"center",marginBottom:"8px"}}>
+                      <Icon icon={ach.icon} color={unlocked?ach.color:"#444"} size={4} badge={true}/>
                     </div>
-                    <div style={{fontSize:"12px",color:unlocked?ach.color:S.textMuted,marginBottom:"2px",lineHeight:"1.4"}}>
+                    <div style={{fontSize:"15px",fontWeight:"700",color:unlocked?ach.color:S.textMuted,marginBottom:"4px",lineHeight:"1.4"}}>
                       {ach[lang]||ach.fi}
                     </div>
-                    <div style={{fontSize:"11px",color:unlocked?S.textSoft:S.textMuted,lineHeight:"1.3"}}>
+                    <div style={{fontSize:"13px",color:unlocked?(S.textSoft||"#88ccaa"):S.textMuted,lineHeight:"1.4"}}>
                       {ach[lang+"_d"]||ach.fi_d}
                     </div>
-                    {unlocked&&<div style={{fontSize:"7px",color:S.textMuted,marginTop:"3px"}}>
+                    {unlocked&&<div style={{fontSize:"10px",color:S.textMuted,marginTop:"4px"}}>
                       {new Date(achUnlocked[id]).toLocaleDateString()}
                     </div>}
                   </div>
@@ -2933,14 +2933,14 @@ export default function Piilosana(){
               })}
             </div>
             {/* Stats summary */}
-            <div style={{marginTop:"16px",padding:"10px",border:`1px solid ${S.border}`,fontSize:"12px",color:S.textSoft||"#88ccaa",
-              display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4px"}}>
-              <div>{lang==="en"?"Words found":lang==="sv"?"Ord hittade":"Sanoja löydetty"}: {achStats.totalWords}</div>
-              <div>{lang==="en"?"Games played":lang==="sv"?"Spel spelade":"Pelejä pelattu"}: {achStats.gamesPlayed}</div>
-              <div>{lang==="en"?"Best score":lang==="sv"?"Bästa poäng":"Paras tulos"}: {achStats.bestScore}</div>
-              <div>{lang==="en"?"Best combo":lang==="sv"?"Bästa kombo":"Paras kombo"}: {achStats.bestCombo}</div>
-              <div>{lang==="en"?"Longest word":lang==="sv"?"Längsta ord":"Pisin sana"}: {achStats.longestWord} {lang==="en"?"letters":lang==="sv"?"bokstäver":"kirjainta"}</div>
-              <div>{lang==="en"?"Multiplayer wins":lang==="sv"?"Flerspelarvinster":"Moninpelivoitot"}: {achStats.arenaWins}</div>
+            <div style={{marginTop:"20px",padding:"14px",border:`1px solid ${S.border}`,fontSize:"14px",color:S.textSoft||"#88ccaa",
+              display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",borderRadius:"8px"}}>
+              <div>{lang==="en"?"Words found":lang==="sv"?"Ord hittade":"Sanoja löydetty"}: <strong>{achStats.totalWords}</strong></div>
+              <div>{lang==="en"?"Games played":lang==="sv"?"Spel spelade":"Pelejä pelattu"}: <strong>{achStats.gamesPlayed}</strong></div>
+              <div>{lang==="en"?"Best score":lang==="sv"?"Bästa poäng":"Paras tulos"}: <strong>{achStats.bestScore}</strong></div>
+              <div>{lang==="en"?"Best combo":lang==="sv"?"Bästa kombo":"Paras kombo"}: <strong>{achStats.bestCombo}</strong></div>
+              <div>{lang==="en"?"Longest word":lang==="sv"?"Längsta ord":"Pisin sana"}: <strong>{achStats.longestWord}</strong> {lang==="en"?"letters":lang==="sv"?"bokstäver":"kirjainta"}</div>
+              <div>{lang==="en"?"Multiplayer wins":lang==="sv"?"Flerspelarvinster":"Moninpelivoitot"}: <strong>{achStats.arenaWins}</strong></div>
             </div>
           </div>
         </div>
