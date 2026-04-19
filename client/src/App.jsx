@@ -1303,7 +1303,46 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
   }
   return(
     <div style={{position:"relative",display:"inline-block"}}>
-    <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"0 0 10px 0",paddingTop:"12px",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px"}}>
+    <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:"6px",paddingTop:"8px"}}>
+      {/* Brain illustration - straining/thinking */}
+      <svg width="44" height="44" viewBox="0 0 100 100" style={{flexShrink:0}}>
+        {/* Brain body */}
+        <ellipse cx="50" cy="52" rx="34" ry="30" fill="#ff9eb8" stroke="#d05070" strokeWidth="2.5"/>
+        {/* Brain wrinkles */}
+        <path d="M30 42 Q40 35 50 42 Q60 35 70 42" fill="none" stroke="#d05070" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M28 52 Q38 46 50 52 Q62 46 72 52" fill="none" stroke="#d05070" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M32 62 Q42 56 52 62 Q62 56 68 62" fill="none" stroke="#d05070" strokeWidth="2" strokeLinecap="round"/>
+        {/* Center line */}
+        <path d="M50 25 Q48 40 50 52 Q52 64 50 78" fill="none" stroke="#d05070" strokeWidth="2" strokeLinecap="round"/>
+        {/* Eyes - strained/squinting */}
+        <line x1="36" y1="46" x2="44" y2="46" stroke="#6b1040" strokeWidth="3" strokeLinecap="round"/>
+        <line x1="56" y1="46" x2="64" y2="46" stroke="#6b1040" strokeWidth="3" strokeLinecap="round"/>
+        {/* Sweat drops */}
+        <ellipse cx="22" cy="36" rx="3" ry="5" fill="#66ccff" opacity="0.8">
+          <animate attributeName="cy" values="36;32;36" dur="1.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="78" cy="40" rx="2.5" ry="4" fill="#66ccff" opacity="0.6">
+          <animate attributeName="cy" values="40;36;40" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
+        </ellipse>
+        {/* Effort lines above */}
+        <line x1="38" y1="18" x2="38" y2="12" stroke="#ffcc00" strokeWidth="2" strokeLinecap="round" opacity="0.7">
+          <animate attributeName="opacity" values="0.7;0.2;0.7" dur="1s" repeatCount="indefinite"/>
+        </line>
+        <line x1="50" y1="15" x2="50" y2="8" stroke="#ffcc00" strokeWidth="2" strokeLinecap="round" opacity="0.8">
+          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="0.8s" repeatCount="indefinite"/>
+        </line>
+        <line x1="62" y1="18" x2="62" y2="12" stroke="#ffcc00" strokeWidth="2" strokeLinecap="round" opacity="0.6">
+          <animate attributeName="opacity" values="0.6;0.2;0.6" dur="1.2s" repeatCount="indefinite"/>
+        </line>
+        {/* Mouth - strained */}
+        <path d="M42 58 Q50 55 58 58" fill="none" stroke="#6b1040" strokeWidth="2" strokeLinecap="round"/>
+        {/* Tiny arms holding head */}
+        <path d="M18 60 Q10 55 14 48" fill="none" stroke="#d05070" strokeWidth="2.5" strokeLinecap="round"/>
+        <path d="M82 60 Q90 55 86 48" fill="none" stroke="#d05070" strokeWidth="2.5" strokeLinecap="round"/>
+      </svg>
+    <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"0 0 10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px"}}>
       {displayChars.map((ch,i)=>{
         const isLit=lit.has(i);
         const isGear=!scramble&&i===tc.gearIdx;
@@ -1330,6 +1369,39 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
         return <span key={i} style={baseStyle}>{ch}</span>;
       })}
     </h1>
+      {/* Coffee cup illustration - steaming */}
+      <svg width="44" height="44" viewBox="0 0 100 100" style={{flexShrink:0}}>
+        {/* Steam */}
+        <path d="M35 30 Q30 20 35 10" fill="none" stroke="#aaaaaa" strokeWidth="2.5" strokeLinecap="round" opacity="0.5">
+          <animate attributeName="d" values="M35 30 Q30 20 35 10;M35 30 Q40 18 35 8;M35 30 Q30 20 35 10" dur="2.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite"/>
+        </path>
+        <path d="M50 28 Q45 16 50 6" fill="none" stroke="#aaaaaa" strokeWidth="2.5" strokeLinecap="round" opacity="0.6">
+          <animate attributeName="d" values="M50 28 Q45 16 50 6;M50 28 Q55 14 50 4;M50 28 Q45 16 50 6" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;0.25;0.6" dur="2s" repeatCount="indefinite"/>
+        </path>
+        <path d="M65 30 Q60 18 65 8" fill="none" stroke="#aaaaaa" strokeWidth="2.5" strokeLinecap="round" opacity="0.4">
+          <animate attributeName="d" values="M65 30 Q60 18 65 8;M65 30 Q70 16 65 6;M65 30 Q60 18 65 8" dur="3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.4;0.15;0.4" dur="3s" repeatCount="indefinite"/>
+        </path>
+        {/* Cup body */}
+        <path d="M22 38 L22 75 Q22 85 35 85 L65 85 Q78 85 78 75 L78 38 Z" fill="#f5e6d0" stroke="#8b6914" strokeWidth="2.5"/>
+        {/* Coffee surface */}
+        <ellipse cx="50" cy="42" rx="28" ry="6" fill="#6b3a1f"/>
+        <ellipse cx="50" cy="41" rx="24" ry="4" fill="#8b5a2f" opacity="0.6"/>
+        {/* Handle */}
+        <path d="M78 48 Q94 48 94 60 Q94 72 78 72" fill="none" stroke="#8b6914" strokeWidth="3" strokeLinecap="round"/>
+        {/* Cup rim */}
+        <ellipse cx="50" cy="38" rx="29" ry="6" fill="none" stroke="#8b6914" strokeWidth="2.5"/>
+        {/* Cute face on cup */}
+        <circle cx="40" cy="62" r="2.5" fill="#8b6914"/>
+        <circle cx="60" cy="62" r="2.5" fill="#8b6914"/>
+        <path d="M44 70 Q50 75 56 70" fill="none" stroke="#8b6914" strokeWidth="2" strokeLinecap="round"/>
+        {/* Blush */}
+        <ellipse cx="34" cy="68" rx="4" ry="2.5" fill="#ffaaaa" opacity="0.5"/>
+        <ellipse cx="66" cy="68" rx="4" ry="2.5" fill="#ffaaaa" opacity="0.5"/>
+      </svg>
+    </div>
     {/* Speech bubble below title pointing up */}
     {showBubble&&!scramble&&(
       <div style={{position:"absolute",bottom:"-52px",left:"50%",transform:"translateX(-50%)",
@@ -1738,7 +1810,11 @@ export default function Piilosana(){
   const[battleMsg,setBattleMsg]=useState(null); // {word, finder, points} - flash when someone finds
   const[emojiFeed,setEmojiFeed]=useState([]); // [{id, nickname, emoji, fading}]
   const emojiFeedIdRef=useRef(0);
-  const[emojiOpen,setEmojiOpen]=useState(false);
+  const[emojiOpen,setEmojiOpen]=useState(false); // false | "open" | "closing"
+  const closeEmojiPicker=useCallback(()=>{
+    setEmojiOpen("closing");
+    setTimeout(()=>setEmojiOpen(false),250);
+  },[]);
   // Public game (Piilosauna)
   const[publicState,setPublicState]=useState(null); // null|'waiting'|'countdown'|'playing'|'end'
   const[publicScores,setPublicScores]=useState([]);
@@ -3645,10 +3721,10 @@ export default function Piilosana(){
 
           {/* Emoji reactions - multiplayer only */}
           {(mode==="public"||mode==="multi")&&state==="play"&&socket&&(
-            <div style={{marginTop:"8px",position:"relative"}}>
+            <div style={{marginTop:"8px"}}>
               {/* Speech bubble toggle button */}
               <div style={{display:"flex",justifyContent:"center",marginBottom:"6px"}}>
-                <button onClick={()=>setEmojiOpen(o=>!o)}
+                <button onClick={()=>emojiOpen==="open"?closeEmojiPicker():setEmojiOpen("open")}
                   style={{fontSize:"22px",padding:"8px 18px",background:emojiOpen?S.border:S.dark,border:`2px solid ${S.border}`,borderRadius:"16px",cursor:"pointer",lineHeight:1,
                   transition:"transform 0.15s, background 0.15s",display:"flex",alignItems:"center",gap:"6px",fontFamily:S.font,color:S.green}}
                   onMouseDown={e=>{e.currentTarget.style.transform="scale(1.05)";}}
@@ -3658,25 +3734,36 @@ export default function Piilosana(){
                   onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
                 >💬</button>
               </div>
-              {/* Emoji picker grid */}
+              {/* Emoji picker - speech bubble with tail */}
               {emojiOpen&&(
-                <div style={{
-                  display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"4px",
-                  padding:"10px",marginBottom:"8px",
-                  background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
-                  border:`2px solid ${S.border}`,borderRadius:"16px",
-                  boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044",
-                  animation:"bubbleIn 0.25s ease-out",maxWidth:"240px",margin:"0 auto 8px"}}>
-                  {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
-                    <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});setEmojiOpen(false);}}
-                      style={{fontSize:"26px",padding:"8px",background:"transparent",border:"none",borderRadius:"10px",cursor:"pointer",lineHeight:1,
-                      transition:"transform 0.12s, background 0.12s"}}
-                      onMouseDown={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
-                      onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
-                      onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
-                      onTouchStart={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
-                      onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}>{em}</button>
-                  ))}
+                <div style={{display:"flex",justifyContent:"center",marginBottom:"8px"}}>
+                  <div style={{position:"relative",width:"240px",
+                    animation:emojiOpen==="closing"?"bubbleOut 0.25s ease forwards":"bubbleIn 0.25s ease-out"}}>
+                    {/* Bubble tail pointing up */}
+                    <div style={{position:"absolute",top:"-8px",left:"50%",transform:"translateX(-50%)",
+                      width:0,height:0,borderLeft:"10px solid transparent",borderRight:"10px solid transparent",
+                      borderBottom:`10px solid ${S.border}`}}/>
+                    <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
+                      width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",
+                      borderBottom:`8px solid ${S.cellGradient?S.dark:S.dark}`}}/>
+                    <div style={{
+                      display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"4px",
+                      padding:"10px",marginTop:"2px",
+                      background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
+                      border:`2px solid ${S.border}`,borderRadius:"16px",
+                      boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044"}}>
+                      {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
+                        <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});closeEmojiPicker();}}
+                          style={{fontSize:"26px",padding:"8px",background:"transparent",border:"none",borderRadius:"10px",cursor:"pointer",lineHeight:1,
+                          transition:"transform 0.12s, background 0.12s"}}
+                          onMouseDown={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
+                          onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
+                          onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
+                          onTouchStart={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
+                          onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}>{em}</button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
               {/* Chat feed */}
