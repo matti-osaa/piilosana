@@ -73,12 +73,12 @@ function applyGravityClient(grid,removedCells,lang='fi'){
 // UI translations
 const T={
   fi:{
-    selectMode:"VALITSE PELIMUOTO",arena:"AREENA",arenaDesc:"24/7 nonstop-moninpeli",arenaCta:"PELAA NYT",arenaWelcome:"Tervetuloa — liity peliin!",customGame:"OMA MONINPELI",customDesc:"kutsu kaverit",practice:"HARJOITTELU",practiceDesc:"yksinpeli",
+    selectMode:"VALITSE PELIMUOTO",arena:"MONINPELI",arenaDesc:"24/7 nonstop-moninpeli",arenaCta:"PELAA NYT",arenaWelcome:"Tervetuloa — liity peliin!",customGame:"OMA MONINPELI",customDesc:"kutsu kaverit",practice:"HARJOITTELU",practiceDesc:"yksinpeli",
     findWords:"Etsi sanoja ruudukosta!",dragHint:"VEDÄ kirjaimien yli kaikkiin suuntiin. Aikaa 2 min.",comboHint:"Löydä sanoja nopeasti putkeen = kombo ja lisäpisteet!",
     scoring:"PISTEYTYS: 3kir=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"sanaa",
     nickname:"NIMIMERKKI",join:"LIITY",back:"TAKAISIN",exit:"POISTU",play:"PELAA",
     arenaJoinDesc:"Jatkuva peli kaikille! Liity mukaan ja etsi sanoja. Kierros kestää 2 min.",
-    nextRound:"Seuraava kierros alkaa",playersInArena:"pelaajaa onlinessa",players:"pelaajaa",
+    nextRound:"Seuraava kierros alkaa",playersInArena:"pelaajaa moninpelissä",players:"pelaajaa",
     getReady:"VALMISTAUDU",roundOver:"KIERROS PÄÄTTYI",yourScore:"PISTEESI",nextRoundIn:"Seuraava kierros",starts:"alkaa!",
     roundResults:"KIERROKSEN TULOKSET",foundWords:"LÖYDETYT SANAT",ownHighlighted:"Omat sanasi korostettu väreillä",
     missed:"JÄIVÄT LÖYTÄMÄTTÄ",
@@ -94,7 +94,7 @@ const T={
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
     notValid:"Ei kelpaa",alreadyFound:"Jo löydetty",
-    arenaLabel:"AREENA",battleLabel:"TAISTELU",tetrisLabel:"PUDOTUS",unlimitedLabel:"RAJATON",letterMultLabel:"KIRJAINARVOT",
+    arenaLabel:"MONINPELI",battleLabel:"TAISTELU",tetrisLabel:"PUDOTUS",unlimitedLabel:"RAJATON",letterMultLabel:"KIRJAINARVOT",
     newLetters:"UUDET KIRJAIMET",stop:"LOPETA",
     saveAs:"TALLENNA NIMELLÄ",save:"TALLENNA",saved:"✓ Tallennettu!",saveToHof:"TALLENNA ENNÄTYSTAULULLE",
     gameStarts:"PELI ALKAA",battleStarts:"TAISTELU ALKAA",tetrisStarts:"PUDOTUS ALKAA",comboStreak:"putkeen!",
@@ -122,12 +122,12 @@ const T={
     helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi noin 138 000, englanniksi ja ruotsiksi omat sanalistansa.",
   },
   en:{
-    selectMode:"SELECT GAME MODE",arena:"ARENA",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
+    selectMode:"SELECT GAME MODE",arena:"MULTIPLAYER",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
     findWords:"Find words from the grid!",dragHint:"DRAG across letters in all directions. 2 min timer.",comboHint:"Find words quickly in a row = combo and bonus points!",
     scoring:"SCORING: 3let=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"COMBO x2 (3+) · COMBO x3 (5+)",words:"words",
     nickname:"NICKNAME",join:"JOIN",back:"BACK",exit:"EXIT",play:"PLAY",
     arenaJoinDesc:"Continuous game for everyone! Join in and find words. Round lasts 2 min.",
-    nextRound:"Next round starts",playersInArena:"players online",players:"players",
+    nextRound:"Next round starts",playersInArena:"playing",players:"players",
     getReady:"GET READY",roundOver:"ROUND OVER",yourScore:"YOUR SCORE",nextRoundIn:"Next round",starts:"starting!",
     roundResults:"ROUND RESULTS",foundWords:"FOUND WORDS",ownHighlighted:"Your words highlighted in color",
     missed:"NOT FOUND",
@@ -143,7 +143,7 @@ const T={
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
     notValid:"Not valid",alreadyFound:"Already found",
-    arenaLabel:"ARENA",battleLabel:"BATTLE",tetrisLabel:"DROP",unlimitedLabel:"UNLIMITED",letterMultLabel:"LETTER VALUES",
+    arenaLabel:"MULTIPLAYER",battleLabel:"BATTLE",tetrisLabel:"DROP",unlimitedLabel:"UNLIMITED",letterMultLabel:"LETTER VALUES",
     newLetters:"NEW LETTERS",stop:"STOP",
     saveAs:"SAVE AS",save:"SAVE",saved:"✓ Saved!",saveToHof:"SAVE TO LEADERBOARD",
     gameStarts:"GAME STARTS",battleStarts:"BATTLE STARTS",tetrisStarts:"DROP STARTS",comboStreak:"in a row!",
@@ -171,12 +171,12 @@ const T={
     helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has about 138,000 words, English and Swedish have their own vocabularies.",
   },
   sv:{
-    selectMode:"VÄLJ SPELLÄGE",arena:"ARENA",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
+    selectMode:"VÄLJ SPELLÄGE",arena:"FLERSPELARE",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
     findWords:"Hitta ord i rutnätet!",dragHint:"DRA över bokstäverna i alla riktningar. 2 min tid.",comboHint:"Hitta ord snabbt i rad = kombo och bonuspoäng!",
     scoring:"POÄNG: 3bok=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"ord",
     nickname:"SMEKNAMN",join:"GÅ MED",back:"TILLBAKA",exit:"LÄMNA",play:"SPELA",
     arenaJoinDesc:"Löpande spel för alla! Gå med och hitta ord. Rundan varar 2 min.",
-    nextRound:"Nästa runda börjar",playersInArena:"spelare online",players:"spelare",
+    nextRound:"Nästa runda börjar",playersInArena:"spelar",players:"spelare",
     getReady:"GÖR DIG REDO",roundOver:"RUNDAN SLUT",yourScore:"DINA POÄNG",nextRoundIn:"Nästa runda",starts:"börjar!",
     roundResults:"RUNDANS RESULTAT",foundWords:"HITTADE ORD",ownHighlighted:"Dina ord markerade i färg",
     missed:"INTE HITTADE",
@@ -192,7 +192,7 @@ const T={
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
     notValid:"Ogiltigt",alreadyFound:"Redan hittat",
-    arenaLabel:"ARENA",battleLabel:"STRID",tetrisLabel:"FALL",unlimitedLabel:"OBEGRÄNSAD",letterMultLabel:"BOKSTAVSVÄRDEN",
+    arenaLabel:"FLERSPELARE",battleLabel:"STRID",tetrisLabel:"FALL",unlimitedLabel:"OBEGRÄNSAD",letterMultLabel:"BOKSTAVSVÄRDEN",
     newLetters:"NYA BOKSTÄVER",stop:"STOPPA",
     saveAs:"SPARA SOM",save:"SPARA",saved:"✓ Sparat!",saveToHof:"SPARA TILL TOPPLISTAN",
     gameStarts:"SPELET BÖRJAR",battleStarts:"STRIDEN BÖRJAR",tetrisStarts:"FALL BÖRJAR",comboStreak:"i rad!",
@@ -254,11 +254,12 @@ const MODERN_BASE={
 const THEMES={
   light:{
     name:"IVORY LIGHT",nameEn:"IVORY LIGHT",nameSv:"IVORY LIGHT",
-    bg:"#faf8f4",green:"#2d6a4f",yellow:"#b8860b",red:"#c0392b",purple:"#6c5ce7",
+    bg:"#faf8f4",green:"#2d6a4f",yellow:"#7a6408",red:"#c0392b",purple:"#6c5ce7",
     dark:"#f0ece4",border:"#d4cbbf",cell:"#ffffff",cellBorder:"#e0d8ce",
     gridBg:"#f5f0e8",textMuted:"#8b7e6e",textSoft:"#5c4f3d",
     inputBg:"#ffffff",
     cellText:"#2c2416",cellTextSel:"#ffffff",
+    btnYellowBg:"#8b7209",btnYellowShadow:"#5c4b06",
     ...MODERN_BASE,
     cellShadow:"inset 0 1px 3px #00000012, 0 1px 4px #00000008",
     panelShadow:"0 4px 16px #00000012",
@@ -686,6 +687,9 @@ function ConfettiCelebration({isWinner}){
 function ScorePopup({text,color,x,y}){
   return(<div style={{position:"fixed",left:x,top:y,transform:"translate(-50%,-50%)",pointerEvents:"none",zIndex:200,fontFamily:"'Press Start 2P',monospace",fontSize:"18px",color,textShadow:`0 0 10px ${color}88`,animation:"floatUp 1s ease-out forwards"}}>{text}</div>);
 }
+function WordPopup({text,color,x,y,font}){
+  return(<div style={{position:"fixed",left:x,top:y,transform:"translate(-50%,-50%)",pointerEvents:"none",zIndex:199,fontFamily:font||"inherit",fontSize:"22px",fontWeight:"700",letterSpacing:"3px",color,textShadow:`0 0 12px ${color}66, 0 2px 4px #00000044`,animation:"wordRise 1.2s ease-out forwards"}}>{text}</div>);
+}
 
 // ============================================
 // TITLE DEMO COMPONENT - shows word-finding animation in menu
@@ -1054,8 +1058,8 @@ const ACHIEVEMENTS={
     fi_d:"Saa 30 pistettä yhdessä pelissä",en_d:"Score 30 in one game",sv_d:"Få 30 poäng i ett spel",
     check:(s)=>s.bestScore>=30},
   arena_player:  {icon:"sword",  color:"#ff6644",tier:2,
-    fi:"Areenataistelija",     en:"Arena Fighter",      sv:"Arenakämpe",
-    fi_d:"Pelaa areenalla",en_d:"Play in the arena",sv_d:"Spela i arenan",
+    fi:"Moninpelitaistelija",  en:"Multiplayer Fighter", sv:"Flerspelarkämpe",
+    fi_d:"Pelaa moninpelissä",en_d:"Play in multiplayer",sv_d:"Spela flerspelare",
     check:(s)=>s.arenaGames>=1},
   polyglot:      {icon:"scroll", color:"#ffcc00",tier:2,
     fi:"Monikielinen",         en:"Polyglot",           sv:"Polyglott",
@@ -1087,8 +1091,8 @@ const ACHIEVEMENTS={
     fi_d:"Löydä 8 sanaa minuutissa",en_d:"Find 8 words per minute",sv_d:"Hitta 8 ord per minut",
     check:(s)=>s.bestWordsPerMin>=8},
   arena_winner:  {icon:"crown",  color:"#ff6644",tier:3,
-    fi:"Arenavoittaja",        en:"Arena Victor",       sv:"Arenavinnare",
-    fi_d:"Voita areenakierros",en_d:"Win an arena round",sv_d:"Vinn en arenarunda",
+    fi:"Moninpelivoittaja",    en:"Multiplayer Victor", sv:"Flerspelarvinnare",
+    fi_d:"Voita moninpelikierros",en_d:"Win a multiplayer round",sv_d:"Vinn en flerspelarrunda",
     check:(s)=>s.arenaWins>=1},
   long_words_10: {icon:"diamond",color:"#44ddff",tier:3,
     fi:"Sanaetsijä",           en:"Word Hunter",        sv:"Ordjägare",
@@ -1121,7 +1125,7 @@ const ACHIEVEMENTS={
     check:(s)=>s.bestWordsPerMin>=12},
   arena_5:       {icon:"sword",  color:"#ff66ff",tier:4,
     fi:"Gladiaattori",         en:"Gladiator",          sv:"Gladiator",
-    fi_d:"Voita 5 areenakierrosta",en_d:"Win 5 arena rounds",sv_d:"Vinn 5 arenarundor",
+    fi_d:"Voita 5 moninpelikierrosta",en_d:"Win 5 multiplayer rounds",sv_d:"Vinn 5 flerspelarrundor",
     check:(s)=>s.arenaWins>=5},
   long_words_30: {icon:"diamond",color:"#ff66ff",tier:4,
     fi:"Sanakirja",            en:"Dictionary",         sv:"Ordbok",
@@ -1146,7 +1150,7 @@ const ACHIEVEMENTS={
     check:(s)=>s.bestCombo>=10},
   arena_15:      {icon:"sword",  color:"#ff4400",tier:5,
     fi:"Mestari",              en:"Grand Master",       sv:"Stormästare",
-    fi_d:"Voita 15 areenakierrosta",en_d:"Win 15 arena rounds",sv_d:"Vinn 15 arenarundor",
+    fi_d:"Voita 15 moninpelikierrosta",en_d:"Win 15 multiplayer rounds",sv_d:"Vinn 15 flerspelarrundor",
     check:(s)=>s.arenaWins>=15},
   perfect_game:  {icon:"crown",  color:"#ff4400",tier:5,
     fi:"Täydellinen peli",     en:"Perfect Game",       sv:"Perfekt spel",
@@ -1171,7 +1175,7 @@ const ACHIEVEMENTS={
     check:(s)=>s.bestWordsPerMin>=15},
   arena_50:      {icon:"sword",  color:"#ff0000",tier:6,
     fi:"Kuolematon",           en:"Immortal",           sv:"Odödlig",
-    fi_d:"Voita 50 areenakierrosta",en_d:"Win 50 arena rounds",sv_d:"Vinn 50 arenarundor",
+    fi_d:"Voita 50 moninpelikierrosta",en_d:"Win 50 multiplayer rounds",sv_d:"Vinn 50 flerspelarrundor",
     check:(s)=>s.arenaWins>=50},
   long_words_100:{icon:"diamond",color:"#ff0000",tier:6,
     fi:"Professori",           en:"Professor",          sv:"Professor",
@@ -1677,6 +1681,7 @@ export default function Piilosana(){
   const[msg,setMsg]=useState(null);
   const[shake,setShake]=useState(false);
   const[popups,setPopups]=useState([]);
+  const[wordPopups,setWordPopups]=useState([]);
   const[combo,setCombo]=useState(0);
   const[lastFoundTime,setLastFoundTime]=useState(0);
   const[flashKey,setFlashKey]=useState(0);
@@ -1795,13 +1800,25 @@ export default function Piilosana(){
     setTimeout(()=>setPopups(p=>p.filter(pp=>pp.id!==id)),1100);
   },[]);
 
+  const addWordPopup=useCallback((word,color,x,y)=>{
+    let px=x,py=y;
+    if(px===undefined||py===undefined){
+      const el=gRef.current||wordBarRef.current;
+      if(el){const r=el.getBoundingClientRect();px=r.left+r.width/2;py=r.top+r.height/2;}
+      else{px=window.innerWidth/2;py=window.innerHeight/2;}
+    }
+    const id=++popupIdRef.current;
+    setWordPopups(p=>[...p,{id,text:word.toUpperCase(),color,x:px,y:py}]);
+    setTimeout(()=>setWordPopups(p=>p.filter(pp=>pp.id!==id)),1300);
+  },[]);
+
   const startSolo=useCallback(async(overrideMode,overrideTime)=>{
     sounds.init().catch(()=>{});
     const gt=overrideTime!==undefined?overrideTime:gameTime;
     let bg=null,bw=new Set();
     for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=findWords(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(gt);setScore(0);setMsg(null);
-    setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);
+    setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);
     setEnding(null);setEndingProgress(0);setDropKey(0);
     setMode("solo");setCountdown(5);setState("countdown");
     if(overrideMode!==undefined)setSoloMode(overrideMode);
@@ -2065,6 +2082,7 @@ export default function Piilosana(){
         let text=`+${totalPts}`;
         if(newCombo>=3)text+=` x${comboMult}`;
         addPopup(text,color,popX,popY);
+        addWordPopup(currentWord,color,popX,popY-20);
       }
       // Tetris mode: remove used cells, apply gravity, recompute valid words
       if(soloMode==="tetris"){
@@ -2080,7 +2098,7 @@ export default function Piilosana(){
     }else{
       setMsg({t:currentWord,ok:false,m:T[lang]?.notValid||"Ei kelpaa"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
     }
-  },[valid,found,lastFoundTime,combo,sounds,addPopup,mode,socket,gameMode,soloMode,grid,trie,letterMult]);
+  },[valid,found,lastFoundTime,combo,sounds,addPopup,addWordPopup,mode,socket,gameMode,soloMode,grid,trie,letterMult]);
 
   // Active grid: use currentMultiGrid in multi mode, grid in solo
   const activeGrid=mode==="multi"?currentMultiGrid:grid;
@@ -2198,7 +2216,7 @@ export default function Piilosana(){
       setMsg(null);
       setCombo(0);
       setLastFoundTime(0);
-      setPopups([]);
+      setPopups([]);setWordPopups([]);
       setMultiScores([]);
       setEatenCells(new Set());
       setEnding(null);
@@ -2238,6 +2256,7 @@ export default function Piilosana(){
             let text=`+${points}`;
             if(c>=3)text+=` x${Math.floor(points/(pts(w.length)))}`;
             addPopup(text,color,popX,popY);
+            addWordPopup(w,color,popX,popY-20);
           }
         }
       }else{
@@ -2289,13 +2308,13 @@ export default function Piilosana(){
     // ---- PUBLIC GAME (PIILOSAUNA) events ----
     newSocket.on("public_countdown",({grid:g,validWords:vw,roundNumber})=>{
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
-      setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setEnding(null);setDropKey(0);
+      setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);setEnding(null);setDropKey(0);
       setPublicState("countdown");setPublicCountdown(5);setPublicRound(roundNumber);
       setPublicRankings(null);setState("countdown");setCountdown(5);
     });
     newSocket.on("public_join_midgame",({grid:g,validWords:vw,timeLeft:tl,roundNumber})=>{
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
-      setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setEnding(null);setDropKey(0);
+      setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);setEnding(null);setDropKey(0);
       setTime(tl);setPublicState("playing");setPublicRound(roundNumber);setPublicRankings(null);setState("play");
       startTimeRef.current=Date.now();
     });
@@ -2317,6 +2336,7 @@ export default function Piilosana(){
         setScore(prev=>prev+p);
         const color=w.length>=6?"#ff66ff":w.length>=5?"#ffcc00":"#00ff88";
         addPopup(`+${p}`,color);
+        addWordPopup(w,color);
         soundsRef.current.playByLength(w.length);
       }else{
         setMsg({t:lastSubmittedWordRef.current,ok:false,m:message});
@@ -2775,6 +2795,7 @@ export default function Piilosana(){
         @keyframes pulse{0%,100%{text-shadow:0 0 5px #ff444444}50%{text-shadow:0 0 20px #ff444488}}
         @keyframes arenaPulse{0%,100%{box-shadow:4px 4px 0 #cc3311,0 0 20px #ff664433}50%{box-shadow:4px 4px 0 #cc3311,0 0 35px #ff664466}}
         @keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}50%{opacity:1;transform:translate(-50%,-100%) scale(1.5)}100%{opacity:0;transform:translate(-50%,-180%) scale(1.8)}}
+        @keyframes wordRise{0%{opacity:0.9;transform:translate(-50%,-50%) scale(0.8)}20%{opacity:1;transform:translate(-50%,-80%) scale(1.1)}60%{opacity:0.8;transform:translate(-50%,-140%) scale(1)}100%{opacity:0;transform:translate(-50%,-200%) scale(0.9)}}
         @keyframes comboGlow{0%,100%{box-shadow:0 0 5px #ffcc0044}50%{box-shadow:0 0 25px #ffcc0088,0 0 50px #ff66ff44}}
         @keyframes epicPulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
         @keyframes wordFlash{0%{background:#00ff8833;box-shadow:0 0 20px #00ff8866}100%{background:transparent;box-shadow:none}}
@@ -2819,6 +2840,7 @@ export default function Piilosana(){
       `}</style>
 
       {popups.map(p=><ScorePopup key={p.id}{...p}/>)}
+      {wordPopups.map(p=><WordPopup key={p.id}{...p} font={S.font}/>)}
 
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
         <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={mode!==null&&settingsBubble} bubbleFading={bubbleFading} hideGear={mode===null} theme={S}/>
@@ -2904,7 +2926,7 @@ export default function Piilosana(){
               <div>{lang==="en"?"Best score":lang==="sv"?"Bästa poäng":"Paras tulos"}: {achStats.bestScore}</div>
               <div>{lang==="en"?"Best combo":lang==="sv"?"Bästa kombo":"Paras kombo"}: {achStats.bestCombo}</div>
               <div>{lang==="en"?"Longest word":lang==="sv"?"Längsta ord":"Pisin sana"}: {achStats.longestWord} {lang==="en"?"letters":lang==="sv"?"bokstäver":"kirjainta"}</div>
-              <div>{lang==="en"?"Arena wins":lang==="sv"?"Arenavinster":"Arenavoitot"}: {achStats.arenaWins}</div>
+              <div>{lang==="en"?"Multiplayer wins":lang==="sv"?"Flerspelarvinster":"Moninpelivoitot"}: {achStats.arenaWins}</div>
             </div>
           </div>
         </div>
@@ -3322,7 +3344,7 @@ export default function Piilosana(){
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease"}}>
           {/* Your score */}
           <div style={{border:"3px solid #ff6644",padding:"20px",marginBottom:"12px",boxShadow:"0 0 30px #ff664433",background:S.dark}}>
-            <div style={{fontSize:"13px",color:"#ff6644",marginBottom:"4px"}}>{t.arena} — {t.roundOver}</div>
+            <div style={{fontSize:"13px",color:"#ff6644",marginBottom:"4px"}}>{t.roundOver}</div>
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.yourScore}</div>
             <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",animation:"pop 0.3s ease"}}>{score}</div>
             <div style={{fontSize:"13px",color:S.textSoft,marginTop:"6px"}}>{found.length} / {valid.size} {t.words} ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>
