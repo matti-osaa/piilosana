@@ -1303,45 +1303,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
   }
   return(
     <div style={{position:"relative",display:"inline-block"}}>
-    <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:"6px",paddingTop:"8px"}}>
-      {/* Brain illustration - straining/thinking */}
-      <svg width="44" height="44" viewBox="0 0 100 100" style={{flexShrink:0}}>
-        {/* Brain body */}
-        <ellipse cx="50" cy="52" rx="34" ry="30" fill="#ff9eb8" stroke="#d05070" strokeWidth="2.5"/>
-        {/* Brain wrinkles */}
-        <path d="M30 42 Q40 35 50 42 Q60 35 70 42" fill="none" stroke="#d05070" strokeWidth="2" strokeLinecap="round"/>
-        <path d="M28 52 Q38 46 50 52 Q62 46 72 52" fill="none" stroke="#d05070" strokeWidth="2" strokeLinecap="round"/>
-        <path d="M32 62 Q42 56 52 62 Q62 56 68 62" fill="none" stroke="#d05070" strokeWidth="2" strokeLinecap="round"/>
-        {/* Center line */}
-        <path d="M50 25 Q48 40 50 52 Q52 64 50 78" fill="none" stroke="#d05070" strokeWidth="2" strokeLinecap="round"/>
-        {/* Eyes - strained/squinting */}
-        <line x1="36" y1="46" x2="44" y2="46" stroke="#6b1040" strokeWidth="3" strokeLinecap="round"/>
-        <line x1="56" y1="46" x2="64" y2="46" stroke="#6b1040" strokeWidth="3" strokeLinecap="round"/>
-        {/* Sweat drops */}
-        <ellipse cx="22" cy="36" rx="3" ry="5" fill="#66ccff" opacity="0.8">
-          <animate attributeName="cy" values="36;32;36" dur="1.5s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite"/>
-        </ellipse>
-        <ellipse cx="78" cy="40" rx="2.5" ry="4" fill="#66ccff" opacity="0.6">
-          <animate attributeName="cy" values="40;36;40" dur="2s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
-        </ellipse>
-        {/* Effort lines above */}
-        <line x1="38" y1="18" x2="38" y2="12" stroke="#ffcc00" strokeWidth="2" strokeLinecap="round" opacity="0.7">
-          <animate attributeName="opacity" values="0.7;0.2;0.7" dur="1s" repeatCount="indefinite"/>
-        </line>
-        <line x1="50" y1="15" x2="50" y2="8" stroke="#ffcc00" strokeWidth="2" strokeLinecap="round" opacity="0.8">
-          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="0.8s" repeatCount="indefinite"/>
-        </line>
-        <line x1="62" y1="18" x2="62" y2="12" stroke="#ffcc00" strokeWidth="2" strokeLinecap="round" opacity="0.6">
-          <animate attributeName="opacity" values="0.6;0.2;0.6" dur="1.2s" repeatCount="indefinite"/>
-        </line>
-        {/* Mouth - strained */}
-        <path d="M42 58 Q50 55 58 58" fill="none" stroke="#6b1040" strokeWidth="2" strokeLinecap="round"/>
-        {/* Tiny arms holding head */}
-        <path d="M18 60 Q10 55 14 48" fill="none" stroke="#d05070" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M82 60 Q90 55 86 48" fill="none" stroke="#d05070" strokeWidth="2.5" strokeLinecap="round"/>
-      </svg>
+    <div style={{display:"flex",justifyContent:"center",alignItems:"flex-start",gap:"6px",paddingTop:"8px"}}>
     <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"0 0 10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px"}}>
       {displayChars.map((ch,i)=>{
         const isLit=lit.has(i);
@@ -1370,7 +1332,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
       })}
     </h1>
       {/* Coffee cup illustration - steaming */}
-      <svg width="44" height="44" viewBox="0 0 100 100" style={{flexShrink:0}}>
+      <svg width="44" height="44" viewBox="0 0 100 100" style={{flexShrink:0,marginTop:"-2px"}}>
         {/* Steam */}
         <path d="M35 30 Q30 20 35 10" fill="none" stroke="#aaaaaa" strokeWidth="2.5" strokeLinecap="round" opacity="0.5">
           <animate attributeName="d" values="M35 30 Q30 20 35 10;M35 30 Q40 18 35 8;M35 30 Q30 20 35 10" dur="2.5s" repeatCount="indefinite"/>
@@ -1888,9 +1850,9 @@ export default function Piilosana(){
   const addWordPopup=useCallback((word,color,x,y)=>{
     let px=x,py=y;
     if(px===undefined||py===undefined){
-      const el=gRef.current||wordBarRef.current;
-      if(el){const r=el.getBoundingClientRect();px=r.left+r.width/2;py=r.top+r.height/2;}
-      else{px=window.innerWidth/2;py=window.innerHeight/2;}
+      const el=wordBarRef.current||gRef.current;
+      if(el){const r=el.getBoundingClientRect();px=r.left+r.width/2;py=r.top;}
+      else{px=window.innerWidth/2;py=window.innerHeight/3;}
     }
     const id=++popupIdRef.current;
     setWordPopups(p=>[...p,{id,text:word.toUpperCase(),color,x:px,y:py}]);
@@ -2168,8 +2130,7 @@ export default function Piilosana(){
         const color=wordColor();
         let text=`+${totalPts}`;
         if(newCombo>=3)text+=` x${comboMult}`;
-        addPopup(text,color,popX,popY);
-        {const bar=wordBarRef.current;if(bar){const br=bar.getBoundingClientRect();addWordPopup(currentWord,color,br.left+br.width/2,br.top+br.height/2);}else{addWordPopup(currentWord,color,popX,popY-20);}}
+        addPopup(`${currentWord.toUpperCase()} ${text}`,color,popX,popY);
       }
       // Tetris mode: remove used cells, apply gravity, recompute valid words
       if(soloMode==="tetris"){
@@ -2185,7 +2146,7 @@ export default function Piilosana(){
     }else{
       setMsg({t:currentWord,ok:false,m:T[lang]?.notValid||"Ei kelpaa"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
     }
-  },[valid,found,lastFoundTime,combo,sounds,addPopup,addWordPopup,mode,socket,gameMode,soloMode,grid,trie,letterMult]);
+  },[valid,found,lastFoundTime,combo,sounds,addPopup,mode,socket,gameMode,soloMode,grid,trie,letterMult]);
 
   // Active grid: use currentMultiGrid in multi mode, grid in solo
   const activeGrid=mode==="multi"?currentMultiGrid:grid;
@@ -2344,8 +2305,7 @@ export default function Piilosana(){
             const color=(THEMES[tid]||THEMES.dark).green;
             let text=`+${points}`;
             if(c>=3)text+=` x${Math.floor(points/(pts(w.length)))}`;
-            addPopup(text,color,popX,popY);
-            {const bar=wordBarRef.current;if(bar){const br=bar.getBoundingClientRect();addWordPopup(w,color,br.left+br.width/2,br.top+br.height/2);}else{addWordPopup(w,color,popX,popY-20);}}
+            addPopup(`${w.toUpperCase()} ${text}`,color,popX,popY);
           }
         }
       }else{
@@ -2424,8 +2384,7 @@ export default function Piilosana(){
         const p=points||pts(w.length);
         setScore(prev=>prev+p);
         const color=(THEMES[themeIdRef.current]||THEMES.dark).green;
-        addPopup(`+${p}`,color);
-        addWordPopup(w,color);
+        addPopup(`${w.toUpperCase()} +${p}`,color);
         soundsRef.current.playByLength(w.length);
       }else{
         setMsg({t:lastSubmittedWordRef.current,ok:false,m:message});
