@@ -682,7 +682,7 @@ io.on('connection', (socket) => {
   });
 
   // ---- EMOJI REACTIONS ----
-  const ALLOWED_EMOJIS = ['😀','😮','🔥','👀','😭','👏'];
+  const ALLOWED_EMOJIS = ['😀','😎','🤔','😮','🔥','💪','🎯','👀','😭','🤣','😱','🥳','👏','❤️','💀','🫡'];
   const emojiCooldowns = new Map();
   socket.on('emoji_reaction', ({ emoji }) => {
     if (!ALLOWED_EMOJIS.includes(emoji)) return;

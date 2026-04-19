@@ -1730,8 +1730,9 @@ export default function Piilosana(){
   // Battle mode states
   const[otherSelections,setOtherSelections]=useState({}); // {playerId: {nickname, cells}}
   const[battleMsg,setBattleMsg]=useState(null); // {word, finder, points} - flash when someone finds
-  const[emojiFeed,setEmojiFeed]=useState([]); // [{id, nickname, emoji, ts}]
+  const[emojiFeed,setEmojiFeed]=useState([]); // [{id, nickname, emoji, fading}]
   const emojiFeedIdRef=useRef(0);
+  const[emojiOpen,setEmojiOpen]=useState(false);
   // Public game (Piilosauna)
   const[publicState,setPublicState]=useState(null); // null|'waiting'|'countdown'|'playing'|'end'
   const[publicScores,setPublicScores]=useState([]);
@@ -2369,9 +2370,9 @@ export default function Piilosana(){
     });
     newSocket.on("emoji_feed",({nickname,emoji})=>{
       const id=++emojiFeedIdRef.current;
-      setEmojiFeed(prev=>[...prev.slice(-4),{id,nickname,emoji,fading:false}]);
-      setTimeout(()=>setEmojiFeed(prev=>prev.map(e=>e.id===id?{...e,fading:true}:e)),4200);
-      setTimeout(()=>setEmojiFeed(prev=>prev.filter(e=>e.id!==id)),5000);
+      setEmojiFeed(prev=>[...prev.slice(-7),{id,nickname,emoji,fading:false}]);
+      setTimeout(()=>setEmojiFeed(prev=>prev.map(e=>e.id===id?{...e,fading:true}:e)),5200);
+      setTimeout(()=>setEmojiFeed(prev=>prev.filter(e=>e.id!==id)),6000);
     });
 
     setSocket(newSocket);
@@ -2806,6 +2807,7 @@ export default function Piilosana(){
         @keyframes fadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
         @keyframes bubbleIn{0%{opacity:0;transform:scale(0.3) translateY(10px)}40%{opacity:1;transform:scale(1.08) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
         @keyframes bubbleOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.6) translateY(-10px)}}
+        @keyframes chatSlideIn{0%{opacity:0;transform:translateX(-30px) scale(0.7)}30%{opacity:1;transform:translateX(4px) scale(1.04)}60%{transform:translateX(-2px) scale(0.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
         @keyframes pulse{0%,100%{text-shadow:0 0 5px #ff444444}50%{text-shadow:0 0 20px #ff444488}}
         @keyframes arenaPulse{0%,100%{box-shadow:4px 4px 0 #cc3311,0 0 20px #ff664433}50%{box-shadow:4px 4px 0 #cc3311,0 0 35px #ff664466}}
         @keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}50%{opacity:1;transform:translate(-50%,-100%) scale(1.5)}100%{opacity:0;transform:translate(-50%,-180%) scale(1.8)}}
@@ -3649,32 +3651,54 @@ export default function Piilosana(){
 
           {/* Emoji reactions - multiplayer only */}
           {(mode==="public"||mode==="multi")&&state==="play"&&socket&&(
-            <div style={{marginTop:"8px"}}>
-              <div style={{display:"flex",justifyContent:"center",gap:"6px",marginBottom:"6px"}}>
-                {["😀","😮","🔥","👀","😭","👏"].map(em=>(
-                  <button key={em} onClick={()=>socket.emit("emoji_reaction",{emoji:em})}
-                    style={{fontSize:"26px",padding:"6px 10px",background:S.dark,border:`1px solid ${S.border}`,borderRadius:"12px",cursor:"pointer",lineHeight:1,
-                    transition:"transform 0.15s, background 0.15s"}}
-                    onMouseDown={e=>{e.currentTarget.style.transform="scale(1.35)";e.currentTarget.style.background=S.border;}}
-                    onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background=S.dark;}}
-                    onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background=S.dark;}}
-                    onTouchStart={e=>{e.currentTarget.style.transform="scale(1.35)";e.currentTarget.style.background=S.border;}}
-                    onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background=S.dark;}}>{em}</button>
-                ))}
+            <div style={{marginTop:"8px",position:"relative"}}>
+              {/* Speech bubble toggle button */}
+              <div style={{display:"flex",justifyContent:"center",marginBottom:"6px"}}>
+                <button onClick={()=>setEmojiOpen(o=>!o)}
+                  style={{fontSize:"22px",padding:"8px 18px",background:emojiOpen?S.border:S.dark,border:`2px solid ${S.border}`,borderRadius:"16px",cursor:"pointer",lineHeight:1,
+                  transition:"transform 0.15s, background 0.15s",display:"flex",alignItems:"center",gap:"6px",fontFamily:S.font,color:S.green}}
+                  onMouseDown={e=>{e.currentTarget.style.transform="scale(1.05)";}}
+                  onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";}}
+                  onTouchStart={e=>{e.currentTarget.style.transform="scale(1.05)";}}
+                  onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
+                >💬</button>
               </div>
+              {/* Emoji picker grid */}
+              {emojiOpen&&(
+                <div style={{
+                  display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"4px",
+                  padding:"10px",marginBottom:"8px",
+                  background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
+                  border:`2px solid ${S.border}`,borderRadius:"16px",
+                  boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044",
+                  animation:"bubbleIn 0.25s ease-out",maxWidth:"240px",margin:"0 auto 8px"}}>
+                  {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
+                    <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});setEmojiOpen(false);}}
+                      style={{fontSize:"26px",padding:"8px",background:"transparent",border:"none",borderRadius:"10px",cursor:"pointer",lineHeight:1,
+                      transition:"transform 0.12s, background 0.12s"}}
+                      onMouseDown={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
+                      onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
+                      onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
+                      onTouchStart={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
+                      onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}>{em}</button>
+                  ))}
+                </div>
+              )}
+              {/* Chat feed */}
               {emojiFeed.length>0&&(
-                <div style={{display:"flex",flexDirection:"column",gap:"4px",alignItems:"flex-start"}}>
+                <div style={{display:"flex",flexDirection:"column",gap:"5px",alignItems:"flex-start",maxHeight:"180px",overflowY:"auto"}}>
                   {emojiFeed.map(e=>(
                     <div key={e.id} style={{
-                      display:"inline-flex",alignItems:"center",gap:"8px",
+                      display:"inline-flex",alignItems:"center",gap:"10px",
                       background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
-                      border:`2px solid ${S.border}`,borderRadius:"18px",
-                      padding:"8px 16px",position:"relative",
-                      animation:e.fading?"bubbleOut 0.8s ease forwards":"bubbleIn 0.4s ease-out",
+                      border:`2px solid ${S.border}`,borderRadius:"20px",
+                      padding:"10px 18px",position:"relative",
+                      animation:e.fading?"bubbleOut 0.8s ease forwards":"chatSlideIn 0.35s ease-out",
                       boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044",
                       maxWidth:"100%"}}>
-                      <span style={{fontSize:"15px",fontWeight:"700",color:S.green,fontFamily:S.font}}>{e.nickname}</span>
-                      <span style={{fontSize:"28px",lineHeight:1}}>{e.emoji}</span>
+                      <span style={{fontSize:"14px",fontWeight:"700",color:S.green,fontFamily:S.font,whiteSpace:"nowrap"}}>{e.nickname}</span>
+                      <span style={{fontSize:"30px",lineHeight:1}}>{e.emoji}</span>
                     </div>
                   ))}
                 </div>
