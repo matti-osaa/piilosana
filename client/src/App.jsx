@@ -596,6 +596,119 @@ function useSounds(soundTheme){
 }
 
 // ============================================
+// BACKGROUND MUSIC - "Two Letters"
+// ============================================
+function useMusic(){
+  const partsRef=useRef(null);
+  const startedRef=useRef(false);
+
+  const start=useCallback(async()=>{
+    if(startedRef.current)return;
+    await Tone.start();
+    startedRef.current=true;
+
+    // Soft pad
+    const pad=new Tone.PolySynth(Tone.Synth,{
+      oscillator:{type:"sine"},
+      envelope:{attack:1.5,decay:2,sustain:0.6,release:3},
+      volume:-26
+    }).toDestination();
+
+    // Light bell/pluck for arpeggios
+    const bell=new Tone.PolySynth(Tone.Synth,{
+      oscillator:{type:"triangle"},
+      envelope:{attack:0.02,decay:0.8,sustain:0.05,release:1.2},
+      volume:-22
+    }).toDestination();
+
+    // Sub bass
+    const bass=new Tone.Synth({
+      oscillator:{type:"sine"},
+      envelope:{attack:0.3,decay:1,sustain:0.4,release:1.5},
+      volume:-24
+    }).toDestination();
+
+    // Chord progression: Cmaj7 → Am7 → Fmaj7 → G → Em7 → Am7 → Dm7 → G
+    const chords=[
+      ["C4","E4","G4","B4"],  // Cmaj7
+      ["A3","C4","E4","G4"],  // Am7
+      ["F3","A3","C4","E4"],  // Fmaj7
+      ["G3","B3","D4","F4"],  // G7
+      ["E3","G3","B3","D4"],  // Em7
+      ["A3","C4","E4","G4"],  // Am7
+      ["D3","F3","A3","C4"],  // Dm7
+      ["G3","B3","D4","F#4"], // Gmaj7
+    ];
+    const bassNotes=["C2","A1","F1","G1","E1","A1","D2","G1"];
+
+    // Arpeggio patterns per chord (pick from chord notes + octave up)
+    const arpPatterns=[
+      ["E5","G5","B5","C6","B5","G5"],
+      ["C5","E5","G5","A5","G5","E5"],
+      ["A4","C5","E5","F5","E5","C5"],
+      ["B4","D5","F5","G5","F5","D5"],
+      ["G4","B4","D5","E5","D5","B4"],
+      ["C5","E5","G5","A5","G5","E5"],
+      ["F4","A4","C5","D5","C5","A4"],
+      ["B4","D5","F#5","G5","F#5","D5"],
+    ];
+
+    let chordIdx=0;
+    const bpm=72;
+    const beatLen=60/bpm;
+    const barLen=beatLen*4;
+
+    // Pad plays chords every bar
+    const padLoop=new Tone.Loop((time)=>{
+      const ch=chords[chordIdx%chords.length];
+      pad.triggerAttackRelease(ch,barLen*0.9,time);
+      bass.triggerAttackRelease(bassNotes[chordIdx%bassNotes.length],barLen*0.8,time);
+      chordIdx++;
+    },barLen);
+
+    // Arpeggio plays 6 notes per bar
+    let arpNote=0;
+    const arpLoop=new Tone.Loop((time)=>{
+      const ci=chordIdx%arpPatterns.length;
+      const pattern=arpPatterns[ci];
+      const note=pattern[arpNote%pattern.length];
+      // Slight random velocity variation for organic feel
+      if(Math.random()>0.25){
+        bell.triggerAttackRelease(note,beatLen*0.6,time);
+      }
+      arpNote=(arpNote+1)%6;
+    },barLen/6);
+
+    Tone.Transport.bpm.value=bpm;
+    padLoop.start(0);
+    arpLoop.start(barLen);// arpeggios start after first chord
+    Tone.Transport.start();
+
+    partsRef.current={pad,bell,bass,padLoop,arpLoop};
+  },[]);
+
+  const stop=useCallback(()=>{
+    if(!startedRef.current)return;
+    startedRef.current=false;
+    const p=partsRef.current;
+    if(p){
+      p.padLoop.stop();p.arpLoop.stop();
+      Tone.Transport.stop();
+      setTimeout(()=>{
+        try{p.pad.dispose();}catch{}
+        try{p.bell.dispose();}catch{}
+        try{p.bass.dispose();}catch{}
+        try{p.padLoop.dispose();}catch{}
+        try{p.arpLoop.dispose();}catch{}
+      },500);
+      partsRef.current=null;
+    }
+  },[]);
+
+  return useMemo(()=>({start,stop}),[start,stop]);
+}
+
+// ============================================
 // ENDING OVERLAY COMPONENT
 // ============================================
 function EndingOverlay({ending, progress, gridRect}){
@@ -1463,6 +1576,7 @@ export default function Piilosana(){
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[soundTheme,setSoundTheme]=useState(()=>localStorage.getItem("piilosana_sound")||"modern");
+  const[musicOn,setMusicOn]=useState(()=>localStorage.getItem("piilosana_music")!=="off");
   const[audioStarted,setAudioStarted]=useState(false);
   const[showSettings,setShowSettings]=useState(false);
   const[showMenuOptions,setShowMenuOptions]=useState(false);
@@ -1496,6 +1610,7 @@ export default function Piilosana(){
     if(s.size){setUiSize(s.size);localStorage.setItem("piilosana_size",s.size);}
     if(typeof s.confetti==="boolean"){setConfettiOn(s.confetti);localStorage.setItem("piilosana_confetti",s.confetti?"on":"off");}
     if(s.sound){setSoundTheme(s.sound);localStorage.setItem("piilosana_sound",s.sound);}
+    if(typeof s.music==="boolean"){setMusicOn(s.music);localStorage.setItem("piilosana_music",s.music?"on":"off");}
   },[]);
   const doLogin=useCallback(async(nickname,password)=>{
     setAuthLoading(true);setAuthError("");
@@ -1564,9 +1679,9 @@ export default function Piilosana(){
   },[]);
   const syncSettings=useCallback((overrides={})=>{
     if(!authUser)return;
-    const s={theme:themeId,lang,size:uiSize,confetti:confettiOn,sound:soundTheme,...overrides};
+    const s={theme:themeId,lang,size:uiSize,confetti:confettiOn,sound:soundTheme,music:musicOn,...overrides};
     saveSettingsToServer(s);
-  },[authUser,themeId,lang,uiSize,confettiOn,soundTheme,saveSettingsToServer]);
+  },[authUser,themeId,lang,uiSize,confettiOn,soundTheme,musicOn,saveSettingsToServer]);
 
   const doChangePassword=useCallback(async(currentPassword,newPassword)=>{
     setAuthLoading(true);setAuthError("");setAuthSuccess("");
@@ -1701,6 +1816,7 @@ export default function Piilosana(){
   const trie=useMemo(()=>langConf.trie,[lang]);
   const t=T[lang]||T.fi;
   const rawSounds=useSounds(soundTheme);
+  const music=useMusic();
   // Wrap sounds with mute check
   const sounds=useMemo(()=>{
     if(soundTheme==="off")return{
@@ -1996,6 +2112,16 @@ export default function Piilosana(){
     },80);
     return()=>clearInterval(t);
   },[state,mode]);
+
+  // Background music control
+  useEffect(()=>{
+    if(musicOn&&(state==="play"||state==="countdown")){
+      music.start();
+    }else{
+      music.stop();
+    }
+    return()=>music.stop();
+  },[state,musicOn,music]);
 
   // Track achievements when game ends
   useEffect(()=>{
@@ -3067,6 +3193,28 @@ export default function Piilosana(){
                   {names[lang]||names.en}
                 </button>
               ))}
+            </div>
+          </div>
+          {/* Background Music */}
+          <div style={{marginBottom:"14px"}}>
+            <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
+              {lang==="en"?"Background Music":lang==="sv"?"Bakgrundsmusik":"Taustamusiikki"}
+            </div>
+            <div style={{display:"flex",gap:"4px"}}>
+              <button onClick={()=>{setMusicOn(true);localStorage.setItem("piilosana_music","on");}}
+                style={{fontFamily:S.font,fontSize:"13px",
+                  color:musicOn?S.bg:S.green,background:musicOn?S.green:"transparent",
+                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer",
+                  boxShadow:musicOn?`0 0 8px ${S.green}66`:"none"}}>
+                {lang==="en"?"TWO LETTERS":lang==="sv"?"TWO LETTERS":"TWO LETTERS"}
+              </button>
+              <button onClick={()=>{setMusicOn(false);localStorage.setItem("piilosana_music","off");music.stop();}}
+                style={{fontFamily:S.font,fontSize:"13px",
+                  color:!musicOn?S.bg:S.green,background:!musicOn?S.green:"transparent",
+                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer",
+                  boxShadow:!musicOn?`0 0 8px ${S.green}66`:"none"}}>
+                {lang==="en"?"OFF":lang==="sv"?"AV":"POIS"}
+              </button>
             </div>
           </div>
           {/* Confetti */}
