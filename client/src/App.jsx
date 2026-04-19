@@ -596,7 +596,8 @@ function useSounds(soundTheme){
 }
 
 // ============================================
-// BACKGROUND MUSIC - "Dreamy Ambient"
+// BACKGROUND MUSIC - Two Dots / Monument Valley ambient
+// Soft piano + bell tones + light pad. C-pentatonic, lots of space.
 // ============================================
 function useMusic(){
   const partsRef=useRef(null);
@@ -607,84 +608,71 @@ function useMusic(){
     await Tone.start();
     startedRef.current=true;
 
-    // Soft pad
-    const pad=new Tone.PolySynth(Tone.Synth,{
+    // Soft piano — warm sine with gentle attack
+    const piano=new Tone.PolySynth(Tone.Synth,{
       oscillator:{type:"sine"},
-      envelope:{attack:1.5,decay:2,sustain:0.6,release:3},
-      volume:-26
+      envelope:{attack:0.08,decay:2.5,sustain:0.0,release:3.5},
+      volume:-20
     }).toDestination();
 
-    // Light bell/pluck for arpeggios
-    const bell=new Tone.PolySynth(Tone.Synth,{
+    // Bell — high, ethereal triangle tones
+    const bell=new Tone.Synth({
       oscillator:{type:"triangle"},
-      envelope:{attack:0.02,decay:0.8,sustain:0.05,release:1.2},
-      volume:-22
-    }).toDestination();
-
-    // Sub bass
-    const bass=new Tone.Synth({
-      oscillator:{type:"sine"},
-      envelope:{attack:0.3,decay:1,sustain:0.4,release:1.5},
+      envelope:{attack:0.01,decay:3,sustain:0.0,release:4},
       volume:-24
     }).toDestination();
 
-    // Chord progression: Cmaj7 → Am7 → Fmaj7 → G → Em7 → Am7 → Dm7 → G
-    const chords=[
-      ["C4","E4","G4","B4"],  // Cmaj7
-      ["A3","C4","E4","G4"],  // Am7
-      ["F3","A3","C4","E4"],  // Fmaj7
-      ["G3","B3","D4","F4"],  // G7
-      ["E3","G3","B3","D4"],  // Em7
-      ["A3","C4","E4","G4"],  // Am7
-      ["D3","F3","A3","C4"],  // Dm7
-      ["G3","B3","D4","F#4"], // Gmaj7
-    ];
-    const bassNotes=["C2","A1","F1","G1","E1","A1","D2","G1"];
+    // Pad — very soft, slow-breathing background
+    const pad=new Tone.PolySynth(Tone.Synth,{
+      oscillator:{type:"sine"},
+      envelope:{attack:3,decay:3,sustain:0.3,release:5},
+      volume:-30
+    }).toDestination();
 
-    // Arpeggio patterns per chord (pick from chord notes + octave up)
-    const arpPatterns=[
-      ["E5","G5","B5","C6","B5","G5"],
-      ["C5","E5","G5","A5","G5","E5"],
-      ["A4","C5","E5","F5","E5","C5"],
-      ["B4","D5","F5","G5","F5","D5"],
-      ["G4","B4","D5","E5","D5","B4"],
-      ["C5","E5","G5","A5","G5","E5"],
-      ["F4","A4","C5","D5","C5","A4"],
-      ["B4","D5","F#5","G5","F#5","D5"],
+    // C-pentatonic notes across octaves
+    const pianoNotes=["C4","D4","E4","G4","A4","C5","D5","E5","G5","A5"];
+    const bellNotes=["E5","G5","C6","D6","E6"];
+    const padChords=[
+      ["C3","G3","C4"],
+      ["A2","E3","A3"],
+      ["G2","D3","G3"],
+      ["C3","E3","G3"],
     ];
 
-    let chordIdx=0;
-    const bpm=72;
-    const beatLen=60/bpm;
-    const barLen=beatLen*4;
-
-    // Pad plays chords every bar
-    const padLoop=new Tone.Loop((time)=>{
-      const ch=chords[chordIdx%chords.length];
-      pad.triggerAttackRelease(ch,barLen*0.9,time);
-      bass.triggerAttackRelease(bassNotes[chordIdx%bassNotes.length],barLen*0.8,time);
-      chordIdx++;
-    },barLen);
-
-    // Arpeggio plays 6 notes per bar
-    let arpNote=0;
-    const arpLoop=new Tone.Loop((time)=>{
-      const ci=chordIdx%arpPatterns.length;
-      const pattern=arpPatterns[ci];
-      const note=pattern[arpNote%pattern.length];
-      // Slight random velocity variation for organic feel
-      if(Math.random()>0.25){
-        bell.triggerAttackRelease(note,beatLen*0.6,time);
+    // Piano: sparse single notes with lots of silence
+    let pianoStep=0;
+    const pianoLoop=new Tone.Loop((time)=>{
+      // ~40% chance to play, lots of breathing room
+      if(Math.random()<0.4){
+        const note=pianoNotes[Math.floor(Math.random()*pianoNotes.length)];
+        piano.triggerAttackRelease(note,"2n",time);
       }
-      arpNote=(arpNote+1)%6;
-    },barLen/6);
+      pianoStep++;
+    },"2n"); // every half note at slow tempo
 
-    Tone.Transport.bpm.value=bpm;
+    // Bell: very rare high sparkles
+    const bellLoop=new Tone.Loop((time)=>{
+      if(Math.random()<0.25){
+        const note=bellNotes[Math.floor(Math.random()*bellNotes.length)];
+        bell.triggerAttackRelease(note,"1n",time);
+      }
+    },"1m"); // once per measure
+
+    // Pad: slow chord changes
+    let padIdx=0;
+    const padLoop=new Tone.Loop((time)=>{
+      const ch=padChords[padIdx%padChords.length];
+      pad.triggerAttackRelease(ch,"2m",time);
+      padIdx++;
+    },"2m"); // every 2 measures
+
+    Tone.Transport.bpm.value=56; // very slow, meditative
     padLoop.start(0);
-    arpLoop.start(barLen);// arpeggios start after first chord
+    pianoLoop.start("1m"); // piano enters after first pad chord
+    bellLoop.start("2m"); // bells enter even later
     Tone.Transport.start();
 
-    partsRef.current={pad,bell,bass,padLoop,arpLoop};
+    partsRef.current={piano,bell,pad,pianoLoop,bellLoop,padLoop};
   },[]);
 
   const stop=useCallback(()=>{
@@ -692,14 +680,15 @@ function useMusic(){
     startedRef.current=false;
     const p=partsRef.current;
     if(p){
-      p.padLoop.stop();p.arpLoop.stop();
+      p.pianoLoop.stop();p.bellLoop.stop();p.padLoop.stop();
       Tone.Transport.stop();
       setTimeout(()=>{
-        try{p.pad.dispose();}catch{}
+        try{p.piano.dispose();}catch{}
         try{p.bell.dispose();}catch{}
-        try{p.bass.dispose();}catch{}
+        try{p.pad.dispose();}catch{}
+        try{p.pianoLoop.dispose();}catch{}
+        try{p.bellLoop.dispose();}catch{}
         try{p.padLoop.dispose();}catch{}
-        try{p.arpLoop.dispose();}catch{}
       },500);
       partsRef.current=null;
     }
