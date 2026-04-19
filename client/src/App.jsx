@@ -579,185 +579,6 @@ function useSounds(soundTheme){
 }
 
 // ============================================
-// BACKGROUND MUSIC
-// ============================================
-const MUSIC_TRACKS={
-  electronic:[
-    // "Neon Drive" — 122 BPM, Am, energinen synth-pop
-    {id:"neon_drive",name:{fi:"Neon Drive",en:"Neon Drive",sv:"Neon Drive"},bpm:122,sub:"8n",melDur:"8n",bassDur:"8n",
-      melSynth:{oscillator:{type:"fatsawtooth",count:3,spread:30},envelope:{attack:0.01,decay:0.3,sustain:0.2,release:0.5},volume:-14},
-      bassSynth:{oscillator:{type:"fatsquare",count:2,spread:10},envelope:{attack:0.005,decay:0.2,sustain:0.3,release:0.3},volume:-12},
-      mel:["C5","E5","A5",null,"G5","E5","C5",null,"A4","C5","F5",null,"E5","C5","A4",null,
-           "G4","C5","E5","G5","E5","C5","G4",null,"B4","D5","G5",null,"F5","D5","B4",null,
-           "C5","E5","A5","C6","A5","E5","C5",null,"A4","C5","F5","A5","G5","F5","E5",null,
-           "D5","F5","A5",null,"G5","F5","D5",null,"E5","G5","B5",null,"A5","G5","E5",null],
-      bass:["A2",null,"A2","A3","A2",null,"A2",null,"F2",null,"F2","F3","F2",null,"F2",null,
-            "C2",null,"C2","C3","C2",null,"C3",null,"G2",null,"G2","G3","G2",null,"G2",null,
-            "A2",null,"A2","A3","A2",null,"A3",null,"F2",null,"F2","F3","F2",null,"F3",null,
-            "D2",null,"D2","D3","D2",null,"D3",null,"E2",null,"E2","E3","E2",null,"E2",null]},
-    // "Pixel Rush" — 136 BPM, Em, retro chiptune
-    {id:"pixel_rush",name:{fi:"Pixel Rush",en:"Pixel Rush",sv:"Pixel Rush"},bpm:136,sub:"8n",melDur:"16n",bassDur:"16n",
-      melSynth:{oscillator:{type:"square"},envelope:{attack:0.005,decay:0.15,sustain:0.3,release:0.2},volume:-12},
-      bassSynth:{oscillator:{type:"pulse",width:0.25},envelope:{attack:0.005,decay:0.1,sustain:0.4,release:0.15},volume:-10},
-      mel:["E5",null,"G5",null,"B5",null,"A5","G5","E5",null,"D5",null,"E5",null,null,null,
-           "C5",null,"E5",null,"G5",null,"A5","G5","E5",null,"C5",null,"D5",null,null,null,
-           "D5",null,"F#5",null,"A5",null,"B5","A5","F#5",null,"D5",null,"F#5",null,null,null,
-           "B4",null,"D#5",null,"F#5",null,"B5","A5","F#5",null,"D#5",null,"B4",null,null,null,
-           "E5","G5","B5",null,"E6",null,"D6","B5","G5",null,"E5",null,"G5","B5","D6",null,
-           "C5","E5","G5",null,"C6",null,"B5","A5","G5",null,"E5",null,"D5",null,null,null,
-           "D5","F#5","A5",null,"D6",null,"C6","A5","F#5",null,"D5",null,"F#5","A5","D6",null,
-           "B4","D#5","F#5","B5","D#6",null,"F#5","B5","F#5",null,"E5",null,null,null,null,null],
-      bass:["E2","E2","E3","E2","E2","E2","E3","E2","E2","E2","E3","E2","G2","G2","A2","B2",
-            "C2","C2","C3","C2","C2","C2","C3","C2","C2","C2","E2","E2","G2","G2","A2","B2",
-            "D2","D2","D3","D2","D2","D2","D3","D2","D2","D2","F#2","F#2","A2","A2","B2","D3",
-            "B1","B1","B2","B1","B1","B1","B2","B1","B1","B1","D#2","D#2","F#2","F#2","A2","B2",
-            "E2","E2","E3","E2","E2","E2","E3","E2","E2","E2","G2","G2","B2","B2","D3","E3",
-            "C2","C2","C3","C2","C2","C2","C3","C2","C2","C2","E2","E2","G2","A2","B2","C3",
-            "D2","D2","D3","D2","D2","D2","D3","D2","D2","D2","F#2","A2","D3","D2","A2","F#2",
-            "B1","B1","B2","B1","D#2","F#2","B2","F#2","B1","B1","B2",null,null,null,null,null]},
-    // "Tropical Bounce" — 115 BPM, D major, trooppinen pop
-    {id:"tropical_bounce",name:{fi:"Tropical Bounce",en:"Tropical Bounce",sv:"Tropical Bounce"},bpm:115,sub:"8n",melDur:"8n",bassDur:"8n",
-      melSynth:{oscillator:{type:"fattriangle",count:2,spread:20},envelope:{attack:0.01,decay:0.25,sustain:0.1,release:0.5},volume:-12},
-      bassSynth:{oscillator:{type:"fatsine",count:2,spread:10},envelope:{attack:0.01,decay:0.2,sustain:0.35,release:0.3},volume:-10},
-      mel:["D5",null,"F#5",null,"A5",null,null,"G5","F#5",null,"D5",null,null,null,null,null,
-           "A4",null,"C#5",null,"E5",null,null,"F#5","E5",null,"C#5",null,"A4",null,null,null,
-           "B4",null,"D5",null,"F#5",null,"A5",null,"G5",null,"F#5",null,"D5",null,null,null,
-           "G4",null,"B4",null,"D5",null,"G5",null,"F#5",null,"E5",null,"D5",null,null,null,
-           "D5","F#5","A5",null,"D6",null,"A5","F#5","A5",null,"F#5",null,"D5",null,null,null,
-           "C#5","E5","A5",null,"C#6",null,"A5","E5","F#5",null,"E5",null,"D5",null,null,null,
-           "B4","D5","F#5",null,"B5",null,"A5","G5","F#5",null,"D5",null,"F#5","A5","B5",null,
-           "G5",null,"A5",null,"B5",null,"A5","G5","F#5",null,"D5",null,null,null,null,null],
-      bass:["D2",null,null,null,"D2",null,"D3",null,"D2",null,null,"D2",null,null,"A2",null,
-            "A1",null,null,null,"A1",null,"A2",null,"A1",null,null,"A1",null,null,"E2",null,
-            "B1",null,null,null,"B1",null,"B2",null,"B1",null,null,"B1",null,null,"F#2",null,
-            "G1",null,null,null,"G1",null,"G2",null,"G1",null,null,"G1",null,null,"D2",null,
-            "D2",null,null,null,"D2",null,"D3",null,"D2",null,"A2",null,"D2",null,"A2",null,
-            "F#1",null,null,null,"F#1",null,"F#2",null,"F#1",null,"C#2",null,"F#1",null,"A1",null,
-            "G1",null,null,null,"G1",null,"G2",null,"G1",null,"D2",null,"G1",null,"B1",null,
-            "A1",null,null,null,"A1",null,"A2",null,"A1",null,"E2",null,"A1",null,null,null]},
-    // "Ethereal Pulse" — 128 BPM, Dm, ethereal trance + Enya-tyylinen
-    {id:"ethereal_pulse",name:{fi:"Ethereal Pulse",en:"Ethereal Pulse",sv:"Ethereal Pulse"},bpm:128,sub:"8n",melDur:"4n.",bassDur:"16n",
-      melSynth:{oscillator:{type:"fatsine",count:4,spread:35},envelope:{attack:0.3,decay:1.5,sustain:0.4,release:2.5},volume:-10},
-      bassSynth:{oscillator:{type:"fatsine",count:2,spread:5},envelope:{attack:0.01,decay:0.15,sustain:0.2,release:0.15},volume:-8},
-      mel:[null,null,"D5",null,null,null,"F5",null,null,null,null,null,"A5",null,null,null,
-           null,null,"G5",null,null,null,"F5",null,null,null,"E5",null,null,null,"D5",null,
-           null,null,"D5",null,"F5",null,"A5",null,null,null,"C6",null,null,null,"Bb5",null,
-           null,null,"A5",null,null,null,"G5",null,null,null,"F5",null,null,null,null,null],
-      bass:[null,null,null,"D2",null,"D2",null,null,null,null,null,"D2",null,"D2",null,null,
-            null,null,null,"Bb1",null,"Bb1",null,null,null,null,null,"Bb1",null,"Bb1",null,null,
-            null,null,null,"F1",null,"F1",null,null,null,null,null,"F1",null,"F1",null,null,
-            null,null,null,"C2",null,"C2",null,null,null,null,null,"C2",null,"C2",null,null]},
-    // "Gentle Flow" — 100 BPM, C major, rauhallinen ja miellyttävä
-    {id:"gentle_flow",name:{fi:"Gentle Flow",en:"Gentle Flow",sv:"Gentle Flow"},bpm:100,sub:"8n",melDur:"4n",bassDur:"8n",
-      melSynth:{oscillator:{type:"triangle"},envelope:{attack:0.08,decay:0.6,sustain:0.15,release:1.2},volume:-16},
-      bassSynth:{oscillator:{type:"sine"},envelope:{attack:0.02,decay:0.3,sustain:0.25,release:0.4},volume:-14},
-      mel:[null,"E5",null,null,"G5",null,"C5",null,null,"D5",null,null,"E5",null,null,null,
-           null,"F5",null,null,"A5",null,"G5",null,null,"E5",null,null,"D5",null,null,null,
-           null,"G5",null,null,"E5",null,"C5",null,null,"D5",null,"E5",null,"D5",null,null,
-           null,"C5",null,null,"E5",null,"D5",null,null,"C5",null,null,null,null,null,null,
-           null,"E5",null,"G5",null,null,"A5",null,null,"G5",null,"E5",null,null,"D5",null,
-           null,"F5",null,"A5",null,null,"G5",null,null,"F5",null,"E5",null,"D5",null,null,
-           null,"G5",null,null,"A5",null,"G5",null,null,"E5",null,null,"D5",null,"C5",null,
-           null,"D5",null,null,"E5",null,null,null,null,"C5",null,null,null,null,null,null],
-      bass:["C2",null,null,null,"C2",null,"G2",null,"C2",null,null,null,"G2",null,"C2",null,
-            "F2",null,null,null,"F2",null,"C3",null,"F2",null,null,null,"A2",null,"F2",null,
-            "G2",null,null,null,"G2",null,"D3",null,"G2",null,null,null,"B2",null,"G2",null,
-            "C2",null,null,null,"G2",null,"E2",null,"C2",null,null,null,null,null,null,null,
-            "A1",null,null,null,"A1",null,"E2",null,"A1",null,null,null,"C2",null,"A1",null,
-            "F2",null,null,null,"F2",null,"A2",null,"F2",null,null,null,"C3",null,"F2",null,
-            "G2",null,null,null,"G2",null,"B2",null,"G2",null,null,null,"D3",null,"G2",null,
-            "C2",null,null,null,"E2",null,"G2",null,"C2",null,null,null,null,null,null,null]},
-  ]
-};
-
-function useMusic(category,isPlaying,shuffle){
-  const melSynthRef=useRef(null);const bassSynthRef=useRef(null);
-  const melSeqRef=useRef(null);const bassSeqRef=useRef(null);
-  const gainRef=useRef(null);const activeRef=useRef(false);
-  const trackIdx=useRef(Math.floor(Math.random()*10));
-  const lastPlayedRef=useRef(-1);
-  const timerRef=useRef(null);
-  const [tick,setTick]=useState(0);
-  const [currentTrackName,setCurrentTrackName]=useState("");
-  const directionRef=useRef(0); // -1=prev, 0=normal, 1=next
-
-  const cleanup=useCallback(()=>{
-    if(timerRef.current){clearTimeout(timerRef.current);timerRef.current=null;}
-    try{Tone.Transport.stop();Tone.Transport.cancel();}catch{}
-    try{melSeqRef.current?.stop();melSeqRef.current?.dispose();}catch{}melSeqRef.current=null;
-    try{bassSeqRef.current?.stop();bassSeqRef.current?.dispose();}catch{}bassSeqRef.current=null;
-    try{melSynthRef.current?.dispose();}catch{}melSynthRef.current=null;
-    try{bassSynthRef.current?.dispose();}catch{}bassSynthRef.current=null;
-    try{gainRef.current?.dispose();}catch{}gainRef.current=null;
-    activeRef.current=false;
-  },[]);
-
-  const skipNext=useCallback(()=>{directionRef.current=1;setTick(t=>t+1);},[]);
-  const skipPrev=useCallback(()=>{directionRef.current=-1;setTick(t=>t+1);},[]);
-
-  useEffect(()=>{
-    if(category==="off"||!isPlaying){cleanup();setCurrentTrackName("");return;}
-    const tracks=MUSIC_TRACKS[category];
-    if(!tracks||!tracks.length)return;
-    let idx;
-    const dir=directionRef.current;
-    directionRef.current=0;
-    if(dir===-1){
-      // Previous: go back 2 (because trackIdx was already incremented)
-      trackIdx.current=((trackIdx.current-2)%tracks.length+tracks.length)%tracks.length;
-      idx=trackIdx.current;
-      trackIdx.current++;
-    }else if(shuffle&&dir===0){
-      do{idx=Math.floor(Math.random()*tracks.length);}while(tracks.length>1&&idx===lastPlayedRef.current);
-    }else{
-      idx=trackIdx.current%tracks.length;
-      trackIdx.current++;
-    }
-    lastPlayedRef.current=idx;
-    const track=tracks[idx];
-    setCurrentTrackName(typeof track.name==="object"?track.name:track.name);
-    let cancelled=false;
-    (async()=>{
-      await Tone.start();
-      if(cancelled)return;
-      cleanup();
-      Tone.Transport.bpm.value=track.bpm;
-      gainRef.current=new Tone.Gain(0).toDestination();
-      melSynthRef.current=new Tone.PolySynth(Tone.Synth,track.melSynth).connect(gainRef.current);
-      bassSynthRef.current=new Tone.PolySynth(Tone.Synth,track.bassSynth).connect(gainRef.current);
-      melSeqRef.current=new Tone.Sequence((time,note)=>{
-        if(note)melSynthRef.current?.triggerAttackRelease(note,track.melDur,time);
-      },track.mel,track.sub);
-      melSeqRef.current.loop=true;
-      if(track.bass){
-        bassSeqRef.current=new Tone.Sequence((time,note)=>{
-          if(note)bassSynthRef.current?.triggerAttackRelease(note,track.bassDur,time);
-        },track.bass,track.sub);
-        bassSeqRef.current.loop=true;
-        bassSeqRef.current.start(0);
-      }
-      melSeqRef.current.start(0);
-      Tone.Transport.start();
-      activeRef.current=true;
-      gainRef.current.gain.rampTo(0.7,2);
-      const stepsPerBeat=track.sub==="8n"?2:1;
-      const beatsPerLoop=track.mel.length/stepsPerBeat;
-      const loopSec=(beatsPerLoop/track.bpm)*60;
-      const playSec=loopSec*2;
-      timerRef.current=setTimeout(()=>{
-        if(!cancelled&&gainRef.current){
-          gainRef.current.gain.rampTo(0,3);
-          timerRef.current=setTimeout(()=>{if(!cancelled)setTick(t=>t+1);},3500);
-        }
-      },(playSec-3)*1000);
-    })();
-    return()=>{cancelled=true;cleanup();};
-  },[category,isPlaying,cleanup,tick]);
-
-  return{trackName:currentTrackName,skipNext,skipPrev};
-}
-
-// ============================================
 // ENDING OVERLAY COMPONENT
 // ============================================
 function EndingOverlay({ending, progress, gridRect}){
@@ -1588,8 +1409,6 @@ export default function Piilosana(){
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[soundTheme,setSoundTheme]=useState(()=>localStorage.getItem("piilosana_sound")||"modern");
-  const[musicTheme,setMusicTheme]=useState(()=>localStorage.getItem("piilosana_music")||"electronic");
-  const[musicShuffle,setMusicShuffle]=useState(()=>localStorage.getItem("piilosana_music_shuffle")!=="off");
   const[audioStarted,setAudioStarted]=useState(false);
   const[showSettings,setShowSettings]=useState(false);
   const[showMenuOptions,setShowMenuOptions]=useState(false);
@@ -1623,7 +1442,6 @@ export default function Piilosana(){
     if(s.size){setUiSize(s.size);localStorage.setItem("piilosana_size",s.size);}
     if(typeof s.confetti==="boolean"){setConfettiOn(s.confetti);localStorage.setItem("piilosana_confetti",s.confetti?"on":"off");}
     if(s.sound){setSoundTheme(s.sound);localStorage.setItem("piilosana_sound",s.sound);}
-    if(s.music){setMusicTheme(s.music);localStorage.setItem("piilosana_music",s.music);}
   },[]);
   const doLogin=useCallback(async(nickname,password)=>{
     setAuthLoading(true);setAuthError("");
@@ -1692,9 +1510,9 @@ export default function Piilosana(){
   },[]);
   const syncSettings=useCallback((overrides={})=>{
     if(!authUser)return;
-    const s={theme:themeId,lang,size:uiSize,confetti:confettiOn,sound:soundTheme,music:musicTheme,...overrides};
+    const s={theme:themeId,lang,size:uiSize,confetti:confettiOn,sound:soundTheme,...overrides};
     saveSettingsToServer(s);
-  },[authUser,themeId,lang,uiSize,confettiOn,soundTheme,musicTheme,saveSettingsToServer]);
+  },[authUser,themeId,lang,uiSize,confettiOn,soundTheme,saveSettingsToServer]);
 
   const doChangePassword=useCallback(async(currentPassword,newPassword)=>{
     setAuthLoading(true);setAuthError("");setAuthSuccess("");
@@ -2009,28 +1827,23 @@ export default function Piilosana(){
     return()=>clearTimeout(t);
   },[state,countdown,sounds]);
 
-  // Scramble animation — letters randomize then settle into final grid
+  // Scramble animation — letters randomize ~0.8s then snap to final grid
   useEffect(()=>{
     if(state!=="scramble")return;
-    const totalCells=SZ*SZ;
     let step=0;
     const interval=setInterval(()=>{
       step++;
-      if(step<=12){
-        // Phase 1: pure randomization (12 steps × 70ms ≈ 840ms)
+      if(step<=10){
+        // Randomize letters rapidly (10 × 80ms = 800ms)
         setScrambleGrid(makeGrid(SZ,lang));
-        setScrambleStep(0);
-      }else if(step<=12+totalCells){
-        // Phase 2: letters settle one by one into real grid (fast)
-        setScrambleStep(step-12);
-        if(step===13)sounds.playGo(); // play GO sound when settling starts
       }else{
-        // Done — transition to play
+        // Done — snap to real grid and start playing
         clearInterval(interval);
+        sounds.playGo();
         setScrambleGrid(null);setScrambleStep(0);
         setState("play");
       }
-    },70);
+    },80);
     return()=>clearInterval(interval);
   },[state,lang,sounds]);
 
@@ -2041,8 +1854,6 @@ export default function Piilosana(){
   // Re-init synths when sound theme changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(()=>{if(soundTheme!=="off")rawSounds.reinit();},[soundTheme]);
-  // Background music — plays whenever user has interacted (audio context unlocked)
-  const{trackName:currentTrack,skipNext:musicNext,skipPrev:musicPrev}=useMusic(musicTheme,audioStarted,musicShuffle);
   useEffect(()=>{
     if(state!=="play"||mode==="multi"||mode==="public"||gameTime===0)return;
     startTimeRef.current=Date.now();
@@ -3164,46 +2975,6 @@ export default function Piilosana(){
                 </button>
               ))}
             </div>
-          </div>
-          {/* Music */}
-          <div style={{marginBottom:"14px"}}>
-            <div style={{fontFamily:S.font,fontSize:"11px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
-              {lang==="en"?"Background Music":lang==="sv"?"Bakgrundsmusik":"Taustamusiikki"}
-            </div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
-              {[["electronic",{fi:"PÄÄLLÄ",en:"ON",sv:"PÅ"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
-                <button key={id} onClick={()=>{setMusicTheme(id);localStorage.setItem("piilosana_music",id);syncSettings({music:id});}}
-                  style={{fontFamily:S.font,fontSize:"12px",
-                    color:musicTheme===id?S.bg:S.green,background:musicTheme===id?S.green:"transparent",
-                    border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer",
-                    boxShadow:musicTheme===id?`0 0 8px ${S.green}66`:"none"}}>
-                  {names[lang]||names.en}
-                </button>
-              ))}
-            </div>
-            {musicTheme!=="off"&&(
-              <>
-              <div style={{display:"flex",alignItems:"center",gap:"6px",marginTop:"8px"}}>
-                <button onClick={musicPrev} style={{fontFamily:S.font,fontSize:"10px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"2px 7px",cursor:"pointer"}}>◀</button>
-                <div style={{fontFamily:S.font,fontSize:"11px",color:S.green,minWidth:"70px",textAlign:"center"}}>
-                  {currentTrack?(currentTrack[lang]||currentTrack.en||currentTrack):"—"}
-                </div>
-                <button onClick={musicNext} style={{fontFamily:S.font,fontSize:"10px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"2px 7px",cursor:"pointer"}}>▶</button>
-              </div>
-              <div style={{display:"flex",gap:"4px",marginTop:"6px"}}>
-                {[["shuffle",{fi:"SEKOITUS",en:"SHUFFLE",sv:"BLANDA"}],["order",{fi:"JÄRJESTYS",en:"IN ORDER",sv:"I ORDNING"}]].map(([id,names])=>(
-                  <button key={id} onClick={()=>{const v=id==="shuffle";setMusicShuffle(v);localStorage.setItem("piilosana_music_shuffle",v?"on":"off");}}
-                    style={{fontFamily:S.font,fontSize:"7px",
-                      color:(musicShuffle?id==="shuffle":id==="order")?S.bg:S.green,
-                      background:(musicShuffle?id==="shuffle":id==="order")?S.green:"transparent",
-                      border:`1px solid ${S.green}`,padding:"3px 6px",cursor:"pointer",
-                      boxShadow:(musicShuffle?id==="shuffle":id==="order")?`0 0 6px ${S.green}44`:"none"}}>
-                    {names[lang]||names.en}
-                  </button>
-                ))}
-              </div>
-              </>
-            )}
           </div>
           {/* Confetti */}
           <div>
