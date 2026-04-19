@@ -3698,11 +3698,11 @@ export default function Piilosana(){
                 <div style={{fontSize:"18px",color:S.yellow}}>{score}</div>
               </div>
             </div>
-            <div ref={wordBarRef} key={flashKey} style={{borderTop:`1px solid ${S.border}`,padding:"4px 10px",textAlign:"center",animation:flashKey>0&&!word&&msg?.ok?"wordFlash 0.6s ease-out":"none"}}>
-              <div style={{fontSize:"18px",minHeight:"20px",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined}}>
-                {state==="ending"?<span style={{color:ending?.color,fontSize:"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
+            <div ref={wordBarRef} key={flashKey} style={{borderTop:S.cellGradient?`1px solid ${S.border}`:`1px solid ${S.border}`,padding:S.cellGradient?"10px 14px":"4px 10px",textAlign:"center",animation:flashKey>0&&!word&&msg?.ok?"wordFlash 0.6s ease-out":"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
+              <div style={{fontSize:S.cellGradient?"28px":"18px",minHeight:S.cellGradient?"36px":"20px",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
+                {state==="ending"?<span style={{color:ending?.color,fontSize:S.cellGradient?"22px":"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
                  word?word.toUpperCase():
-                 (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?"12px":"10px",fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted}}>···</span>)}
+                 (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?(S.cellGradient?"16px":"12px"):(S.cellGradient?"14px":"10px"),fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted,fontSize:S.cellGradient?"20px":"18px"}}>···</span>)}
               </div>
             </div>
           </div>
