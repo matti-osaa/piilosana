@@ -1629,10 +1629,10 @@ async function submitToHallOfFame({nickname,score,wordsFound,wordsTotal,gameMode
 export default function Piilosana(){
   const SZ=5,COMBO_WINDOW=4000;
   const[lang,setLang]=useState(()=>localStorage.getItem("piilosana_lang")||"fi");
-  const[themeId,setThemeId]=useState(()=>localStorage.getItem("piilosana_theme")||"dark");
+  const[themeId,setThemeId]=useState(()=>localStorage.getItem("piilosana_theme")||"modern");
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
-  const[soundTheme,setSoundTheme]=useState(()=>localStorage.getItem("piilosana_sound")||"retro");
+  const[soundTheme,setSoundTheme]=useState(()=>localStorage.getItem("piilosana_sound")||"modern");
   const[musicTheme,setMusicTheme]=useState(()=>localStorage.getItem("piilosana_music")||"electronic");
   const[musicShuffle,setMusicShuffle]=useState(()=>localStorage.getItem("piilosana_music_shuffle")!=="off");
   const[audioStarted,setAudioStarted]=useState(false);
