@@ -681,6 +681,38 @@ io.on('connection', (socket) => {
     console.log(`Player left Arena/${gameLang} (${pg.players.size} remaining)`);
   });
 
+  // ---- EMOJI REACTIONS ----
+  const ALLOWED_EMOJIS = ['😀','😮','🔥','👀','😭','👏'];
+  const emojiCooldowns = new Map();
+  socket.on('emoji_reaction', ({ emoji }) => {
+    if (!ALLOWED_EMOJIS.includes(emoji)) return;
+    // Rate limit: 1 emoji per 2 seconds per player
+    const now = Date.now();
+    const last = emojiCooldowns.get(socket.id) || 0;
+    if (now - last < 2000) return;
+    emojiCooldowns.set(socket.id, now);
+
+    // Find player nickname and room
+    const pubLang = playerPublicLang.get(socket.id);
+    if (pubLang) {
+      const pg = getPublicGame(pubLang);
+      const p = pg.players.get(socket.id);
+      if (p) {
+        io.to(publicRoomName(pubLang)).emit('emoji_feed', { nickname: p.nickname, emoji });
+      }
+      return;
+    }
+    // Check custom rooms
+    const playerRoom = playerRooms.get(socket.id);
+    if (playerRoom && rooms.has(playerRoom)) {
+      const room = rooms.get(playerRoom);
+      const p = room.players.get(socket.id);
+      if (p) {
+        io.to(playerRoom).emit('emoji_feed', { nickname: p.nickname, emoji });
+      }
+    }
+  });
+
   // ---- LIST ROOMS ----
   socket.on('list_rooms', () => {
     socket.emit('room_list', { rooms: getPublicRooms() });

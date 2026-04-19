@@ -1730,6 +1730,8 @@ export default function Piilosana(){
   // Battle mode states
   const[otherSelections,setOtherSelections]=useState({}); // {playerId: {nickname, cells}}
   const[battleMsg,setBattleMsg]=useState(null); // {word, finder, points} - flash when someone finds
+  const[emojiFeed,setEmojiFeed]=useState([]); // [{id, nickname, emoji, ts}]
+  const emojiFeedIdRef=useRef(0);
   // Public game (Piilosauna)
   const[publicState,setPublicState]=useState(null); // null|'waiting'|'countdown'|'playing'|'end'
   const[publicScores,setPublicScores]=useState([]);
@@ -2080,7 +2082,7 @@ export default function Piilosana(){
           if(cellEl){const cr=cellEl.getBoundingClientRect();popX=cr.left+cr.width/2;popY=cr.top+cr.height/2;}
           else{const rect=gRef.current.getBoundingClientRect();popX=rect.left+rect.width/2;popY=rect.top+rect.height/2;}
         }else{const rect=(gRef.current||wordBarRef.current).getBoundingClientRect();popX=rect.left+rect.width/2;popY=rect.top+rect.height/2;}
-        const color=wordColor(currentWord.length);
+        const color=wordColor();
         let text=`+${totalPts}`;
         if(newCombo>=3)text+=` x${comboMult}`;
         addPopup(text,color,popX,popY);
@@ -2226,6 +2228,7 @@ export default function Piilosana(){
       setGameMode(gm||"classic");
       setOtherSelections({});
       setBattleMsg(null);
+      setEmojiFeed([]);
       setLobbyState("playing");
       setCountdown(5);setState("countdown");
     });
@@ -2254,8 +2257,8 @@ export default function Piilosana(){
           {
             const rect=(gRef.current||wordBarRef.current).getBoundingClientRect();
             const popX=rect.left+rect.width/2,popY=rect.top+rect.height/2;
-            const isLight=themeIdRef.current==="light";
-            const color=isLight?(w.length>=6?"#9b30a0":w.length>=5?"#8a6d00":"#2d6a4f"):(w.length>=6?"#ff66ff":w.length>=5?"#ffcc00":"#00ff88");
+            const tid=themeIdRef.current;
+            const color=(THEMES[tid]||THEMES.dark).green;
             let text=`+${points}`;
             if(c>=3)text+=` x${Math.floor(points/(pts(w.length)))}`;
             addPopup(text,color,popX,popY);
@@ -2337,8 +2340,7 @@ export default function Piilosana(){
         setFound(prev=>[...prev,w]);
         const p=points||pts(w.length);
         setScore(prev=>prev+p);
-        const isLight=themeIdRef.current==="light";
-        const color=isLight?(w.length>=6?"#9b30a0":w.length>=5?"#8a6d00":"#2d6a4f"):(w.length>=6?"#ff66ff":w.length>=5?"#ffcc00":"#00ff88");
+        const color=(THEMES[themeIdRef.current]||THEMES.dark).green;
         addPopup(`+${p}`,color);
         addWordPopup(w,color);
         soundsRef.current.playByLength(w.length);
@@ -2365,6 +2367,11 @@ export default function Piilosana(){
     newSocket.on("public_next_round_countdown",({seconds})=>{
       setPublicNextCountdown(seconds);
     });
+    newSocket.on("emoji_feed",({nickname,emoji})=>{
+      const id=++emojiFeedIdRef.current;
+      setEmojiFeed(prev=>[...prev.slice(-8),{id,nickname,emoji,ts:Date.now()}]);
+      setTimeout(()=>setEmojiFeed(prev=>prev.filter(e=>e.id!==id)),6000);
+    });
 
     setSocket(newSocket);
     
@@ -2374,10 +2381,7 @@ export default function Piilosana(){
   },[mode]);
   const missed=useMemo(()=>state==="end"?[...valid].filter(w=>!found.includes(w)).sort((a,b)=>b.length-a.length):[],[state,valid,found]);
   const totalPossible=useMemo(()=>[...valid].reduce((s,w)=>s+(letterMult?ptsLetters(w,lang):pts(w.length)),0),[valid,letterMult,lang]);
-  const wordColor=(len)=>{
-    if(themeId==="light") return len>=7?"#9b30a0":len>=6?"#b87800":len>=5?"#8a6d00":len>=4?"#1a7a4a":"#2d6a4f";
-    return len>=7?"#ff66ff":len>=6?"#ffaa00":len>=5?"#ffcc00":len>=4?"#00ffaa":"#00ff88";
-  };
+  const wordColor=()=>S.green;
 
 
   // Multiplayer helper functions
@@ -3637,6 +3641,31 @@ export default function Piilosana(){
                   ))
                 }
               </div>
+            </div>
+          )}
+
+          {/* Emoji reactions - multiplayer only */}
+          {(mode==="public"||mode==="multi")&&state==="play"&&socket&&(
+            <div style={{marginTop:"6px"}}>
+              <div style={{display:"flex",justifyContent:"center",gap:"4px",marginBottom:"4px"}}>
+                {["😀","😮","🔥","👀","😭","👏"].map(em=>(
+                  <button key={em} onClick={()=>socket.emit("emoji_reaction",{emoji:em})}
+                    style={{fontSize:"22px",padding:"4px 8px",background:S.dark,border:`1px solid ${S.border}`,borderRadius:"8px",cursor:"pointer",lineHeight:1,
+                    transition:"transform 0.1s"}}
+                    onMouseDown={e=>e.currentTarget.style.transform="scale(1.3)"}
+                    onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
+                    onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>{em}</button>
+                ))}
+              </div>
+              {emojiFeed.length>0&&(
+                <div style={{maxHeight:"60px",overflowY:"auto",fontSize:"12px",color:S.textMuted,textAlign:"center"}}>
+                  {emojiFeed.map(e=>(
+                    <span key={e.id} style={{display:"inline-block",marginRight:"8px",animation:"fadeIn 0.3s ease"}}>
+                      <span style={{color:S.textSoft}}>{e.nickname}</span> {e.emoji}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
