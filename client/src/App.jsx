@@ -253,7 +253,7 @@ const MODERN_BASE={
 };
 const THEMES={
   light:{
-    name:"IVORY LIGHT",nameEn:"IVORY LIGHT",nameSv:"IVORY LIGHT",
+    name:"VAALEA",nameEn:"LIGHT",nameSv:"LJUS",
     bg:"#faf8f4",green:"#2d6a4f",yellow:"#7a6408",red:"#c0392b",purple:"#6c5ce7",
     dark:"#f0ece4",border:"#d4cbbf",cell:"#ffffff",cellBorder:"#e0d8ce",
     gridBg:"#f5f0e8",textMuted:"#8b7e6e",textSoft:"#5c4f3d",
@@ -266,7 +266,7 @@ const THEMES={
     flavor:"ivory",
   },
   dark:{
-    name:"DARK VELVET",nameEn:"DARK VELVET",nameSv:"DARK VELVET",
+    name:"TUMMA",nameEn:"DARK",nameSv:"MÖRK",
     bg:"#12101a",green:"#b39ddb",yellow:"#f0c674",red:"#ef5350",purple:"#ce93d8",
     dark:"#1c1828",border:"#342e48",cell:"#1c1828",cellBorder:"#3e3658",
     gridBg:"#0e0c16",textMuted:"#7e6fa0",textSoft:"#c4b5e0",
@@ -275,21 +275,27 @@ const THEMES={
     flavor:"velvet",
   },
   pink:{
-    name:"PINK BLUSH",nameEn:"PINK BLUSH",nameSv:"PINK BLUSH",
-    bg:"#1e0c1a",green:"#ff6eb4",yellow:"#ffb7d5",red:"#ff4081",purple:"#ea80fc",
-    dark:"#2a1224",border:"#5c2048",cell:"#2a1224",cellBorder:"#6e2a58",
-    gridBg:"#180816",textMuted:"#c06090",textSoft:"#ffb0d0",
-    inputBg:"#180816",
+    name:"PINK DREAM",nameEn:"PINK DREAM",nameSv:"PINK DREAM",
+    bg:"#fff0f5",green:"#d6336c",yellow:"#e64980",red:"#c2255c",purple:"#be4bdb",
+    dark:"#ffe0ec",border:"#f0a0c0",cell:"#fff5f8",cellBorder:"#f5b8d0",
+    gridBg:"#ffe8f0",textMuted:"#d0709a",textSoft:"#b03060",
+    inputBg:"#fff5f8",
+    cellText:"#6b1040",cellTextSel:"#ffffff",
+    btnYellowBg:"#e64980",btnYellowShadow:"#c2255c",
     ...MODERN_BASE,
-    flavor:"blush",
+    cellShadow:"inset 0 1px 3px #ff80b020, 0 1px 4px #ff80b010",
+    panelShadow:"0 4px 16px #ff80b018",
+    flavor:"dream",
   },
   electric:{
     name:"ELECTRIC BLUE",nameEn:"ELECTRIC BLUE",nameSv:"ELECTRIC BLUE",
-    bg:"#04080f",green:"#00e5ff",yellow:"#76ff03",red:"#ff1744",purple:"#448aff",
-    dark:"#0a1220",border:"#0d3b66",cell:"#0a1220",cellBorder:"#1a4a7a",
-    gridBg:"#020610",textMuted:"#3080bb",textSoft:"#60d0ff",
-    inputBg:"#020610",
+    bg:"#000814",green:"#00f0ff",yellow:"#7dff3a",red:"#ff2050",purple:"#6090ff",
+    dark:"#001228",border:"#0050aa",cell:"#001030",cellBorder:"#0060cc",
+    gridBg:"#000610",textMuted:"#2890dd",textSoft:"#50d0ff",
+    inputBg:"#000a18",
     ...MODERN_BASE,
+    cellShadow:"inset 0 1px 4px #00a0ff30, 0 2px 8px #00a0ff15",
+    panelShadow:"0 8px 32px #0080ff20",
     flavor:"electric",
   },
   retro:{
@@ -3542,18 +3548,6 @@ export default function Piilosana(){
             </div>
           )}
 
-          {/* Percentage counter - solo normal + classic multi only */}
-          {mode==="solo"&&soloMode==="normal"&&state==="play"&&valid.size>0&&(
-            <div style={{textAlign:"center",fontSize:"11px",color:S.textMuted,marginBottom:"4px"}}>
-              {found.length} / {valid.size} {t.words} ({Math.round(found.length/valid.size*100)}%)
-            </div>
-          )}
-          {mode==="multi"&&gameMode==="classic"&&state==="play"&&valid.size>0&&(
-            <div style={{textAlign:"center",fontSize:"11px",color:S.textMuted,marginBottom:"4px"}}>
-              {found.length} / {valid.size} {t.words} ({Math.round(found.length/valid.size*100)}%)
-            </div>
-          )}
-
           {gameTime!==0&&(
           <div style={{height:"4px",background:S.dark,marginBottom:"6px",border:`1px solid ${S.border}`}}>
             <div style={{height:"100%",width:`${(time/gameTime)*100}%`,background:time<=15?S.red:time<=30?S.yellow:S.green,transition:"width 0.3s linear"}}/>
@@ -3636,7 +3630,7 @@ export default function Piilosana(){
 
           {state==="play"&&(
             <div className="piilosana-found" style={{marginTop:"8px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,maxHeight:"120px",overflowY:"auto"}}>
-              <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"4px"}}>{(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?`${t.found} (${found.length})`:`${t.found} (${found.length}/${valid.size})`}</div>
+              <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"4px"}}>{(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?`${t.found} (${found.length})`:`${t.found} (${found.length}/${valid.size}) ${valid.size>0?Math.round(found.length/valid.size*100):0}%`}</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {found.length===0?<span style={{fontSize:"18px",color:S.textMuted}}>{t.dragWords}</span>:
                   found.map((w,i)=>(
