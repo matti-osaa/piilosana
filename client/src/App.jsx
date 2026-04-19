@@ -2369,8 +2369,9 @@ export default function Piilosana(){
     });
     newSocket.on("emoji_feed",({nickname,emoji})=>{
       const id=++emojiFeedIdRef.current;
-      setEmojiFeed(prev=>[...prev.slice(-8),{id,nickname,emoji,ts:Date.now()}]);
-      setTimeout(()=>setEmojiFeed(prev=>prev.filter(e=>e.id!==id)),6000);
+      setEmojiFeed(prev=>[...prev.slice(-4),{id,nickname,emoji,fading:false}]);
+      setTimeout(()=>setEmojiFeed(prev=>prev.map(e=>e.id===id?{...e,fading:true}:e)),4200);
+      setTimeout(()=>setEmojiFeed(prev=>prev.filter(e=>e.id!==id)),5000);
     });
 
     setSocket(newSocket);
@@ -2803,6 +2804,8 @@ export default function Piilosana(){
         @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
         @keyframes snowfall{0%{transform:translateY(0);opacity:0.6}100%{transform:translateY(30px);opacity:0}}
         @keyframes fadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+        @keyframes bubbleIn{0%{opacity:0;transform:scale(0.3) translateY(10px)}40%{opacity:1;transform:scale(1.08) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+        @keyframes bubbleOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.6) translateY(-10px)}}
         @keyframes pulse{0%,100%{text-shadow:0 0 5px #ff444444}50%{text-shadow:0 0 20px #ff444488}}
         @keyframes arenaPulse{0%,100%{box-shadow:4px 4px 0 #cc3311,0 0 20px #ff664433}50%{box-shadow:4px 4px 0 #cc3311,0 0 35px #ff664466}}
         @keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}50%{opacity:1;transform:translate(-50%,-100%) scale(1.5)}100%{opacity:0;transform:translate(-50%,-180%) scale(1.8)}}
@@ -3646,23 +3649,33 @@ export default function Piilosana(){
 
           {/* Emoji reactions - multiplayer only */}
           {(mode==="public"||mode==="multi")&&state==="play"&&socket&&(
-            <div style={{marginTop:"6px"}}>
-              <div style={{display:"flex",justifyContent:"center",gap:"4px",marginBottom:"4px"}}>
+            <div style={{marginTop:"8px"}}>
+              <div style={{display:"flex",justifyContent:"center",gap:"6px",marginBottom:"6px"}}>
                 {["😀","😮","🔥","👀","😭","👏"].map(em=>(
                   <button key={em} onClick={()=>socket.emit("emoji_reaction",{emoji:em})}
-                    style={{fontSize:"22px",padding:"4px 8px",background:S.dark,border:`1px solid ${S.border}`,borderRadius:"8px",cursor:"pointer",lineHeight:1,
-                    transition:"transform 0.1s"}}
-                    onMouseDown={e=>e.currentTarget.style.transform="scale(1.3)"}
-                    onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
-                    onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>{em}</button>
+                    style={{fontSize:"26px",padding:"6px 10px",background:S.dark,border:`1px solid ${S.border}`,borderRadius:"12px",cursor:"pointer",lineHeight:1,
+                    transition:"transform 0.15s, background 0.15s"}}
+                    onMouseDown={e=>{e.currentTarget.style.transform="scale(1.35)";e.currentTarget.style.background=S.border;}}
+                    onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background=S.dark;}}
+                    onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background=S.dark;}}
+                    onTouchStart={e=>{e.currentTarget.style.transform="scale(1.35)";e.currentTarget.style.background=S.border;}}
+                    onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background=S.dark;}}>{em}</button>
                 ))}
               </div>
               {emojiFeed.length>0&&(
-                <div style={{maxHeight:"60px",overflowY:"auto",fontSize:"12px",color:S.textMuted,textAlign:"center"}}>
+                <div style={{display:"flex",flexDirection:"column",gap:"4px",alignItems:"flex-start"}}>
                   {emojiFeed.map(e=>(
-                    <span key={e.id} style={{display:"inline-block",marginRight:"8px",animation:"fadeIn 0.3s ease"}}>
-                      <span style={{color:S.textSoft}}>{e.nickname}</span> {e.emoji}
-                    </span>
+                    <div key={e.id} style={{
+                      display:"inline-flex",alignItems:"center",gap:"8px",
+                      background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
+                      border:`2px solid ${S.border}`,borderRadius:"18px",
+                      padding:"8px 16px",position:"relative",
+                      animation:e.fading?"bubbleOut 0.8s ease forwards":"bubbleIn 0.4s ease-out",
+                      boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044",
+                      maxWidth:"100%"}}>
+                      <span style={{fontSize:"15px",fontWeight:"700",color:S.green,fontFamily:S.font}}>{e.nickname}</span>
+                      <span style={{fontSize:"28px",lineHeight:1}}>{e.emoji}</span>
+                    </div>
                   ))}
                 </div>
               )}
