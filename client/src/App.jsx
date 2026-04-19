@@ -2104,7 +2104,7 @@ export default function Piilosana(){
 
   // Background music control
   useEffect(()=>{
-    if(musicOn&&(state==="play"||state==="countdown")){
+    if(musicOn){
       music.start();
     }else{
       music.stop();
@@ -2763,17 +2763,17 @@ export default function Piilosana(){
       <div style={{marginTop:"24px",width:"100%",maxWidth:"600px"}}>
         {/* Flag language bubble — positioned above flag buttons */}
         {mode===null&&flagBubble&&(
-          <div style={{width:"100%",
+          <div style={{width:"100%",display:"flex",justifyContent:"center",
             animation:flagBubbleFading?"flagBubbleOut 0.6s ease-in forwards":"flagBubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
             zIndex:50,marginBottom:"6px"}}>
-            <div style={{background:"#ffffff",color:"#000000",fontFamily:S.font,
-              fontSize:S.cellGradient?"12px":"8px",padding:"8px 12px",borderRadius:S.btnRadius||"0px",position:"relative",lineHeight:"1.6",
+            <div style={{fontFamily:S.font,
+              fontSize:S.cellGradient?"13px":"13px",padding:"8px 12px",borderRadius:S.btnRadius||"0px",position:"relative",lineHeight:"1.6",
               border:S.cellGradient?`2px solid ${S.border}`:"3px solid #000000",boxShadow:S.cellGradient?S.panelShadow:"4px 4px 0 #00000044",
-              width:"max-content",maxWidth:"100%",
+              width:"max-content",maxWidth:"90%",
               background:S.cellGradient?S.dark:"#ffffff",color:S.cellGradient?S.green:"#000000"}}>
-              <div style={{position:"absolute",bottom:"-9px",left:"20px",
+              <div style={{position:"absolute",bottom:"-9px",left:"50%",transform:"translateX(-50%)",
                 width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderTop:S.cellGradient?`8px solid ${S.border}`:"8px solid #000000"}}/>
-              <div style={{position:"absolute",bottom:"-5px",left:"22px",
+              <div style={{position:"absolute",bottom:"-5px",left:"50%",transform:"translateX(-50%)",
                 width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:S.cellGradient?`6px solid ${S.dark}`:"6px solid #ffffff"}}/>
               {lang==="en"?"Play in different languages!":lang==="sv"?"Spela på olika språk!":"Pelaa eri kielillä!"}
             </div>
