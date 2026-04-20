@@ -85,6 +85,11 @@ function rotateCol(grid,col,dir){// dir: 1=down, -1=up
 // Chess piece movement rules
 const CHESS_PIECES=["pawn","rook","bishop","knight","queen"];
 const CHESS_EMOJI={pawn:"♟",rook:"♜",bishop:"♝",knight:"♞",queen:"♛"};
+const CHESS_NAMES={
+  fi:{pawn:"sotilas",rook:"torni",bishop:"lähetti",knight:"ratsu",queen:"kuningatar"},
+  en:{pawn:"pawn",rook:"rook",bishop:"bishop",knight:"knight",queen:"queen"},
+  sv:{pawn:"bonde",rook:"torn",bishop:"löpare",knight:"springare",queen:"dam"},
+};
 const CHESS_MULT={pawn:1.5,rook:1,bishop:1.5,knight:2,queen:1};
 function chessValidMoves(piece,r,c,sz){
   const moves=[];
@@ -2412,9 +2417,9 @@ export default function Piilosana(){
     };
   },[state,soloMode,rotateActive,trie,sounds]);
 
-  // Chess mode: is cell on edge of 8×8 grid?
-  const isEdgeCell=useCallback((r,c)=>{
-    return r===0||r===CHESS_SZ-1||c===0||c===CHESS_SZ-1;
+  // Chess mode: is cell on bottom row (placing zone)?
+  const isBottomRow=useCallback((r)=>{
+    return r===CHESS_SZ-1;
   },[]);
 
   // Chess mode: handle cell click
@@ -2422,7 +2427,7 @@ export default function Piilosana(){
     if(state!=="play"||soloMode!=="chess"||!chessPiece)return;
     // Placing phase: must click an edge cell
     if(chessPlacing){
-      if(!isEdgeCell(r,c)){
+      if(!isBottomRow(r)){
         setChessInvalid({r,c,t:Date.now()});
         sounds.playWrong();
         setTimeout(()=>setChessInvalid(null),400);
@@ -2462,7 +2467,7 @@ export default function Piilosana(){
     setChessValidCells(chessValidMoves(chessPiece,r,c,CHESS_SZ));
     setChessMoves(m=>m+1);
     sounds.playCountdown(0);
-  },[state,soloMode,chessPiece,chessValidCells,chessPath,chessWord,chessGrid,chessPlacing,isEdgeCell,sounds]);
+  },[state,soloMode,chessPiece,chessValidCells,chessPath,chessWord,chessGrid,chessPlacing,isBottomRow,sounds]);
 
   // Chess mode: undo last move
   const chessUndo=useCallback(()=>{
@@ -4159,21 +4164,26 @@ export default function Piilosana(){
             {mode==="solo"&&soloMode==="bomb"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff4444",background:"#ff444411",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>💣 {t.bombLabel} — {bombTimer}s</div>}
             {mode==="solo"&&soloMode==="mystery"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#aa66ff",background:"#aa66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>❓ {t.mysteryLabel}</div>}
             {mode==="solo"&&soloMode==="chess"&&state==="play"&&chessPiece&&(
-              <div style={{textAlign:"center",padding:"6px 8px",fontSize:"13px",color:"#ddaa33",background:"#ddaa3311",borderBottom:`1px solid ${S.border}`}}>
+              <div style={{textAlign:"center",padding:"8px",fontSize:"13px",color:"#ddaa33",background:"#ddaa3311",borderBottom:`1px solid ${S.border}`}}>
                 {chessPlacing?(
-                  <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}>
-                    <span style={{fontSize:"28px",color:"#fff",filter:"drop-shadow(0 0 6px #ddaa33)"}}>{CHESS_EMOJI[chessPiece]}</span>
-                    <span style={{fontSize:"14px",fontFamily:S.font,color:"#ddaa33"}}>{lang==="en"?"Place on edge":lang==="sv"?"Placera på kanten":"Aseta reunalle"}</span>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"10px"}}>
+                    <span style={{fontSize:"42px",color:"#fff",filter:"drop-shadow(0 0 10px #ddaa33) drop-shadow(0 2px 4px #000)",WebkitTextStroke:"1px rgba(221,170,51,0.6)"}}>{CHESS_EMOJI[chessPiece]}</span>
+                    <div style={{textAlign:"left"}}>
+                      <div style={{fontSize:"12px",color:"#ddaa33",fontFamily:S.font,textTransform:"uppercase",letterSpacing:"1px"}}>{(CHESS_NAMES[lang]||CHESS_NAMES.fi)[chessPiece]}</div>
+                      <div style={{fontSize:"13px",color:"#ddaa3388",marginTop:"2px"}}>{lang==="en"?"Place on bottom row":lang==="sv"?"Placera på nedersta raden":"Aseta alariville ↓"}</div>
+                    </div>
                   </div>
                 ):(
-                  <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",flexWrap:"wrap"}}>
-                    <span style={{fontSize:"24px",color:"#fff",filter:"drop-shadow(0 0 4px #ddaa33)"}}>{CHESS_EMOJI[chessPiece]}</span>
-                    <span style={{fontSize:"16px",fontFamily:S.font,letterSpacing:"2px",color:chessWord.length>=3&&WORDS_SET.has(chessWord)?"#44bb66":"#ddaa33",fontWeight:"700"}}>{chessWord.toUpperCase()||"..."}</span>
-                    <span style={{fontSize:"13px",color:"#ddaa3388"}}>({chessPath.length})</span>
-                    <div style={{display:"flex",gap:"4px"}}>
-                      <button onClick={chessSubmitWord} disabled={chessWord.length<3} style={{fontFamily:S.font,fontSize:"13px",color:chessWord.length>=3?"#fff":"#666",background:chessWord.length>=3?"#44bb66":"#333",border:"none",padding:"4px 12px",cursor:chessWord.length>=3?"pointer":"default",borderRadius:S.btnRadius}}>✓</button>
-                      <button onClick={chessUndo} disabled={chessPath.length<=1} style={{fontFamily:S.font,fontSize:"13px",color:chessPath.length>1?"#ddaa33":"#555",background:"transparent",border:`1px solid ${chessPath.length>1?"#ddaa3366":"#33333366"}`,padding:"4px 12px",cursor:chessPath.length>1?"pointer":"default",borderRadius:S.btnRadius}}>↩</button>
-                      <button onClick={chessReset} style={{fontFamily:S.font,fontSize:"13px",color:"#ddaa33",background:"transparent",border:"1px solid #ddaa3366",padding:"4px 12px",cursor:"pointer",borderRadius:S.btnRadius}}>{t.chessSkip}</button>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",flexWrap:"wrap"}}>
+                    <span style={{fontSize:"32px",color:"#fff",filter:"drop-shadow(0 0 6px #ddaa33)",WebkitTextStroke:"0.5px rgba(221,170,51,0.4)"}}>{CHESS_EMOJI[chessPiece]}</span>
+                    <div style={{textAlign:"left"}}>
+                      <div style={{fontSize:"11px",color:"#ddaa3388",fontFamily:S.font,textTransform:"uppercase"}}>{(CHESS_NAMES[lang]||CHESS_NAMES.fi)[chessPiece]}</div>
+                      <div style={{fontSize:"16px",fontFamily:S.font,letterSpacing:"2px",color:chessWord.length>=3&&WORDS_SET.has(chessWord)?"#44bb66":"#fff",fontWeight:"700"}}>{chessWord.toUpperCase()||"..."}</div>
+                    </div>
+                    <div style={{display:"flex",gap:"4px",marginLeft:"auto"}}>
+                      <button onClick={chessSubmitWord} disabled={chessWord.length<3} style={{fontFamily:S.font,fontSize:"13px",color:chessWord.length>=3?"#fff":"#555",background:chessWord.length>=3?"#44bb66":"#333",border:"none",padding:"5px 14px",cursor:chessWord.length>=3?"pointer":"default",borderRadius:S.btnRadius,transition:"all 0.2s"}}>✓</button>
+                      <button onClick={chessUndo} disabled={chessPath.length<=1} style={{fontFamily:S.font,fontSize:"13px",color:chessPath.length>1?"#ddaa33":"#444",background:"transparent",border:`1px solid ${chessPath.length>1?"#ddaa3366":"#33333366"}`,padding:"5px 10px",cursor:chessPath.length>1?"pointer":"default",borderRadius:S.btnRadius}}>↩</button>
+                      <button onClick={chessReset} style={{fontFamily:S.font,fontSize:"13px",color:"#ddaa33",background:"transparent",border:"1px solid #ddaa3366",padding:"5px 10px",cursor:"pointer",borderRadius:S.btnRadius}}>⟳</button>
                     </div>
                   </div>
                 )}
@@ -4249,7 +4259,7 @@ export default function Piilosana(){
                 const endColor=eaten&&ending?ending.cellColor(cellIdx):null;
                 // Chess: checkered pattern (light/dark squares)
                 const chessSquareLight=isChessMode&&(r+c)%2===0;
-                const chessEdge=isChessMode&&(r===0||r===CHESS_SZ-1||c===0||c===CHESS_SZ-1);
+                const chessBottomRow=isChessMode&&r===CHESS_SZ-1;
                 // Scramble: show random letter or settled real letter
                 const isScrambling=state==="scramble"||(state==="ending"&&scrambleGrid);
                 const settled=state==="scramble"&&scrambleStep>cellIdx;
@@ -4291,7 +4301,7 @@ export default function Piilosana(){
                       fontSize:isChessMode?"clamp(14px,4vw,22px)":(isLarge?"clamp(34px,10vw,56px)":"clamp(28px,8vw,48px)"),fontFamily:S.letterFont,fontWeight:S.cellGradient?"700":"normal",
                       letterSpacing:S.cellGradient?"1px":"0",
                       color:eaten?endColor||"transparent":scrambleColor||(chessIsPos?"#ddaa33":chessInPath?"#ddaa33":chessIsInvalid?"#ff4444":s?(S.cellTextSel||"#0f1720"):otherSelColor||(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":S.green)))),
-                      background:eaten?(S.gridBg||"#111133"):chessIsPos?"#ddaa3355":chessInPath?"#ddaa3330":chessIsValid?"#ddaa3320":chessIsInvalid?"#ff444433":(isChessMode&&chessPlacing&&chessEdge)?"#ddaa3318":isChessMode?(chessSquareLight?"#2a2a3a":"#1a1a28"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":(soloMode==="bomb"&&bombCell&&r===bombCell.r&&c===bombCell.c)?`linear-gradient(135deg, #ff444433 0%, #ff880033 100%)`:(soloMode==="mystery"&&mysteryCell&&r===mysteryCell.r&&c===mysteryCell.c&&!mysteryRevealed)?`linear-gradient(135deg, #aa66ff33 0%, #6644ff33 100%)`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
+                      background:eaten?(S.gridBg||"#111133"):chessIsPos?"#ddaa3355":chessInPath?"#ddaa3330":chessIsValid?"#ddaa3320":chessIsInvalid?"#ff444433":(isChessMode&&chessPlacing&&chessBottomRow)?"#ddaa3322":isChessMode?(chessSquareLight?"#2a2a3a":"#1a1a28"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":(soloMode==="bomb"&&bombCell&&r===bombCell.r&&c===bombCell.c)?`linear-gradient(135deg, #ff444433 0%, #ff880033 100%)`:(soloMode==="mystery"&&mysteryCell&&r===mysteryCell.r&&c===mysteryCell.c&&!mysteryRevealed)?`linear-gradient(135deg, #aa66ff33 0%, #6644ff33 100%)`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
                       border:chessIsPos?`2px solid #ddaa33`:chessIsValid?`2px dashed #ddaa3366`:chessIsInvalid?`2px solid #ff4444`:chessInPath?`2px solid #ddaa3355`:S.cellGradient?`1px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
                       borderRadius:S.cellRadius,
                       cursor:state==="play"?(rotateActive?"grab":"pointer"):"default",transition:isScrambling?"color 0.07s, transform 0.15s":(S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s"),transform:cellTransform,
@@ -4304,12 +4314,18 @@ export default function Piilosana(){
                     {eaten?"":<>
                       {/* Mystery mode: show ? for hidden cell */}
                       {soloMode==="mystery"&&mysteryCell&&r===mysteryCell.r&&c===mysteryCell.c&&!mysteryRevealed&&!isScrambling?"?":displayLetter}
-                      {/* Chess: large white piece on current position */}
-                      {chessIsPos&&chessPiece&&!isScrambling&&<span style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"clamp(18px,5vw,30px)",lineHeight:1,color:"#fff",filter:"drop-shadow(0 0 6px #ddaa33) drop-shadow(0 2px 3px #000)",zIndex:2,pointerEvents:"none"}}>{CHESS_EMOJI[chessPiece]}</span>}
+                      {/* Chess: glass piece overlay on current position — letter shows through */}
+                      {chessIsPos&&chessPiece&&!isScrambling&&(
+                        <span style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"clamp(20px,6vw,34px)",lineHeight:1,zIndex:2,pointerEvents:"none",
+                          color:"transparent",WebkitTextStroke:"1.5px rgba(255,255,255,0.8)",
+                          filter:"drop-shadow(0 0 8px #ddaa3388) drop-shadow(0 1px 2px #000a)",
+                          background:"radial-gradient(circle, rgba(221,170,51,0.15) 0%, rgba(221,170,51,0.05) 70%, transparent 100%)",
+                          borderRadius:"inherit"}}>{CHESS_EMOJI[chessPiece]}</span>
+                      )}
                       {/* Chess: dot on valid moves */}
                       {chessIsValid&&!isScrambling&&<span style={{position:"absolute",width:"clamp(6px,2vw,10px)",height:"clamp(6px,2vw,10px)",borderRadius:"50%",background:"#ddaa33",opacity:0.5,zIndex:1,pointerEvents:"none"}}/>}
-                      {/* Chess: placing phase — glow on edge cells */}
-                      {isChessMode&&chessPlacing&&chessEdge&&!isScrambling&&<span style={{position:"absolute",inset:0,borderRadius:"inherit",boxShadow:"inset 0 0 8px #ddaa3344",pointerEvents:"none"}}/>}
+                      {/* Chess: placing phase — glow on bottom row cells */}
+                      {isChessMode&&chessPlacing&&chessBottomRow&&!isScrambling&&<span style={{position:"absolute",inset:0,borderRadius:"inherit",boxShadow:"inset 0 0 10px #ddaa3355, 0 0 6px #ddaa3333",pointerEvents:"none"}}/>}
                       {letterMult&&!isScrambling&&<span style={{position:"absolute",bottom:"1px",right:"3px",fontSize:"clamp(9px,2.5vw,13px)",fontFamily:"'Press Start 2P',monospace",color:letterColor(letter,lang),opacity:0.7,lineHeight:1}}>{getLetterValues(lang)[letter]||1}</span>}
                       {/* Bomb indicator */}
                       {soloMode==="bomb"&&bombCell&&r===bombCell.r&&c===bombCell.c&&!isScrambling&&<span style={{position:"absolute",top:"-2px",right:"-2px",fontSize:"clamp(10px,3vw,16px)",animation:bombTimer<=5?"epicPulse 0.4s infinite":"none",lineHeight:1}}>💣</span>}
