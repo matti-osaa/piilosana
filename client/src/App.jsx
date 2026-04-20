@@ -682,71 +682,94 @@ function useMusic(){
     await Tone.start();
     startedRef.current=true;
 
-    // Soft piano — warm sine with gentle attack
-    const piano=new Tone.PolySynth(Tone.Synth,{
-      oscillator:{type:"sine"},
-      envelope:{attack:0.08,decay:2.5,sustain:0.0,release:3.5},
-      volume:-20
+    // Soft synth lead — warm, dreamy, slightly bouncy
+    const synth=new Tone.PolySynth(Tone.Synth,{
+      oscillator:{type:"fatsine3",spread:12},
+      envelope:{attack:0.05,decay:0.6,sustain:0.2,release:1.8},
+      volume:-19
     }).toDestination();
 
-    // Bell — high, ethereal triangle tones
+    // Bell / sparkle — bright, playful
     const bell=new Tone.Synth({
       oscillator:{type:"triangle"},
-      envelope:{attack:0.01,decay:3,sustain:0.0,release:4},
-      volume:-24
+      envelope:{attack:0.005,decay:1.5,sustain:0.0,release:2},
+      volume:-22
     }).toDestination();
 
-    // Pad — very soft, slow-breathing background
+    // Pad — warm, wider, slightly brighter
     const pad=new Tone.PolySynth(Tone.Synth,{
-      oscillator:{type:"sine"},
-      envelope:{attack:3,decay:3,sustain:0.3,release:5},
-      volume:-30
+      oscillator:{type:"fatsine2",spread:20},
+      envelope:{attack:1.5,decay:2,sustain:0.35,release:3},
+      volume:-27
     }).toDestination();
 
-    // C-pentatonic notes across octaves
-    const pianoNotes=["C4","D4","E4","G4","A4","C5","D5","E5","G5","A5"];
-    const bellNotes=["E5","G5","C6","D6","E6"];
+    // Pluck bass — gentle rhythmic pulse
+    const bass=new Tone.Synth({
+      oscillator:{type:"sine"},
+      envelope:{attack:0.02,decay:0.8,sustain:0.0,release:1.2},
+      volume:-25
+    }).toDestination();
+
+    // C-pentatonic notes — upbeat range
+    const synthNotes=["C4","D4","E4","G4","A4","C5","D5","E5","G5","A5"];
+    const bellNotes=["E5","G5","A5","C6","D6","E6"];
+    const bassNotes=["C2","G2","A2","C3","D3"];
     const padChords=[
-      ["C3","G3","C4"],
-      ["A2","E3","A3"],
-      ["G2","D3","G3"],
-      ["C3","E3","G3"],
+      ["C3","E3","G3","C4"],
+      ["A2","C3","E3","A3"],
+      ["G2","B2","D3","G3"],
+      ["D3","G3","A3","D4"],
+      ["C3","E3","G3","C4"],
     ];
 
-    // Piano: sparse single notes with lots of silence
-    let pianoStep=0;
-    const pianoLoop=new Tone.Loop((time)=>{
-      // ~40% chance to play, lots of breathing room
-      if(Math.random()<0.4){
-        const note=pianoNotes[Math.floor(Math.random()*pianoNotes.length)];
-        piano.triggerAttackRelease(note,"2n",time);
+    // Synth melody: more frequent, playful pattern
+    let synthStep=0;
+    const synthLoop=new Tone.Loop((time)=>{
+      // 60% chance — busier but still breathing
+      if(Math.random()<0.6){
+        const note=synthNotes[Math.floor(Math.random()*synthNotes.length)];
+        synth.triggerAttackRelease(note,"4n",time);
+        // 30% chance of a quick follow-up note for bounce
+        if(Math.random()<0.3){
+          const note2=synthNotes[Math.floor(Math.random()*synthNotes.length)];
+          synth.triggerAttackRelease(note2,"8n",time+0.18);
+        }
       }
-      pianoStep++;
-    },"2n"); // every half note at slow tempo
+      synthStep++;
+    },"4n"); // every quarter note — more movement
 
-    // Bell: very rare high sparkles
+    // Bell: playful sparkles, more frequent
     const bellLoop=new Tone.Loop((time)=>{
-      if(Math.random()<0.25){
+      if(Math.random()<0.4){
         const note=bellNotes[Math.floor(Math.random()*bellNotes.length)];
-        bell.triggerAttackRelease(note,"1n",time);
+        bell.triggerAttackRelease(note,"2n",time);
       }
-    },"1m"); // once per measure
+    },"2n"); // every half note
 
-    // Pad: slow chord changes
+    // Bass: gentle pulse on beats
+    const bassLoop=new Tone.Loop((time)=>{
+      if(Math.random()<0.5){
+        const note=bassNotes[Math.floor(Math.random()*bassNotes.length)];
+        bass.triggerAttackRelease(note,"8n",time);
+      }
+    },"2n");
+
+    // Pad: chord changes every measure — more harmonic movement
     let padIdx=0;
     const padLoop=new Tone.Loop((time)=>{
       const ch=padChords[padIdx%padChords.length];
-      pad.triggerAttackRelease(ch,"2m",time);
+      pad.triggerAttackRelease(ch,"1m",time);
       padIdx++;
-    },"2m"); // every 2 measures
+    },"1m"); // every measure
 
-    Tone.Transport.bpm.value=56; // very slow, meditative
+    Tone.Transport.bpm.value=72; // upbeat but still chill
     padLoop.start(0);
-    pianoLoop.start("1m"); // piano enters after first pad chord
-    bellLoop.start("2m"); // bells enter even later
+    bassLoop.start(0);
+    synthLoop.start("1m"); // synth enters after first pad
+    bellLoop.start("1m"); // bells enter with synth
     Tone.Transport.start();
 
-    partsRef.current={piano,bell,pad,pianoLoop,bellLoop,padLoop};
+    partsRef.current={synth,bell,pad,bass,synthLoop,bellLoop,bassLoop,padLoop};
   },[]);
 
   const stop=useCallback(()=>{
@@ -754,14 +777,16 @@ function useMusic(){
     startedRef.current=false;
     const p=partsRef.current;
     if(p){
-      p.pianoLoop.stop();p.bellLoop.stop();p.padLoop.stop();
+      p.synthLoop.stop();p.bellLoop.stop();p.bassLoop.stop();p.padLoop.stop();
       Tone.Transport.stop();
       setTimeout(()=>{
-        try{p.piano.dispose();}catch{}
+        try{p.synth.dispose();}catch{}
         try{p.bell.dispose();}catch{}
         try{p.pad.dispose();}catch{}
-        try{p.pianoLoop.dispose();}catch{}
+        try{p.bass.dispose();}catch{}
+        try{p.synthLoop.dispose();}catch{}
         try{p.bellLoop.dispose();}catch{}
+        try{p.bassLoop.dispose();}catch{}
         try{p.padLoop.dispose();}catch{}
       },500);
       partsRef.current=null;
@@ -2958,7 +2983,7 @@ export default function Piilosana(){
 
       {/* Two smaller buttons side by side */}
       <div style={{display:"flex",gap:"8px"}}>
-        <button onClick={()=>startSolo("normal",120)} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.green,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.green,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
           onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #008844"}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844"}}>
           <span>{t.practice}</span>
@@ -2973,12 +2998,12 @@ export default function Piilosana(){
       </div>
 
       {/* Expandable solo options under the smaller buttons */}
-      <button onClick={()=>setShowMenuOptions(v=>!v)} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",display:"flex",alignItems:"center",gap:"4px",margin:"0 auto",marginTop:"4px"}}>
-        <span style={{transform:showMenuOptions?"rotate(90deg)":"rotate(0deg)",transition:"transform 0.2s",display:"inline-block"}}>▶</span>
-        {t.advancedOptions}
-      </button>
       {showMenuOptions&&(
-        <div style={{padding:"16px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"4px",animation:"fadeIn 0.3s ease",borderRadius:S.panelRadius}}>
+        <div style={{padding:"16px",border:`2px solid ${S.green}`,background:S.dark,marginTop:"8px",marginBottom:"4px",animation:"fadeIn 0.3s ease",borderRadius:S.panelRadius}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
+            <div style={{fontSize:"14px",color:S.green,fontFamily:S.font,fontWeight:"700"}}>{t.practice}</div>
+            <button onClick={()=>setShowMenuOptions(false)} style={{fontFamily:S.font,fontSize:"16px",color:S.textMuted,background:"transparent",border:"none",cursor:"pointer",padding:"2px 6px"}}>✕</button>
+          </div>
           <div style={{marginBottom:"12px"}}>
             <div style={{fontSize:"13px",color:S.green,marginBottom:"6px"}}>{t.gameMode}</div>
             <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap"}}>
@@ -3007,7 +3032,9 @@ export default function Piilosana(){
               {letterMult?"✓ ":""}{t.letterMultBtn}
             </button>
           </div>
-          <button onClick={()=>startSolo()} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844",borderRadius:S.btnRadius,marginTop:"14px"}}>{t.practice}</button>
+          <button onClick={()=>{startSolo();setShowMenuOptions(false);}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"14px 32px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844",borderRadius:S.btnRadius,marginTop:"14px",width:"100%",letterSpacing:"2px"}}
+            onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #008844"}}
+            onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844"}}>▶ {t.startGame||"ALOITA"}</button>
         </div>
       )}
 
