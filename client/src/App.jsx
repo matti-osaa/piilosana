@@ -1899,8 +1899,9 @@ export default function Piilosana(){
   const[gameMode,setGameMode]=useState("classic"); // 'classic' or 'battle'
 
   // Rotate mode state
-  const[rotateAnim,setRotateAnim]=useState(null); // {type:'row'|'col', idx, dir, progress}
+  const[rotateAnim,setRotateAnim]=useState(null); // {type:'row'|'col', idx, dir}
   const[rotateCount,setRotateCount]=useState(0);
+  const[rotateActive,setRotateActive]=useState(false); // toggle: false=word mode, true=rotate mode
 
   // Theme mode state
   const[activeTheme,setActiveTheme]=useState(null); // {name, words}
@@ -2075,7 +2076,7 @@ export default function Piilosana(){
     setEnding(null);setEndingProgress(0);setDropKey(0);
 
     // Mode-specific initialization
-    if(sm==="rotate"){setRotateAnim(null);setRotateCount(0);}
+    if(sm==="rotate"){setRotateAnim(null);setRotateCount(0);setRotateActive(false);}
     if(sm==="theme"){
       const themes=WORD_THEMES[lang]||WORD_THEMES.fi;
       const theme=themes[Math.floor(Math.random()*themes.length)];
@@ -2248,65 +2249,61 @@ export default function Piilosana(){
     return()=>clearInterval(iv);
   },[state,soloMode,bombCell,lang,trie,sounds,addPopup]);
 
-  // Rotate mode: drag-to-rotate handler
+  // Rotate mode: drag on grid cells to rotate row/column when rotateActive
   const rotateDragRef=useRef(null);
   useEffect(()=>{
-    if(state!=="play"||soloMode!=="rotate")return;
-    const gridEl=gRef.current?.parentElement;
+    if(state!=="play"||soloMode!=="rotate"||!rotateActive)return;
+    const gridEl=gRef.current;
     if(!gridEl)return;
-    const THRESHOLD=30; // px to trigger rotation
+    const THRESHOLD=25;
     const onDown=(e)=>{
-      const t=e.target.closest("[data-rotate-row],[data-rotate-col]");
-      if(!t)return;
       e.preventDefault();
-      const rowIdx=t.dataset.rotateRow!==undefined?parseInt(t.dataset.rotateRow):null;
-      const colIdx=t.dataset.rotateCol!==undefined?parseInt(t.dataset.rotateCol):null;
+      // Find which cell was touched
+      const cell=e.target.closest("[data-c]");
+      if(!cell)return;
+      const[rr,cc]=cell.dataset.c.split(",").map(Number);
       const px=e.touches?e.touches[0].clientX:e.clientX;
       const py=e.touches?e.touches[0].clientY:e.clientY;
-      rotateDragRef.current={rowIdx,colIdx,startX:px,startY:py,done:false};
+      rotateDragRef.current={row:rr,col:cc,startX:px,startY:py,done:false};
     };
     const onMove=(e)=>{
       const d=rotateDragRef.current;
       if(!d||d.done)return;
+      e.preventDefault();
       const px=e.touches?e.touches[0].clientX:e.clientX;
       const py=e.touches?e.touches[0].clientY:e.clientY;
       const dx=px-d.startX,dy=py-d.startY;
-      if(d.rowIdx!==null&&Math.abs(dx)>THRESHOLD){
+      // Determine if horizontal (row rotate) or vertical (col rotate)
+      if(Math.abs(dx)>THRESHOLD&&Math.abs(dx)>Math.abs(dy)){
         d.done=true;
         const dir=dx>0?1:-1;
-        const anim={type:"row",idx:d.rowIdx,dir};
-        setRotateAnim(anim);
+        setRotateAnim({type:"row",idx:d.row,dir});
         sounds.playSlide();
         setTimeout(()=>{
           setGrid(g=>{
-            const ng=rotateRow(g,d.rowIdx,dir);
-            const nv=findWords(ng,trie);
-            setValid(nv);
+            const ng=rotateRow(g,d.row,dir);
+            const nv=findWords(ng,trie);setValid(nv);
             return ng;
           });
-          setRotateCount(n=>n+1);
-          setRotateAnim(null);
+          setRotateCount(n=>n+1);setRotateAnim(null);
         },300);
-      }
-      if(d.colIdx!==null&&Math.abs(dy)>THRESHOLD){
+      }else if(Math.abs(dy)>THRESHOLD&&Math.abs(dy)>Math.abs(dx)){
         d.done=true;
         const dir=dy>0?1:-1;
-        const anim={type:"col",idx:d.colIdx,dir};
-        setRotateAnim(anim);
+        setRotateAnim({type:"col",idx:d.col,dir});
         sounds.playSlide();
         setTimeout(()=>{
           setGrid(g=>{
-            const ng=rotateCol(g,d.colIdx,dir);
-            const nv=findWords(ng,trie);
-            setValid(nv);
+            const ng=rotateCol(g,d.col,dir);
+            const nv=findWords(ng,trie);setValid(nv);
             return ng;
           });
-          setRotateCount(n=>n+1);
-          setRotateAnim(null);
+          setRotateCount(n=>n+1);setRotateAnim(null);
         },300);
       }
     };
     const onUp=()=>{rotateDragRef.current=null;};
+    const onCtx=(e)=>{e.preventDefault();}; // block right-click menu
     gridEl.addEventListener("pointerdown",onDown,{passive:false});
     gridEl.addEventListener("pointermove",onMove,{passive:false});
     gridEl.addEventListener("pointerup",onUp);
@@ -2314,6 +2311,7 @@ export default function Piilosana(){
     gridEl.addEventListener("touchstart",onDown,{passive:false});
     gridEl.addEventListener("touchmove",onMove,{passive:false});
     gridEl.addEventListener("touchend",onUp);
+    gridEl.addEventListener("contextmenu",onCtx);
     return()=>{
       gridEl.removeEventListener("pointerdown",onDown);
       gridEl.removeEventListener("pointermove",onMove);
@@ -2322,8 +2320,9 @@ export default function Piilosana(){
       gridEl.removeEventListener("touchstart",onDown);
       gridEl.removeEventListener("touchmove",onMove);
       gridEl.removeEventListener("touchend",onUp);
+      gridEl.removeEventListener("contextmenu",onCtx);
     };
-  },[state,soloMode,trie,sounds,lang]);
+  },[state,soloMode,rotateActive,trie,sounds]);
 
   // Track achievements when game ends
   useEffect(()=>{
@@ -2523,7 +2522,7 @@ export default function Piilosana(){
   const activeGrid=mode==="multi"?currentMultiGrid:grid;
 
   // Drag handlers
-  const onDragStart=useCallback((r,c)=>{if(state!=="play")return;setDragging(true);const s=[{r,c}];setSel(s);selRef.current=s;setWord(activeGrid[r]?.[c]||"");setMsg(null);
+  const onDragStart=useCallback((r,c)=>{if(state!=="play"||rotateActive)return;setDragging(true);const s=[{r,c}];setSel(s);selRef.current=s;setWord(activeGrid[r]?.[c]||"");setMsg(null);
     // Battle mode: broadcast selection start
     if(mode==="multi"&&gameMode==="battle"&&socket)socket.emit("battle_selection",{cells:[{r,c}]});
   },[state,activeGrid,mode,gameMode,socket]);
@@ -3950,7 +3949,20 @@ export default function Piilosana(){
             {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {publicPlayerCount===1?t.player:t.players}</div>}
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
-            {mode==="solo"&&soloMode==="rotate"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff9900",background:"#ff990011",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>🔄 {t.rotateLabel} — {rotateCount} {lang==="en"?"moves":lang==="sv"?"drag":"siirtoa"}</div>}
+            {mode==="solo"&&soloMode==="rotate"&&(
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",padding:"4px",
+                background:rotateActive?"#ff990022":"#ff990008",borderBottom:`1px solid ${S.border}`,transition:"background 0.2s"}}>
+                <button onClick={()=>setRotateActive(a=>!a)}
+                  style={{fontFamily:S.font,fontSize:"13px",padding:"4px 14px",cursor:"pointer",borderRadius:S.btnRadius,
+                    border:rotateActive?"2px solid #ff9900":`2px solid ${S.border}`,
+                    background:rotateActive?"#ff9900":"transparent",
+                    color:rotateActive?S.bg:"#ff9900",
+                    transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px"}}>
+                  {rotateActive?"🔄":"✋"} {rotateActive?(lang==="en"?"ROTATING":lang==="sv"?"ROTERA":"PYÖRITÄ"):(lang==="en"?"FIND WORDS":lang==="sv"?"HITTA ORD":"ETSI SANOJA")}
+                </button>
+                <span style={{fontSize:"13px",color:"#ff990088"}}>{rotateCount>0?`${rotateCount} ${lang==="en"?"moves":lang==="sv"?"drag":"siirtoa"}`:""}</span>
+              </div>
+            )}
             {mode==="solo"&&soloMode==="theme"&&activeTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44bb66",background:"#44bb6611",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>{activeTheme.emoji} {t.themeHint}: {activeTheme.name} — {themeFound.length}/{activeTheme.words.length}</div>}
             {mode==="solo"&&soloMode==="bomb"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff4444",background:"#ff444411",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>💣 {t.bombLabel} — {bombTimer}s</div>}
             {mode==="solo"&&soloMode==="mystery"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#aa66ff",background:"#aa66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>❓ {t.mysteryLabel}</div>}
@@ -4057,7 +4069,7 @@ export default function Piilosana(){
                       background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":(soloMode==="bomb"&&bombCell&&r===bombCell.r&&c===bombCell.c)?`linear-gradient(135deg, #ff444433 0%, #ff880033 100%)`:(soloMode==="mystery"&&mysteryCell&&r===mysteryCell.r&&c===mysteryCell.c&&!mysteryRevealed)?`linear-gradient(135deg, #aa66ff33 0%, #6644ff33 100%)`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
                       border:S.cellGradient?`1px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
                       borderRadius:S.cellRadius,
-                      cursor:state==="play"?"pointer":"default",transition:isScrambling?"color 0.07s, transform 0.15s":(S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s"),transform:cellTransform,
+                      cursor:state==="play"?(rotateActive?"grab":"pointer"):"default",transition:isScrambling?"color 0.07s, transform 0.15s":(S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s"),transform:cellTransform,
                       boxShadow:eaten?"none":isScrambling&&settled?`0 0 12px ${S.green}66`:(s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:S.cellShadow),
                       textTransform:"uppercase",textShadow:isScrambling&&!settled?`0 0 8px ${scrambleColor}88`:(s||eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${otherSelColor||(letterMult?letterColor(letter,lang):S.green)}44`),
                       animation:eaten?endAnim:useDropAnim?`cellDrop 0.3s ${c*0.03}s ease-out`:(rotateAnim&&((rotateAnim.type==="row"&&rotateAnim.idx===r)||(rotateAnim.type==="col"&&rotateAnim.idx===c)))?`${rotateAnim.type==="row"?(rotateAnim.dir>0?"rotateRowRight":"rotateRowLeft"):(rotateAnim.dir>0?"rotateColDown":"rotateColUp")} 0.3s ease-out`:(isScrambling&&settled?"pop 0.2s ease":"none"),
@@ -4078,26 +4090,11 @@ export default function Piilosana(){
               }))}
             </div>
             {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true}/>}
-            {/* Rotate mode: drag zones on edges for row/column rotation */}
-            {soloMode==="rotate"&&state==="play"&&(
-              <>
-                {/* Left edge: drag zones for rows */}
-                {Array.from({length:SZ}).map((_,r)=>(
-                  <div key={`rl${r}`} data-rotate-row={r}
-                    style={{position:"absolute",left:"-24px",top:`${(r/SZ)*100}%`,height:`${100/SZ}%`,width:"22px",
-                      display:"flex",alignItems:"center",justifyContent:"center",cursor:"grab",
-                      fontSize:"13px",color:"#ff990088",borderRadius:"4px",background:"#ff990011",
-                      border:"1px solid #ff990033",userSelect:"none",touchAction:"none"}}>⟷</div>
-                ))}
-                {/* Top edge: drag zones for columns */}
-                {Array.from({length:SZ}).map((_,c)=>(
-                  <div key={`rt${c}`} data-rotate-col={c}
-                    style={{position:"absolute",top:"-24px",left:`${(c/SZ)*100}%`,width:`${100/SZ}%`,height:"22px",
-                      display:"flex",alignItems:"center",justifyContent:"center",cursor:"grab",
-                      fontSize:"13px",color:"#ff990088",borderRadius:"4px",background:"#ff990011",
-                      border:"1px solid #ff990033",userSelect:"none",touchAction:"none"}}>⟷</div>
-                ))}
-              </>
+            {/* Rotate mode: visual overlay when in rotate-active state */}
+            {soloMode==="rotate"&&state==="play"&&rotateActive&&(
+              <div style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:10,
+                border:"3px solid #ff9900",borderRadius:S.cellRadius!=="0px"?"16px":"0px",
+                boxShadow:"inset 0 0 20px #ff990033, 0 0 20px #ff990022"}}/>
             )}
           </div>
 
