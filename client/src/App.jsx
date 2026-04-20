@@ -141,7 +141,7 @@ const T={
     letterMult:"PISTEYTYS",letterMultBtn:"KIRJAINARVOT",letterMultDesc:"Harvinaiset kirjaimet = enemmän pisteitä! (D,Ö=7 V,J,H,Y,P,U=4 ...)",
     otherOptions:"MUUT VALINNAT",nickForHof:"NIMIMERKKI (ennätystauluun)",optional:"VAPAAEHTOINEN",scoresSaved:"Pisteesi tallennetaan nimellä",
     modeNormal:"NORMAALI",modeTetris:"PUDOTUS",tetrisDesc:"Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä!",
-    modeRotate:"PYÖRITYS",rotateDesc:"Pyöritä rivejä ja sarakkeita löytääksesi uusia sanoja!",rotateStarts:"PYÖRITYS ALKAA",rotateLabel:"PYÖRITYS",movesLeft:"siirtoa jäljellä",
+    modeRotate:"PYÖRITYS",rotateDesc:"Raahaa reunoilta pyörittääksesi rivejä ja sarakkeita — kuin kuutiota! Löydä uusia sanoja.",rotateStarts:"PYÖRITYS ALKAA",rotateLabel:"PYÖRITYS",
     modeTheme:"TEEMAT",themeDesc:"Löydä teemaan kuuluvia sanoja bonuspisteillä!",themeStarts:"TEEMAT ALKAA",themeLabel:"TEEMAT",themeBonus:"TEEMABONUS",themeHint:"Teema",
     modeBomb:"POMMI",bombDesc:"Käytä tikittävä kirjain sanassa ennen kuin se räjähtää!",bombStarts:"POMMI ALKAA",bombLabel:"POMMI",bombExploded:"POMMI RÄJÄHTI!",
     modeMystery:"MYSTEERI",mysteryDesc:"Piilotettu kirjain paljastuu kun löydät sanan sen kautta!",mysteryStarts:"MYSTEERI ALKAA",mysteryLabel:"MYSTEERI",mysteryRevealed:"PALJASTETTU!",
@@ -194,7 +194,7 @@ const T={
     letterMult:"SCORING",letterMultBtn:"LETTER VALUES",letterMultDesc:"Rare letters = more points! (Q,Z=10 J,X=8 K=5 ...)",
     otherOptions:"OTHER OPTIONS",nickForHof:"NICKNAME (for leaderboard)",optional:"OPTIONAL",scoresSaved:"Your score will be saved as",
     modeNormal:"NORMAL",modeTetris:"DROP",tetrisDesc:"Found letters disappear and new ones drop from above!",
-    modeRotate:"ROTATE",rotateDesc:"Rotate rows and columns to find new words!",rotateStarts:"ROTATE STARTS",rotateLabel:"ROTATE",movesLeft:"moves left",
+    modeRotate:"ROTATE",rotateDesc:"Drag edges to rotate rows and columns — like a cube! Find new words.",rotateStarts:"ROTATE STARTS",rotateLabel:"ROTATE",
     modeTheme:"THEMES",themeDesc:"Find themed words for bonus points!",themeStarts:"THEMES START",themeLabel:"THEMES",themeBonus:"THEME BONUS",themeHint:"Theme",
     modeBomb:"BOMB",bombDesc:"Use the ticking letter in a word before it explodes!",bombStarts:"BOMB STARTS",bombLabel:"BOMB",bombExploded:"BOMB EXPLODED!",
     modeMystery:"MYSTERY",mysteryDesc:"A hidden letter is revealed when you find a word through it!",mysteryStarts:"MYSTERY STARTS",mysteryLabel:"MYSTERY",mysteryRevealed:"REVEALED!",
@@ -247,7 +247,7 @@ const T={
     letterMult:"POÄNGSÄTTNING",letterMultBtn:"BOKSTAVSVÄRDEN",letterMultDesc:"Ovanliga bokstäver = mer poäng! (Z=10 X=8 J=7 ...)",
     otherOptions:"ANDRA VAL",nickForHof:"SMEKNAMN (för topplistan)",optional:"VALFRITT",scoresSaved:"Dina poäng sparas som",
     modeNormal:"NORMAL",modeTetris:"FALL",tetrisDesc:"Hittade bokstäver försvinner och nya faller uppifrån!",
-    modeRotate:"ROTERA",rotateDesc:"Rotera rader och kolumner för att hitta nya ord!",rotateStarts:"ROTERA BÖRJAR",rotateLabel:"ROTERA",movesLeft:"drag kvar",
+    modeRotate:"ROTERA",rotateDesc:"Dra i kanterna för att rotera rader och kolumner — som en kub! Hitta nya ord.",rotateStarts:"ROTERA BÖRJAR",rotateLabel:"ROTERA",
     modeTheme:"TEMAN",themeDesc:"Hitta temaord för bonuspoäng!",themeStarts:"TEMAN BÖRJAR",themeLabel:"TEMAN",themeBonus:"TEMABONUS",themeHint:"Tema",
     modeBomb:"BOMB",bombDesc:"Använd den tickande bokstaven i ett ord innan den exploderar!",bombStarts:"BOMB BÖRJAR",bombLabel:"BOMB",bombExploded:"BOMBEN EXPLODERADE!",
     modeMystery:"MYSTERIUM",mysteryDesc:"En dold bokstav avslöjas när du hittar ett ord genom den!",mysteryStarts:"MYSTERIUM BÖRJAR",mysteryLabel:"MYSTERIUM",mysteryRevealed:"AVSLÖJAD!",
@@ -656,8 +656,16 @@ function useSounds(soundTheme){
     btnNoiseRef.current.triggerAttackRelease("32n");
     notes.btnBass(n).forEach(args=>bassRef.current.triggerAttackRelease(...args));
   },[getNotes]);
+  // Stone slide sound for rotate mode
+  const playSlide=useCallback(()=>{
+    if(!btnNoiseRef.current||!bassRef.current)return;
+    const n=Tone.now();
+    btnNoiseRef.current.triggerAttackRelease("8n",n);
+    bassRef.current.triggerAttackRelease("E1","8n",n,0.3);
+    bassRef.current.triggerAttackRelease("G1","16n",n+0.08,0.2);
+  },[]);
 
-  const api=useMemo(()=>({init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn}),[init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn]);
+  const api=useMemo(()=>({init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn,playSlide}),[init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn,playSlide]);
   return api;
 }
 
@@ -1877,7 +1885,7 @@ export default function Piilosana(){
     if(soundTheme==="off")return{
       init:async()=>{},playByLength:()=>{},playCombo:()=>{},playWrong:()=>{},
       playTick:()=>{},playCountdown:()=>{},playGo:()=>{},playEnding:()=>{},
-      playChomp:()=>{},playBtn:()=>{},reinit:async()=>{}
+      playChomp:()=>{},playBtn:()=>{},playSlide:()=>{},reinit:async()=>{}
     };
     return rawSounds;
   },[soundTheme,rawSounds]);
@@ -1891,7 +1899,8 @@ export default function Piilosana(){
   const[gameMode,setGameMode]=useState("classic"); // 'classic' or 'battle'
 
   // Rotate mode state
-  const[rotatesLeft,setRotatesLeft]=useState(0);
+  const[rotateAnim,setRotateAnim]=useState(null); // {type:'row'|'col', idx, dir, progress}
+  const[rotateCount,setRotateCount]=useState(0);
 
   // Theme mode state
   const[activeTheme,setActiveTheme]=useState(null); // {name, words}
@@ -2066,7 +2075,7 @@ export default function Piilosana(){
     setEnding(null);setEndingProgress(0);setDropKey(0);
 
     // Mode-specific initialization
-    if(sm==="rotate"){setRotatesLeft(5);}
+    if(sm==="rotate"){setRotateAnim(null);setRotateCount(0);}
     if(sm==="theme"){
       const themes=WORD_THEMES[lang]||WORD_THEMES.fi;
       const theme=themes[Math.floor(Math.random()*themes.length)];
@@ -2238,6 +2247,83 @@ export default function Piilosana(){
     },1000);
     return()=>clearInterval(iv);
   },[state,soloMode,bombCell,lang,trie,sounds,addPopup]);
+
+  // Rotate mode: drag-to-rotate handler
+  const rotateDragRef=useRef(null);
+  useEffect(()=>{
+    if(state!=="play"||soloMode!=="rotate")return;
+    const gridEl=gRef.current?.parentElement;
+    if(!gridEl)return;
+    const THRESHOLD=30; // px to trigger rotation
+    const onDown=(e)=>{
+      const t=e.target.closest("[data-rotate-row],[data-rotate-col]");
+      if(!t)return;
+      e.preventDefault();
+      const rowIdx=t.dataset.rotateRow!==undefined?parseInt(t.dataset.rotateRow):null;
+      const colIdx=t.dataset.rotateCol!==undefined?parseInt(t.dataset.rotateCol):null;
+      const px=e.touches?e.touches[0].clientX:e.clientX;
+      const py=e.touches?e.touches[0].clientY:e.clientY;
+      rotateDragRef.current={rowIdx,colIdx,startX:px,startY:py,done:false};
+    };
+    const onMove=(e)=>{
+      const d=rotateDragRef.current;
+      if(!d||d.done)return;
+      const px=e.touches?e.touches[0].clientX:e.clientX;
+      const py=e.touches?e.touches[0].clientY:e.clientY;
+      const dx=px-d.startX,dy=py-d.startY;
+      if(d.rowIdx!==null&&Math.abs(dx)>THRESHOLD){
+        d.done=true;
+        const dir=dx>0?1:-1;
+        const anim={type:"row",idx:d.rowIdx,dir};
+        setRotateAnim(anim);
+        sounds.playSlide();
+        setTimeout(()=>{
+          setGrid(g=>{
+            const ng=rotateRow(g,d.rowIdx,dir);
+            const nv=findWords(ng,trie);
+            setValid(nv);
+            return ng;
+          });
+          setRotateCount(n=>n+1);
+          setRotateAnim(null);
+        },300);
+      }
+      if(d.colIdx!==null&&Math.abs(dy)>THRESHOLD){
+        d.done=true;
+        const dir=dy>0?1:-1;
+        const anim={type:"col",idx:d.colIdx,dir};
+        setRotateAnim(anim);
+        sounds.playSlide();
+        setTimeout(()=>{
+          setGrid(g=>{
+            const ng=rotateCol(g,d.colIdx,dir);
+            const nv=findWords(ng,trie);
+            setValid(nv);
+            return ng;
+          });
+          setRotateCount(n=>n+1);
+          setRotateAnim(null);
+        },300);
+      }
+    };
+    const onUp=()=>{rotateDragRef.current=null;};
+    gridEl.addEventListener("pointerdown",onDown,{passive:false});
+    gridEl.addEventListener("pointermove",onMove,{passive:false});
+    gridEl.addEventListener("pointerup",onUp);
+    gridEl.addEventListener("pointercancel",onUp);
+    gridEl.addEventListener("touchstart",onDown,{passive:false});
+    gridEl.addEventListener("touchmove",onMove,{passive:false});
+    gridEl.addEventListener("touchend",onUp);
+    return()=>{
+      gridEl.removeEventListener("pointerdown",onDown);
+      gridEl.removeEventListener("pointermove",onMove);
+      gridEl.removeEventListener("pointerup",onUp);
+      gridEl.removeEventListener("pointercancel",onUp);
+      gridEl.removeEventListener("touchstart",onDown);
+      gridEl.removeEventListener("touchmove",onMove);
+      gridEl.removeEventListener("touchend",onUp);
+    };
+  },[state,soloMode,trie,sounds,lang]);
 
   // Track achievements when game ends
   useEffect(()=>{
@@ -3165,6 +3251,10 @@ export default function Piilosana(){
         @keyframes cellGlitch{0%{opacity:1;transform:translate(0,0)}25%{transform:translate(5px,-3px);filter:hue-rotate(90deg)}50%{transform:translate(-5px,3px);filter:hue-rotate(180deg)}75%{transform:translate(3px,5px);filter:hue-rotate(270deg)}100%{opacity:0;transform:translate(-10px,-10px);filter:hue-rotate(360deg)}}
         @keyframes cellShutterClose{0%{opacity:1;transform:scaleX(1)}30%{opacity:1;transform:scaleX(1.05)}60%{opacity:0.8;transform:scaleX(0.3)}100%{opacity:0;transform:scaleX(0);background:#3a2208}}
         @keyframes cellDrop{0%{transform:translateY(-100%);opacity:0.5}60%{transform:translateY(5%);opacity:1}80%{transform:translateY(-2%)}100%{transform:translateY(0)}}
+        @keyframes rotateRowRight{0%{transform:perspective(400px) rotateY(0deg)}40%{transform:perspective(400px) rotateY(45deg);opacity:0.6}60%{transform:perspective(400px) rotateY(-10deg);opacity:0.9}100%{transform:perspective(400px) rotateY(0deg);opacity:1}}
+        @keyframes rotateRowLeft{0%{transform:perspective(400px) rotateY(0deg)}40%{transform:perspective(400px) rotateY(-45deg);opacity:0.6}60%{transform:perspective(400px) rotateY(10deg);opacity:0.9}100%{transform:perspective(400px) rotateY(0deg);opacity:1}}
+        @keyframes rotateColDown{0%{transform:perspective(400px) rotateX(0deg)}40%{transform:perspective(400px) rotateX(-45deg);opacity:0.6}60%{transform:perspective(400px) rotateX(10deg);opacity:0.9}100%{transform:perspective(400px) rotateX(0deg);opacity:1}}
+        @keyframes rotateColUp{0%{transform:perspective(400px) rotateX(0deg)}40%{transform:perspective(400px) rotateX(45deg);opacity:0.6}60%{transform:perspective(400px) rotateX(-10deg);opacity:0.9}100%{transform:perspective(400px) rotateX(0deg);opacity:1}}
         @keyframes cellPop{0%{transform:scale(1)}50%{transform:scale(0);opacity:0}100%{transform:scale(0);opacity:0}}
         @keyframes bubbleIn{0%{opacity:0;transform:translateX(-50%) translateY(8px) scale(0.3)}30%{opacity:1;transform:translateX(-50%) translateY(-4px) scale(1.05)}50%{transform:translateX(-50%) translateY(2px) scale(0.97)}70%{transform:translateX(-50%) translateY(-1px) scale(1.01)}100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
         @keyframes bubbleOut{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}40%{opacity:0.8;transform:translateX(-50%) translateY(-3px) scale(1.03)}100%{opacity:0;transform:translateX(-50%) translateY(10px) scale(0.3)}}
@@ -3860,7 +3950,7 @@ export default function Piilosana(){
             {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {publicPlayerCount===1?t.player:t.players}</div>}
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
-            {mode==="solo"&&soloMode==="rotate"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff9900",background:"#ff990011",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>🔄 {t.rotateLabel} — {rotatesLeft} {t.movesLeft}</div>}
+            {mode==="solo"&&soloMode==="rotate"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff9900",background:"#ff990011",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>🔄 {t.rotateLabel} — {rotateCount} {lang==="en"?"moves":lang==="sv"?"drag":"siirtoa"}</div>}
             {mode==="solo"&&soloMode==="theme"&&activeTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44bb66",background:"#44bb6611",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>{activeTheme.emoji} {t.themeHint}: {activeTheme.name} — {themeFound.length}/{activeTheme.words.length}</div>}
             {mode==="solo"&&soloMode==="bomb"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff4444",background:"#ff444411",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>💣 {t.bombLabel} — {bombTimer}s</div>}
             {mode==="solo"&&soloMode==="mystery"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#aa66ff",background:"#aa66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>❓ {t.mysteryLabel}</div>}
@@ -3970,7 +4060,7 @@ export default function Piilosana(){
                       cursor:state==="play"?"pointer":"default",transition:isScrambling?"color 0.07s, transform 0.15s":(S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s"),transform:cellTransform,
                       boxShadow:eaten?"none":isScrambling&&settled?`0 0 12px ${S.green}66`:(s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:S.cellShadow),
                       textTransform:"uppercase",textShadow:isScrambling&&!settled?`0 0 8px ${scrambleColor}88`:(s||eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${otherSelColor||(letterMult?letterColor(letter,lang):S.green)}44`),
-                      animation:eaten?endAnim:useDropAnim?`cellDrop 0.3s ${c*0.03}s ease-out`:(isScrambling&&settled?"pop 0.2s ease":"none"),
+                      animation:eaten?endAnim:useDropAnim?`cellDrop 0.3s ${c*0.03}s ease-out`:(rotateAnim&&((rotateAnim.type==="row"&&rotateAnim.idx===r)||(rotateAnim.type==="col"&&rotateAnim.idx===c)))?`${rotateAnim.type==="row"?(rotateAnim.dir>0?"rotateRowRight":"rotateRowLeft"):(rotateAnim.dir>0?"rotateColDown":"rotateColUp")} 0.3s ease-out`:(isScrambling&&settled?"pop 0.2s ease":"none"),
                       "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
                       position:"relative",
                     }}>
@@ -3988,28 +4078,24 @@ export default function Piilosana(){
               }))}
             </div>
             {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true}/>}
-            {/* Rotate mode: arrow buttons on edges */}
-            {soloMode==="rotate"&&state==="play"&&rotatesLeft>0&&(
+            {/* Rotate mode: drag zones on edges for row/column rotation */}
+            {soloMode==="rotate"&&state==="play"&&(
               <>
-                {/* Right side: arrows to shift rows right */}
+                {/* Left edge: drag zones for rows */}
                 {Array.from({length:SZ}).map((_,r)=>(
-                  <button key={`rr${r}`} onClick={()=>{
-                    const ng=rotateRow(grid,r,1);setGrid(ng);
-                    const nv=findWords(ng,trie);setValid(nv);setFound([]);
-                    setRotatesLeft(n=>n-1);sounds.playBtn();
-                  }} style={{position:"absolute",right:"-28px",top:`${(r/SZ)*100+100/(SZ*2)}%`,transform:"translateY(-50%)",
-                    background:"#ff990044",border:"1px solid #ff990066",borderRadius:"50%",width:"22px",height:"22px",
-                    display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:"13px",color:"#ff9900",padding:0,lineHeight:1}}>→</button>
+                  <div key={`rl${r}`} data-rotate-row={r}
+                    style={{position:"absolute",left:"-24px",top:`${(r/SZ)*100}%`,height:`${100/SZ}%`,width:"22px",
+                      display:"flex",alignItems:"center",justifyContent:"center",cursor:"grab",
+                      fontSize:"13px",color:"#ff990088",borderRadius:"4px",background:"#ff990011",
+                      border:"1px solid #ff990033",userSelect:"none",touchAction:"none"}}>⟷</div>
                 ))}
-                {/* Bottom: arrows to shift columns down */}
+                {/* Top edge: drag zones for columns */}
                 {Array.from({length:SZ}).map((_,c)=>(
-                  <button key={`rc${c}`} onClick={()=>{
-                    const ng=rotateCol(grid,c,1);setGrid(ng);
-                    const nv=findWords(ng,trie);setValid(nv);setFound([]);
-                    setRotatesLeft(n=>n-1);sounds.playBtn();
-                  }} style={{position:"absolute",bottom:"-28px",left:`${(c/SZ)*100+100/(SZ*2)}%`,transform:"translateX(-50%)",
-                    background:"#ff990044",border:"1px solid #ff990066",borderRadius:"50%",width:"22px",height:"22px",
-                    display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:"13px",color:"#ff9900",padding:0,lineHeight:1}}>↓</button>
+                  <div key={`rt${c}`} data-rotate-col={c}
+                    style={{position:"absolute",top:"-24px",left:`${(c/SZ)*100}%`,width:`${100/SZ}%`,height:"22px",
+                      display:"flex",alignItems:"center",justifyContent:"center",cursor:"grab",
+                      fontSize:"13px",color:"#ff990088",borderRadius:"4px",background:"#ff990011",
+                      border:"1px solid #ff990033",userSelect:"none",touchAction:"none"}}>⟷</div>
                 ))}
               </>
             )}
