@@ -710,8 +710,27 @@ function useSounds(soundTheme){
     bassRef.current.triggerAttackRelease("E1","8n",n,0.3);
     bassRef.current.triggerAttackRelease("G1","16n",n+0.08,0.2);
   },[]);
+  // Chess piece move sound — short wooden "clack" like a real chess move
+  const playChessMove=useCallback(()=>{
+    if(!synthRef.current||!bassRef.current)return;
+    const n=Tone.now();
+    // Sharp attack, fast decay — percussive tap
+    synthRef.current.triggerAttackRelease("G5","32n",n,0.25);
+    synthRef.current.triggerAttackRelease("D5","32n",n+0.02,0.15);
+    bassRef.current.triggerAttackRelease("G2","16n",n,0.4);
+    // Soft noise click
+    if(btnNoiseRef.current)btnNoiseRef.current.triggerAttackRelease("64n",n);
+  },[]);
+  // Chess piece place sound — deeper thud when placing on board
+  const playChessPlace=useCallback(()=>{
+    if(!synthRef.current||!bassRef.current)return;
+    const n=Tone.now();
+    synthRef.current.triggerAttackRelease("E4","16n",n,0.3);
+    bassRef.current.triggerAttackRelease("C2","8n",n,0.5);
+    if(btnNoiseRef.current)btnNoiseRef.current.triggerAttackRelease("32n",n);
+  },[]);
 
-  const api=useMemo(()=>({init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn,playSlide}),[init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn,playSlide]);
+  const api=useMemo(()=>({init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn,playSlide,playChessMove,playChessPlace}),[init,reinit,playByLength,playCombo,playWrong,playTick,playCountdown,playGo,playEnding,playChomp,playBtn,playSlide,playChessMove,playChessPlace]);
   return api;
 }
 
@@ -1956,7 +1975,7 @@ export default function Piilosana(){
     if(soundTheme==="off")return{
       init:async()=>{},playByLength:()=>{},playCombo:()=>{},playWrong:()=>{},
       playTick:()=>{},playCountdown:()=>{},playGo:()=>{},playEnding:()=>{},
-      playChomp:()=>{},playBtn:()=>{},playSlide:()=>{},reinit:async()=>{}
+      playChomp:()=>{},playBtn:()=>{},playSlide:()=>{},playChessMove:()=>{},playChessPlace:()=>{},reinit:async()=>{}
     };
     return rawSounds;
   },[soundTheme,rawSounds]);
@@ -1994,6 +2013,7 @@ export default function Piilosana(){
   const[chessValidCells,setChessValidCells]=useState([]); // valid move targets
   const[chessInvalid,setChessInvalid]=useState(null); // {r,c,t} for invalid move flash
   const[chessMoves,setChessMoves]=useState(0); // total moves this game
+  const[chessAnimFrom,setChessAnimFrom]=useState(null); // {r,c} previous position for move animation
   const[chessGrid,setChessGrid]=useState([]); // separate 8×8 grid for chess mode
   const[chessPlacing,setChessPlacing]=useState(true); // true = placing piece phase
   const CHESS_SZ=8;
@@ -2440,7 +2460,18 @@ export default function Piilosana(){
       setChessValidCells(chessValidMoves(chessPiece,r,c,CHESS_SZ));
       setChessPlacing(false);
       setChessMoves(0);
-      sounds.playByLength(3);
+      setChessAnimFrom(null);
+      sounds.playChessPlace();
+      return;
+    }
+    // Clicking current position → go back to placing phase (re-place piece)
+    if(chessPos&&r===chessPos.r&&c===chessPos.c){
+      setChessPos(null);
+      setChessPath([]);
+      setChessWord("");
+      setChessValidCells([]);
+      setChessPlacing(true);
+      setChessAnimFrom(null);
       return;
     }
     // Check if this is a valid move
@@ -2458,16 +2489,20 @@ export default function Piilosana(){
       setTimeout(()=>setChessInvalid(null),400);
       return;
     }
-    // Move piece
+    // Move piece — trigger animation from old position
+    const oldPos={...chessPos};
     const newPath=[...chessPath,{r,c}];
     const newWord=chessWord+(chessGrid[r]?.[c]||"");
+    setChessAnimFrom(oldPos);
     setChessPos({r,c});
     setChessPath(newPath);
     setChessWord(newWord);
     setChessValidCells(chessValidMoves(chessPiece,r,c,CHESS_SZ));
     setChessMoves(m=>m+1);
-    sounds.playCountdown(0);
-  },[state,soloMode,chessPiece,chessValidCells,chessPath,chessWord,chessGrid,chessPlacing,isBottomRow,sounds]);
+    sounds.playChessMove();
+    // Clear animation after it completes
+    setTimeout(()=>setChessAnimFrom(null),280);
+  },[state,soloMode,chessPiece,chessValidCells,chessPath,chessWord,chessGrid,chessPlacing,chessPos,isBottomRow,sounds]);
 
   // Chess mode: undo last move
   const chessUndo=useCallback(()=>{
@@ -2480,6 +2515,7 @@ export default function Piilosana(){
     setChessWord(newWord);
     setChessValidCells(chessValidMoves(chessPiece,lastPos.r,lastPos.c,CHESS_SZ));
     setChessMoves(m=>Math.max(0,m-1));
+    setChessAnimFrom(null);
   },[soloMode,chessPath,chessGrid,chessPiece]);
 
   // Chess mode: submit current word
@@ -3420,6 +3456,7 @@ export default function Piilosana(){
       <style>{`
         @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
         @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+        @keyframes chessArrive{0%{transform:translate(var(--chess-dx),var(--chess-dy)) scale(1.2);opacity:0.6}60%{transform:translate(0,0) scale(1.1);opacity:1}100%{transform:translate(0,0) scale(1);opacity:1}}
         @keyframes snowfall{0%{transform:translateY(0);opacity:0.6}100%{transform:translateY(30px);opacity:0}}
         @keyframes fadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
         @keyframes bubbleIn{0%{opacity:0;transform:scale(0.3) translateY(10px)}40%{opacity:1;transform:scale(1.08) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
@@ -4315,13 +4352,19 @@ export default function Piilosana(){
                       {/* Mystery mode: show ? for hidden cell */}
                       {soloMode==="mystery"&&mysteryCell&&r===mysteryCell.r&&c===mysteryCell.c&&!mysteryRevealed&&!isScrambling?"?":displayLetter}
                       {/* Chess: glass piece overlay on current position — letter shows through */}
-                      {chessIsPos&&chessPiece&&!isScrambling&&(
-                        <span style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"clamp(20px,6vw,34px)",lineHeight:1,zIndex:2,pointerEvents:"none",
+                      {chessIsPos&&chessPiece&&!isScrambling&&(()=>{
+                        const hasAnim=chessAnimFrom&&(chessAnimFrom.r!==r||chessAnimFrom.c!==c);
+                        const dx=hasAnim?`${(chessAnimFrom.c-c)*100}%`:"0";
+                        const dy=hasAnim?`${(chessAnimFrom.r-r)*100}%`:"0";
+                        return <span style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"clamp(20px,6vw,34px)",lineHeight:1,zIndex:2,pointerEvents:"none",
                           color:"transparent",WebkitTextStroke:"1.5px rgba(255,255,255,0.8)",
                           filter:"drop-shadow(0 0 8px #ddaa3388) drop-shadow(0 1px 2px #000a)",
                           background:"radial-gradient(circle, rgba(221,170,51,0.15) 0%, rgba(221,170,51,0.05) 70%, transparent 100%)",
-                          borderRadius:"inherit"}}>{CHESS_EMOJI[chessPiece]}</span>
-                      )}
+                          borderRadius:"inherit",
+                          "--chess-dx":dx,"--chess-dy":dy,
+                          animation:hasAnim?"chessArrive 0.25s cubic-bezier(0.22,1,0.36,1)":"none",
+                        }}>{CHESS_EMOJI[chessPiece]}</span>;
+                      })()}
                       {/* Chess: dot on valid moves */}
                       {chessIsValid&&!isScrambling&&<span style={{position:"absolute",width:"clamp(6px,2vw,10px)",height:"clamp(6px,2vw,10px)",borderRadius:"50%",background:"#ddaa33",opacity:0.5,zIndex:1,pointerEvents:"none"}}/>}
                       {/* Chess: placing phase — glow on bottom row cells */}
