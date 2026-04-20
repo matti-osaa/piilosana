@@ -2464,14 +2464,8 @@ export default function Piilosana(){
       sounds.playChessPlace();
       return;
     }
-    // Clicking current position → go back to placing phase (re-place piece)
+    // Clicking current position — ignore (use undo button to go back)
     if(chessPos&&r===chessPos.r&&c===chessPos.c){
-      setChessPos(null);
-      setChessPath([]);
-      setChessWord("");
-      setChessValidCells([]);
-      setChessPlacing(true);
-      setChessAnimFrom(null);
       return;
     }
     // Check if this is a valid move
@@ -2504,9 +2498,19 @@ export default function Piilosana(){
     setTimeout(()=>setChessAnimFrom(null),280);
   },[state,soloMode,chessPiece,chessValidCells,chessPath,chessWord,chessGrid,chessPlacing,chessPos,isBottomRow,sounds]);
 
-  // Chess mode: undo last move
+  // Chess mode: undo last move (or go back to placing if only 1 step)
   const chessUndo=useCallback(()=>{
-    if(soloMode!=="chess"||chessPath.length<=1)return;
+    if(soloMode!=="chess"||chessPath.length<1)return;
+    if(chessPath.length===1){
+      // Undo placement — go back to placing phase
+      setChessPos(null);
+      setChessPath([]);
+      setChessWord("");
+      setChessValidCells([]);
+      setChessPlacing(true);
+      setChessAnimFrom(null);
+      return;
+    }
     const newPath=chessPath.slice(0,-1);
     const lastPos=newPath[newPath.length-1];
     const newWord=newPath.map(p=>chessGrid[p.r]?.[p.c]||"").join("");
@@ -4219,7 +4223,7 @@ export default function Piilosana(){
                     </div>
                     <div style={{display:"flex",gap:"4px",marginLeft:"auto"}}>
                       <button onClick={chessSubmitWord} disabled={chessWord.length<3} style={{fontFamily:S.font,fontSize:"13px",color:chessWord.length>=3?"#fff":"#555",background:chessWord.length>=3?"#44bb66":"#333",border:"none",padding:"5px 14px",cursor:chessWord.length>=3?"pointer":"default",borderRadius:S.btnRadius,transition:"all 0.2s"}}>✓</button>
-                      <button onClick={chessUndo} disabled={chessPath.length<=1} style={{fontFamily:S.font,fontSize:"13px",color:chessPath.length>1?"#ddaa33":"#444",background:"transparent",border:`1px solid ${chessPath.length>1?"#ddaa3366":"#33333366"}`,padding:"5px 10px",cursor:chessPath.length>1?"pointer":"default",borderRadius:S.btnRadius}}>↩</button>
+                      <button onClick={chessUndo} disabled={chessPath.length<1} style={{fontFamily:S.font,fontSize:"13px",color:chessPath.length>=1?"#ddaa33":"#444",background:"transparent",border:`1px solid ${chessPath.length>=1?"#ddaa3366":"#33333366"}`,padding:"5px 10px",cursor:chessPath.length>=1?"pointer":"default",borderRadius:S.btnRadius}}>↩</button>
                       <button onClick={chessReset} style={{fontFamily:S.font,fontSize:"13px",color:"#ddaa33",background:"transparent",border:"1px solid #ddaa3366",padding:"5px 10px",cursor:"pointer",borderRadius:S.btnRadius}}>⟳</button>
                     </div>
                   </div>
