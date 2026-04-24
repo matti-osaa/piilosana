@@ -437,8 +437,8 @@ const THEMES={
 function getTheme(id){
   const t=THEMES[id]||THEMES.dark;
   return {
-    cellRadius:"10px",btnRadius:"10px",cellShadow:"none",btnShadow:"none",
-    cellGradient:false,panelRadius:"12px",panelShadow:"none",
+    cellRadius:"0px",btnRadius:"0px",cellShadow:"none",btnShadow:"none",
+    cellGradient:false,panelRadius:"0px",panelShadow:"none",
     titleFont:t.font,gridGap:"0px",letterFont:"'VT323',monospace",
     ...t
   };
@@ -1616,7 +1616,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
         animation:bubbleFading?"bubbleOut 0.6s ease-in forwards":`bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards`,
         whiteSpace:"nowrap",zIndex:50}}>
         <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
-          fontSize:"13px",padding:"8px 14px",borderRadius:"8px",position:"relative",lineHeight:"1.6",
+          fontSize:"13px",padding:"8px 14px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
           border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",
           imageRendering:"pixelated"}}>
           <div style={{position:"absolute",top:"-9px",left:"50%",transform:"translateX(-50%)",
@@ -3152,9 +3152,9 @@ export default function Piilosana(){
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
       {/* Welcome text + ARENA CTA */}
       <div style={{fontSize:"14px",color:S.textSoft,marginBottom:"10px",letterSpacing:"1px"}}>{t.arenaWelcome}</div>
-      <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#fff",background:"linear-gradient(135deg,#ff6644 0%,#ff4422 100%)",border:"none",padding:"28px 32px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #ff664466,${S.btnShadow}`:"4px 4px 0 #cc3311,0 0 20px #ff664433",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"6px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
-        onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #ff664488":"6px 6px 0 #cc3311,0 0 30px #ff664455"}}
-        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #ff664466,${S.btnShadow}`:"4px 4px 0 #cc3311,0 0 20px #ff664433"}}>
+      <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#5a3e2b",background:"linear-gradient(135deg,#ffb4a2 0%,#e5989b 100%)",border:"none",padding:"28px 32px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #e5989b44,${S.btnShadow}`:"4px 4px 0 #d4888b,0 0 20px #e5989b33",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"6px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
+        onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #e5989b66":"6px 6px 0 #d4888b,0 0 30px #e5989b44"}}
+        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #e5989b44,${S.btnShadow}`:"4px 4px 0 #d4888b,0 0 20px #e5989b33"}}>
         <span style={{fontSize:"13px",letterSpacing:"3px",opacity:0.9}}>{t.arenaDesc}</span>
         <span>{t.arenaCta}</span>
       </button>
@@ -3164,15 +3164,15 @@ export default function Piilosana(){
 
       {/* Two smaller buttons side by side */}
       <div style={{display:"flex",gap:"8px"}}>
-        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.green,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #008844"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844"}}>
+        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"14px",color:"#2d5240",background:"#a8d8b9",border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #7bb89a",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #7bb89a"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #7bb89a"}}>
           <span>{t.practice}</span>
           <span style={{fontSize:"13px",opacity:0.7}}>{t.practiceDesc}</span>
         </button>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:S.bg,background:S.yellow,border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #cc8800",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #cc8800"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #cc8800"}}>
+        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:"#5a4520",background:"#f5d89a",border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #d4b870",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #d4b870"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #d4b870"}}>
           <span>{t.customGame}</span>
           <span style={{fontSize:"13px",opacity:0.7}}>{t.customDesc}</span>
         </button>
@@ -3452,7 +3452,7 @@ export default function Piilosana(){
         @keyframes chatSlideIn{0%{opacity:0;transform:translateX(-30px) scale(0.7)}30%{opacity:1;transform:translateX(4px) scale(1.04)}60%{transform:translateX(-2px) scale(0.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
         @keyframes chatFadeOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.92);max-height:0;margin:0;padding:0}}
         @keyframes pulse{0%,100%{text-shadow:0 0 5px #ff444444}50%{text-shadow:0 0 20px #ff444488}}
-        @keyframes arenaPulse{0%,100%{box-shadow:4px 4px 0 #cc3311,0 0 20px #ff664433}50%{box-shadow:4px 4px 0 #cc3311,0 0 35px #ff664466}}
+        @keyframes arenaPulse{0%,100%{box-shadow:4px 4px 0 #d4888b,0 0 20px #e5989b33}50%{box-shadow:4px 4px 0 #d4888b,0 0 35px #e5989b55}}
         @keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}50%{opacity:1;transform:translate(-50%,-100%) scale(1.5)}100%{opacity:0;transform:translate(-50%,-180%) scale(1.8)}}
         @keyframes wordRise{0%{opacity:0.9;transform:translate(-50%,-50%) scale(0.8)}20%{opacity:1;transform:translate(-50%,-80%) scale(1.1)}60%{opacity:0.8;transform:translate(-50%,-140%) scale(1)}100%{opacity:0;transform:translate(-50%,-200%) scale(0.9)}}
         @keyframes comboGlow{0%,100%{box-shadow:0 0 5px #ffcc0044}50%{box-shadow:0 0 25px #ffcc0088,0 0 50px #ff66ff44}}
@@ -3490,9 +3490,9 @@ export default function Piilosana(){
         @keyframes rainbowSpin{from{--rainbow-angle:0deg}to{--rainbow-angle:360deg}}
         @keyframes rainbowText{0%{color:#ff4444}14%{color:#ff8844}28%{color:#ffcc44}42%{color:#44dd88}57%{color:#44aaff}71%{color:#8866ff}85%{color:#ff44cc}100%{color:#ff4444}}
         @keyframes hexPrismatic{0%{background-position:200% 0}100%{background-position:-200% 0}}
-        @keyframes hexGlowPulse{0%,100%{opacity:0.5;transform:scale(0.95)}50%{opacity:1;transform:scale(1.05)}}
-        @keyframes hexSelectPop{0%{transform:scale(0.85);opacity:0}30%{transform:scale(1.12);opacity:1}60%{transform:scale(0.97)}100%{transform:scale(1);opacity:1}}
-        @keyframes hexAuroraShift{0%{filter:hue-rotate(0deg) brightness(1.1)}33%{filter:hue-rotate(40deg) brightness(1.3)}66%{filter:hue-rotate(-30deg) brightness(1.2)}100%{filter:hue-rotate(0deg) brightness(1.1)}}
+        @keyframes hexGlowPulse{0%,100%{opacity:0.3;transform:scale(0.98)}50%{opacity:0.6;transform:scale(1.02)}}
+        @keyframes hexSelectPop{0%{transform:scale(0.92);opacity:0}40%{transform:scale(1.05);opacity:1}70%{transform:scale(0.98)}100%{transform:scale(1);opacity:1}}
+        @keyframes hexAuroraShift{0%{filter:hue-rotate(0deg) brightness(1.05)}50%{filter:hue-rotate(15deg) brightness(1.12)}100%{filter:hue-rotate(0deg) brightness(1.05)}}
         @media(max-height:750px){
           .piilosana-title{font-size:22px!important;margin:4px 0!important;}
           .piilosana-grid{gap:4px!important;padding:5px!important;}
@@ -4237,7 +4237,7 @@ export default function Piilosana(){
                 <span style={{fontSize:"28px",fontWeight:"700",color:S.yellow,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{score}</span>
               </div>
             </div>
-            <div ref={wordBarRef} key={flashKey} style={{borderTop:S.cellGradient?`1px solid ${S.border}`:`1px solid ${S.border}`,padding:S.cellGradient?"10px 14px":"4px 10px",textAlign:"center",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0 0 10px 10px"}}>
+            <div ref={wordBarRef} key={flashKey} style={{borderTop:S.cellGradient?`1px solid ${S.border}`:`1px solid ${S.border}`,padding:S.cellGradient?"10px 14px":"4px 10px",textAlign:"center",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
               <div style={{fontSize:S.cellGradient?"28px":"18px",minHeight:S.cellGradient?"36px":"20px",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
                 {state==="ending"?<span style={{color:ending?.color,fontSize:S.cellGradient?"22px":"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
                  word?word.toUpperCase():
@@ -4318,13 +4318,13 @@ export default function Piilosana(){
                         <div style={{position:"absolute",inset:s?"-2px":"0",clipPath:hexClip,
                           background:borderBg,
                           backgroundSize:s?"300% 100%":"100% 100%",
-                          animation:s?`hexPrismatic 2s linear infinite, hexAuroraShift 3s ease-in-out infinite`:"none",
+                          animation:s?`hexPrismatic 6s linear infinite, hexAuroraShift 8s ease-in-out infinite`:"none",
                           transition:"background 0.2s ease, inset 0.2s ease",
                           boxShadow:s?`0 0 16px ${S.green}88, 0 0 30px #aa66ff44, inset 0 0 8px #ffffff22`:"none"}}/>
                         {/* Glow ring behind selected cell */}
                         {s&&!isScrambling&&<div style={{position:"absolute",inset:"-6px",clipPath:hexClip,
                           background:`radial-gradient(ellipse at 50% 50%, #44ffaa33 0%, #8866ff22 40%, transparent 70%)`,
-                          animation:"hexGlowPulse 1.5s ease-in-out infinite",
+                          animation:"hexGlowPulse 4s ease-in-out infinite",
                           pointerEvents:"none"}}/>}
                         {/* Inner hex = cell content */}
                         <div style={{position:"absolute",inset:innerInset,clipPath:hexClip,
@@ -4349,7 +4349,7 @@ export default function Piilosana(){
                               <span style={{position:"absolute",inset:0,
                                 background:`linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.25) 35%, rgba(68,255,170,0.12) 45%, rgba(136,102,255,0.12) 55%, rgba(255,255,255,0.2) 65%, transparent 80%)`,
                                 backgroundSize:"300% 300%",
-                                animation:"hexPrismatic 2.5s ease-in-out infinite",
+                                animation:"hexPrismatic 8s ease-in-out infinite",
                                 pointerEvents:"none",zIndex:1,clipPath:hexClip}}/>
                               <span style={{position:"absolute",inset:0,
                                 background:`radial-gradient(circle at ${30+selIdx*10}% ${25+selIdx*8}%, rgba(255,255,255,0.3) 0%, transparent 50%)`,
