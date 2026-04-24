@@ -1580,9 +1580,10 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
         return <span key={i} style={baseStyle}>{ch}</span>;
       })}
     </h1>
-      {/* Coffee cup illustration - steaming */}
-      <svg width="44" height="44" viewBox="0 0 100 100" style={{flexShrink:0,marginTop:"-2px"}}>
-        {/* Steam */}
+      {/* Coffee cup illustration - steaming, spills on lang change */}
+      <svg width="44" height="44" viewBox="0 0 100 100" style={{flexShrink:0,marginTop:"-2px",transition:"transform 0.15s ease",transform:scramble?"rotate(-12deg)":"rotate(0deg)"}}>
+        {/* Steam — hidden during spill */}
+        {!scramble&&<>
         <path d="M35 30 Q30 20 35 10" fill="none" stroke="#aaaaaa" strokeWidth="2.5" strokeLinecap="round" opacity="0.5">
           <animate attributeName="d" values="M35 30 Q30 20 35 10;M35 30 Q40 18 35 8;M35 30 Q30 20 35 10" dur="2.5s" repeatCount="indefinite"/>
           <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite"/>
@@ -1595,22 +1596,63 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
           <animate attributeName="d" values="M65 30 Q60 18 65 8;M65 30 Q70 16 65 6;M65 30 Q60 18 65 8" dur="3s" repeatCount="indefinite"/>
           <animate attributeName="opacity" values="0.4;0.15;0.4" dur="3s" repeatCount="indefinite"/>
         </path>
+        </>}
+        {/* Coffee splash drops — only during spill */}
+        {scramble&&<>
+          <ellipse cx="18" cy="30" rx="4" ry="3" fill="#6b3a1f" opacity="0.8">
+            <animate attributeName="cy" values="30;18;28" dur="0.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.8;0.4;0.8" dur="0.6s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="10" cy="36" rx="3" ry="2" fill="#8b5a2f" opacity="0.6">
+            <animate attributeName="cy" values="36;26;34" dur="0.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.6;0.2;0.6" dur="0.5s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="24" cy="22" rx="2.5" ry="2" fill="#6b3a1f" opacity="0.7">
+            <animate attributeName="cy" values="22;12;20" dur="0.7s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0.3;0.7" dur="0.7s" repeatCount="indefinite"/>
+          </ellipse>
+        </>}
         {/* Cup body */}
         <path d="M22 38 L22 75 Q22 85 35 85 L65 85 Q78 85 78 75 L78 38 Z" fill="#f5e6d0" stroke="#8b6914" strokeWidth="2.5"/>
-        {/* Coffee surface */}
-        <ellipse cx="50" cy="42" rx="28" ry="6" fill="#6b3a1f"/>
-        <ellipse cx="50" cy="41" rx="24" ry="4" fill="#8b5a2f" opacity="0.6"/>
+        {/* Coffee surface — tilts during spill */}
+        <ellipse cx={scramble?"45":"50"} cy={scramble?"40":"42"} rx="28" ry={scramble?"7":"6"} fill="#6b3a1f" style={{transition:"all 0.2s ease"}}/>
+        <ellipse cx={scramble?"44":"50"} cy={scramble?"39":"41"} rx="24" ry={scramble?"5":"4"} fill="#8b5a2f" opacity="0.6" style={{transition:"all 0.2s ease"}}/>
         {/* Handle */}
         <path d="M78 48 Q94 48 94 60 Q94 72 78 72" fill="none" stroke="#8b6914" strokeWidth="3" strokeLinecap="round"/>
         {/* Cup rim */}
         <ellipse cx="50" cy="38" rx="29" ry="6" fill="none" stroke="#8b6914" strokeWidth="2.5"/>
-        {/* Cute face on cup */}
-        <circle cx="40" cy="62" r="2.5" fill="#8b6914"/>
-        <circle cx="60" cy="62" r="2.5" fill="#8b6914"/>
-        <path d="M44 70 Q50 75 56 70" fill="none" stroke="#8b6914" strokeWidth="2" strokeLinecap="round"/>
-        {/* Blush */}
-        <ellipse cx="34" cy="68" rx="4" ry="2.5" fill="#ffaaaa" opacity="0.5"/>
-        <ellipse cx="66" cy="68" rx="4" ry="2.5" fill="#ffaaaa" opacity="0.5"/>
+        {/* Face — normal vs embarrassed */}
+        {scramble?<>
+          {/* Embarrassed spiral eyes */}
+          <g transform="translate(40,62)">
+            <circle r="3.5" fill="none" stroke="#8b6914" strokeWidth="1.5">
+              <animate attributeName="r" values="2;3.5;2" dur="0.4s" repeatCount="indefinite"/>
+            </circle>
+            <circle r="1" fill="#8b6914"/>
+          </g>
+          <g transform="translate(60,62)">
+            <circle r="3.5" fill="none" stroke="#8b6914" strokeWidth="1.5">
+              <animate attributeName="r" values="3.5;2;3.5" dur="0.4s" repeatCount="indefinite"/>
+            </circle>
+            <circle r="1" fill="#8b6914"/>
+          </g>
+          {/* Wavy embarrassed mouth */}
+          <path d="M43 71 Q47 69 50 71 Q53 73 57 71" fill="none" stroke="#8b6914" strokeWidth="2" strokeLinecap="round"/>
+          {/* Extra blush — more visible when embarrassed */}
+          <ellipse cx="34" cy="68" rx="5" ry="3" fill="#ff8888" opacity="0.7"/>
+          <ellipse cx="66" cy="68" rx="5" ry="3" fill="#ff8888" opacity="0.7"/>
+          {/* Sweat drop */}
+          <path d="M72 54 Q74 50 73 46" fill="none" stroke="#66aadd" strokeWidth="1.5" strokeLinecap="round" opacity="0.8"/>
+          <circle cx="73" cy="46" r="1.5" fill="#66aadd" opacity="0.8"/>
+        </>:<>
+          {/* Normal happy face */}
+          <circle cx="40" cy="62" r="2.5" fill="#8b6914"/>
+          <circle cx="60" cy="62" r="2.5" fill="#8b6914"/>
+          <path d="M44 70 Q50 75 56 70" fill="none" stroke="#8b6914" strokeWidth="2" strokeLinecap="round"/>
+          {/* Normal blush */}
+          <ellipse cx="34" cy="68" rx="4" ry="2.5" fill="#ffaaaa" opacity="0.5"/>
+          <ellipse cx="66" cy="68" rx="4" ry="2.5" fill="#ffaaaa" opacity="0.5"/>
+        </>}
       </svg>
     </div>
     {/* Speech bubble below title pointing up */}
