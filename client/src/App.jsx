@@ -437,8 +437,8 @@ const THEMES={
 function getTheme(id){
   const t=THEMES[id]||THEMES.dark;
   return {
-    cellRadius:"0px",btnRadius:"0px",cellShadow:"none",btnShadow:"none",
-    cellGradient:false,panelRadius:"0px",panelShadow:"none",
+    cellRadius:"10px",btnRadius:"10px",cellShadow:"none",btnShadow:"none",
+    cellGradient:false,panelRadius:"12px",panelShadow:"none",
     titleFont:t.font,gridGap:"0px",letterFont:"'VT323',monospace",
     ...t
   };
@@ -565,50 +565,6 @@ const ENDINGS = [
 // SOUNDS
 // ============================================
 const SOUND_THEMES={
-  retro:{
-    synth:{oscillator:{type:"square"},envelope:{attack:0.01,decay:0.15,sustain:0.05,release:0.15},volume:-14},
-    bass:{oscillator:{type:"triangle"},envelope:{attack:0.01,decay:0.3,sustain:0.1,release:0.3},volume:-10},
-    btn:{noise:{type:"brown"},envelope:{attack:0.003,decay:0.04,sustain:0,release:0.02},volume:-22},
-    btnFilter:400,
-    notes:{
-      find3:n=>[["C5","16n",n]],
-      find4:n=>[["E5","16n",n],["G5","16n",n+0.08]],
-      find5:n=>[["C5","16n",n],["E5","16n",n+0.07],["G5","8n",n+0.14]],
-      find6:n=>({synth:[["C5","16n",n],["E5","16n",n+0.06],["G5","16n",n+0.12],["C6","8n",n+0.18]],bass:[["C3","4n",n]]}),
-      find7:n=>({synth:[["C5","16n",n],["E5","16n",n+0.05],["G5","16n",n+0.1],["C6","16n",n+0.15],["E6","16n",n+0.2],["G6","4n",n+0.25]],bass:[["C3","8n",n],["G2","4n",n+0.15]]}),
-      combo3:n=>[["C5","8n"],["E5","8n"],["G5","8n"],["C6","8n"]],
-      combo5:n=>[["C5","8n"],["E5","8n"],["G5","8n"],["B5","8n"],["D6","8n"]],
-      wrong:n=>[["E3","16n",n],["Eb3","8n",n+0.1]],
-      tick:n=>[["E5","32n",n],["G5","32n",n+0.06]],
-      countdown:n=>[["G4","16n",n]],
-      go:n=>[["C5","16n",n],["E5","16n",n+0.06],["G5","8n",n+0.12]],
-      ending:n=>({bass:[["E2","8n",n],["C2","8n",n+0.2],["A1","4n",n+0.4]]}),
-      chomp:n=>[["G3","32n",n]],
-      btnBass:n=>[["A2","32n",n]],
-    }
-  },
-  soft:{
-    synth:{oscillator:{type:"sine"},envelope:{attack:0.05,decay:0.3,sustain:0.1,release:0.4},volume:-20},
-    bass:{oscillator:{type:"sine"},envelope:{attack:0.05,decay:0.4,sustain:0.1,release:0.5},volume:-18},
-    btn:{noise:{type:"pink"},envelope:{attack:0.01,decay:0.06,sustain:0,release:0.04},volume:-30},
-    btnFilter:300,
-    notes:{
-      find3:n=>[["E5","8n",n]],
-      find4:n=>[["G5","8n",n],["B5","8n",n+0.12]],
-      find5:n=>[["E5","8n",n],["G5","8n",n+0.1],["B5","4n",n+0.2]],
-      find6:n=>({synth:[["E5","8n",n],["G5","8n",n+0.09],["B5","8n",n+0.18],["E6","4n",n+0.27]],bass:[["E3","4n",n]]}),
-      find7:n=>({synth:[["E5","8n",n],["G5","8n",n+0.08],["B5","8n",n+0.16],["E6","8n",n+0.24],["G6","4n",n+0.32]],bass:[["E3","8n",n],["B2","4n",n+0.2]]}),
-      combo3:n=>[["E5","4n"],["G5","4n"],["B5","4n"],["E6","4n"]],
-      combo5:n=>[["E5","4n"],["G5","4n"],["B5","4n"],["D6","4n"],["E6","4n"]],
-      wrong:n=>[["D4","8n",n],["Db4","4n",n+0.15]],
-      tick:n=>[["G5","32n",n],["B5","32n",n+0.08]],
-      countdown:n=>[["A4","8n",n]],
-      go:n=>[["E5","8n",n],["G5","8n",n+0.1],["B5","4n",n+0.2]],
-      ending:n=>({bass:[["G2","4n",n],["E2","4n",n+0.3],["C2","2n",n+0.6]]}),
-      chomp:n=>[["A3","32n",n]],
-      btnBass:n=>[["E3","32n",n]],
-    }
-  },
   modern:{
     synth:{oscillator:{type:"triangle"},envelope:{attack:0.02,decay:0.2,sustain:0.08,release:0.25},volume:-16},
     bass:{oscillator:{type:"sawtooth4"},envelope:{attack:0.02,decay:0.25,sustain:0.1,release:0.3},volume:-14},
@@ -1660,7 +1616,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
         animation:bubbleFading?"bubbleOut 0.6s ease-in forwards":`bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards`,
         whiteSpace:"nowrap",zIndex:50}}>
         <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
-          fontSize:"13px",padding:"8px 14px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
+          fontSize:"13px",padding:"8px 14px",borderRadius:"8px",position:"relative",lineHeight:"1.6",
           border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",
           imageRendering:"pixelated"}}>
           <div style={{position:"absolute",top:"-9px",left:"50%",transform:"translateX(-50%)",
@@ -1742,7 +1698,7 @@ export default function Piilosana(){
   const[themeId,setThemeId]=useState(()=>{const saved=localStorage.getItem("piilosana_theme");return saved&&THEMES[saved]?saved:"dark";});
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
-  const[soundTheme,setSoundTheme]=useState(()=>localStorage.getItem("piilosana_sound")||"modern");
+  const[soundTheme,setSoundTheme]=useState(()=>{const s=localStorage.getItem("piilosana_sound");return s==="modern"||s==="off"?s:"modern";});
   const[musicOn,setMusicOn]=useState(()=>localStorage.getItem("piilosana_music")!=="off");
   const[audioStarted,setAudioStarted]=useState(false);
   const[showSettings,setShowSettings]=useState(false);
@@ -1776,7 +1732,7 @@ export default function Piilosana(){
     if(s.lang){setLang(s.lang);localStorage.setItem("piilosana_lang",s.lang);}
     if(s.size){setUiSize(s.size);localStorage.setItem("piilosana_size",s.size);}
     if(typeof s.confetti==="boolean"){setConfettiOn(s.confetti);localStorage.setItem("piilosana_confetti",s.confetti?"on":"off");}
-    if(s.sound){setSoundTheme(s.sound);localStorage.setItem("piilosana_sound",s.sound);}
+    if(s.sound){const snd=s.sound==="modern"||s.sound==="off"?s.sound:"modern";setSoundTheme(snd);localStorage.setItem("piilosana_sound",snd);}
     if(typeof s.music==="boolean"){setMusicOn(s.music);localStorage.setItem("piilosana_music",s.music?"on":"off");}
   },[]);
   const doLogin=useCallback(async(nickname,password)=>{
@@ -3699,7 +3655,7 @@ export default function Piilosana(){
               {lang==="en"?"Sound Effects":lang==="sv"?"Ljudeffekter":"Ääniefektit"}
             </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
-              {[["retro",{fi:"RETRO",en:"RETRO",sv:"RETRO"}],["soft",{fi:"PEHMEÄ",en:"SOFT",sv:"MJUK"}],["modern",{fi:"MODERNI",en:"MODERN",sv:"MODERN"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
+              {[["modern",{fi:"PÄÄLLÄ",en:"ON",sv:"PÅ"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
                 <button key={id} onClick={()=>{setSoundTheme(id);localStorage.setItem("piilosana_sound",id);syncSettings({sound:id});}}
                   style={{fontFamily:S.font,fontSize:"13px",
                     color:soundTheme===id?S.bg:S.green,background:soundTheme===id?S.green:"transparent",
@@ -4281,7 +4237,7 @@ export default function Piilosana(){
                 <span style={{fontSize:"28px",fontWeight:"700",color:S.yellow,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{score}</span>
               </div>
             </div>
-            <div ref={wordBarRef} key={flashKey} style={{borderTop:S.cellGradient?`1px solid ${S.border}`:`1px solid ${S.border}`,padding:S.cellGradient?"10px 14px":"4px 10px",textAlign:"center",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
+            <div ref={wordBarRef} key={flashKey} style={{borderTop:S.cellGradient?`1px solid ${S.border}`:`1px solid ${S.border}`,padding:S.cellGradient?"10px 14px":"4px 10px",textAlign:"center",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0 0 10px 10px"}}>
               <div style={{fontSize:S.cellGradient?"28px":"18px",minHeight:S.cellGradient?"36px":"20px",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
                 {state==="ending"?<span style={{color:ending?.color,fontSize:S.cellGradient?"22px":"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
                  word?word.toUpperCase():
@@ -4321,7 +4277,7 @@ export default function Piilosana(){
                 touchAction:"none",position:"relative",borderRadius:"16px"}}>
               {grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"1px",
-                  marginTop:r>0?"-2%":"0",
+                  marginTop:r>0?"-3.3%":"0",
                   paddingLeft:r%2===1?"8%":"0",paddingRight:r%2===0?"8%":"0",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
