@@ -2221,7 +2221,7 @@ export default function Piilosana(){
       setChessInvalid(null);setChessMoves(0);setChessPlacing(true);
     }else{setChessPiece(null);setChessPos(null);setChessPath([]);setChessWord("");setChessValidCells([]);setChessInvalid(null);setChessMoves(0);setChessGrid([]);setChessPlacing(false);}
 
-    setMode("solo");setCountdown(5);setState("countdown");
+    setMode("solo");setCountdown(3);setState("countdown");
     if(overrideMode!==undefined)setSoloMode(overrideMode);
     if(overrideTime!==undefined)setGameTime(overrideTime);
     window.scrollTo(0,0);
@@ -2893,7 +2893,7 @@ export default function Piilosana(){
       setBattleMsg(null);
       setEmojiFeed([]);
       setLobbyState("playing");
-      setCountdown(5);setState("countdown");
+      setCountdown(3);setState("countdown");
     });
     
     newSocket.on("timer_tick",({remaining})=>{
@@ -2978,7 +2978,7 @@ export default function Piilosana(){
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
       setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);setEnding(null);setDropKey(0);
       setPublicState("countdown");setPublicCountdown(5);setPublicRound(roundNumber);
-      setPublicRankings(null);setState("countdown");setCountdown(5);
+      setPublicRankings(null);setState("countdown");setCountdown(3);
     });
     newSocket.on("public_join_midgame",({grid:g,validWords:vw,timeLeft:tl,roundNumber})=>{
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
@@ -3533,6 +3533,10 @@ export default function Piilosana(){
         @property --rainbow-angle{syntax:'<angle>';initial-value:0deg;inherits:false}
         @keyframes rainbowSpin{from{--rainbow-angle:0deg}to{--rainbow-angle:360deg}}
         @keyframes rainbowText{0%{color:#ff4444}14%{color:#ff8844}28%{color:#ffcc44}42%{color:#44dd88}57%{color:#44aaff}71%{color:#8866ff}85%{color:#ff44cc}100%{color:#ff4444}}
+        @keyframes hexPrismatic{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        @keyframes hexGlowPulse{0%,100%{opacity:0.5;transform:scale(0.95)}50%{opacity:1;transform:scale(1.05)}}
+        @keyframes hexSelectPop{0%{transform:scale(0.85);opacity:0}30%{transform:scale(1.12);opacity:1}60%{transform:scale(0.97)}100%{transform:scale(1);opacity:1}}
+        @keyframes hexAuroraShift{0%{filter:hue-rotate(0deg) brightness(1.1)}33%{filter:hue-rotate(40deg) brightness(1.3)}66%{filter:hue-rotate(-30deg) brightness(1.2)}100%{filter:hue-rotate(0deg) brightness(1.1)}}
         @media(max-height:750px){
           .piilosana-title{font-size:22px!important;margin:4px 0!important;}
           .piilosana-grid{gap:4px!important;padding:5px!important;}
@@ -4317,7 +4321,7 @@ export default function Piilosana(){
                 touchAction:"none",position:"relative",borderRadius:"16px"}}>
               {grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"1px",
-                  marginTop:r>0?"-5%":"0",
+                  marginTop:r>0?"-2%":"0",
                   paddingLeft:r%2===1?"8%":"0",paddingRight:r%2===0?"8%":"0",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
@@ -4335,10 +4339,11 @@ export default function Piilosana(){
                     const scrambleColor=isScrambling&&!settled?`hsl(${(cellIdx*37+scrambleStep*73)%360},70%,65%)`:null;
                     const hexClip="polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
                     const hexClipInner="polygon(50% 5%, 95% 27%, 95% 73%, 50% 95%, 5% 73%, 5% 27%)";
-                    // Border: bright & visible in all themes; selected = accent color, thicker
-                    const borderBg=eaten?"transparent":s?S.green:(S.cellBorder||S.border);
+                    // Border: bright & visible in all themes; selected = aurora prismatic
+                    const selIdx=s?sel.findIndex(p=>p.r===r&&p.c===c):-1;
+                    const borderBg=eaten?"transparent":s?`linear-gradient(${120+selIdx*60}deg, #00ffaa, #44bbff, #aa66ff, #ff66aa, #ffaa44, #00ffaa)`:(S.cellBorder||S.border);
                     const innerInset=s?"3px":"2px";
-                    const cellBg=eaten?(S.gridBg||"#111133"):S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell;
+                    const cellBg=eaten?(S.gridBg||"#111133"):s?`linear-gradient(${160+selIdx*30}deg, ${S.cell}ee 0%, ${S.cell}cc 40%, ${S.dark||S.cell}dd 100%)`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell;
                     return(
                       <div key={`${r}-${c}-${dropKey}`} data-c={`${r},${c}`}
                         onMouseDown={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
@@ -4347,39 +4352,54 @@ export default function Piilosana(){
                           width:"15.5%",aspectRatio:"0.866",
                           position:"relative",
                           cursor:state==="play"?"pointer":"default",
-                          transition:"transform 0.2s ease",
-                          transform:s?"scale(1.08)":"none",
-                          animation:eaten?endAnim:(isScrambling&&settled?"pop 0.2s ease":"none"),
+                          transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1)",
+                          transform:s?(last?"scale(1.14)":"scale(1.06)"):"none",
+                          animation:eaten?endAnim:(s&&!isScrambling?`hexSelectPop 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards`:(isScrambling&&settled?"pop 0.2s ease":"none")),
+                          zIndex:s?10:0,
                           "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
                         }}>
-                        {/* Outer hex = border */}
-                        <div style={{position:"absolute",inset:0,clipPath:hexClip,
+                        {/* Outer hex = border — prismatic gradient when selected */}
+                        <div style={{position:"absolute",inset:s?"-2px":"0",clipPath:hexClip,
                           background:borderBg,
-                          transition:"background 0.15s ease",
-                          boxShadow:s?`0 0 10px ${S.green}66`:"none"}}/>
+                          backgroundSize:s?"300% 100%":"100% 100%",
+                          animation:s?`hexPrismatic 2s linear infinite, hexAuroraShift 3s ease-in-out infinite`:"none",
+                          transition:"background 0.2s ease, inset 0.2s ease",
+                          boxShadow:s?`0 0 16px ${S.green}88, 0 0 30px #aa66ff44, inset 0 0 8px #ffffff22`:"none"}}/>
+                        {/* Glow ring behind selected cell */}
+                        {s&&!isScrambling&&<div style={{position:"absolute",inset:"-6px",clipPath:hexClip,
+                          background:`radial-gradient(ellipse at 50% 50%, #44ffaa33 0%, #8866ff22 40%, transparent 70%)`,
+                          animation:"hexGlowPulse 1.5s ease-in-out infinite",
+                          pointerEvents:"none"}}/>}
                         {/* Inner hex = cell content */}
                         <div style={{position:"absolute",inset:innerInset,clipPath:hexClip,
                           background:cellBg,
                           display:"flex",alignItems:"center",justifyContent:"center",
                           fontSize:isLarge?"clamp(24px,6vw,38px)":"clamp(20px,5.5vw,32px)",
-                          fontFamily:S.letterFont,fontWeight:S.cellGradient?"700":"normal",
+                          fontFamily:S.letterFont,fontWeight:S.cellGradient||s?"700":"normal",
                           textTransform:"uppercase",
                           transition:"all 0.2s ease",
-                          color:eaten?endColor||"transparent":scrambleColor||(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa"))),
-                          textShadow:eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${letterMult?letterColor(letter,lang):"#22ccaa"}44`,
+                          color:eaten?endColor||"transparent":scrambleColor||(s?"#ffffff":(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
+                          textShadow:eaten?"none":s?`0 0 12px #44ffaa99, 0 0 24px #8866ff66, 0 1px 2px #000000aa`:(S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${letterMult?letterColor(letter,lang):"#22ccaa"}44`),
                         }}>
                           {eaten?"":<>
-                            {/* Letter — magnifies when selected (water lens) */}
+                            {/* Letter — bouncy scale + white glow when selected */}
                             <span style={{position:"relative",zIndex:2,
-                              transition:"transform 0.2s ease, text-shadow 0.2s ease",
-                              transform:s?"scale(1.18)":"none",
-                              textShadow:s?`0 0 10px ${S.green}88, 0 0 20px ${S.green}44`:(eaten?"none":undefined),
+                              transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1), text-shadow 0.2s ease, filter 0.2s ease",
+                              transform:s?(last?"scale(1.25)":"scale(1.12)"):"none",
+                              filter:s?"drop-shadow(0 0 4px #44ffaa88) drop-shadow(0 0 8px #8866ff44)":"none",
                             }}>{displayLetter}</span>
-                            {/* Water caustic — subtle light refraction on selected */}
-                            {s&&!isScrambling&&<span style={{position:"absolute",inset:0,
-                              background:`radial-gradient(ellipse at 40% 35%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 45%, transparent 70%)`,
-                              pointerEvents:"none",zIndex:1}}/>}
-                            {letterMult&&!isScrambling&&<span style={{position:"absolute",bottom:"4px",right:"6px",fontSize:"clamp(8px,2vw,11px)",fontFamily:"'Press Start 2P',monospace",color:letterColor(letter,lang),opacity:0.7,lineHeight:1,zIndex:3}}>{getLetterValues(lang)[letter]||1}</span>}
+                            {/* Prismatic light sweep on selected cells */}
+                            {s&&!isScrambling&&<>
+                              <span style={{position:"absolute",inset:0,
+                                background:`linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.25) 35%, rgba(68,255,170,0.12) 45%, rgba(136,102,255,0.12) 55%, rgba(255,255,255,0.2) 65%, transparent 80%)`,
+                                backgroundSize:"300% 300%",
+                                animation:"hexPrismatic 2.5s ease-in-out infinite",
+                                pointerEvents:"none",zIndex:1,clipPath:hexClip}}/>
+                              <span style={{position:"absolute",inset:0,
+                                background:`radial-gradient(circle at ${30+selIdx*10}% ${25+selIdx*8}%, rgba(255,255,255,0.3) 0%, transparent 50%)`,
+                                pointerEvents:"none",zIndex:1}}/>
+                            </>}
+                            {letterMult&&!isScrambling&&<span style={{position:"absolute",bottom:"4px",right:"6px",fontSize:"clamp(8px,2vw,11px)",fontFamily:"'Press Start 2P',monospace",color:s?"#ffffff":letterColor(letter,lang),opacity:s?0.9:0.7,lineHeight:1,zIndex:3}}>{getLetterValues(lang)[letter]||1}</span>}
                           </>}
                         </div>
                       </div>
