@@ -1737,7 +1737,7 @@ async function submitToHallOfFame({nickname,score,wordsFound,wordsTotal,gameMode
 // MAIN COMPONENT
 // ============================================
 export default function Piilosana(){
-  const SZ=5,COMBO_WINDOW=4000;
+  const SZ=5,HEX_SZ=6,COMBO_WINDOW=4000;
   const[lang,setLang]=useState(()=>localStorage.getItem("piilosana_lang")||"fi");
   const[themeId,setThemeId]=useState(()=>{const saved=localStorage.getItem("piilosana_theme");return saved&&THEMES[saved]?saved:"dark";});
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
@@ -2188,7 +2188,8 @@ export default function Piilosana(){
     const gt=overrideTime!==undefined?overrideTime:gameTime;
     const sm=overrideMode!==undefined?overrideMode:soloMode;
     let bg=null,bw=new Set();
-    for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=(sm==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
+    const gridSz=sm==="hex"?HEX_SZ:SZ;
+    for(let i=0;i<30;i++){const g=makeGrid(gridSz,lang),w=(sm==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(sm==="hex"?25:15))break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(gt);setScore(0);setMsg(null);
     setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);
     setEnding(null);setEndingProgress(0);setDropKey(0);
@@ -2237,7 +2238,7 @@ export default function Piilosana(){
     if(state!=="countdown")return;
     if(countdown<=0){
       if(mode==="public"){sounds.playGo();setState("play");return;}
-      setState("scramble");setScrambleStep(0);setScrambleGrid(makeGrid(soloMode==="chess"?8:SZ,lang));return;
+      setState("scramble");setScrambleStep(0);setScrambleGrid(makeGrid(soloMode==="chess"?8:soloMode==="hex"?HEX_SZ:SZ,lang));return;
     }
     sounds.playCountdown(countdown);
     const t=setTimeout(()=>setCountdown(c=>c-1),1000);
@@ -2252,7 +2253,7 @@ export default function Piilosana(){
       step++;
       if(step<=10){
         // Randomize letters rapidly (10 × 80ms = 800ms)
-        setScrambleGrid(makeGrid(soloMode==="chess"?8:SZ,lang));
+        setScrambleGrid(makeGrid(soloMode==="chess"?8:soloMode==="hex"?HEX_SZ:SZ,lang));
       }else{
         // Done — snap to real grid and start playing
         clearInterval(interval);
@@ -2312,7 +2313,7 @@ export default function Piilosana(){
       // Phase 0: scramble letters rapidly
       if(progress<=0.25){
         scrambleCount++;
-        setScrambleGrid(makeGrid(soloMode==="chess"?8:SZ,lang));
+        setScrambleGrid(makeGrid(soloMode==="chess"?8:soloMode==="hex"?HEX_SZ:SZ,lang));
         setScrambleStep(0);
       }else if(progress>0.25&&scrambleCount>0){
         // End scramble phase — clear it
@@ -3086,10 +3087,11 @@ export default function Piilosana(){
   const refreshGrid=useCallback(()=>{
     if(state!=="play"||gameTime!==0)return;
     let bg=null,bw=new Set();
-    for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
+    const gsz=soloMode==="hex"?HEX_SZ:SZ;
+    for(let i=0;i<30;i++){const g=makeGrid(gsz,lang),w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(soloMode==="hex"?25:15))break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setMsg(null);
     setDropKey(0);
-  },[state,gameTime,trie,lang]);
+  },[state,gameTime,trie,lang,soloMode]);
 
   // Unlimited mode: end game voluntarily
   const endUnlimited=useCallback(()=>{
@@ -4315,14 +4317,16 @@ export default function Piilosana(){
                 touchAction:"none",position:"relative",borderRadius:"16px"}}>
               {grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"3px",
-                  marginTop:r>0?"-6%":"0",
-                  paddingLeft:r%2===1?"9%":"0",paddingRight:r%2===0?"9%":"0"}}>
+                  marginTop:r>0?"-4.8%":"0",
+                  paddingLeft:r%2===1?"8%":"0",paddingRight:r%2===0?"8%":"0",
+                  position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
                     const s=isSel(r,c);
                     const last=sel.length>0&&sel[sel.length-1].r===r&&sel[sel.length-1].c===c;
-                    const cellIdx=r*SZ+c;
+                    const hexSz=grid.length;
+                    const cellIdx=r*hexSz+c;
                     const eaten=eatenCells.has(cellIdx);
-                    const endAnim=eaten&&ending?ending.cellAnim(cellIdx,SZ*SZ):"none";
+                    const endAnim=eaten&&ending?ending.cellAnim(cellIdx,hexSz*hexSz):"none";
                     const endColor=eaten&&ending?ending.cellColor(cellIdx):null;
                     const isScrambling=state==="scramble"||(state==="ending"&&scrambleGrid);
                     const settled=state==="scramble"&&scrambleStep>cellIdx;
@@ -4334,10 +4338,10 @@ export default function Piilosana(){
                         onMouseDown={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         onTouchStart={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         style={{
-                          width:"17%",aspectRatio:"0.866",
+                          width:"15.5%",aspectRatio:"0.866",
                           clipPath:"polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
                           display:"flex",alignItems:"center",justifyContent:"center",
-                          fontSize:isLarge?"clamp(30px,8vw,48px)":"clamp(24px,7vw,40px)",
+                          fontSize:isLarge?"clamp(24px,6vw,38px)":"clamp(20px,5.5vw,32px)",
                           fontFamily:S.letterFont,fontWeight:S.cellGradient?"700":"normal",
                           color:eaten?endColor||"transparent":scrambleColor||(s?(S.cellTextSel||"#0f1720"):(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
                           background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
