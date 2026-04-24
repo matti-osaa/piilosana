@@ -189,6 +189,7 @@ const T={
     modeBomb:"POMMI",bombDesc:"Käytä tikittävä kirjain sanassa ennen kuin se räjähtää!",bombStarts:"POMMI ALKAA",bombLabel:"POMMI",bombExploded:"POMMI RÄJÄHTI!",
     modeMystery:"MYSTEERI",mysteryDesc:"Piilotettu kirjain paljastuu kun löydät sanan sen kautta!",mysteryStarts:"MYSTEERI ALKAA",mysteryLabel:"MYSTEERI",mysteryRevealed:"PALJASTETTU!",
     modeChess:"SHAKKI",chessDesc:"Liikuta shakkinappulaa ja muodosta sanoja sen liikkeen mukaan!",chessLabel:"SHAKKI",chessSubmit:"VAHVISTA",chessSkip:"OHITA",chessNewPiece:"Uusi nappula:",chessInvalidMove:"Ei mahdollinen!",
+    modeHex:"HEKSA",hexDesc:"Kuusikulmaiset ruudut — 6 naapuria jokaisella! Uusia polkuja sanoille.",hexStarts:"HEKSA ALKAA",hexLabel:"HEKSA",
     waiting:"ODOTETAAN PELAAJIA",playersCount:"PELAAJAT",youTag:"SINÄ",createGame:"LUO PELI",connecting:"YHDISTETÄÄN...",
     startGame:"ALOITA PELI",waitForPlayers:"Odota, että joku liittyy peliisi...",waitForHost:"Odota, että isäntä aloittaa pelin...",
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
@@ -243,6 +244,7 @@ const T={
     modeBomb:"BOMB",bombDesc:"Use the ticking letter in a word before it explodes!",bombStarts:"BOMB STARTS",bombLabel:"BOMB",bombExploded:"BOMB EXPLODED!",
     modeMystery:"MYSTERY",mysteryDesc:"A hidden letter is revealed when you find a word through it!",mysteryStarts:"MYSTERY STARTS",mysteryLabel:"MYSTERY",mysteryRevealed:"REVEALED!",
     modeChess:"CHESS",chessDesc:"Move a chess piece and form words following its movement rules!",chessLabel:"CHESS",chessSubmit:"SUBMIT",chessSkip:"SKIP",chessNewPiece:"New piece:",chessInvalidMove:"Not possible!",
+    modeHex:"HEX",hexDesc:"Hexagonal cells — 6 neighbors each! New paths for words.",hexStarts:"HEX STARTS",hexLabel:"HEX",
     waiting:"WAITING FOR PLAYERS",playersCount:"PLAYERS",youTag:"YOU",createGame:"CREATE GAME",connecting:"CONNECTING...",
     startGame:"START GAME",waitForPlayers:"Wait for someone to join...",waitForHost:"Waiting for host to start...",
     joinGame:"JOIN GAME",roomCode:"ROOM CODE",noRooms:"No open rooms",orJoinRoom:"or join with code",
@@ -297,6 +299,7 @@ const T={
     modeBomb:"BOMB",bombDesc:"Använd den tickande bokstaven i ett ord innan den exploderar!",bombStarts:"BOMB BÖRJAR",bombLabel:"BOMB",bombExploded:"BOMBEN EXPLODERADE!",
     modeMystery:"MYSTERIUM",mysteryDesc:"En dold bokstav avslöjas när du hittar ett ord genom den!",mysteryStarts:"MYSTERIUM BÖRJAR",mysteryLabel:"MYSTERIUM",mysteryRevealed:"AVSLÖJAD!",
     modeChess:"SCHACK",chessDesc:"Flytta en schackpjäs och bilda ord efter dess rörelseregler!",chessLabel:"SCHACK",chessSubmit:"BEKRÄFTA",chessSkip:"HOPPA ÖVER",chessNewPiece:"Ny pjäs:",chessInvalidMove:"Inte möjligt!",
+    modeHex:"HEXA",hexDesc:"Hexagonala rutor — 6 grannar var! Nya vägar för ord.",hexStarts:"HEXA BÖRJAR",hexLabel:"HEXA",
     waiting:"VÄNTAR PÅ SPELARE",playersCount:"SPELARE",youTag:"DU",createGame:"SKAPA SPEL",connecting:"ANSLUTER...",
     startGame:"STARTA SPEL",waitForPlayers:"Vänta tills någon går med...",waitForHost:"Väntar på att värden startar...",
     joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
@@ -338,6 +341,17 @@ function findWords(grid,trie){
   function dfs(r,c,node,path,vis){const ch=grid[r][c],nx=node.c[ch];if(!nx)return;const np=path+ch;if(nx.w&&np.length>=3)found.add(np);vis.add(r*sz+c);for(const[dr,dc]of dirs){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<sz&&nc>=0&&nc<sz&&!vis.has(nr*sz+nc))dfs(nr,nc,nx,np,vis);}vis.delete(r*sz+c);}
   for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)dfs(r,c,trie,"",new Set());return found;
 }
+
+// Hex grid utilities (6-neighbor hexagonal grid, odd-r offset)
+const HEX_DIRS_EVEN=[[-1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]];
+const HEX_DIRS_ODD=[[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]];
+function hexNeighbors(r,c,sz){const dirs=r%2===0?HEX_DIRS_EVEN:HEX_DIRS_ODD;return dirs.map(([dr,dc])=>({r:r+dr,c:c+dc})).filter(n=>n.r>=0&&n.r<sz&&n.c>=0&&n.c<sz);}
+function findWordsHex(grid,trie){
+  const sz=grid.length,found=new Set();
+  function dfs(r,c,node,path,vis){const ch=grid[r][c],nx=node.c[ch];if(!nx)return;const np=path+ch;if(nx.w&&np.length>=3)found.add(np);vis.add(r*sz+c);for(const n of hexNeighbors(r,c,sz)){if(!vis.has(n.r*sz+n.c))dfs(n.r,n.c,nx,np,vis);}vis.delete(r*sz+c);}
+  for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)dfs(r,c,trie,"",new Set());return found;
+}
+function adjHex(a,b){const dirs=a.r%2===0?HEX_DIRS_EVEN:HEX_DIRS_ODD;return dirs.some(([dr,dc])=>a.r+dr===b.r&&a.c+dc===b.c);}
 
 function pts(len){if(len<=2)return 0;if(len===3)return 1;if(len===4)return 2;if(len===5)return 4;if(len===6)return 6;if(len===7)return 10;return 14;}
 
@@ -1984,7 +1998,7 @@ export default function Piilosana(){
   // Game settings (must be declared before states that reference them)
   const[gameTime,setGameTime]=useState(120); // 120 (2min) or 402 (6min 42s = "6,7")
   const[letterMult,setLetterMult]=useState(false); // scrabble-style letter values
-  const[soloMode,setSoloMode]=useState("normal"); // 'normal','tetris','rotate','theme','bomb','mystery','chess'
+  const[soloMode,setSoloMode]=useState("normal"); // 'normal','tetris','rotate','theme','bomb','mystery','chess','hex'
   const[dropKey,setDropKey]=useState(0); // increments on gravity to trigger drop animation
   const[gameMode,setGameMode]=useState("classic"); // 'classic' or 'battle'
 
@@ -2082,6 +2096,7 @@ export default function Piilosana(){
   const[emojiFeed,setEmojiFeed]=useState([]); // [{id, nickname, emoji, fading}]
   const emojiFeedIdRef=useRef(0);
   const[emojiOpen,setEmojiOpen]=useState(false); // false | "open" | "closing"
+  const[chatHidden,setChatHidden]=useState(false); // hide glass chat overlay
   const closeEmojiPicker=useCallback(()=>{
     setEmojiOpen("closing");
     setTimeout(()=>setEmojiOpen(false),250);
@@ -2173,7 +2188,7 @@ export default function Piilosana(){
     const gt=overrideTime!==undefined?overrideTime:gameTime;
     const sm=overrideMode!==undefined?overrideMode:soloMode;
     let bg=null,bw=new Set();
-    for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=findWords(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
+    for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=(sm==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(gt);setScore(0);setMsg(null);
     setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);
     setEnding(null);setEndingProgress(0);setDropKey(0);
@@ -2344,7 +2359,7 @@ export default function Piilosana(){
           // BOOM! Scramble area around bomb
           setGrid(g=>{
             const ng=scrambleArea(g,bombCell.r,bombCell.c,1,lang);
-            const nv=findWords(ng,trie);
+            const nv=(soloMode==="hex"?findWordsHex:findWords)(ng,trie);
             setValid(nv);
             return ng;
           });
@@ -2395,7 +2410,7 @@ export default function Piilosana(){
         setTimeout(()=>{
           setGrid(g=>{
             const ng=rotateRow(g,d.row,dir);
-            const nv=findWords(ng,trie);setValid(nv);
+            const nv=(soloMode==="hex"?findWordsHex:findWords)(ng,trie);setValid(nv);
             return ng;
           });
           setRotateCount(n=>n+1);setRotateAnim(null);
@@ -2408,7 +2423,7 @@ export default function Piilosana(){
         setTimeout(()=>{
           setGrid(g=>{
             const ng=rotateCol(g,d.col,dir);
-            const nv=findWords(ng,trie);setValid(nv);
+            const nv=(soloMode==="hex"?findWordsHex:findWords)(ng,trie);setValid(nv);
             return ng;
           });
           setRotateCount(n=>n+1);setRotateAnim(null);
@@ -2632,7 +2647,7 @@ export default function Piilosana(){
     return best;
   },[]);
 
-  const adj=(a,b)=>Math.abs(a.r-b.r)<=1&&Math.abs(a.c-b.c)<=1&&!(a.r===b.r&&a.c===b.c);
+  const adj=(a,b)=>soloMode==="hex"?adjHex(a,b):(Math.abs(a.r-b.r)<=1&&Math.abs(a.c-b.c)<=1&&!(a.r===b.r&&a.c===b.c));
   const isSel=(r,c)=>sel.some(s=>s.r===r&&s.c===c);
 
   // Submit word (handles both solo and multiplayer)
@@ -2709,7 +2724,7 @@ export default function Piilosana(){
         const newGrid=applyGravityClient(grid,cells,lang);
         setGrid(newGrid);
         setDropKey(k=>k+1);
-        const newValid=findWords(newGrid,trie);
+        const newValid=(soloMode==="hex"?findWordsHex:findWords)(newGrid,trie);
         setValid(newValid);
       }
       // Theme mode: check if word is a theme word
@@ -3071,7 +3086,7 @@ export default function Piilosana(){
   const refreshGrid=useCallback(()=>{
     if(state!=="play"||gameTime!==0)return;
     let bg=null,bw=new Set();
-    for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=findWords(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
+    for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setMsg(null);
     setDropKey(0);
   },[state,gameTime,trie,lang]);
@@ -3089,7 +3104,7 @@ export default function Piilosana(){
     if(!socket||!isHost||players.length<2)return;
     const gm=selectedMode||gameMode;
     let bg=null,bw=new Set();
-    for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=findWords(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
+    for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
     setCurrentMultiGrid(bg);
     setGameMode(gm);
     socket.emit("start_game",{grid:bg,validWords:Array.from(bw),gameMode:gm,gameTime});
@@ -3226,12 +3241,14 @@ export default function Piilosana(){
                   <button onClick={()=>setSoloMode("bomb")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="bomb"?S.bg:"#ff4444",background:soloMode==="bomb"?"#ff4444":"transparent",border:"2px solid #ff4444",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>💣 {t.modeBomb}</button>
                   <button onClick={()=>setSoloMode("mystery")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="mystery"?S.bg:"#aa66ff",background:soloMode==="mystery"?"#aa66ff":"transparent",border:"2px solid #aa66ff",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>❓ {t.modeMystery}</button>
                   <button onClick={()=>setSoloMode("chess")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="chess"?S.bg:"#ddaa33",background:soloMode==="chess"?"#ddaa33":"transparent",border:"2px solid #ddaa33",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>♞ {t.modeChess}</button>
+                  <button onClick={()=>setSoloMode("hex")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="hex"?S.bg:"#22ccaa",background:soloMode==="hex"?"#22ccaa":"transparent",border:"2px solid #22ccaa",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>⬡ {t.modeHex}</button>
                 </div>
                 {soloMode==="rotate"&&<p style={{fontSize:"13px",color:"#ff9900",marginTop:"8px",lineHeight:"1.8"}}>{t.rotateDesc}</p>}
                 {soloMode==="theme"&&<p style={{fontSize:"13px",color:"#44bb66",marginTop:"8px",lineHeight:"1.8"}}>{t.themeDesc}</p>}
                 {soloMode==="bomb"&&<p style={{fontSize:"13px",color:"#ff4444",marginTop:"8px",lineHeight:"1.8"}}>{t.bombDesc}</p>}
                 {soloMode==="mystery"&&<p style={{fontSize:"13px",color:"#aa66ff",marginTop:"8px",lineHeight:"1.8"}}>{t.mysteryDesc}</p>}
                 {soloMode==="chess"&&<p style={{fontSize:"13px",color:"#ddaa33",marginTop:"8px",lineHeight:"1.8"}}>{t.chessDesc}</p>}
+                {soloMode==="hex"&&<p style={{fontSize:"13px",color:"#22ccaa",marginTop:"8px",lineHeight:"1.8"}}>{t.hexDesc}</p>}
               </div>
               <div style={{marginBottom:"12px"}}>
                 <div style={{fontSize:"13px",color:S.green,marginBottom:"6px"}}>{t.time}</div>
@@ -4289,6 +4306,61 @@ export default function Piilosana(){
 
           {/* GRID */}
           <div style={{position:"relative"}}>
+            {soloMode==="hex"?(
+            <div ref={gRef}
+              onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
+              style={{padding:isLarge?"10px":"8px",background:S.gridBg||"#111133",
+                border:`3px solid ${combo>=3&&state==="play"?S.yellow:ending?ending.color+"88":S.border}`,
+                boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:`0 0 30px #22ccaa22`,
+                touchAction:"none",position:"relative",borderRadius:"16px"}}>
+              {grid.map((row,r)=>(
+                <div key={r} style={{display:"flex",justifyContent:"center",gap:"3px",
+                  marginTop:r>0?"-6%":"0",
+                  paddingLeft:r%2===1?"9%":"0",paddingRight:r%2===0?"9%":"0"}}>
+                  {row.map((letter,c)=>{
+                    const s=isSel(r,c);
+                    const last=sel.length>0&&sel[sel.length-1].r===r&&sel[sel.length-1].c===c;
+                    const cellIdx=r*SZ+c;
+                    const eaten=eatenCells.has(cellIdx);
+                    const endAnim=eaten&&ending?ending.cellAnim(cellIdx,SZ*SZ):"none";
+                    const endColor=eaten&&ending?ending.cellColor(cellIdx):null;
+                    const isScrambling=state==="scramble"||(state==="ending"&&scrambleGrid);
+                    const settled=state==="scramble"&&scrambleStep>cellIdx;
+                    const scrambleLetter=isScrambling&&scrambleGrid?scrambleGrid[r]?.[c]||letter:letter;
+                    const displayLetter=isScrambling&&!settled&&scrambleGrid?scrambleLetter:letter;
+                    const scrambleColor=isScrambling&&!settled?`hsl(${(cellIdx*37+scrambleStep*73)%360},70%,65%)`:null;
+                    return(
+                      <div key={`${r}-${c}-${dropKey}`} data-c={`${r},${c}`}
+                        onMouseDown={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
+                        onTouchStart={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
+                        style={{
+                          width:"17%",aspectRatio:"0.866",
+                          clipPath:"polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                          display:"flex",alignItems:"center",justifyContent:"center",
+                          fontSize:isLarge?"clamp(30px,8vw,48px)":"clamp(24px,7vw,40px)",
+                          fontFamily:S.letterFont,fontWeight:S.cellGradient?"700":"normal",
+                          color:eaten?endColor||"transparent":scrambleColor||(s?(S.cellTextSel||"#0f1720"):(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
+                          background:eaten?(S.gridBg||"#111133"):last?S.yellow:s?S.green:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
+                          cursor:state==="play"?"pointer":"default",
+                          transition:isScrambling?"color 0.07s, transform 0.15s":"all 0.15s",
+                          textTransform:"uppercase",
+                          textShadow:s||eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${letterMult?letterColor(letter,lang):"#22ccaa"}44`,
+                          animation:eaten?endAnim:(isScrambling&&settled?"pop 0.2s ease":"none"),
+                          "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
+                          position:"relative",
+                        }}>
+                        {eaten?"":<>
+                          {displayLetter}
+                          {letterMult&&!isScrambling&&<span style={{position:"absolute",bottom:"2px",right:"4px",fontSize:"clamp(8px,2vw,11px)",fontFamily:"'Press Start 2P',monospace",color:letterColor(letter,lang),opacity:0.7,lineHeight:1}}>{getLetterValues(lang)[letter]||1}</span>}
+                        </>}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+              {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true}/>}
+            </div>
+            ):(<>
             <div ref={gRef} className="piilosana-grid"
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
               style={{display:"grid",gridTemplateColumns:`repeat(${soloMode==="chess"?CHESS_SZ:SZ},1fr)`,gap:soloMode==="chess"?"2px":(S.gridGap!=="0px"?S.gridGap:isLarge?"6px":"4px"),padding:soloMode==="chess"?"4px":(isLarge?"8px":"6px"),background:S.gridBg||"#111133",
@@ -4399,6 +4471,7 @@ export default function Piilosana(){
                 border:"3px solid #ff9900",borderRadius:S.cellRadius!=="0px"?"16px":"0px",
                 boxShadow:"inset 0 0 20px #ff990033, 0 0 20px #ff990022"}}/>
             )}
+            </>)}
           </div>
 
           {state==="play"&&(
@@ -4416,76 +4489,83 @@ export default function Piilosana(){
             </div>
           )}
 
-          {/* Emoji reactions - multiplayer only */}
-          {(mode==="public"||mode==="multi")&&state==="play"&&socket&&(
-            <div style={{marginTop:"8px"}}>
-              {/* Speech bubble toggle button */}
-              <div style={{display:"flex",justifyContent:"center",marginBottom:"6px",position:"relative"}}>
+          {/* Glassmorphic chat overlay - multiplayer only */}
+          {(mode==="public"||mode==="multi")&&state==="play"&&socket&&!chatHidden&&(
+            <div style={{position:"fixed",bottom:"16px",right:"16px",zIndex:100,
+              width:"clamp(180px,30vw,220px)",
+              background:"rgba(15,20,35,0.55)",
+              backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",
+              border:"1px solid rgba(255,255,255,0.12)",
+              borderRadius:"18px",
+              boxShadow:"0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
+              overflow:"hidden",
+              animation:"fadeIn 0.4s ease"}}>
+              {/* Glass light reflection */}
+              <div style={{position:"absolute",top:0,left:0,right:0,height:"40%",
+                background:"linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 60%, transparent 100%)",
+                borderRadius:"18px 18px 0 0",pointerEvents:"none"}}/>
+              {/* Header with close */}
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 12px 4px",position:"relative",zIndex:1}}>
                 <button onClick={()=>emojiOpen==="open"?closeEmojiPicker():setEmojiOpen("open")}
-                  style={{fontSize:"22px",padding:"8px 18px",background:emojiOpen?S.border:S.dark,border:`2px solid ${S.border}`,borderRadius:"16px",cursor:"pointer",lineHeight:1,
-                  transition:"transform 0.15s, background 0.15s",display:"flex",alignItems:"center",gap:"6px",fontFamily:S.font,color:S.green}}
-                  onMouseDown={e=>{e.currentTarget.style.transform="scale(1.05)";}}
-                  onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";}}
-                  onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";}}
-                  onTouchStart={e=>{e.currentTarget.style.transform="scale(1.05)";}}
-                  onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
+                  style={{fontSize:"16px",padding:"4px 10px",background:emojiOpen?"rgba(255,255,255,0.12)":"transparent",
+                  border:"1px solid rgba(255,255,255,0.15)",borderRadius:"12px",cursor:"pointer",lineHeight:1,
+                  transition:"all 0.15s",color:S.green,fontFamily:S.font,fontSize:"12px",display:"flex",alignItems:"center",gap:"4px"}}
                 >💬</button>
+                <button onClick={()=>setChatHidden(true)}
+                  style={{fontSize:"11px",padding:"2px 6px",background:"transparent",border:"none",cursor:"pointer",
+                  color:"rgba(255,255,255,0.4)",fontFamily:S.font,transition:"color 0.15s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.color="rgba(255,255,255,0.8)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,0.4)";}}
+                >✕</button>
               </div>
-              {/* Emoji picker - opens below button, overlays chat feed */}
+              {/* Emoji picker */}
               {emojiOpen&&(
-                <div style={{position:"absolute",left:"50%",transform:"translateX(-50%)",top:"100%",marginTop:"6px",zIndex:50,
-                  overflow:"hidden",
-                  maxHeight:emojiOpen==="closing"?0:"400px",opacity:emojiOpen==="closing"?0:1,
-                  transition:"max-height 0.25s ease, opacity 0.2s ease"}}>
-                  <div style={{display:"flex",justifyContent:"center"}}>
-                    <div style={{position:"relative",width:"240px"}}>
-                      {/* Bubble tail pointing up */}
-                      <div style={{position:"absolute",top:"-8px",left:"50%",transform:"translateX(-50%)",
-                        width:0,height:0,borderLeft:"10px solid transparent",borderRight:"10px solid transparent",
-                        borderBottom:`10px solid ${S.border}`}}/>
-                      <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
-                        width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",
-                        borderBottom:`8px solid ${S.cellGradient?S.dark:S.dark}`}}/>
-                      <div style={{
-                        display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"3px",
-                        padding:"8px",marginTop:"2px",
-                        background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
-                        border:`2px solid ${S.border}`,borderRadius:"16px",
-                        boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044"}}>
-                        {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
-                          <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});closeEmojiPicker();}}
-                            style={{fontSize:"22px",padding:"6px",background:"transparent",border:"none",borderRadius:"10px",cursor:"pointer",lineHeight:1,
-                            transition:"transform 0.12s, background 0.12s"}}
-                            onMouseDown={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
-                            onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
-                            onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
-                            onTouchStart={e=>{e.currentTarget.style.transform="scale(1.3)";e.currentTarget.style.background=S.border;}}
-                            onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}>{em}</button>
-                        ))}
-                      </div>
-                    </div>
+                <div style={{padding:"4px 8px 8px",position:"relative",zIndex:1,
+                  animation:"fadeIn 0.2s ease"}}>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"2px"}}>
+                    {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
+                      <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});closeEmojiPicker();}}
+                        style={{fontSize:"18px",padding:"5px",background:"transparent",border:"none",borderRadius:"8px",cursor:"pointer",lineHeight:1,
+                        transition:"transform 0.12s, background 0.12s"}}
+                        onMouseDown={e=>{e.currentTarget.style.transform="scale(1.2)";e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
+                        onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
+                        onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
+                        onTouchStart={e=>{e.currentTarget.style.transform="scale(1.2)";e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
+                        onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}>{em}</button>
+                    ))}
                   </div>
                 </div>
               )}
               {/* Chat feed */}
               {emojiFeed.length>0&&(
-                <div style={{display:"flex",flexDirection:"column",gap:"5px",alignItems:"flex-start",maxHeight:"180px",overflowY:"auto"}}>
+                <div style={{padding:"0 8px 8px",maxHeight:"120px",overflowY:"auto",position:"relative",zIndex:1}}>
                   {emojiFeed.map(e=>(
                     <div key={e.id} style={{
-                      display:"inline-flex",alignItems:"center",gap:"10px",
-                      background:S.cellGradient?`linear-gradient(135deg, ${S.dark} 0%, ${S.cell} 100%)`:S.dark,
-                      border:`2px solid ${S.border}`,borderRadius:"20px",
-                      padding:"10px 18px",position:"relative",
-                      animation:e.fading?"chatFadeOut 0.8s ease forwards":"chatSlideIn 0.35s ease-out",
-                      boxShadow:S.cellGradient?S.panelShadow:"2px 2px 0 #00000044",
-                      maxWidth:"100%"}}>
-                      <span style={{fontSize:"14px",fontWeight:"700",color:S.green,fontFamily:S.font,whiteSpace:"nowrap"}}>{e.nickname}</span>
-                      <span style={{fontSize:"30px",lineHeight:1}}>{e.emoji}</span>
+                      display:"flex",alignItems:"center",gap:"6px",
+                      padding:"4px 8px",marginBottom:"3px",
+                      background:"rgba(255,255,255,0.06)",
+                      borderRadius:"10px",
+                      animation:e.fading?"chatFadeOut 0.8s ease forwards":"chatSlideIn 0.3s ease-out"}}>
+                      <span style={{fontSize:"11px",fontWeight:"600",color:S.green,fontFamily:S.font,whiteSpace:"nowrap",opacity:0.9}}>{e.nickname}</span>
+                      <span style={{fontSize:"20px",lineHeight:1}}>{e.emoji}</span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
+          )}
+          {/* Chat hidden - small reopen button */}
+          {(mode==="public"||mode==="multi")&&state==="play"&&socket&&chatHidden&&(
+            <button onClick={()=>setChatHidden(false)}
+              style={{position:"fixed",bottom:"16px",right:"16px",zIndex:100,
+                fontSize:"16px",padding:"8px",lineHeight:1,
+                background:"rgba(15,20,35,0.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
+                border:"1px solid rgba(255,255,255,0.1)",borderRadius:"14px",cursor:"pointer",
+                boxShadow:"0 4px 16px rgba(0,0,0,0.2)",
+                transition:"all 0.2s",opacity:0.6}}
+              onMouseEnter={e=>{e.currentTarget.style.opacity="1";}}
+              onMouseLeave={e=>{e.currentTarget.style.opacity="0.6";}}
+            >💬</button>
           )}
 
           {/* Unlimited mode: refresh + end buttons */}
