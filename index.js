@@ -204,10 +204,11 @@ for (const lang of Object.keys(LANGS)) {
 function getLang(lang) { return LANGS[lang] || LANGS.fi; }
 
 const GRID_SIZE = 5;
+const HEX_GRID_SIZE = 6;
 
-function makeGrid(lang = 'fi') {
-  return Array.from({ length: GRID_SIZE }, () =>
-    Array.from({ length: GRID_SIZE }, () => randLetter(lang))
+function makeGrid(lang = 'fi', sz = GRID_SIZE) {
+  return Array.from({ length: sz }, () =>
+    Array.from({ length: sz }, () => randLetter(lang))
   );
 }
 
@@ -233,14 +234,45 @@ function findWords(grid, trie) {
   return found;
 }
 
-function generateGoodGrid(lang = 'fi') {
+// Hex grid neighbors (odd-r offset)
+const HEX_DIRS_EVEN = [[-1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]];
+const HEX_DIRS_ODD  = [[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]];
+function hexNeighbors(r, c, sz) {
+  const dirs = r % 2 === 0 ? HEX_DIRS_EVEN : HEX_DIRS_ODD;
+  return dirs.map(([dr,dc]) => ({r: r+dr, c: c+dc}))
+    .filter(n => n.r >= 0 && n.r < sz && n.c >= 0 && n.c < sz);
+}
+
+function findWordsHex(grid, trie) {
+  const sz = grid.length, found = new Set();
+  function dfs(r, c, node, path, vis) {
+    const ch = grid[r][c], nx = node.c[ch];
+    if (!nx) return;
+    const np = path + ch;
+    if (nx.w && np.length >= 3) found.add(np);
+    vis.add(r * sz + c);
+    for (const n of hexNeighbors(r, c, sz)) {
+      if (!vis.has(n.r * sz + n.c)) dfs(n.r, n.c, nx, np, vis);
+    }
+    vis.delete(r * sz + c);
+  }
+  for (let r = 0; r < sz; r++)
+    for (let c = 0; c < sz; c++)
+      dfs(r, c, trie, '', new Set());
+  return found;
+}
+
+function generateGoodGrid(lang = 'fi', hex = false) {
   const trie = getLang(lang).trie;
+  const sz = hex ? HEX_GRID_SIZE : GRID_SIZE;
+  const wordFinder = hex ? findWordsHex : findWords;
+  const threshold = hex ? 25 : 15;
   let bestGrid = null, bestWords = new Set();
   for (let i = 0; i < 30; i++) {
-    const g = makeGrid(lang);
-    const w = findWords(g, trie);
+    const g = makeGrid(lang, sz);
+    const w = wordFinder(g, trie);
     if (w.size > bestWords.size) { bestGrid = g; bestWords = w; }
-    if (w.size >= 15) break;
+    if (w.size >= threshold) break;
   }
   return { grid: bestGrid, validWords: bestWords };
 }
@@ -291,7 +323,7 @@ function startPublicRound(lang = 'fi') {
     clearInterval(pg.nextRoundInterval);
     pg.nextRoundInterval = null;
   }
-  const { grid, validWords } = generateGoodGrid(lang);
+  const { grid, validWords } = generateGoodGrid(lang, true); // hex grid for arena
   pg.grid = grid;
   pg.validWords = validWords;
   pg.validWordsList = [...validWords];
@@ -308,6 +340,7 @@ function startPublicRound(lang = 'fi') {
     grid,
     validWords: pg.validWordsList,
     roundNumber: pg.roundNumber,
+    hex: true,
   });
 
   pg.countdownTimer = setTimeout(() => {
@@ -619,12 +652,14 @@ io.on('connection', (socket) => {
         validWords: pg.validWordsList,
         timeLeft: pg.timeLeft,
         roundNumber: pg.roundNumber,
+        hex: true,
       });
     } else if (pg.state === 'countdown') {
       socket.emit('public_countdown', {
         grid: pg.grid,
         validWords: pg.validWordsList,
         roundNumber: pg.roundNumber,
+        hex: true,
       });
     } else {
       socket.emit('public_waiting', { playerCount: pg.players.size, nextRoundCountdown: pg.nextRoundCountdown || 0 });

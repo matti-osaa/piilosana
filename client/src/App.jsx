@@ -2112,6 +2112,7 @@ export default function Piilosana(){
   const[publicCountdown,setPublicCountdown]=useState(5);
   const[publicNextCountdown,setPublicNextCountdown]=useState(0);
   const[publicOnlineCount,setPublicOnlineCount]=useState(0);
+  const[publicHex,setPublicHex]=useState(false);
 
   // Poll arena player count from REST API when on main menu
   useEffect(()=>{
@@ -2649,7 +2650,8 @@ export default function Piilosana(){
     return best;
   },[]);
 
-  const adj=(a,b)=>soloMode==="hex"?adjHex(a,b):(Math.abs(a.r-b.r)<=1&&Math.abs(a.c-b.c)<=1&&!(a.r===b.r&&a.c===b.c));
+  const isHexMode=soloMode==="hex"||(mode==="public"&&publicHex);
+  const adj=(a,b)=>isHexMode?adjHex(a,b):(Math.abs(a.r-b.r)<=1&&Math.abs(a.c-b.c)<=1&&!(a.r===b.r&&a.c===b.c));
   const isSel=(r,c)=>sel.some(s=>s.r===r&&s.c===c);
 
   // Submit word (handles both solo and multiplayer)
@@ -2975,16 +2977,16 @@ export default function Piilosana(){
     });
 
     // ---- PUBLIC GAME (PIILOSAUNA) events ----
-    newSocket.on("public_countdown",({grid:g,validWords:vw,roundNumber})=>{
+    newSocket.on("public_countdown",({grid:g,validWords:vw,roundNumber,hex})=>{
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
       setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);setEnding(null);setDropKey(0);
       setPublicState("countdown");setPublicCountdown(5);setPublicRound(roundNumber);
-      setPublicRankings(null);setState("countdown");setCountdown(3);
+      setPublicRankings(null);setState("countdown");setCountdown(3);setPublicHex(!!hex);
     });
-    newSocket.on("public_join_midgame",({grid:g,validWords:vw,timeLeft:tl,roundNumber})=>{
+    newSocket.on("public_join_midgame",({grid:g,validWords:vw,timeLeft:tl,roundNumber,hex})=>{
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
       setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);setEnding(null);setDropKey(0);
-      setTime(tl);setPublicState("playing");setPublicRound(roundNumber);setPublicRankings(null);setState("play");
+      setTime(tl);setPublicState("playing");setPublicRound(roundNumber);setPublicRankings(null);setState("play");setPublicHex(!!hex);
       startTimeRef.current=Date.now();
     });
     newSocket.on("public_game_start",()=>{
@@ -4314,7 +4316,7 @@ export default function Piilosana(){
 
           {/* GRID */}
           <div style={{position:"relative"}}>
-            {soloMode==="hex"?(
+            {(soloMode==="hex"||(mode==="public"&&publicHex))?(
             <div ref={gRef}
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
               style={{padding:isLarge?"10px":"8px",background:S.gridBg||"#111133",
