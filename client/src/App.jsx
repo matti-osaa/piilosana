@@ -4316,8 +4316,8 @@ export default function Piilosana(){
                 boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:`0 0 30px #22ccaa22`,
                 touchAction:"none",position:"relative",borderRadius:"16px"}}>
               {grid.map((row,r)=>(
-                <div key={r} style={{display:"flex",justifyContent:"center",gap:"3px",
-                  marginTop:r>0?"-4.8%":"0",
+                <div key={r} style={{display:"flex",justifyContent:"center",gap:"1px",
+                  marginTop:r>0?"-5%":"0",
                   paddingLeft:r%2===1?"8%":"0",paddingRight:r%2===0?"8%":"0",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
@@ -4333,43 +4333,55 @@ export default function Piilosana(){
                     const scrambleLetter=isScrambling&&scrambleGrid?scrambleGrid[r]?.[c]||letter:letter;
                     const displayLetter=isScrambling&&!settled&&scrambleGrid?scrambleLetter:letter;
                     const scrambleColor=isScrambling&&!settled?`hsl(${(cellIdx*37+scrambleStep*73)%360},70%,65%)`:null;
-                    // Hex border color — high contrast across all themes
-                    const hexBorderColor=s?S.green:(S.cellBorder||S.border);
+                    const hexClip="polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
+                    const hexClipInner="polygon(50% 5%, 95% 27%, 95% 73%, 50% 95%, 5% 73%, 5% 27%)";
+                    // Border: bright & visible in all themes; selected = accent color, thicker
+                    const borderBg=eaten?"transparent":s?S.green:(S.cellBorder||S.border);
+                    const innerInset=s?"3px":"2px";
+                    const cellBg=eaten?(S.gridBg||"#111133"):S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell;
                     return(
                       <div key={`${r}-${c}-${dropKey}`} data-c={`${r},${c}`}
                         onMouseDown={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         onTouchStart={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         style={{
                           width:"15.5%",aspectRatio:"0.866",
-                          clipPath:"polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                          position:"relative",
+                          cursor:state==="play"?"pointer":"default",
+                          transition:"transform 0.2s ease",
+                          transform:s?"scale(1.08)":"none",
+                          animation:eaten?endAnim:(isScrambling&&settled?"pop 0.2s ease":"none"),
+                          "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
+                        }}>
+                        {/* Outer hex = border */}
+                        <div style={{position:"absolute",inset:0,clipPath:hexClip,
+                          background:borderBg,
+                          transition:"background 0.15s ease",
+                          boxShadow:s?`0 0 10px ${S.green}66`:"none"}}/>
+                        {/* Inner hex = cell content */}
+                        <div style={{position:"absolute",inset:innerInset,clipPath:hexClip,
+                          background:cellBg,
                           display:"flex",alignItems:"center",justifyContent:"center",
                           fontSize:isLarge?"clamp(24px,6vw,38px)":"clamp(20px,5.5vw,32px)",
                           fontFamily:S.letterFont,fontWeight:S.cellGradient?"700":"normal",
-                          color:eaten?endColor||"transparent":scrambleColor||(s?(S.cellText||(S.cellGradient?"#e6eef8":"#ffffff")):(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
-                          background:eaten?(S.gridBg||"#111133"):last?`linear-gradient(160deg, ${S.yellow}cc 0%, ${S.yellow}88 50%, ${S.yellow}55 100%)`:s?`linear-gradient(160deg, ${S.green}40 0%, ${S.green}25 40%, ${S.green}15 100%)`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
-                          cursor:state==="play"?"pointer":"default",
-                          transition:isScrambling?"color 0.07s, transform 0.15s, filter 0.15s":"all 0.2s ease",
                           textTransform:"uppercase",
-                          textShadow:s?`0 0 12px ${S.green}88, 0 1px 3px #00000066`:(eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${letterMult?letterColor(letter,lang):"#22ccaa"}44`),
-                          filter:eaten?"none":`drop-shadow(0 0 1.5px ${hexBorderColor}) drop-shadow(0 0 0.5px ${hexBorderColor})`,
-                          animation:eaten?endAnim:(isScrambling&&settled?"pop 0.2s ease":"none"),
-                          transform:s?"scale(1.06)":"none",
-                          "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
-                          position:"relative",
+                          transition:"all 0.2s ease",
+                          color:eaten?endColor||"transparent":scrambleColor||(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa"))),
+                          textShadow:eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${letterMult?letterColor(letter,lang):"#22ccaa"}44`,
                         }}>
-                        {eaten?"":<>
-                          {displayLetter}
-                          {/* Liquid glass effect on selected cells */}
-                          {s&&!isScrambling&&<span style={{position:"absolute",inset:0,
-                            clipPath:"polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                            background:`linear-gradient(170deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.08) 35%, transparent 50%, rgba(255,255,255,0.05) 65%, rgba(255,255,255,0.15) 100%)`,
-                            pointerEvents:"none",zIndex:1}}/>}
-                          {s&&!isScrambling&&<span style={{position:"absolute",top:"8%",left:"20%",width:"60%",height:"30%",
-                            borderRadius:"50%",
-                            background:`radial-gradient(ellipse, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.06) 60%, transparent 100%)`,
-                            pointerEvents:"none",zIndex:2,filter:"blur(1px)"}}/>}
-                          {letterMult&&!isScrambling&&<span style={{position:"absolute",bottom:"2px",right:"4px",fontSize:"clamp(8px,2vw,11px)",fontFamily:"'Press Start 2P',monospace",color:letterColor(letter,lang),opacity:0.7,lineHeight:1,zIndex:3}}>{getLetterValues(lang)[letter]||1}</span>}
-                        </>}
+                          {eaten?"":<>
+                            {/* Letter — magnifies when selected (water lens) */}
+                            <span style={{position:"relative",zIndex:2,
+                              transition:"transform 0.2s ease, text-shadow 0.2s ease",
+                              transform:s?"scale(1.18)":"none",
+                              textShadow:s?`0 0 10px ${S.green}88, 0 0 20px ${S.green}44`:(eaten?"none":undefined),
+                            }}>{displayLetter}</span>
+                            {/* Water caustic — subtle light refraction on selected */}
+                            {s&&!isScrambling&&<span style={{position:"absolute",inset:0,
+                              background:`radial-gradient(ellipse at 40% 35%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 45%, transparent 70%)`,
+                              pointerEvents:"none",zIndex:1}}/>}
+                            {letterMult&&!isScrambling&&<span style={{position:"absolute",bottom:"4px",right:"6px",fontSize:"clamp(8px,2vw,11px)",fontFamily:"'Press Start 2P',monospace",color:letterColor(letter,lang),opacity:0.7,lineHeight:1,zIndex:3}}>{getLetterValues(lang)[letter]||1}</span>}
+                          </>}
+                        </div>
                       </div>
                     );
                   })}
