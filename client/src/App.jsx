@@ -223,6 +223,7 @@ const T={
     helpCombo:"Löydä sanoja nopeasti peräkkäin → combo! 3+ peräkkäin = x2, 5+ = x3 pisteet.",
     helpMultiplier:"Kultaiset kirjaimet antavat 2× tai 3× pistekertoimen sanaan.",
     helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi noin 138 000, englanniksi ja ruotsiksi omat sanalistansa.",
+    helpInflection:"Taivutusmuodot kelpaavat! Esim. sametti → sametin, samettia, samettiin, sametilla, sametteja, samettien… Kaikki suomen sijamuodot toimivat, joten kokeile rohkeasti eri päätteitä.",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"MULTIPLAYER",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -278,6 +279,7 @@ const T={
     helpCombo:"Find words quickly in a row → combo! 3+ in a row = x2, 5+ = x3 points.",
     helpMultiplier:"Golden letters give a 2× or 3× score multiplier for the word.",
     helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has about 138,000 words, English and Swedish have their own vocabularies.",
+    helpInflection:"Inflected forms count! E.g. velvet → sametin, samettia, samettiin, sametilla, sametteja… All Finnish case forms work, so try different endings boldly.",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"FLERSPELARE",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -333,6 +335,7 @@ const T={
     helpCombo:"Hitta ord snabbt i rad → kombo! 3+ i rad = x2, 5+ = x3 poäng.",
     helpMultiplier:"Gyllene bokstäver ger 2× eller 3× poängmultiplikator för ordet.",
     helpLang:"Du kan byta språk från huvudmenyn. Varje språk har sin egen ordlista — finska har cirka 138 000 ord, engelska och svenska har egna vokabulär.",
+    helpInflection:"Böjningsformer räknas! T.ex. sammet → sammeten, sammets, sammeterna… Prova olika ändelser.",
   },
 };
 
@@ -3436,6 +3439,7 @@ export default function Piilosana(){
               <div><span style={{color:S.yellow}}>🔥</span> {t.helpCombo}</div>
               <div><span style={{color:S.yellow}}>✦</span> {t.helpMultiplier}</div>
               <div><span style={{color:S.yellow}}>🌐</span> {t.helpLang}</div>
+              <div><span style={{color:S.yellow}}>🔤</span> {t.helpInflection}</div>
             </div>
           </div>
         </div>
