@@ -4276,9 +4276,9 @@ export default function Piilosana(){
                 boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:`0 0 30px #22ccaa22`,
                 touchAction:"none",position:"relative",borderRadius:"16px"}}>
               {grid.map((row,r)=>(
-                <div key={r} style={{display:"flex",justifyContent:"center",gap:"1px",
-                  marginTop:r>0?"-3.3%":"0",
-                  paddingLeft:r%2===1?"8%":"0",paddingRight:r%2===0?"8%":"0",
+                <div key={r} style={{display:"flex",justifyContent:"center",gap:"2px",
+                  marginTop:r>0?"calc(-4.475% + 2px)":"0",
+                  transform:r%2===1?"translateX(calc(15.5% / 2 + 1px))":"none",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
                     const s=isSel(r,c);
