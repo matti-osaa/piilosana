@@ -4468,9 +4468,9 @@ export default function Piilosana(){
 
       {/* PLAYING + ENDING + SCRAMBLE */}
       {(state==="play"||state==="ending"||state==="scramble")&&(
-        <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
+        <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:(soloMode==="hex"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD */}
-          <div style={{marginBottom:"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
+          <div style={{marginBottom:isHexMode?"3px":"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
             {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {publicPlayerCount===1?t.player:t.players}</div>}
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
@@ -4579,7 +4579,7 @@ export default function Piilosana(){
           )}
 
           {gameTime!==0&&(
-          <div style={{height:"4px",background:S.dark,marginBottom:"6px",border:`1px solid ${S.border}`}}>
+          <div style={{height:"4px",background:S.dark,marginBottom:isHexMode?"3px":"6px",border:`1px solid ${S.border}`}}>
             <div style={{height:"100%",width:`${(time/gameTime)*100}%`,background:time<=15?S.red:time<=30?S.yellow:S.green,transition:"width 0.3s linear"}}/>
           </div>
           )}
@@ -4590,14 +4590,14 @@ export default function Piilosana(){
             {(soloMode==="hex"||(mode==="public"&&publicHex))?(
             <div ref={gRef}
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
-              style={{padding:isLarge?"10px":"8px",background:S.gridBg||"#111133",
+              style={{padding:isLarge?"4px 2px":"2px 1px",background:S.gridBg||"#111133",
                 border:`3px solid ${combo>=3&&state==="play"?S.yellow:ending?ending.color+"88":S.border}`,
                 boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:`0 0 30px #22ccaa22`,
                 touchAction:"none",position:"relative",borderRadius:"16px",overflow:"hidden"}}>
               {grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"2px",
-                  marginTop:r>0?"calc(-4.475% + 2px)":"0",
-                  transform:r%2===1?"translateX(calc(15.5% / 4 + 0.5px))":"translateX(calc(-15.5% / 4 - 0.5px))",
+                  marginTop:r>0?"calc(-4.764% + 2px)":"0",
+                  transform:r%2===1?"translateX(calc(16.5% / 4 + 0.5px))":"translateX(calc(-16.5% / 4 - 0.5px))",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
                     const s=isSel(r,c);
@@ -4624,7 +4624,7 @@ export default function Piilosana(){
                         onMouseDown={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         onTouchStart={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         style={{
-                          width:"15.5%",aspectRatio:"0.866",
+                          width:"16.5%",aspectRatio:"0.866",
                           position:"relative",
                           cursor:state==="play"?"pointer":"default",
                           transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1)",
@@ -4649,7 +4649,7 @@ export default function Piilosana(){
                         <div style={{position:"absolute",inset:innerInset,clipPath:hexClip,
                           background:cellBg,
                           display:"flex",alignItems:"center",justifyContent:"center",
-                          fontSize:isLarge?"clamp(24px,6vw,38px)":"clamp(20px,5.5vw,32px)",
+                          fontSize:isLarge?"clamp(26px,6.5vw,40px)":"clamp(22px,6vw,34px)",
                           fontFamily:S.letterFont,fontWeight:S.cellGradient||s?"700":"normal",
                           textTransform:"uppercase",
                           transition:"all 0.2s ease",
