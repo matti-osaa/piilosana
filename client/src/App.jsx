@@ -4467,10 +4467,11 @@ export default function Piilosana(){
       {(state==="play"||state==="ending"||state==="scramble")&&(
         <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:(soloMode==="hex"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD */}
-          <div style={{marginBottom:isHexMode?"3px":"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
-            {mode==="public"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {publicPlayerCount===1?t.player:t.players}</div>}
-            {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
-            {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
+          <div style={{marginBottom:isHexMode?"1px":"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
+            {mode==="public"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {publicPlayerCount===1?t.player:t.players}</div>}
+            {mode==="multi"&&gameMode!=="battle"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.green,background:S.dark,borderBottom:`1px solid ${S.border}`}}>{t.multiLabel||"MONINPELI"} — {players.length} {t.players}</div>}
+            {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
+            {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
             {mode==="solo"&&soloMode==="rotate"&&(
               <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",padding:"4px",
                 background:rotateActive?"#ff990022":"#ff990008",borderBottom:`1px solid ${S.border}`,transition:"background 0.2s"}}>
@@ -4516,35 +4517,35 @@ export default function Piilosana(){
             )}
             {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="infinity" color="#44ddff" size={1}/>{t.unlimitedLabel}</div>}
             {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
-            <div className="piilosana-hud" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 14px"}}>
+            <div className="piilosana-hud" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 10px"}}>
               {gameTime!==0?(
-              <div style={{display:"flex",alignItems:"baseline",gap:"8px",flex:1}}>
-                <span style={{fontSize:"14px",color:S.textMuted,fontWeight:"600"}}>{t.time}</span>
-                <span style={{fontSize:"28px",fontWeight:"700",color:time<=15?S.red:time<=30?S.yellow:S.green,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{fmt(time)}</span>
+              <div style={{display:"flex",alignItems:"baseline",gap:"4px",flex:1}}>
+                <span style={{fontSize:"11px",color:S.textMuted,fontWeight:"600"}}>{t.time}</span>
+                <span style={{fontSize:"22px",fontWeight:"700",color:time<=15?S.red:time<=30?S.yellow:S.green,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{fmt(time)}</span>
               </div>
               ):(
-              <div style={{display:"flex",alignItems:"baseline",gap:"8px",flex:1}}>
-                <span style={{fontSize:"14px",color:S.textMuted,fontWeight:"600"}}>{t.words.toUpperCase()}</span>
-                <span style={{fontSize:"28px",fontWeight:"700",color:"#44ddff",lineHeight:1}}>{found.length}</span>
+              <div style={{display:"flex",alignItems:"baseline",gap:"4px",flex:1}}>
+                <span style={{fontSize:"11px",color:S.textMuted,fontWeight:"600"}}>{t.words.toUpperCase()}</span>
+                <span style={{fontSize:"22px",fontWeight:"700",color:"#44ddff",lineHeight:1}}>{found.length}</span>
               </div>
               )}
               {mode==="solo"&&state==="play"&&(
-                <button onClick={()=>setShowExitConfirm(true)} style={{background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"4px 8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"4px",transition:"all 0.15s",flexShrink:0}}
+                <button onClick={()=>setShowExitConfirm(true)} style={{background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"2px 6px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"4px",transition:"all 0.15s",flexShrink:0}}
                   onMouseEnter={e=>{e.currentTarget.style.borderColor=S.red;e.currentTarget.style.background=S.red+"15";}}
                   onMouseLeave={e=>{e.currentTarget.style.borderColor=S.textMuted+"44";e.currentTarget.style.background="transparent";}}>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.textMuted} strokeWidth="2" strokeLinecap="round"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.textMuted} strokeWidth="2" strokeLinecap="round"/></svg>
                 </button>
               )}
-              <div style={{display:"flex",alignItems:"baseline",gap:"8px",justifyContent:"flex-end",flex:1}}>
-                <span style={{fontSize:"14px",color:S.textMuted,fontWeight:"600"}}>{t.score}</span>
-                <span style={{fontSize:"28px",fontWeight:"700",color:S.yellow,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{score}</span>
+              <div style={{display:"flex",alignItems:"baseline",gap:"4px",justifyContent:"flex-end",flex:1}}>
+                <span style={{fontSize:"11px",color:S.textMuted,fontWeight:"600"}}>{t.score}</span>
+                <span style={{fontSize:"22px",fontWeight:"700",color:S.yellow,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{score}</span>
               </div>
             </div>
-            <div ref={wordBarRef} key={flashKey} style={{borderTop:S.cellGradient?`1px solid ${S.border}`:`1px solid ${S.border}`,padding:S.cellGradient?"10px 14px":"4px 10px",textAlign:"center",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
-              <div style={{fontSize:S.cellGradient?"28px":"18px",minHeight:S.cellGradient?"36px":"20px",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
-                {state==="ending"?<span style={{color:ending?.color,fontSize:S.cellGradient?"22px":"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
+            <div ref={wordBarRef} key={flashKey} style={{borderTop:`1px solid ${S.border}`,padding:S.cellGradient?"4px 10px":"2px 8px",textAlign:"center",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
+              <div style={{fontSize:S.cellGradient?"22px":"18px",minHeight:S.cellGradient?"26px":"20px",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
+                {state==="ending"?<span style={{color:ending?.color,fontSize:S.cellGradient?"18px":"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
                  word?word.toUpperCase():
-                 (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?(S.cellGradient?"16px":"12px"):(S.cellGradient?"14px":"10px"),fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted,fontSize:S.cellGradient?"20px":"18px"}}>···</span>)}
+                 (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?(S.cellGradient?"14px":"12px"):(S.cellGradient?"12px":"10px"),fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted,fontSize:S.cellGradient?"16px":"18px"}}>···</span>)}
               </div>
             </div>
           </div>
@@ -4576,7 +4577,7 @@ export default function Piilosana(){
           )}
 
           {gameTime!==0&&(
-          <div style={{height:"4px",background:S.dark,marginBottom:isHexMode?"3px":"6px",border:`1px solid ${S.border}`}}>
+          <div style={{height:"3px",background:S.dark,marginBottom:isHexMode?"1px":"6px",border:`1px solid ${S.border}`}}>
             <div style={{height:"100%",width:`${(time/gameTime)*100}%`,background:time<=15?S.red:time<=30?S.yellow:S.green,transition:"width 0.3s linear"}}/>
           </div>
           )}
@@ -4795,12 +4796,12 @@ export default function Piilosana(){
           </div>
 
           {state==="play"&&(
-            <div className="piilosana-found" style={{marginTop:"8px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,maxHeight:"120px",overflowY:"auto"}}>
-              <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"4px"}}>{(gameMode==="battle"||(mode==="solo"&&(soloMode==="tetris"||soloMode==="rotate"||soloMode==="chess")))?`${t.found} (${found.length})`:`${t.found} (${found.length}/${valid.size}) ${valid.size>0?Math.round(found.length/valid.size*100):0}%`}</div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
-                {found.length===0?<span style={{fontSize:"18px",color:S.textMuted}}>{t.dragWords}</span>:
+            <div className="piilosana-found" style={{marginTop:isHexMode?"2px":"8px",padding:"4px 6px",border:`2px solid ${S.border}`,background:S.dark,maxHeight:"100px",overflowY:"auto"}}>
+              <div style={{fontSize:"11px",color:S.textMuted,marginBottom:"2px"}}>{(gameMode==="battle"||(mode==="solo"&&(soloMode==="tetris"||soloMode==="rotate"||soloMode==="chess")))?`${t.found} (${found.length})`:`${t.found} (${found.length}/${valid.size}) ${valid.size>0?Math.round(found.length/valid.size*100):0}%`}</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:"2px"}}>
+                {found.length===0?null:
                   found.map((w,i)=>(
-                    <span key={i} style={{fontSize:"18px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length),animation:i===found.length-1?"pop 0.3s ease":"none"}}>
+                    <span key={i} style={{fontSize:"14px",background:S.dark,padding:"1px 3px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length),animation:i===found.length-1?"pop 0.3s ease":"none"}}>
                       {w.toUpperCase()} +{letterMult?ptsLetters(w,lang):pts(w.length)}
                     </span>
                   ))
