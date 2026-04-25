@@ -224,6 +224,7 @@ const T={
     helpMultiplier:"Kultaiset kirjaimet antavat 2× tai 3× pistekertoimen sanaan.",
     helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi noin 138 000, englanniksi ja ruotsiksi omat sanalistansa.",
     helpInflection:"Taivutusmuodot kelpaavat! Esim. sametti → sametin, samettia, samettiin, sametilla, sametteja, samettien… Kaikki suomen sijamuodot toimivat, joten kokeile rohkeasti eri päätteitä.",
+    tutorialBtn:"PIKAOHJE",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"MULTIPLAYER",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -280,6 +281,7 @@ const T={
     helpMultiplier:"Golden letters give a 2× or 3× score multiplier for the word.",
     helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has about 138,000 words, English and Swedish have their own vocabularies.",
     helpInflection:"Inflected forms count! E.g. velvet → sametin, samettia, samettiin, sametilla, sametteja… All Finnish case forms work, so try different endings boldly.",
+    tutorialBtn:"QUICK GUIDE",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"FLERSPELARE",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -336,6 +338,7 @@ const T={
     helpMultiplier:"Gyllene bokstäver ger 2× eller 3× poängmultiplikator för ordet.",
     helpLang:"Du kan byta språk från huvudmenyn. Varje språk har sin egen ordlista — finska har cirka 138 000 ord, engelska och svenska har egna vokabulär.",
     helpInflection:"Böjningsformer räknas! T.ex. sammet → sammeten, sammets, sammeterna… Prova olika ändelser.",
+    tutorialBtn:"SNABBGUIDE",
   },
 };
 
@@ -944,6 +947,234 @@ function ScorePopup({text,color,x,y}){
 }
 function WordPopup({text,color,x,y,font}){
   return(<div style={{position:"fixed",left:x,top:y,transform:"translate(-50%,-50%)",pointerEvents:"none",zIndex:199,fontFamily:font||"inherit",fontSize:"22px",fontWeight:"700",letterSpacing:"3px",color,textShadow:`0 0 12px ${color}66, 0 2px 4px #00000044`,animation:"wordRise 1.2s ease-out forwards"}}>{text}</div>);
+}
+
+// ============================================
+// QUICK TUTORIAL - animated demo showing how to drag words
+// ============================================
+const TUTORIAL_GRIDS={
+  fi:{
+    // 4 rows × 5 cols — letters placed so paths spell real words
+    // sauna: (2,0)s → (1,0)a → (0,0)u → (0,1)n → (1,1)a
+    // suo:   (3,2)s → (3,1)u → (2,1)o
+    grid:[
+      ["u","n","k","e","t"],
+      ["a","a","l","i","v"],
+      ["s","o","m","a","p"],
+      ["r","u","s","h","i"],
+    ],
+    words:[
+      {word:"sauna",path:[[2,0],[1,0],[0,0],[0,1],[1,1]],color:"#44ff88"},
+      {word:"suo",path:[[3,2],[3,1],[2,1]],color:"#ffaa44"},
+    ],
+  },
+  en:{
+    // train: (2,0)t → (1,0)r → (0,0)a → (0,1)i → (1,1)n
+    // net:   (3,2)n → (3,1)e → (2,1)t
+    grid:[
+      ["a","i","k","o","p"],
+      ["r","n","l","f","d"],
+      ["t","t","m","h","s"],
+      ["g","e","n","a","w"],
+    ],
+    words:[
+      {word:"train",path:[[2,0],[1,0],[0,0],[0,1],[1,1]],color:"#44ff88"},
+      {word:"net",path:[[3,2],[3,1],[2,1]],color:"#ffaa44"},
+    ],
+  },
+  sv:{
+    // storm: (2,0)s → (1,0)t → (0,0)o → (0,1)r → (1,1)m
+    // sol:   (3,2)s → (3,1)o → (2,1)l
+    grid:[
+      ["o","r","k","e","n"],
+      ["t","m","a","i","d"],
+      ["s","l","v","h","p"],
+      ["g","o","s","a","f"],
+    ],
+    words:[
+      {word:"storm",path:[[2,0],[1,0],[0,0],[0,1],[1,1]],color:"#44ff88"},
+      {word:"sol",path:[[3,2],[3,1],[2,1]],color:"#ffaa44"},
+    ],
+  },
+};
+
+function QuickTutorial({lang,theme,onClose}){
+  const S=theme;
+  const config=TUTORIAL_GRIDS[lang]||TUTORIAL_GRIDS.fi;
+  const grid=config.grid;
+  const rows=grid.length,cols=grid[0].length;
+  const [step,setStep]=useState(0); // which word we're animating
+  const [progress,setProgress]=useState(0); // 0..1 progress along current word path
+  const [completedWords,setCompletedWords]=useState([]);
+  const [wordFlash,setWordFlash]=useState(null);
+  const containerRef=useRef(null);
+
+  // Timing: each word takes ~2.5s to trace, 1s pause between, 1s at end
+  const TRACE_DURATION=2500;
+  const PAUSE_BETWEEN=800;
+  const END_PAUSE=1500;
+
+  useEffect(()=>{
+    let cancelled=false;
+    async function animate(){
+      for(let wi=0;wi<config.words.length;wi++){
+        if(cancelled)return;
+        setStep(wi);
+        setProgress(0);
+        // Animate tracing
+        await new Promise(resolve=>{
+          const start=performance.now();
+          function tick(now){
+            if(cancelled){resolve();return;}
+            const elapsed=now-start;
+            const p=Math.min(1,elapsed/TRACE_DURATION);
+            setProgress(p);
+            if(p<1)requestAnimationFrame(tick);
+            else{
+              setCompletedWords(prev=>[...prev,wi]);
+              setWordFlash(wi);
+              setTimeout(()=>setWordFlash(null),600);
+              setTimeout(resolve,PAUSE_BETWEEN);
+            }
+          }
+          requestAnimationFrame(tick);
+        });
+      }
+      // Wait at end then close
+      if(!cancelled)setTimeout(()=>{if(!cancelled)onClose();},END_PAUSE);
+    }
+    animate();
+    return()=>{cancelled=true;};
+  },[]);
+
+  // Calculate which cells are currently "selected" (traced by the pointer)
+  const currentWord=config.words[step];
+  const path=currentWord?currentWord.path:[];
+  const cellCount=path.length;
+  const activeCellCount=Math.min(cellCount,Math.floor(progress*cellCount)+1);
+  const activeCells=path.slice(0,Math.min(activeCellCount,cellCount));
+
+  // All completed word cells
+  const completedCells=new Set();
+  completedWords.forEach(wi=>{
+    config.words[wi].path.forEach(([r,c])=>completedCells.add(`${r},${c}`));
+  });
+
+  // Pointer is visible when we're actively tracing (not between words)
+  const pointerVisible=progress>0||step===0;
+
+  // Get cell center position using DOM refs
+  const cellRefs=useRef({});
+  const getCellCenter=(r,c)=>{
+    const el=cellRefs.current[`${r},${c}`];
+    const container=containerRef.current;
+    if(!el||!container)return null;
+    const cRect=container.getBoundingClientRect();
+    const eRect=el.getBoundingClientRect();
+    return{
+      x:eRect.left+eRect.width/2-cRect.left,
+      y:eRect.top+eRect.height/2-cRect.top,
+    };
+  };
+
+  const hexClip="polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
+
+  // Build the formed word text
+  const formedWord=activeCells.map(([r,c])=>grid[r][c]).join("").toUpperCase();
+  const completedWordTexts=completedWords.map(wi=>config.words[wi].word.toUpperCase());
+
+  return(
+    <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000dd",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px",animation:"fadeIn 0.3s ease"}} onClick={onClose}>
+      <div style={{background:S.bg,border:`3px solid ${S.green}`,borderRadius:S.panelRadius,padding:"20px",maxWidth:"360px",width:"100%",boxShadow:S.panelShadow,position:"relative"}} onClick={e=>e.stopPropagation()}>
+        <button onClick={onClose} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius,zIndex:10}}>✕</button>
+
+        {/* Formed word display */}
+        <div style={{textAlign:"center",marginBottom:"12px",minHeight:"32px"}}>
+          {formedWord&&!completedWords.includes(step)&&(
+            <span style={{fontSize:"18px",fontWeight:"700",fontFamily:S.font,color:currentWord.color,letterSpacing:"3px",textShadow:`0 0 10px ${currentWord.color}66`,animation:"none"}}>{formedWord}</span>
+          )}
+          {wordFlash!==null&&(
+            <span style={{fontSize:"18px",fontWeight:"700",fontFamily:S.font,color:config.words[wordFlash].color,letterSpacing:"3px",textShadow:`0 0 15px ${config.words[wordFlash].color}88`,animation:"pop 0.5s ease"}}>{config.words[wordFlash].word.toUpperCase()} ✓</span>
+          )}
+        </div>
+
+        {/* Mini hex grid */}
+        <div style={{position:"relative",width:"100%",paddingBottom:"60%",overflow:"hidden",borderRadius:"12px",background:S.gridBg||S.dark,border:`2px solid ${S.border}`}}>
+          <div ref={containerRef} style={{position:"absolute",inset:0,padding:"8px"}}>
+            {grid.map((row,r)=>(
+              <div key={r} style={{display:"flex",justifyContent:"center",gap:"3px",
+                marginTop:r>0?"calc(-4.475% + 1px)":"0",
+                transform:r%2===1?"translateX(calc(18% / 4 + 0.5px))":"translateX(calc(-18% / 4 - 0.5px))",
+                position:"relative",zIndex:rows-r}}>
+                {row.map((letter,c)=>{
+                  const cellKey=`${r},${c}`;
+                  const isActive=activeCells.some(([ar,ac])=>ar===r&&ac===c)&&!completedWords.includes(step);
+                  const isCompleted=completedCells.has(cellKey);
+                  const wordIdx=isCompleted?completedWords.find(wi=>config.words[wi].path.some(([pr,pc])=>pr===r&&pc===c)):null;
+                  const completedColor=wordIdx!==null&&wordIdx!==undefined?config.words[wordIdx].color:null;
+                  const activeColor=currentWord?currentWord.color:"#44ff88";
+                  const isLast=isActive&&activeCells.length>0&&activeCells[activeCells.length-1][0]===r&&activeCells[activeCells.length-1][1]===c;
+                  const borderBg=isActive?`linear-gradient(120deg, ${activeColor}, ${activeColor}cc)`:(isCompleted?`${completedColor}88`:(S.cellBorder||S.border));
+                  const cellBg=isActive?(S.cell+"ee"):(isCompleted?`${completedColor}15`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell);
+
+                  return(
+                    <div key={c} ref={el=>{if(el)cellRefs.current[`${r},${c}`]=el;}} style={{width:"18%",aspectRatio:"0.866",position:"relative",
+                      transition:"transform 0.2s cubic-bezier(0.34,1.56,0.64,1)",
+                      transform:isActive?(isLast?"scale(1.12)":"scale(1.05)"):"none",
+                      zIndex:isActive?10:0}}>
+                      <div style={{position:"absolute",inset:isActive?"-1px":"0",clipPath:hexClip,
+                        background:borderBg,transition:"all 0.2s ease",
+                        boxShadow:isActive?`0 0 12px ${activeColor}66`:"none"}}/>
+                      <div style={{position:"absolute",inset:isActive?"2px":"1px",clipPath:hexClip,
+                        background:cellBg,
+                        display:"flex",alignItems:"center",justifyContent:"center",
+                        fontSize:"clamp(14px,4.5vw,22px)",fontFamily:S.letterFont,fontWeight:"700",
+                        textTransform:"uppercase",transition:"all 0.2s ease",
+                        color:isActive?"#ffffff":(isCompleted?completedColor:(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa"))),
+                        textShadow:isActive?`0 0 10px ${activeColor}88`:"none"}}>
+                        {letter}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+
+            {/* Animated hand pointer */}
+            {pointerVisible&&!completedWords.includes(step)&&(()=>{
+              // Interpolate between cell centers using DOM positions
+              const totalSegments=Math.max(1,path.length-1);
+              const exactPos=progress*totalSegments;
+              const segIdx=Math.max(0,Math.min(Math.floor(exactPos),totalSegments-1));
+              const segProgress=exactPos-segIdx;
+              const p1=getCellCenter(...path[segIdx]);
+              const p2=getCellCenter(...path[Math.min(segIdx+1,path.length-1)]);
+              if(!p1||!p2)return null;
+              const px=p1.x+(p2.x-p1.x)*segProgress;
+              const py=p1.y+(p2.y-p1.y)*segProgress;
+              return(
+                <div style={{position:"absolute",left:`${px}px`,top:`${py}px`,transform:"translate(-4px, -4px)",
+                  pointerEvents:"none",zIndex:50,transition:"none",filter:"drop-shadow(0 2px 6px #00000066)"}}>
+                  <svg width="32" height="40" viewBox="0 0 32 40" fill="none">
+                    <path d="M8 1L8 24L12 20L16 28L20 26L16 18L22 18L8 1Z" fill="white" stroke="#333" strokeWidth="1.5" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+
+        {/* Completed words shown below */}
+        <div style={{display:"flex",gap:"8px",justifyContent:"center",marginTop:"12px",minHeight:"28px",flexWrap:"wrap"}}>
+          {completedWordTexts.map((w,i)=>(
+            <span key={i} style={{fontSize:"14px",fontWeight:"700",fontFamily:S.font,color:config.words[i].color,
+              padding:"2px 10px",border:`2px solid ${config.words[i].color}66`,borderRadius:"4px",
+              background:`${config.words[i].color}15`,letterSpacing:"2px"}}>{w} ✓</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ============================================
@@ -1754,6 +1985,7 @@ export default function Piilosana(){
   const[flagBubbleFading,setFlagBubbleFading]=useState(false);
   const[showWordInfo,setShowWordInfo]=useState(false);
   const[showHelp,setShowHelp]=useState(false);
+  const[showTutorial,setShowTutorial]=useState(false);
   const[gearBlend,setGearBlend]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
   const[themeTransition,setThemeTransition]=useState(false);
@@ -3314,6 +3546,7 @@ export default function Piilosana(){
         {/* Info links */}
         <div style={{fontSize:"14px",color:S.textMuted,marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString("fi-FI")} {t.words}</div>
         <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
+          <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,background:"transparent",border:`1px solid ${S.yellow}44`,padding:"3px 10px",cursor:"pointer",borderRadius:"4px",opacity:0.9}}>{t.tutorialBtn} ▶</button>
           <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.howToPlay}</button>
           <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
         </div>
@@ -3452,6 +3685,7 @@ export default function Piilosana(){
         </div>
       )}
       {/* Help / How to play modal */}
+      {showTutorial&&<QuickTutorial lang={lang} theme={S} onClose={()=>setShowTutorial(false)}/>}
       {showHelp&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}} onClick={()=>setShowHelp(false)}>
           <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"440px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative",borderRadius:S.panelRadius,boxShadow:S.panelShadow}} onClick={e=>e.stopPropagation()}>
