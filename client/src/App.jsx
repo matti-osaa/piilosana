@@ -1156,10 +1156,23 @@ function QuickTutorial({lang,theme,onClose}){
               const px=p1.x+(p2.x-p1.x)*segProgress;
               const py=p1.y+(p2.y-p1.y)*segProgress;
               return(
-                <div style={{position:"absolute",left:`${px}px`,top:`${py}px`,transform:"translate(-4px, -4px)",
-                  pointerEvents:"none",zIndex:50,transition:"none",filter:"drop-shadow(0 2px 6px #00000066)"}}>
-                  <svg width="32" height="40" viewBox="0 0 32 40" fill="none">
-                    <path d="M8 1L8 24L12 20L16 28L20 26L16 18L22 18L8 1Z" fill="white" stroke="#333" strokeWidth="1.5" strokeLinejoin="round"/>
+                <div style={{position:"absolute",left:`${px}px`,top:`${py}px`,transform:"translate(-12px, -6px)",
+                  pointerEvents:"none",zIndex:50,transition:"none",filter:"drop-shadow(0 3px 8px #00000088)"}}>
+                  <svg width="36" height="44" viewBox="0 0 48 56" fill="none">
+                    {/* Pointing/dragging finger */}
+                    <ellipse cx="20" cy="6" rx="5" ry="6" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1.2"/>
+                    <rect x="15" y="10" width="10" height="14" rx="4" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1.2"/>
+                    <rect x="11" y="22" width="26" height="20" rx="6" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1.2"/>
+                    <ellipse cx="18" cy="45" rx="3.5" ry="4" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1"/>
+                    <ellipse cx="25" cy="46" rx="3.5" ry="4.5" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1"/>
+                    <ellipse cx="32" cy="45" rx="3.5" ry="4" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1"/>
+                    {/* Fingernail */}
+                    <ellipse cx="20" cy="3" rx="3.5" ry="2.5" fill="#fce4d0" stroke="#ddb898" strokeWidth="0.8"/>
+                    {/* Touch ripple */}
+                    <circle cx="20" cy="4" r="10" fill="none" stroke="#44ff8866" strokeWidth="1.5" opacity="0.5">
+                      <animate attributeName="r" values="6;14;6" dur="1.5s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0.6;0;0.6" dur="1.5s" repeatCount="indefinite"/>
+                    </circle>
                   </svg>
                 </div>
               );
