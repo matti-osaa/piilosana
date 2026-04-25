@@ -4525,7 +4525,7 @@ export default function Piilosana(){
                  word?word.toUpperCase():
                  (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?(S.cellGradient?"16px":"12px"):(S.cellGradient?"14px":"10px"),fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted,fontSize:S.cellGradient?"20px":"18px"}}>···</span>)}
               </div>
-              {(mode==="multi"||mode==="public")&&<span style={{position:"absolute",right:"6px",top:"50%",transform:"translateY(-50%)",fontSize:"10px",color:S.textMuted}}>{mode==="public"?`${t.arenaLabel} ${publicPlayerCount}`:` ${players.length} ${t.players}`}</span>}
+              {(mode==="multi"||mode==="public")&&<span style={{position:"absolute",right:"6px",top:"50%",transform:"translateY(-50%)",fontSize:"10px",color:S.textMuted,display:"flex",alignItems:"center",gap:"2px"}}><Icon icon="person" color={S.textMuted} size={1}/>{mode==="public"?publicPlayerCount:players.length}</span>}
             </div>
           </div>
 

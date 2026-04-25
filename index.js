@@ -402,8 +402,8 @@ function endPublicRound(lang = 'fi') {
     allFoundWords: [...allFoundWords],
   });
 
-  pg.nextRoundCountdown = 40;
-  let nextRoundCountdown = 40;
+  pg.nextRoundCountdown = 30;
+  let nextRoundCountdown = 30;
   pg.nextRoundInterval = setInterval(() => {
     nextRoundCountdown--;
     pg.nextRoundCountdown = nextRoundCountdown;
