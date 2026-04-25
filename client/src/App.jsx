@@ -4326,7 +4326,7 @@ export default function Piilosana(){
               {grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"2px",
                   marginTop:r>0?"calc(-4.475% + 2px)":"0",
-                  transform:r%2===1?"translateX(calc(15.5% / 4 + 1px))":"translateX(calc(-15.5% / 4 - 1px))",
+                  transform:r%2===1?"translateX(calc(15.5% / 4 + 0.5px))":"translateX(calc(-15.5% / 4 - 0.5px))",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
                     const s=isSel(r,c);
