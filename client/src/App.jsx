@@ -220,11 +220,12 @@ const T={
     howToPlay:"Näin pelaat",
     helpDrag:"Vedä sormella tai hiirellä kirjainten yli muodostaaksesi sanoja. Voit liikkua kaikkiin suuntiin, myös vinottain.",
     helpTime:"Sinulla on 2 minuuttia aikaa löytää mahdollisimman monta sanaa.",
-    helpScoring:"Pisteytys: 3 kirjainta = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7+ = 10p",
+    helpScoring:"Pisteytys: 3 kirjainta = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7 = 10p · 8+ = 14p",
     helpCombo:"Löydä sanoja nopeasti peräkkäin → combo! 3+ peräkkäin = x2, 5+ = x3 pisteet.",
     helpMultiplier:"Kultaiset kirjaimet antavat 2× tai 3× pistekertoimen sanaan.",
-    helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi noin 138 000, englanniksi ja ruotsiksi omat sanalistansa.",
+    helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi yli miljoona sanaa (3–15 kirjainta), englanniksi ja ruotsiksi omat sanalistansa.",
     helpInflection:"Taivutusmuodot kelpaavat! Esim. sametti → sametin, samettia, samettiin, sametilla, sametteja, samettien… Kaikki suomen sijamuodot toimivat, joten kokeile rohkeasti eri päätteitä.",
+    helpDefs:"Klikkaa lyhyitä sanoja tulosnäkymässä nähdäksesi niiden merkityksen. Selitteet löytyvät 3-kirjaimisille sanoille.",
     tutorialBtn:"PIKAOHJE",
     exitConfirm:"Poistu pelistä?",exitYes:"POISTU",exitNo:"JATKA",
   },
@@ -278,11 +279,12 @@ const T={
     howToPlay:"How to play",
     helpDrag:"Drag your finger or mouse across letters to form words. You can move in all directions, including diagonally.",
     helpTime:"You have 2 minutes to find as many words as possible.",
-    helpScoring:"Scoring: 3 letters = 1pt · 4 = 2pt · 5 = 4pt · 6 = 6pt · 7+ = 10pt",
+    helpScoring:"Scoring: 3 letters = 1pt · 4 = 2pt · 5 = 4pt · 6 = 6pt · 7 = 10pt · 8+ = 14pt",
     helpCombo:"Find words quickly in a row → combo! 3+ in a row = x2, 5+ = x3 points.",
     helpMultiplier:"Golden letters give a 2× or 3× score multiplier for the word.",
-    helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has about 138,000 words, English and Swedish have their own vocabularies.",
+    helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has over a million words (3–15 letters), English and Swedish have their own vocabularies.",
     helpInflection:"Inflected forms count! E.g. velvet → sametin, samettia, samettiin, sametilla, sametteja… All Finnish case forms work, so try different endings boldly.",
+    helpDefs:"Tap short words in the results screen to see their meaning. Definitions are available for 3-letter words.",
     tutorialBtn:"QUICK GUIDE",
     exitConfirm:"Quit the game?",exitYes:"QUIT",exitNo:"CONTINUE",
   },
@@ -336,11 +338,12 @@ const T={
     howToPlay:"Så spelar du",
     helpDrag:"Dra fingret eller musen över bokstäver för att bilda ord. Du kan röra dig i alla riktningar, även diagonalt.",
     helpTime:"Du har 2 minuter på dig att hitta så många ord som möjligt.",
-    helpScoring:"Poäng: 3 bokstäver = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7+ = 10p",
+    helpScoring:"Poäng: 3 bokstäver = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7 = 10p · 8+ = 14p",
     helpCombo:"Hitta ord snabbt i rad → kombo! 3+ i rad = x2, 5+ = x3 poäng.",
     helpMultiplier:"Gyllene bokstäver ger 2× eller 3× poängmultiplikator för ordet.",
-    helpLang:"Du kan byta språk från huvudmenyn. Varje språk har sin egen ordlista — finska har cirka 138 000 ord, engelska och svenska har egna vokabulär.",
+    helpLang:"Du kan byta språk från huvudmenyn. Varje språk har sin egen ordlista — finska har över en miljon ord (3–15 bokstäver), engelska och svenska har egna vokabulär.",
     helpInflection:"Böjningsformer räknas! T.ex. sammet → sammeten, sammets, sammeterna… Prova olika ändelser.",
+    helpDefs:"Tryck på korta ord i resultatvyn för att se deras betydelse. Definitioner finns för 3-bokstavsord.",
     tutorialBtn:"SNABBGUIDE",
     exitConfirm:"Avsluta spelet?",exitYes:"AVSLUTA",exitNo:"FORTSÄTT",
   },
@@ -1120,7 +1123,7 @@ function QuickTutorial({lang,theme,onClose}){
                   const isLast=isActive&&activeCells.length>0&&activeCells[activeCells.length-1][0]===r&&activeCells[activeCells.length-1][1]===c;
                   const selIdx=isActive?activeCells.findIndex(([ar,ac])=>ar===r&&ac===c):-1;
                   const borderBg=isActive?`linear-gradient(${120+selIdx*60}deg, #00ffaa, #44bbff, #aa66ff, #ff66aa, #ffaa44, #00ffaa)`:(isCompleted?`${completedColor}88`:(S.cellBorder||S.border));
-                  const cellBg=isActive?`linear-gradient(${160+selIdx*30}deg, ${S.cell}ee 0%, ${S.cell}cc 40%, ${S.dark||S.cell}dd 100%)`:(isCompleted?`${completedColor}15`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell);
+                  const cellBg=isActive?`linear-gradient(${160+selIdx*30}deg, ${S.cell}ee 0%, ${S.cell}cc 40%, ${S.dark||S.cell}dd 100%)`:(isCompleted?`${completedColor}44`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell);
 
                   return(
                     <div key={c} ref={el=>{if(el)cellRefs.current[`${r},${c}`]=el;}} style={{width:"18%",aspectRatio:"0.866",position:"relative",
@@ -1144,10 +1147,10 @@ function QuickTutorial({lang,theme,onClose}){
                         display:"flex",alignItems:"center",justifyContent:"center",
                         fontSize:"clamp(14px,4.5vw,22px)",fontFamily:S.letterFont,fontWeight:"700",
                         textTransform:"uppercase",transition:"all 0.2s ease",
-                        color:isActive?"#ffffff":(isCompleted?completedColor:(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa"))),
-                        textShadow:isActive?`0 0 12px #44ffaa99, 0 0 24px #8866ff66, 0 1px 2px #000000aa`:"none"}}>
+                        color:isActive?"#ffffff":(isCompleted?"#ffffff":(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa"))),
+                        textShadow:isActive?`0 0 12px #44ffaa99, 0 0 24px #8866ff66, 0 1px 2px #000000aa`:(isCompleted?`0 1px 3px #00000088, 0 0 8px ${completedColor}88`:"none")}}>
                         <span style={{position:"relative",zIndex:2,
-                          filter:isActive?"drop-shadow(0 0 4px #44ffaa88) drop-shadow(0 0 8px #8866ff44)":"none",
+                          filter:isActive?"drop-shadow(0 0 4px #44ffaa88) drop-shadow(0 0 8px #8866ff44)":(isCompleted?"drop-shadow(0 1px 1px #00000066)":"none"),
                         }}>{letter}</span>
                       </div>
                     </div>
@@ -3792,6 +3795,7 @@ export default function Piilosana(){
               <div><span style={{color:S.yellow}}>✦</span> {t.helpMultiplier}</div>
               <div><span style={{color:S.yellow}}>🌐</span> {t.helpLang}</div>
               <div><span style={{color:S.yellow}}>🔤</span> {t.helpInflection}</div>
+              {t.helpDefs&&<div><span style={{color:S.yellow}}>💬</span> {t.helpDefs}</div>}
             </div>
           </div>
         </div>
