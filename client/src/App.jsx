@@ -3535,40 +3535,13 @@ export default function Piilosana(){
 
       {/* Footer with buttons + info */}
       <div style={{marginTop:"24px",width:"100%",maxWidth:"600px"}}>
-        {/* Flag language bubble — positioned above flag buttons */}
-        {mode===null&&flagBubble&&(
-          <div style={{width:"100%",display:"flex",justifyContent:"center",
-            animation:flagBubbleFading?"flagBubbleOut 0.6s ease-in forwards":"flagBubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
-            zIndex:50,marginBottom:"6px"}}>
-            <div style={{fontFamily:S.font,
-              fontSize:S.cellGradient?"13px":"13px",padding:"8px 12px",borderRadius:S.btnRadius||"0px",position:"relative",lineHeight:"1.6",
-              border:S.cellGradient?`2px solid ${S.border}`:"3px solid #000000",boxShadow:S.cellGradient?S.panelShadow:"4px 4px 0 #00000044",
-              width:"max-content",maxWidth:"90%",
-              background:S.cellGradient?S.dark:"#ffffff",color:S.cellGradient?S.green:"#000000"}}>
-              <div style={{position:"absolute",bottom:"-9px",left:"50%",transform:"translateX(-50%)",
-                width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderTop:S.cellGradient?`8px solid ${S.border}`:"8px solid #000000"}}/>
-              <div style={{position:"absolute",bottom:"-5px",left:"50%",transform:"translateX(-50%)",
-                width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:S.cellGradient?`6px solid ${S.dark}`:"6px solid #ffffff"}}/>
-              {lang==="en"?"Play in different languages!":lang==="sv"?"Spela på olika språk!":"Pelaa eri kielillä!"}
-            </div>
-          </div>
-        )}
+        {/* Flag language bubble — moved near bottom flags */}
         {/* Action buttons row */}
         <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap",marginBottom:"12px"}}>
-          {Object.entries(LANG_CONFIG).map(([code,lc])=>(
-            <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
-              style={{fontFamily:S.font,fontSize:"13px",background:lang===code?S.dark:"transparent",
-                border:lang===code?`2px solid ${S.green}`:`2px solid ${S.border}`,
-                padding:"6px 10px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
-                boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
-                transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px",minHeight:"36px",borderRadius:S.btnRadius}}>
-              <PixelFlag lang={code} size={2}/>
-            </button>
-          ))}
           <button onClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} style={{fontFamily:S.font,fontSize:"13px",color:S.textSoft,
-            background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
-            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",minHeight:"36px",borderRadius:S.btnRadius}}>
-            <Icon icon="gear" color={S.textSoft} size={2}/>
+            background:"transparent",border:`2px solid ${S.border}`,padding:"2px",cursor:"pointer",
+            display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s",minHeight:"36px",minWidth:"36px",borderRadius:S.btnRadius}}>
+            <Icon icon="gear" color={S.textSoft} size={S.cellGradient?3.5:2.5}/>
           </button>
           <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,
             background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
@@ -3594,6 +3567,19 @@ export default function Piilosana(){
         <div style={{fontSize:"13px",marginTop:"4px",display:"flex",gap:"10px",justifyContent:"center"}}>
           <a href="mailto:info@piilosana.com" style={{color:S.textMuted,textDecoration:"none"}}>{lang==="en"?"Feedback":lang==="sv"?"Feedback":"Palaute"}</a>
           <a href="/privacy" style={{color:S.textMuted,textDecoration:"none"}}>{lang==="en"?"Privacy":lang==="sv"?"Integritet":"Tietosuoja"}</a>
+        </div>
+        {/* Language flags at bottom */}
+        <div style={{display:"flex",gap:"6px",justifyContent:"center",marginTop:"12px"}}>
+          {Object.entries(LANG_CONFIG).map(([code,lc])=>(
+            <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
+              style={{fontFamily:S.font,fontSize:"13px",background:lang===code?S.dark:"transparent",
+                border:lang===code?`2px solid ${S.green}`:`2px solid ${S.border}`,
+                padding:"6px 10px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
+                boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
+                transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px",minHeight:"36px",borderRadius:S.btnRadius}}>
+              <PixelFlag lang={code} size={2}/>
+            </button>
+          ))}
         </div>
       </div>
     </div>
@@ -3816,16 +3802,27 @@ export default function Piilosana(){
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
         <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={mode!==null&&settingsBubble} bubbleFading={bubbleFading} hideGear={mode===null} theme={S}/>
       ):(
-        <h1 className="piilosana-title" style={{fontSize:"28px",letterSpacing:"4px",margin:"6px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
-          animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
-          {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>{
-            if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
-              cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",
-              marginRight:"4px"}}>
-              <Icon icon="gear" color={gearBlend?S.yellow:S.textSoft} size={S.cellGradient?3.5:1.7} style={{transition:"filter 2s ease"}}/></span>;
-            return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:S.titleFont}}>{ch}</span>;
-          });})()}
-        </h1>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%",maxWidth:"600px",margin:"6px 0",position:"relative"}}>
+          {(state==="play"||state==="ending"||state==="scramble")&&gameTime!==0&&(
+            <span style={{position:"absolute",left:"4px",fontSize:"18px",fontWeight:"700",color:time<=15?S.red:time<=30?S.yellow:S.green,fontVariantNumeric:"tabular-nums",fontFamily:S.font}}>{fmt(time)}</span>
+          )}
+          {(state==="play"||state==="ending"||state==="scramble")&&gameTime===0&&(
+            <span style={{position:"absolute",left:"4px",fontSize:"14px",fontWeight:"700",color:"#44ddff",fontFamily:S.font}}>{found.length} {t.words}</span>
+          )}
+          <h1 className="piilosana-title" style={{fontSize:"28px",letterSpacing:"4px",margin:0,display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
+            animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
+            {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>{
+              if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
+                cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",
+                marginRight:"4px"}}>
+                <Icon icon="gear" color={gearBlend?S.yellow:S.textSoft} size={S.cellGradient?3.5:1.7} style={{transition:"filter 2s ease"}}/></span>;
+              return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:S.titleFont}}>{ch}</span>;
+            });})()}
+          </h1>
+          {(state==="play"||state==="ending"||state==="scramble")&&(
+            <span style={{position:"absolute",right:"4px",fontSize:"18px",fontWeight:"700",color:S.yellow,fontVariantNumeric:"tabular-nums",fontFamily:S.font}}>{score}p.</span>
+          )}
+        </div>
       )}
 
       {/* Achievement unlock popup */}
@@ -4467,9 +4464,7 @@ export default function Piilosana(){
       {(state==="play"||state==="ending"||state==="scramble")&&(
         <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:(soloMode==="hex"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD */}
-          <div style={{marginBottom:isHexMode?"1px":"6px",border:`2px solid ${(gameMode==="battle"||(mode==="solo"&&soloMode==="tetris"))?S.purple+"88":gameTime===0?"#44ddff88":S.border}`,background:S.dark}}>
-            {mode==="public"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:"#ff6644",background:"#ff664411",borderBottom:`1px solid ${S.border}`}}>{t.arenaLabel} — {publicPlayerCount} {publicPlayerCount===1?t.player:t.players}</div>}
-            {mode==="multi"&&gameMode!=="battle"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.green,background:S.dark,borderBottom:`1px solid ${S.border}`}}>{t.multiLabel||"MONINPELI"} — {players.length} {t.players}</div>}
+          <div style={{marginBottom:isHexMode?"1px":"4px",border:`1px solid ${S.border}`,background:S.dark}}>
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
             {mode==="solo"&&soloMode==="rotate"&&(
@@ -4517,36 +4512,20 @@ export default function Piilosana(){
             )}
             {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="infinity" color="#44ddff" size={1}/>{t.unlimitedLabel}</div>}
             {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
-            <div className="piilosana-hud" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 10px"}}>
-              {gameTime!==0?(
-              <div style={{display:"flex",alignItems:"baseline",gap:"4px",flex:1}}>
-                <span style={{fontSize:"11px",color:S.textMuted,fontWeight:"600"}}>{t.time}</span>
-                <span style={{fontSize:"22px",fontWeight:"700",color:time<=15?S.red:time<=30?S.yellow:S.green,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{fmt(time)}</span>
-              </div>
-              ):(
-              <div style={{display:"flex",alignItems:"baseline",gap:"4px",flex:1}}>
-                <span style={{fontSize:"11px",color:S.textMuted,fontWeight:"600"}}>{t.words.toUpperCase()}</span>
-                <span style={{fontSize:"22px",fontWeight:"700",color:"#44ddff",lineHeight:1}}>{found.length}</span>
-              </div>
-              )}
+            <div ref={wordBarRef} key={flashKey} style={{padding:S.cellGradient?"4px 10px":"2px 8px",textAlign:"center",position:"relative",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
               {mode==="solo"&&state==="play"&&(
-                <button onClick={()=>setShowExitConfirm(true)} style={{background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"2px 6px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"4px",transition:"all 0.15s",flexShrink:0}}
+                <button onClick={()=>setShowExitConfirm(true)} style={{position:"absolute",left:"4px",top:"50%",transform:"translateY(-50%)",background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"2px 6px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"4px",transition:"all 0.15s",zIndex:2}}
                   onMouseEnter={e=>{e.currentTarget.style.borderColor=S.red;e.currentTarget.style.background=S.red+"15";}}
                   onMouseLeave={e=>{e.currentTarget.style.borderColor=S.textMuted+"44";e.currentTarget.style.background="transparent";}}>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.textMuted} strokeWidth="2" strokeLinecap="round"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.textMuted} strokeWidth="2" strokeLinecap="round"/></svg>
                 </button>
               )}
-              <div style={{display:"flex",alignItems:"baseline",gap:"4px",justifyContent:"flex-end",flex:1}}>
-                <span style={{fontSize:"11px",color:S.textMuted,fontWeight:"600"}}>{t.score}</span>
-                <span style={{fontSize:"22px",fontWeight:"700",color:S.yellow,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{score}</span>
-              </div>
-            </div>
-            <div ref={wordBarRef} key={flashKey} style={{borderTop:`1px solid ${S.border}`,padding:S.cellGradient?"4px 10px":"2px 8px",textAlign:"center",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
-              <div style={{fontSize:S.cellGradient?"22px":"18px",minHeight:S.cellGradient?"26px":"20px",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
+              <div style={{fontSize:S.cellGradient?"28px":"18px",minHeight:S.cellGradient?"32px":"20px",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
                 {state==="ending"?<span style={{color:ending?.color,fontSize:S.cellGradient?"18px":"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
                  word?word.toUpperCase():
-                 (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?(S.cellGradient?"14px":"12px"):(S.cellGradient?"12px":"10px"),fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted,fontSize:S.cellGradient?"16px":"18px"}}>···</span>)}
+                 (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?(S.cellGradient?"16px":"12px"):(S.cellGradient?"14px":"10px"),fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted,fontSize:S.cellGradient?"20px":"18px"}}>···</span>)}
               </div>
+              {(mode==="multi"||mode==="public")&&<span style={{position:"absolute",right:"6px",top:"50%",transform:"translateY(-50%)",fontSize:"10px",color:S.textMuted}}>{mode==="public"?`${t.arenaLabel} ${publicPlayerCount}`:` ${players.length} ${t.players}`}</span>}
             </div>
           </div>
 
