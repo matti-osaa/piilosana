@@ -52,7 +52,7 @@ function randLetterLang(lang){
   const ls=Object.keys(lw),ws=Object.values(lw),tot=ws.reduce((a,b)=>a+b,0);
   let r=Math.random()*tot;for(let i=0;i<ls.length;i++){r-=ws[i];if(r<=0)return ls[i];}return ls[ls.length-1];
 }
-function makeGrid(sz,lang='fi'){return Array.from({length:sz},()=>Array.from({length:sz},()=>randLetterLang(lang)));}
+function makeGrid(rows,lang='fi',cols){const c=cols||rows;return Array.from({length:rows},()=>Array.from({length:c},()=>randLetterLang(lang)));}
 
 // Client-side gravity: remove cells, drop letters down, fill new from top
 function applyGravityClient(grid,removedCells,lang='fi'){
@@ -354,11 +354,11 @@ function findWords(grid,trie){
 // Hex grid utilities (6-neighbor hexagonal grid, odd-r offset)
 const HEX_DIRS_EVEN=[[-1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]];
 const HEX_DIRS_ODD=[[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]];
-function hexNeighbors(r,c,sz){const dirs=r%2===0?HEX_DIRS_EVEN:HEX_DIRS_ODD;return dirs.map(([dr,dc])=>({r:r+dr,c:c+dc})).filter(n=>n.r>=0&&n.r<sz&&n.c>=0&&n.c<sz);}
+function hexNeighbors(r,c,rows,cols){const dirs=r%2===0?HEX_DIRS_EVEN:HEX_DIRS_ODD;return dirs.map(([dr,dc])=>({r:r+dr,c:c+dc})).filter(n=>n.r>=0&&n.r<rows&&n.c>=0&&n.c<cols);}
 function findWordsHex(grid,trie){
-  const sz=grid.length,found=new Set();
-  function dfs(r,c,node,path,vis){const ch=grid[r][c],nx=node.c[ch];if(!nx)return;const np=path+ch;if(nx.w&&np.length>=3)found.add(np);vis.add(r*sz+c);for(const n of hexNeighbors(r,c,sz)){if(!vis.has(n.r*sz+n.c))dfs(n.r,n.c,nx,np,vis);}vis.delete(r*sz+c);}
-  for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)dfs(r,c,trie,"",new Set());return found;
+  const rows=grid.length,cols=grid[0].length,found=new Set();
+  function dfs(r,c,node,path,vis){const ch=grid[r][c],nx=node.c[ch];if(!nx)return;const np=path+ch;if(nx.w&&np.length>=3)found.add(np);vis.add(r*cols+c);for(const n of hexNeighbors(r,c,rows,cols)){if(!vis.has(n.r*cols+n.c))dfs(n.r,n.c,nx,np,vis);}vis.delete(r*cols+c);}
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)dfs(r,c,trie,"",new Set());return found;
 }
 function adjHex(a,b){const dirs=a.r%2===0?HEX_DIRS_EVEN:HEX_DIRS_ODD;return dirs.some(([dr,dc])=>a.r+dr===b.r&&a.c+dc===b.c);}
 
@@ -2006,7 +2006,7 @@ async function submitToHallOfFame({nickname,score,wordsFound,wordsTotal,gameMode
 // MAIN COMPONENT
 // ============================================
 export default function Piilosana(){
-  const SZ=5,HEX_SZ=6,COMBO_WINDOW=4000;
+  const SZ=5,HEX_ROWS=7,HEX_COLS=5,COMBO_WINDOW=4000;
   const[lang,setLang]=useState(()=>localStorage.getItem("piilosana_lang")||"fi");
   const[themeId,setThemeId]=useState(()=>{const saved=localStorage.getItem("piilosana_theme");return saved&&THEMES[saved]?saved:"dark";});
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
@@ -2460,8 +2460,7 @@ export default function Piilosana(){
     const gt=overrideTime!==undefined?overrideTime:gameTime;
     const sm=overrideMode!==undefined?overrideMode:soloMode;
     let bg=null,bw=new Set();
-    const gridSz=sm==="hex"?HEX_SZ:SZ;
-    for(let i=0;i<30;i++){const g=makeGrid(gridSz,lang),w=(sm==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(sm==="hex"?25:15))break;}
+    for(let i=0;i<30;i++){const g=sm==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=(sm==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(sm==="hex"?25:15))break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(gt);setScore(0);setMsg(null);
     setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);
     setEnding(null);setEndingProgress(0);setDropKey(0);
@@ -2510,7 +2509,7 @@ export default function Piilosana(){
     if(state!=="countdown")return;
     if(countdown<=0){
       if(mode==="public"){sounds.playGo();setState("play");return;}
-      setState("scramble");setScrambleStep(0);setScrambleGrid(makeGrid(soloMode==="chess"?8:soloMode==="hex"?HEX_SZ:SZ,lang));return;
+      setState("scramble");setScrambleStep(0);setScrambleGrid(soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(soloMode==="chess"?8:SZ,lang));return;
     }
     sounds.playCountdown(countdown);
     const t=setTimeout(()=>setCountdown(c=>c-1),1000);
@@ -2525,7 +2524,7 @@ export default function Piilosana(){
       step++;
       if(step<=10){
         // Randomize letters rapidly (10 × 80ms = 800ms)
-        setScrambleGrid(makeGrid(soloMode==="chess"?8:soloMode==="hex"?HEX_SZ:SZ,lang));
+        setScrambleGrid(soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(soloMode==="chess"?8:SZ,lang));
       }else{
         // Done — snap to real grid and start playing
         clearInterval(interval);
@@ -2585,7 +2584,7 @@ export default function Piilosana(){
       // Phase 0: scramble letters rapidly
       if(progress<=0.25){
         scrambleCount++;
-        setScrambleGrid(makeGrid(soloMode==="chess"?8:soloMode==="hex"?HEX_SZ:SZ,lang));
+        setScrambleGrid(soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(soloMode==="chess"?8:SZ,lang));
         setScrambleStep(0);
       }else if(progress>0.25&&scrambleCount>0){
         // End scramble phase — clear it
@@ -2596,8 +2595,7 @@ export default function Piilosana(){
       if(progress>0.45){
         const eatProgress=(progress-0.45)/0.55; // 0 to 1
         const isHex=soloMode==="hex"||(mode==="public"&&publicHex);
-        const gridSz=isHex?HEX_SZ:soloMode==="chess"?8:SZ;
-        const totalCells=gridSz*gridSz;
+        const totalCells=isHex?HEX_ROWS*HEX_COLS:(soloMode==="chess"?8*8:SZ*SZ);
         const cellCount=Math.min(totalCells, Math.floor(eatProgress * totalCells));
         setEatenCells(prev=>{
           const n=new Set(prev);
@@ -3363,8 +3361,7 @@ export default function Piilosana(){
   const refreshGrid=useCallback(()=>{
     if(state!=="play"||gameTime!==0)return;
     let bg=null,bw=new Set();
-    const gsz=soloMode==="hex"?HEX_SZ:SZ;
-    for(let i=0;i<30;i++){const g=makeGrid(gsz,lang),w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(soloMode==="hex"?25:15))break;}
+    for(let i=0;i<30;i++){const g=soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(soloMode==="hex"?25:15))break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setMsg(null);
     setDropKey(0);
   },[state,gameTime,trie,lang,soloMode]);
@@ -4594,16 +4591,17 @@ export default function Piilosana(){
                 touchAction:"none",position:"relative"}}>
               {grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"0px",
-                  marginTop:r>0?"calc(-4.764% + 1px)":"0",
-                  transform:r%2===1?"translateX(calc(16.5% / 4))":"translateX(calc(-16.5% / 4))",
+                  marginTop:r>0?"calc(-5.254% + 1px)":"0",
+                  transform:r%2===1?"translateX(calc(18.2% / 4))":"translateX(calc(-18.2% / 4))",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
                     const s=isSel(r,c);
                     const last=sel.length>0&&sel[sel.length-1].r===r&&sel[sel.length-1].c===c;
-                    const hexSz=grid.length;
-                    const cellIdx=r*hexSz+c;
+                    const hexCols=row.length;
+                    const cellIdx=r*hexCols+c;
                     const eaten=eatenCells.has(cellIdx);
-                    const endAnim=eaten&&ending?ending.cellAnim(cellIdx,hexSz*hexSz):"none";
+                    const totalHexCells=grid.length*hexCols;
+                    const endAnim=eaten&&ending?ending.cellAnim(cellIdx,totalHexCells):"none";
                     const endColor=eaten&&ending?ending.cellColor(cellIdx):null;
                     const isScrambling=state==="scramble"||(state==="ending"&&scrambleGrid);
                     const settled=state==="scramble"&&scrambleStep>cellIdx;
@@ -4622,14 +4620,14 @@ export default function Piilosana(){
                         onMouseDown={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         onTouchStart={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         style={{
-                          width:"16.5%",aspectRatio:"0.866",
+                          width:"18.2%",aspectRatio:"0.866",
                           position:"relative",
                           cursor:state==="play"?"pointer":"default",
                           transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1)",
                           transform:s?(last?"scale(1.14)":"scale(1.06)"):"none",
                           animation:eaten?endAnim:(s&&!isScrambling?`hexSelectPop 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards`:(isScrambling&&settled?"pop 0.2s ease":"none")),
                           zIndex:s?10:0,
-                          "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
+                          "--ex":`${((c-Math.floor(hexCols/2))*40)}px`,"--ey":`${((r-Math.floor(grid.length/2))*40)}px`,
                         }}>
                         {/* Outer hex = border — prismatic gradient when selected */}
                         <div style={{position:"absolute",inset:s?"-2px":"0",clipPath:hexClip,

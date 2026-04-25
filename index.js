@@ -204,11 +204,13 @@ for (const lang of Object.keys(LANGS)) {
 function getLang(lang) { return LANGS[lang] || LANGS.fi; }
 
 const GRID_SIZE = 5;
-const HEX_GRID_SIZE = 6;
+const HEX_ROWS = 7;
+const HEX_COLS = 5;
 
-function makeGrid(lang = 'fi', sz = GRID_SIZE) {
-  return Array.from({ length: sz }, () =>
-    Array.from({ length: sz }, () => randLetter(lang))
+function makeGrid(lang = 'fi', rows = GRID_SIZE, cols) {
+  const c = cols || rows;
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: c }, () => randLetter(lang))
   );
 }
 
@@ -237,39 +239,38 @@ function findWords(grid, trie) {
 // Hex grid neighbors (odd-r offset)
 const HEX_DIRS_EVEN = [[-1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]];
 const HEX_DIRS_ODD  = [[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]];
-function hexNeighbors(r, c, sz) {
+function hexNeighbors(r, c, rows, cols) {
   const dirs = r % 2 === 0 ? HEX_DIRS_EVEN : HEX_DIRS_ODD;
   return dirs.map(([dr,dc]) => ({r: r+dr, c: c+dc}))
-    .filter(n => n.r >= 0 && n.r < sz && n.c >= 0 && n.c < sz);
+    .filter(n => n.r >= 0 && n.r < rows && n.c >= 0 && n.c < cols);
 }
 
 function findWordsHex(grid, trie) {
-  const sz = grid.length, found = new Set();
+  const rows = grid.length, cols = grid[0].length, found = new Set();
   function dfs(r, c, node, path, vis) {
     const ch = grid[r][c], nx = node.c[ch];
     if (!nx) return;
     const np = path + ch;
     if (nx.w && np.length >= 3) found.add(np);
-    vis.add(r * sz + c);
-    for (const n of hexNeighbors(r, c, sz)) {
-      if (!vis.has(n.r * sz + n.c)) dfs(n.r, n.c, nx, np, vis);
+    vis.add(r * cols + c);
+    for (const n of hexNeighbors(r, c, rows, cols)) {
+      if (!vis.has(n.r * cols + n.c)) dfs(n.r, n.c, nx, np, vis);
     }
-    vis.delete(r * sz + c);
+    vis.delete(r * cols + c);
   }
-  for (let r = 0; r < sz; r++)
-    for (let c = 0; c < sz; c++)
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++)
       dfs(r, c, trie, '', new Set());
   return found;
 }
 
 function generateGoodGrid(lang = 'fi', hex = false) {
   const trie = getLang(lang).trie;
-  const sz = hex ? HEX_GRID_SIZE : GRID_SIZE;
   const wordFinder = hex ? findWordsHex : findWords;
   const threshold = hex ? 25 : 15;
   let bestGrid = null, bestWords = new Set();
   for (let i = 0; i < 30; i++) {
-    const g = makeGrid(lang, sz);
+    const g = hex ? makeGrid(lang, HEX_ROWS, HEX_COLS) : makeGrid(lang, GRID_SIZE);
     const w = wordFinder(g, trie);
     if (w.size > bestWords.size) { bestGrid = g; bestWords = w; }
     if (w.size >= threshold) break;
