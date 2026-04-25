@@ -2463,6 +2463,8 @@ export default function Piilosana(){
     let bg=null,bw=new Set();
     for(let i=0;i<30;i++){const g=sm==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=(sm==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(sm==="hex"?25:15))break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(gt);setScore(0);setMsg(null);
+    // Fetch long words (11-15 chars) from server in background
+    if(lang==="fi"&&bg){fetch(`${SERVER_URL}/api/find-long-words`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({grid:bg,hex:sm==="hex"})}).then(r=>r.json()).then(({words})=>{if(words&&words.length>0)setValid(prev=>{const n=new Set(prev);words.forEach(w=>n.add(w));return n;});}).catch(()=>{});}
     setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);
     setEnding(null);setEndingProgress(0);setDropKey(0);
 
@@ -2970,13 +2972,35 @@ export default function Piilosana(){
 
     // For long words (>10 chars), validate server-side if not in local set
     if(!isValidWord&&currentWord.length>10&&lang==="fi"){
+      const savedSel=[...currentSel];
       fetch(`${SERVER_URL}/api/validate-word`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({word:currentWord})})
         .then(r=>r.json()).then(({valid:v})=>{
-          if(v){
-            // Add to valid set so it counts
+          if(v&&!found.includes(currentWord)){
+            // Score the word directly
+            const n2=Date.now();
+            let p2=letterMult?ptsLetters(currentWord,lang):pts(currentWord.length);
+            const isC=(n2-lastFoundTime)<COMBO_WINDOW&&lastFoundTime>0;
+            const nc=isC?combo+1:1;
+            setCombo(nc);setLastFoundTime(n2);
+            const cm=nc>=5?3:nc>=3?2:1;
+            const tp=p2*cm;
+            setScore(s=>s+tp);setFound(f=>[...f,currentWord]);
             setValid(prev=>{const n=new Set(prev);n.add(currentWord);return n;});
-            // Re-submit now that it's validated
-            submitWord(currentSel,currentWord);
+            setMsg({t:currentWord,ok:true,p:tp,combo:nc});
+            setFlashKey(k=>k+1);
+            sounds.playByLength(currentWord.length);
+            if(nc>=3)setTimeout(()=>sounds.playCombo(nc),200);
+            // Popup
+            let popX,popY;
+            if(gRef.current&&savedSel.length>0){
+              const mid=savedSel[Math.floor(savedSel.length/2)];
+              const cellEl=gRef.current.querySelector(`[data-c="${mid.r},${mid.c}"]`);
+              if(cellEl){const cr=cellEl.getBoundingClientRect();popX=cr.left+cr.width/2;popY=cr.top+cr.height/2;}
+              else{const rect=gRef.current.getBoundingClientRect();popX=rect.left+rect.width/2;popY=rect.top+rect.height/2;}
+            }else if(gRef.current){const rect=gRef.current.getBoundingClientRect();popX=rect.left+rect.width/2;popY=rect.top+rect.height/2;}
+            if(popX)addPopup(`${currentWord.toUpperCase()} +${tp}${nc>=3?` x${cm}`:""}`,wordColor(),popX,popY);
+          }else if(v){
+            setMsg({t:currentWord,ok:false,m:"Jo löydetty!"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
           }else{
             setMsg({t:currentWord,ok:false,m:T[lang]?.notValid||"Ei kelpaa"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
           }

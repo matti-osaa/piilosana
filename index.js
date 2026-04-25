@@ -323,6 +323,46 @@ function canTraceWord(grid, word, hex) {
   return false;
 }
 
+// Find long words (11-15 chars) on a hex grid using Buffer binary search (no trie needed)
+function bufHasPrefix(buf, prefix) {
+  if (!buf) return false;
+  let lo = 0, hi = buf.length - 1, best = -1;
+  while (lo <= hi) {
+    let mid = (lo + hi) >>> 1;
+    const ls = bufFindLineStart(buf, mid);
+    const line = bufGetLine(buf, ls);
+    if (line >= prefix) { best = ls; hi = ls > lo ? ls - 1 : lo - 1; }
+    else { let e = buf.indexOf(10, ls); lo = e === -1 ? hi + 1 : e + 1; }
+  }
+  if (best === -1) return false;
+  return bufGetLine(buf, best).startsWith(prefix);
+}
+
+function findLongWordsOnGrid(grid, buf, hex, minLen = 11, maxLen = 15) {
+  if (!buf) return new Set();
+  const rows = grid.length, cols = grid[0].length, found = new Set();
+  function getNeighbors(r, c) {
+    if (hex) return hexNeighbors(r, c, rows, cols);
+    const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+    return dirs.map(([dr,dc]) => ({r:r+dr,c:c+dc})).filter(n => n.r>=0 && n.r<rows && n.c>=0 && n.c<cols);
+  }
+  function dfs(r, c, path, vis) {
+    const np = path + grid[r][c];
+    if (!bufHasPrefix(buf, np)) return;
+    if (np.length >= minLen && hasWordInBuf(buf, np)) found.add(np);
+    if (np.length >= maxLen) return;
+    vis.add(r * cols + c);
+    for (const n of getNeighbors(r, c)) {
+      if (!vis.has(n.r * cols + n.c)) dfs(n.r, n.c, np, vis);
+    }
+    vis.delete(r * cols + c);
+  }
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++)
+      dfs(r, c, '', new Set());
+  return found;
+}
+
 function generateGoodGrid(lang = 'fi', hex = false) {
   const trie = getLang(lang).trie;
   const wordFinder = hex ? findWordsHex : findWords;
@@ -333,6 +373,11 @@ function generateGoodGrid(lang = 'fi', hex = false) {
     const w = wordFinder(g, trie);
     if (w.size > bestWords.size) { bestGrid = g; bestWords = w; }
     if (w.size >= threshold) break;
+  }
+  // Find long words (11-15 chars) using full word list buffer
+  if (lang === 'fi' && bestGrid && FULL_WORDS_BUF) {
+    const longWords = findLongWordsOnGrid(bestGrid, FULL_WORDS_BUF, hex);
+    for (const w of longWords) bestWords.add(w);
   }
   return { grid: bestGrid, validWords: bestWords };
 }
@@ -1192,6 +1237,20 @@ app.get('/health', (req, res) => {
 });
 
 // Validate long words (11+ chars) using the full Finnish word list
+// Find long words (11-15 chars) on a given grid - for solo mode
+app.post('/api/find-long-words', (req, res) => {
+  const { grid, hex } = req.body;
+  if (!grid || !Array.isArray(grid) || !FULL_WORDS_BUF) {
+    return res.json({ words: [] });
+  }
+  try {
+    const longWords = findLongWordsOnGrid(grid, FULL_WORDS_BUF, !!hex);
+    return res.json({ words: [...longWords] });
+  } catch (e) {
+    return res.json({ words: [] });
+  }
+});
+
 app.post('/api/validate-word', (req, res) => {
   const { word } = req.body;
   if (!word || typeof word !== 'string' || word.length < 3 || word.length > 30) {
