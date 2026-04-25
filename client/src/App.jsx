@@ -854,10 +854,10 @@ function EndingOverlay({ending, progress, gridRect}){
       {introOpacity>0&&(
         <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",textAlign:"center",zIndex:60,opacity:introOpacity,transition:"opacity 0.3s",width:"90%"}}>
           {ending.emoji&&<div style={{fontSize:"72px",animation:"pop 0.6s ease",marginBottom:"10px",filter:`drop-shadow(0 0 20px ${ending.color}88)`}}>{ending.emoji}</div>}
-          <div style={{fontFamily:"'Press Start 2P',monospace",fontSize:"20px",color:ending.color,textShadow:`0 0 30px ${ending.color}aa, 0 0 60px ${ending.color}44`,animation:"pop 0.6s ease",letterSpacing:"2px",marginBottom:"14px"}}>
+          <div style={{fontFamily:"inherit",fontSize:"24px",fontWeight:"700",color:ending.color,textShadow:`0 0 30px ${ending.color}aa, 0 0 60px ${ending.color}44`,animation:"pop 0.6s ease",letterSpacing:"2px",marginBottom:"14px"}}>
             {ending.name}
           </div>
-          <div style={{fontFamily:"'Press Start 2P',monospace",fontSize:"14px",color:"#ffffff",textShadow:`0 0 20px ${ending.color}aa, 2px 2px 0 #000`,animation:"fadeIn 0.8s ease",lineHeight:"2",padding:"0 8px"}}>
+          <div style={{fontFamily:"inherit",fontSize:"16px",fontWeight:"600",color:"#ffffff",textShadow:`0 0 20px ${ending.color}aa, 2px 2px 0 #000`,animation:"fadeIn 0.8s ease",lineHeight:"1.8",padding:"0 8px"}}>
             {ending.desc}
           </div>
         </div>
@@ -866,10 +866,10 @@ function EndingOverlay({ending, progress, gridRect}){
       {!introPhase&&(
         <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",textAlign:"center",zIndex:60,width:"90%"}}>
           {ending.emoji&&<div style={{fontSize:"56px",animation:"pop 0.4s ease",marginBottom:"6px"}}>{ending.emoji}</div>}
-          <div style={{fontFamily:"'Press Start 2P',monospace",fontSize:"16px",color:"#ffffff",textShadow:`0 0 20px ${ending.color}aa, 2px 2px 0 #000`,lineHeight:"2",marginBottom:"8px"}}>
+          <div style={{fontFamily:"inherit",fontSize:"18px",fontWeight:"600",color:"#ffffff",textShadow:`0 0 20px ${ending.color}aa, 2px 2px 0 #000`,lineHeight:"1.8",marginBottom:"8px"}}>
             {ending.desc}
           </div>
-          {ov.text&&<div style={{fontFamily:"'Press Start 2P',monospace",fontSize:"22px",color:ov.textColor,textShadow:`0 0 20px ${ov.textColor}88, 0 0 40px ${ov.textColor}44`,animation:"pop 0.4s ease"}}>
+          {ov.text&&<div style={{fontFamily:"inherit",fontSize:"26px",fontWeight:"700",color:ov.textColor,textShadow:`0 0 20px ${ov.textColor}88, 0 0 40px ${ov.textColor}44`,animation:"pop 0.4s ease"}}>
             {ov.text}
           </div>}
         </div>
@@ -940,7 +940,7 @@ function ConfettiCelebration({isWinner}){
 // SCORE POPUP
 // ============================================
 function ScorePopup({text,color,x,y}){
-  return(<div style={{position:"fixed",left:x,top:y,transform:"translate(-50%,-50%)",pointerEvents:"none",zIndex:200,fontFamily:"'Press Start 2P',monospace",fontSize:"18px",color,textShadow:`0 0 10px ${color}88`,animation:"floatUp 1s ease-out forwards"}}>{text}</div>);
+  return(<div style={{position:"fixed",left:x,top:y,transform:"translate(-50%,-50%)",pointerEvents:"none",zIndex:200,fontFamily:"inherit",fontSize:"20px",fontWeight:"700",color,textShadow:`0 0 10px ${color}88`,animation:"floatUp 1s ease-out forwards"}}>{text}</div>);
 }
 function WordPopup({text,color,x,y,font}){
   return(<div style={{position:"fixed",left:x,top:y,transform:"translate(-50%,-50%)",pointerEvents:"none",zIndex:199,fontFamily:font||"inherit",fontSize:"22px",fontWeight:"700",letterSpacing:"3px",color,textShadow:`0 0 12px ${color}66, 0 2px 4px #00000044`,animation:"wordRise 1.2s ease-out forwards"}}>{text}</div>);
@@ -1999,7 +1999,7 @@ export default function Piilosana(){
   // Game settings (must be declared before states that reference them)
   const[gameTime,setGameTime]=useState(120); // 120 (2min) or 402 (6min 42s = "6,7")
   const[letterMult,setLetterMult]=useState(false); // scrabble-style letter values
-  const[soloMode,setSoloMode]=useState("normal"); // 'normal','tetris','rotate','theme','bomb','mystery','chess','hex'
+  const[soloMode,setSoloMode]=useState("hex"); // 'hex' is the default and only visible mode
   const[dropKey,setDropKey]=useState(0); // increments on gravity to trigger drop animation
   const[gameMode,setGameMode]=useState("classic"); // 'classic' or 'battle'
 
@@ -3237,25 +3237,6 @@ export default function Piilosana(){
             {/* Scrollable content */}
             <div style={{padding:"12px 16px",overflowY:"auto",flex:1}}>
               <div style={{marginBottom:"12px"}}>
-                <div style={{fontSize:"13px",color:S.green,marginBottom:"6px"}}>{t.gameMode}</div>
-                <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap"}}>
-                  <button onClick={()=>setSoloMode("normal")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="normal"?S.bg:S.green,background:soloMode==="normal"?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>{t.modeNormal}</button>
-                  <button onClick={()=>setSoloMode("tetris")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="tetris"?S.bg:S.purple,background:soloMode==="tetris"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"6px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px",borderRadius:S.btnRadius}}><Icon icon="arrow" color={soloMode==="tetris"?S.bg:S.purple} size={1.5}/>{t.modeTetris}</button>
-                  <button onClick={()=>setSoloMode("rotate")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="rotate"?S.bg:"#ff9900",background:soloMode==="rotate"?"#ff9900":"transparent",border:"2px solid #ff9900",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>🔄 {t.modeRotate}</button>
-                  <button onClick={()=>setSoloMode("theme")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="theme"?S.bg:"#44bb66",background:soloMode==="theme"?"#44bb66":"transparent",border:"2px solid #44bb66",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>📚 {t.modeTheme}</button>
-                  <button onClick={()=>setSoloMode("bomb")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="bomb"?S.bg:"#ff4444",background:soloMode==="bomb"?"#ff4444":"transparent",border:"2px solid #ff4444",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>💣 {t.modeBomb}</button>
-                  <button onClick={()=>setSoloMode("mystery")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="mystery"?S.bg:"#aa66ff",background:soloMode==="mystery"?"#aa66ff":"transparent",border:"2px solid #aa66ff",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>❓ {t.modeMystery}</button>
-                  <button onClick={()=>setSoloMode("chess")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="chess"?S.bg:"#ddaa33",background:soloMode==="chess"?"#ddaa33":"transparent",border:"2px solid #ddaa33",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>♞ {t.modeChess}</button>
-                  <button onClick={()=>setSoloMode("hex")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="hex"?S.bg:"#22ccaa",background:soloMode==="hex"?"#22ccaa":"transparent",border:"2px solid #22ccaa",padding:"6px 14px",cursor:"pointer",borderRadius:S.btnRadius}}>⬡ {t.modeHex}</button>
-                </div>
-                {soloMode==="rotate"&&<p style={{fontSize:"13px",color:"#ff9900",marginTop:"8px",lineHeight:"1.8"}}>{t.rotateDesc}</p>}
-                {soloMode==="theme"&&<p style={{fontSize:"13px",color:"#44bb66",marginTop:"8px",lineHeight:"1.8"}}>{t.themeDesc}</p>}
-                {soloMode==="bomb"&&<p style={{fontSize:"13px",color:"#ff4444",marginTop:"8px",lineHeight:"1.8"}}>{t.bombDesc}</p>}
-                {soloMode==="mystery"&&<p style={{fontSize:"13px",color:"#aa66ff",marginTop:"8px",lineHeight:"1.8"}}>{t.mysteryDesc}</p>}
-                {soloMode==="chess"&&<p style={{fontSize:"13px",color:"#ddaa33",marginTop:"8px",lineHeight:"1.8"}}>{t.chessDesc}</p>}
-                {soloMode==="hex"&&<p style={{fontSize:"13px",color:"#22ccaa",marginTop:"8px",lineHeight:"1.8"}}>{t.hexDesc}</p>}
-              </div>
-              <div style={{marginBottom:"12px"}}>
                 <div style={{fontSize:"13px",color:S.green,marginBottom:"6px"}}>{t.time}</div>
                 <div style={{display:"flex",gap:"6px",justifyContent:"center"}}>
                   <button onClick={()=>setGameTime(120)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===120?S.bg:S.green,background:gameTime===120?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer"}}>2 MIN</button>
@@ -4153,14 +4134,7 @@ export default function Piilosana(){
       {/* SOLO MENU - just play button */}
       {mode==="solo"&&state==="menu"&&(
         <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{marginBottom:"16px"}}>
-            <p style={{fontSize:"13px",color:S.green,marginBottom:"8px"}}>{t.gameMode}</p>
-            <div style={{display:"flex",gap:"8px",justifyContent:"center",flexWrap:"wrap"}}>
-              <button onClick={()=>setSoloMode("normal")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="normal"?S.bg:S.green,background:soloMode==="normal"?S.green:"transparent",border:`2px solid ${S.green}`,padding:"8px 16px",cursor:"pointer"}}>{t.modeNormal}</button>
-              <button onClick={()=>setSoloMode("tetris")} style={{fontFamily:S.font,fontSize:"13px",color:soloMode==="tetris"?S.bg:S.purple,background:soloMode==="tetris"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"8px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px"}}><Icon icon="arrow" color={soloMode==="tetris"?S.bg:S.purple} size={2}/>{t.modeTetris}</button>
-            </div>
-            {soloMode==="tetris"&&<p style={{fontSize:"13px",color:S.purple,marginTop:"8px",lineHeight:"1.8"}}>{t.tetrisDesc}</p>}
-          </div>
+          {/* Mode selection removed — hex only */}
           <div style={{marginBottom:"16px"}}>
             <p style={{fontSize:"13px",color:S.green,marginBottom:"8px"}}>{t.time}</p>
             <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
