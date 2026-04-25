@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import * as Tone from "tone";
 import { io } from "socket.io-client";
+import DEFS_FI from "./defs_fi.js";
 
 // ============================================
 // PIILOSANA - Finnish Word Hunt Game
@@ -3319,6 +3320,15 @@ export default function Piilosana(){
   const missed=useMemo(()=>state==="end"?[...valid].filter(w=>!found.includes(w)).sort((a,b)=>b.length-a.length):[],[state,valid,found]);
   const totalPossible=useMemo(()=>[...valid].reduce((s,w)=>s+(letterMult?ptsLetters(w,lang):pts(w.length)),0),[valid,letterMult,lang]);
   const wordColor=()=>S.green;
+  const[defPopup,setDefPopup]=useState(null); // {word,def,x,y}
+  const DEFS=lang==="fi"?DEFS_FI:null;
+  const showDef=useCallback((w,e)=>{
+    if(!DEFS)return;
+    const d=DEFS[w.toLowerCase()];
+    if(!d)return;
+    const r=e.currentTarget.getBoundingClientRect();
+    setDefPopup({word:w,def:d,x:r.left+r.width/2,y:r.top});
+  },[DEFS]);
 
 
   // Multiplayer helper functions
@@ -3624,7 +3634,7 @@ export default function Piilosana(){
                 {foundWords.map((w,i)=>{
                   const finders=Object.entries(multiAllFoundWords).filter(([,ws])=>ws.includes(w)).map(([pid])=>nickMap[pid]||"?");
                   return(
-                    <span key={i} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length)}} title={finders.join(", ")}>{w.toUpperCase()}</span>
+                    <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}} title={finders.join(", ")}>{w.toUpperCase()}</span>
                   );
                 })}
               </div>
@@ -3646,7 +3656,7 @@ export default function Piilosana(){
                   {foundWords.map((w,i)=>{
                     const finders=Object.entries(multiAllFoundWords).filter(([,ws])=>ws.includes(w)).map(([pid])=>nickMap[pid]||"?");
                     return(
-                      <span key={i} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length)}} title={finders.join(", ")}>{w.toUpperCase()}</span>
+                      <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}} title={finders.join(", ")}>{w.toUpperCase()}</span>
                     );
                   })}
                 </div>
@@ -3657,7 +3667,7 @@ export default function Piilosana(){
                 <div style={{fontSize:"14px",color:"#ff6666",marginBottom:"6px"}}>JÄIVÄT LÖYTÄMÄTTÄ ({missedWords.length})</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                   {missedWords.map((w,i)=>(
-                    <span key={i} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666"}}>{w.toUpperCase()}</span>
+                    <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                   ))}
                 </div>
               </div>
@@ -3677,6 +3687,20 @@ export default function Piilosana(){
   return(
     <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100dvh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflowX:"hidden",animation:themeTransition?"themeResolve 0.6s ease-out":"none"}}
       onMouseMove={e=>onDragMove(e.clientX,e.clientY)} onMouseUp={onDragEnd} onTouchEnd={onDragEnd}>
+      {/* Word definition popup */}
+      {defPopup&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",zIndex:300}} onClick={()=>setDefPopup(null)}>
+          <div style={{position:"absolute",left:Math.min(defPopup.x,window.innerWidth-160),top:Math.max(defPopup.y-44,8),
+            transform:"translateX(-50%)",background:S.dark||"#1a1a2e",border:`2px solid ${S.green}`,
+            padding:"6px 12px",borderRadius:"8px",boxShadow:`0 4px 20px #00000066`,
+            maxWidth:"280px",zIndex:301,animation:"pop 0.2s ease"}} onClick={e=>e.stopPropagation()}>
+            <div style={{fontSize:"14px",fontWeight:"700",color:S.yellow,marginBottom:"2px"}}>{defPopup.word.toUpperCase()}</div>
+            <div style={{fontSize:"12px",color:S.green,lineHeight:"1.4"}}>{defPopup.def}</div>
+            <div style={{position:"absolute",bottom:"-7px",left:"50%",transform:"translateX(-50%)",
+              width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:`6px solid ${S.green}`}}/>
+          </div>
+        </div>
+      )}
       {/* Top bar removed — buttons moved to footer */}
       {/* Word info modal */}
       {showWordInfo&&(
@@ -4375,9 +4399,9 @@ export default function Piilosana(){
               <div style={{fontSize:"16px",color:S.green,marginBottom:"6px"}}>{t.foundWords} ({publicFoundSorted.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {publicFoundSorted.map((w,i)=>(
-                  <span key={i} style={{fontSize:"16px",background:found.includes(w)?S.dark:S.gridBg,padding:"2px 4px",
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"16px",background:found.includes(w)?S.dark:S.gridBg,padding:"2px 4px",
                     border:`1px solid ${found.includes(w)?wordColor(w.length)+"44":"#33333366"}`,
-                    color:found.includes(w)?wordColor(w.length):"#667"}}>{w.toUpperCase()}</span>
+                    color:found.includes(w)?wordColor(w.length):"#667",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
               <div style={{fontSize:"13px",color:S.textMuted,marginTop:"4px"}}>{t.ownHighlighted}</div>
@@ -4390,7 +4414,7 @@ export default function Piilosana(){
               <div style={{fontSize:"13px",color:"#ff6666",marginBottom:"6px"}}>{t.missed} ({publicMissed.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {publicMissed.map((w,i)=>(
-                  <span key={i} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666"}}>{w.toUpperCase()}</span>
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
             </div>
@@ -4947,7 +4971,7 @@ export default function Piilosana(){
               <div style={{fontSize:"18px",color:S.green,marginBottom:"6px"}}>{t.foundOf} ({found.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {[...found].sort((a,b)=>b.length-a.length).map((w,i)=>(
-                  <span key={i} style={{fontSize:"18px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length)}}>{w.toUpperCase()}</span>
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"18px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
             </div>
@@ -4958,7 +4982,7 @@ export default function Piilosana(){
               <div style={{fontSize:"13px",color:"#ff6666",marginBottom:"6px"}}>{t.missed} ({missed.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {missed.map((w,i)=>(
-                  <span key={i} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666"}}>{w.toUpperCase()}</span>
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
             </div>
