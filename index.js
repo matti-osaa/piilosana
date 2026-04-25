@@ -559,37 +559,6 @@ function randLetter(lang = 'fi') {
 // BATTLE MODE: Grid path validation
 // ============================================================================
 
-// Check if a word can be traced on the grid via adjacent cells
-function canTraceWord(grid, word) {
-  const sz = grid.length;
-  const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
-
-  function dfs(r, c, idx, visited) {
-    if (idx === word.length) return true;
-    for (const [dr, dc] of dirs) {
-      const nr = r + dr, nc = c + dc;
-      if (nr >= 0 && nr < sz && nc >= 0 && nc < sz && !visited.has(nr * sz + nc)) {
-        if (grid[nr][nc] === word[idx]) {
-          visited.add(nr * sz + nc);
-          if (dfs(nr, nc, idx + 1, visited)) return true;
-          visited.delete(nr * sz + nc);
-        }
-      }
-    }
-    return false;
-  }
-
-  for (let r = 0; r < sz; r++) {
-    for (let c = 0; c < sz; c++) {
-      if (grid[r][c] === word[0]) {
-        const visited = new Set([r * sz + c]);
-        if (dfs(r, c, 1, visited)) return true;
-      }
-    }
-  }
-  return false;
-}
-
 // Apply gravity: letters fall down, empty cells filled from top
 function applyGravity(grid, removedCells, lang = 'fi') {
   const sz = grid.length;
