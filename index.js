@@ -203,6 +203,41 @@ for (const lang of Object.keys(LANGS)) {
 
 function getLang(lang) { return LANGS[lang] || LANGS.fi; }
 
+// Full Finnish word list as Buffer for memory-efficient long word validation
+const FULL_WORDS_BUF = (() => {
+  const fullPath = join(__dirname, 'words_fi_full.txt');
+  if (!existsSync(fullPath)) return null;
+  return readFileSync(fullPath);
+})();
+
+function bufFindLineStart(buf, pos) {
+  while (pos > 0 && buf[pos - 1] !== 10) pos--;
+  return pos;
+}
+function bufGetLine(buf, pos) {
+  const start = bufFindLineStart(buf, pos);
+  let end = buf.indexOf(10, start);
+  if (end === -1) end = buf.length;
+  return buf.toString('utf8', start, end);
+}
+function hasWordInBuf(buf, word) {
+  if (!buf) return false;
+  let lo = 0, hi = buf.length - 1;
+  while (lo <= hi) {
+    let mid = (lo + hi) >>> 1;
+    const lineStart = bufFindLineStart(buf, mid);
+    const line = bufGetLine(buf, lineStart);
+    if (line === word) return true;
+    if (line < word) {
+      let end = buf.indexOf(10, lineStart);
+      lo = end === -1 ? hi + 1 : end + 1;
+    } else {
+      hi = lineStart - 1;
+    }
+  }
+  return false;
+}
+
 const GRID_SIZE = 5;
 const HEX_ROWS = 7;
 const HEX_COLS = 5;
@@ -262,6 +297,30 @@ function findWordsHex(grid, trie) {
     for (let c = 0; c < cols; c++)
       dfs(r, c, trie, '', new Set());
   return found;
+}
+
+// Check if a specific word can be traced on the grid (for long word validation)
+function canTraceWord(grid, word, hex) {
+  const rows = grid.length, cols = grid[0].length;
+  function neighbors(r, c) {
+    if (hex) return hexNeighbors(r, c, rows, cols);
+    const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
+    return dirs.map(([dr,dc]) => ({r:r+dr,c:c+dc})).filter(n => n.r>=0 && n.r<rows && n.c>=0 && n.c<cols);
+  }
+  function dfs(idx, r, c, vis) {
+    if (grid[r][c] !== word[idx]) return false;
+    if (idx === word.length - 1) return true;
+    vis.add(r * cols + c);
+    for (const n of neighbors(r, c)) {
+      if (!vis.has(n.r * cols + n.c) && dfs(idx + 1, n.r, n.c, vis)) return true;
+    }
+    vis.delete(r * cols + c);
+    return false;
+  }
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++)
+      if (grid[r][c] === word[0] && dfs(0, r, c, new Set())) return true;
+  return false;
 }
 
 function generateGoodGrid(lang = 'fi', hex = false) {
@@ -683,8 +742,15 @@ io.on('connection', (socket) => {
     const normalized = word.toLowerCase().trim();
     if (normalized.length < 3) return;
     if (!pg.validWords.has(normalized)) {
-      socket.emit('public_word_result', { valid: false, message: gameLang === 'en' ? 'Not valid' : 'Ei kelpaa' });
-      return;
+      // Check full word list for long words + verify grid traceability
+      if (gameLang === 'fi' && normalized.length > 10 && hasWordInBuf(FULL_WORDS_BUF, normalized) && canTraceWord(pg.grid, normalized, true)) {
+        // Valid long word - add to validWords so it's counted
+        pg.validWords.add(normalized);
+        pg.validWordsList.push(normalized);
+      } else {
+        socket.emit('public_word_result', { valid: false, message: gameLang === 'en' ? 'Not valid' : 'Ei kelpaa' });
+        return;
+      }
     }
     if (player.wordsFound.has(normalized)) {
       socket.emit('public_word_result', { valid: false, message: gameLang === 'en' ? 'Already found' : 'Jo löydetty' });
@@ -927,7 +993,14 @@ io.on('connection', (socket) => {
     }
 
     // Classic mode logic
-    const isValid = room.validWords.includes(normalized);
+    let isValid = room.validWords.includes(normalized);
+
+    // Check full word list for long Finnish words + verify grid traceability
+    const isHexGrid = room.grid && room.grid.length === HEX_ROWS && room.grid[0].length === HEX_COLS;
+    if (!isValid && (room.lang || 'fi') === 'fi' && normalized.length > 10 && hasWordInBuf(FULL_WORDS_BUF, normalized) && canTraceWord(room.grid, normalized, isHexGrid)) {
+      isValid = true;
+      room.validWords.push(normalized);
+    }
 
     if (!isValid) {
       socket.emit('word_result', { valid: false, message: 'Ei kelpaa' });
@@ -1116,6 +1189,22 @@ app.get('/', (req, res) => {
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', rooms: rooms.size });
+});
+
+// Validate long words (11+ chars) using the full Finnish word list
+app.post('/api/validate-word', (req, res) => {
+  const { word } = req.body;
+  if (!word || typeof word !== 'string' || word.length < 3 || word.length > 30) {
+    return res.json({ valid: false });
+  }
+  const w = word.toLowerCase().trim();
+  // Short words: check trie/set
+  if (w.length <= 10) {
+    const lang = getLang('fi');
+    return res.json({ valid: lang.words.has(w) });
+  }
+  // Long words: binary search in full word buffer
+  return res.json({ valid: hasWordInBuf(FULL_WORDS_BUF, w) });
 });
 
 // Hall of Fame: get all categories

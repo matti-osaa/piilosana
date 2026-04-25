@@ -2932,7 +2932,7 @@ export default function Piilosana(){
 
     // Public game (Piilosauna)
     if(mode==="public"&&socket){
-      if(!WORDS_SET.has(currentWord)){
+      if(!WORDS_SET.has(currentWord)&&currentWord.length<=10){
         setMsg({t:currentWord,ok:false,m:T[lang]?.notValid||"Ei kelpaa"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
         return;
       }
@@ -2946,8 +2946,8 @@ export default function Piilosana(){
     }
 
     if(mode==="multi"&&socket){
-      // Client-side dictionary check before sending to server
-      if(!WORDS_SET.has(currentWord)){
+      // Client-side dictionary check before sending to server (skip for long words - server validates)
+      if(!WORDS_SET.has(currentWord)&&currentWord.length<=10){
         setMsg({t:currentWord,ok:false,m:T[lang]?.notValid||"Ei kelpaa"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
         return;
       }
@@ -2965,8 +2965,27 @@ export default function Piilosana(){
     const now=Date.now();
     // Always validate against valid set (pre-computed words traceable on current grid)
     // In tetris mode, valid is recomputed after each gravity step
-    const isValidWord=valid.has(currentWord);
+    let isValidWord=valid.has(currentWord);
     const alreadyFound=found.includes(currentWord);
+
+    // For long words (>10 chars), validate server-side if not in local set
+    if(!isValidWord&&currentWord.length>10&&lang==="fi"){
+      fetch(`${SERVER_URL}/api/validate-word`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({word:currentWord})})
+        .then(r=>r.json()).then(({valid:v})=>{
+          if(v){
+            // Add to valid set so it counts
+            setValid(prev=>{const n=new Set(prev);n.add(currentWord);return n;});
+            // Re-submit now that it's validated
+            submitWord(currentSel,currentWord);
+          }else{
+            setMsg({t:currentWord,ok:false,m:T[lang]?.notValid||"Ei kelpaa"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
+          }
+        }).catch(()=>{
+          setMsg({t:currentWord,ok:false,m:T[lang]?.notValid||"Ei kelpaa"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
+        });
+      return;
+    }
+
     // In tetris mode, allow re-finding same word (grid changed, new path)
     if(isValidWord&&(soloMode==="tetris"?true:!alreadyFound)){
       let p=letterMult?ptsLetters(currentWord,lang):pts(currentWord.length);
