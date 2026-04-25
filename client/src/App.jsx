@@ -1087,12 +1087,12 @@ function QuickTutorial({lang,theme,onClose}){
   const completedWordTexts=completedWords.map(wi=>config.words[wi].word.toUpperCase());
 
   return(
-    <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000dd",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px",animation:"fadeIn 0.3s ease"}} onClick={onClose}>
-      <div style={{background:S.bg,border:`3px solid ${S.green}`,borderRadius:S.panelRadius,padding:"20px",maxWidth:"360px",width:"100%",boxShadow:S.panelShadow,position:"relative"}} onClick={e=>e.stopPropagation()}>
-        <button onClick={onClose} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius,zIndex:10}}>✕</button>
+    <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000dd",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"12px",animation:"fadeIn 0.3s ease"}} onClick={onClose}>
+      <div style={{background:S.bg,border:`3px solid ${S.green}`,borderRadius:S.panelRadius,padding:"16px",maxWidth:"340px",width:"100%",boxShadow:S.panelShadow,position:"relative",maxHeight:"90vh",overflow:"auto"}} onClick={e=>e.stopPropagation()}>
+        <button onClick={onClose} style={{position:"absolute",top:"6px",right:"6px",fontFamily:S.font,fontSize:"14px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"28px",height:"28px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius,zIndex:10}}>✕</button>
 
         {/* Formed word display */}
-        <div style={{textAlign:"center",marginBottom:"12px",minHeight:"32px"}}>
+        <div style={{textAlign:"center",marginBottom:"8px",minHeight:"28px"}}>
           {formedWord&&!completedWords.includes(step)&&(
             <span style={{fontSize:"18px",fontWeight:"700",fontFamily:S.font,color:currentWord.color,letterSpacing:"3px",textShadow:`0 0 10px ${currentWord.color}66`,animation:"none"}}>{formedWord}</span>
           )}
@@ -1102,8 +1102,8 @@ function QuickTutorial({lang,theme,onClose}){
         </div>
 
         {/* Mini hex grid */}
-        <div style={{position:"relative",width:"100%",paddingBottom:"60%",overflow:"hidden",borderRadius:"12px",background:S.gridBg||S.dark,border:`2px solid ${S.border}`}}>
-          <div ref={containerRef} style={{position:"absolute",inset:0,padding:"8px"}}>
+        <div style={{position:"relative",width:"100%",paddingBottom:"78%",overflow:"hidden",borderRadius:"12px",background:S.gridBg||S.dark,border:`2px solid ${S.border}`}}>
+          <div ref={containerRef} style={{position:"absolute",inset:0,padding:"6px 8px"}}>
             {grid.map((row,r)=>(
               <div key={r} style={{display:"flex",justifyContent:"center",gap:"3px",
                 marginTop:r>0?"calc(-4.475% + 1px)":"0",
@@ -1168,11 +1168,11 @@ function QuickTutorial({lang,theme,onClose}){
         </div>
 
         {/* Completed words shown below */}
-        <div style={{display:"flex",gap:"8px",justifyContent:"center",marginTop:"12px",minHeight:"28px",flexWrap:"wrap"}}>
+        <div style={{display:"flex",gap:"6px",justifyContent:"center",marginTop:"10px",minHeight:"24px",flexWrap:"wrap"}}>
           {completedWordTexts.map((w,i)=>(
-            <span key={i} style={{fontSize:"14px",fontWeight:"700",fontFamily:S.font,color:config.words[i].color,
-              padding:"2px 10px",border:`2px solid ${config.words[i].color}66`,borderRadius:"4px",
-              background:`${config.words[i].color}15`,letterSpacing:"2px"}}>{w} ✓</span>
+            <span key={i} style={{fontSize:"13px",fontWeight:"700",fontFamily:S.font,color:config.words[i].color,
+              padding:"2px 8px",border:`2px solid ${config.words[i].color}66`,borderRadius:"4px",
+              background:`${config.words[i].color}15`,letterSpacing:"1px"}}>{w} ✓</span>
           ))}
         </div>
       </div>
