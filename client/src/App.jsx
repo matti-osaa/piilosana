@@ -4591,7 +4591,7 @@ export default function Piilosana(){
                 touchAction:"none",position:"relative"}}>
               {grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"0px",
-                  marginTop:r>0?"calc(-5.254% + 1px)":"0",
+                  marginTop:r>0?"-5.254%":"0",
                   transform:r%2===1?"translateX(calc(18.2% / 4))":"translateX(calc(-18.2% / 4))",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
