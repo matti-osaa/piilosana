@@ -4323,11 +4323,21 @@ export default function Piilosana(){
                 border:`3px solid ${combo>=3&&state==="play"?S.yellow:ending?ending.color+"88":S.border}`,
                 boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:`0 0 30px #22ccaa22`,
                 touchAction:"none",position:"relative",borderRadius:"16px"}}>
-              {grid.map((row,r)=>(
+              {grid.map((row,r)=>{
+                const ghostHex=(
+                  <div key="ghost" style={{width:"15.5%",aspectRatio:"0.866",position:"relative",opacity:0.25,pointerEvents:"none"}}>
+                    <div style={{position:"absolute",inset:0,clipPath:"polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                      background:S.cellBorder||S.border}}/>
+                    <div style={{position:"absolute",inset:"2px",clipPath:"polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                      background:S.gridBg||"#111133"}}/>
+                  </div>
+                );
+                return(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"2px",
                   marginTop:r>0?"calc(-4.475% + 2px)":"0",
                   transform:r%2===1?"translateX(calc(15.5% / 4 + 0.5px))":"translateX(calc(-15.5% / 4 - 0.5px))",
                   position:"relative",zIndex:grid.length-r}}>
+                  {r%2===1&&ghostHex}
                   {row.map((letter,c)=>{
                     const s=isSel(r,c);
                     const last=sel.length>0&&sel[sel.length-1].r===r&&sel[sel.length-1].c===c;
@@ -4409,8 +4419,10 @@ export default function Piilosana(){
                       </div>
                     );
                   })}
+                  {r%2===0&&ghostHex}
                 </div>
-              ))}
+                );
+              })}
               {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true}/>}
             </div>
             ):(<>
