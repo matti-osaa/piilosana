@@ -4590,10 +4590,8 @@ export default function Piilosana(){
             {(soloMode==="hex"||(mode==="public"&&publicHex))?(
             <div ref={gRef}
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
-              style={{padding:isLarge?"4px 2px":"2px 1px",background:S.gridBg||"#111133",
-                border:`3px solid ${combo>=3&&state==="play"?S.yellow:ending?ending.color+"88":S.border}`,
-                boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:`0 0 30px #22ccaa22`,
-                touchAction:"none",position:"relative",borderRadius:"16px",overflow:"hidden"}}>
+              style={{padding:isLarge?"4px 0":"2px 0",background:"transparent",
+                touchAction:"none",position:"relative"}}>
               {grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"2px",
                   marginTop:r>0?"calc(-4.764% + 2px)":"0",
