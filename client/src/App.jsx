@@ -225,6 +225,7 @@ const T={
     helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi noin 138 000, englanniksi ja ruotsiksi omat sanalistansa.",
     helpInflection:"Taivutusmuodot kelpaavat! Esim. sametti → sametin, samettia, samettiin, sametilla, sametteja, samettien… Kaikki suomen sijamuodot toimivat, joten kokeile rohkeasti eri päätteitä.",
     tutorialBtn:"PIKAOHJE",
+    exitConfirm:"Poistu pelistä?",exitYes:"POISTU",exitNo:"JATKA",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"MULTIPLAYER",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -282,6 +283,7 @@ const T={
     helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has about 138,000 words, English and Swedish have their own vocabularies.",
     helpInflection:"Inflected forms count! E.g. velvet → sametin, samettia, samettiin, sametilla, sametteja… All Finnish case forms work, so try different endings boldly.",
     tutorialBtn:"QUICK GUIDE",
+    exitConfirm:"Quit the game?",exitYes:"QUIT",exitNo:"CONTINUE",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"FLERSPELARE",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -339,6 +341,7 @@ const T={
     helpLang:"Du kan byta språk från huvudmenyn. Varje språk har sin egen ordlista — finska har cirka 138 000 ord, engelska och svenska har egna vokabulär.",
     helpInflection:"Böjningsformer räknas! T.ex. sammet → sammeten, sammets, sammeterna… Prova olika ändelser.",
     tutorialBtn:"SNABBGUIDE",
+    exitConfirm:"Avsluta spelet?",exitYes:"AVSLUTA",exitNo:"FORTSÄTT",
   },
 };
 
@@ -1812,7 +1815,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
       })}
     </h1>
       {/* Coffee cup illustration - steaming, spills on lang change */}
-      <svg width="44" height="44" viewBox="0 0 100 100" style={{flexShrink:0,marginTop:"-2px",transition:"transform 0.15s ease",transform:scramble?"rotate(-12deg)":"rotate(0deg)"}}>
+      <svg width="64" height="64" viewBox="0 0 100 100" style={{flexShrink:0,marginTop:"-4px",transition:"transform 0.15s ease",transform:scramble?"rotate(-12deg)":"rotate(0deg)"}}>
         {/* Steam — hidden during spill */}
         {!scramble&&<>
         <path d="M35 30 Q30 20 35 10" fill="none" stroke="#aaaaaa" strokeWidth="2.5" strokeLinecap="round" opacity="0.5">
@@ -1986,6 +1989,7 @@ export default function Piilosana(){
   const[showWordInfo,setShowWordInfo]=useState(false);
   const[showHelp,setShowHelp]=useState(false);
   const[showTutorial,setShowTutorial]=useState(false);
+  const[showExitConfirm,setShowExitConfirm]=useState(false);
   const[gearBlend,setGearBlend]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
   const[themeTransition,setThemeTransition]=useState(false);
@@ -2557,7 +2561,10 @@ export default function Piilosana(){
       // Phase 2: start eating cells
       if(progress>0.45){
         const eatProgress=(progress-0.45)/0.55; // 0 to 1
-        const cellCount=Math.min(SZ*SZ, Math.floor(eatProgress * SZ * SZ));
+        const isHex=soloMode==="hex"||(mode==="public"&&publicHex);
+        const gridSz=isHex?HEX_SZ:soloMode==="chess"?8:SZ;
+        const totalCells=gridSz*gridSz;
+        const cellCount=Math.min(totalCells, Math.floor(eatProgress * totalCells));
         setEatenCells(prev=>{
           const n=new Set(prev);
           for(let i=0;i<cellCount;i++) n.add(i);
@@ -3429,31 +3436,34 @@ export default function Piilosana(){
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
-      {/* Welcome text + ARENA CTA */}
-      <div style={{fontSize:"14px",color:S.textSoft,marginBottom:"10px",letterSpacing:"1px"}}>{t.arenaWelcome}</div>
-      <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#5a3e2b",background:"linear-gradient(135deg,#ffb4a2 0%,#e5989b 100%)",border:"none",padding:"28px 32px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #e5989b44,${S.btnShadow}`:"4px 4px 0 #d4888b,0 0 20px #e5989b33",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"6px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
+      {/* ARENA CTA — player count inside button */}
+      <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#5a3e2b",background:"linear-gradient(135deg,#ffb4a2 0%,#e5989b 100%)",border:"none",padding:"28px 32px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #e5989b44,${S.btnShadow}`:"4px 4px 0 #d4888b,0 0 20px #e5989b33",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"8px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
         onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #e5989b66":"6px 6px 0 #d4888b,0 0 30px #e5989b44"}}
         onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #e5989b44,${S.btnShadow}`:"4px 4px 0 #d4888b,0 0 20px #e5989b33"}}>
         <span style={{fontSize:"13px",letterSpacing:"3px",opacity:0.9}}>{t.arenaDesc}</span>
         <span>{t.arenaCta}</span>
+        <span style={{fontSize:"12px",opacity:0.8,display:"flex",alignItems:"center",gap:"4px",marginTop:"2px"}}><span style={{fontSize:"14px",fontWeight:"700"}}>{publicOnlineCount}</span> {publicOnlineCount===1?t.playerInArena:t.playersInArena}</span>
       </button>
-      <div style={{fontSize:"16px",color:S.textSoft,marginBottom:"10px",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>
-        <Icon icon="person" color={S.green} size={2}/><span style={{color:S.green,fontWeight:"700"}}>{publicOnlineCount}</span> {publicOnlineCount===1?t.playerInArena:t.playersInArena}
-      </div>
 
-      {/* Two smaller buttons side by side */}
+      {/* Three buttons side by side: Practice, Custom Game, Quick Guide */}
       <div style={{display:"flex",gap:"8px"}}>
-        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"14px",color:"#2d5240",background:"#a8d8b9",border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #7bb89a",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"14px",color:"#2d5240",background:"#a8d8b9",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #7bb89a",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
           onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #7bb89a"}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #7bb89a"}}>
           <span>{t.practice}</span>
-          <span style={{fontSize:"13px",opacity:0.7}}>{t.practiceDesc}</span>
+          <span style={{fontSize:"12px",opacity:0.7}}>{t.practiceDesc}</span>
         </button>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:"#5a4520",background:"#f5d89a",border:"none",padding:"18px 16px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #d4b870",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:"#5a4520",background:"#f5d89a",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #d4b870",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
           onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #d4b870"}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #d4b870"}}>
           <span>{t.customGame}</span>
-          <span style={{fontSize:"13px",opacity:0.7}}>{t.customDesc}</span>
+          <span style={{fontSize:"12px",opacity:0.7}}>{t.customDesc}</span>
+        </button>
+        <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"14px",color:"#3d4a6b",background:"#b8c8e8",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #8a9bc0",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #8a9bc0"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #8a9bc0"}}>
+          <span>{t.tutorialBtn}</span>
+          <span style={{fontSize:"12px",opacity:0.7}}>▶</span>
         </button>
       </div>
 
@@ -3546,7 +3556,6 @@ export default function Piilosana(){
         {/* Info links */}
         <div style={{fontSize:"14px",color:S.textMuted,marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString("fi-FI")} {t.words}</div>
         <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
-          <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,background:"transparent",border:`1px solid ${S.yellow}44`,padding:"3px 10px",cursor:"pointer",borderRadius:"4px",opacity:0.9}}>{t.tutorialBtn} ▶</button>
           <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.howToPlay}</button>
           <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
         </div>
@@ -4488,6 +4497,13 @@ export default function Piilosana(){
                 <span style={{fontSize:"28px",fontWeight:"700",color:"#44ddff",lineHeight:1}}>{found.length}</span>
               </div>
               )}
+              {mode==="solo"&&state==="play"&&(
+                <button onClick={()=>setShowExitConfirm(true)} style={{background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"4px 8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"4px",transition:"all 0.15s",flexShrink:0}}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor=S.red;e.currentTarget.style.background=S.red+"15";}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor=S.textMuted+"44";e.currentTarget.style.background="transparent";}}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.textMuted} strokeWidth="2" strokeLinecap="round"/></svg>
+                </button>
+              )}
               <div style={{display:"flex",alignItems:"baseline",gap:"8px",justifyContent:"flex-end",flex:1}}>
                 <span style={{fontSize:"14px",color:S.textMuted,fontWeight:"600"}}>{t.score}</span>
                 <span style={{fontSize:"28px",fontWeight:"700",color:S.yellow,lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{score}</span>
@@ -4512,6 +4528,19 @@ export default function Piilosana(){
           {combo>=2&&state==="play"&&(
             <div style={{textAlign:"center",fontSize:"13px",color:combo>=5?S.purple:combo>=3?S.yellow:S.green,marginBottom:"4px",animation:combo>=3?"epicPulse 0.5s infinite":"none"}}>
               {combo>=5?`${t.megaCombo} x${combo}!`:combo>=3?`${t.combo} x${combo}! (x2)`:`${combo} ${t.comboStreak}`}
+            </div>
+          )}
+
+          {/* Exit confirmation overlay */}
+          {showExitConfirm&&(
+            <div style={{position:"absolute",top:0,left:0,right:0,bottom:0,background:"#000000cc",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeIn 0.2s ease",borderRadius:"8px"}} onClick={()=>setShowExitConfirm(false)}>
+              <div style={{background:S.dark,border:`2px solid ${S.red}`,borderRadius:S.panelRadius,padding:"24px 28px",textAlign:"center",boxShadow:`0 0 30px ${S.red}33`}} onClick={e=>e.stopPropagation()}>
+                <div style={{fontSize:"16px",color:S.red,fontFamily:S.font,fontWeight:"700",marginBottom:"16px"}}>{t.exitConfirm}</div>
+                <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
+                  <button onClick={()=>{setShowExitConfirm(false);returnToModeSelect();}} style={{fontFamily:S.font,fontSize:"14px",color:"#fff",background:S.red,border:"none",padding:"10px 24px",cursor:"pointer",borderRadius:S.btnRadius}}>{t.exitYes}</button>
+                  <button onClick={()=>setShowExitConfirm(false)} style={{fontFamily:S.font,fontSize:"14px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,padding:"10px 24px",cursor:"pointer",borderRadius:S.btnRadius}}>{t.exitNo}</button>
+                </div>
+              </div>
             </div>
           )}
 
