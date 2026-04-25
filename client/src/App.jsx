@@ -1117,25 +1117,37 @@ function QuickTutorial({lang,theme,onClose}){
                   const completedColor=wordIdx!==null&&wordIdx!==undefined?config.words[wordIdx].color:null;
                   const activeColor=currentWord?currentWord.color:"#44ff88";
                   const isLast=isActive&&activeCells.length>0&&activeCells[activeCells.length-1][0]===r&&activeCells[activeCells.length-1][1]===c;
-                  const borderBg=isActive?`linear-gradient(120deg, ${activeColor}, ${activeColor}cc)`:(isCompleted?`${completedColor}88`:(S.cellBorder||S.border));
-                  const cellBg=isActive?(S.cell+"ee"):(isCompleted?`${completedColor}15`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell);
+                  const selIdx=isActive?activeCells.findIndex(([ar,ac])=>ar===r&&ac===c):-1;
+                  const borderBg=isActive?`linear-gradient(${120+selIdx*60}deg, #00ffaa, #44bbff, #aa66ff, #ff66aa, #ffaa44, #00ffaa)`:(isCompleted?`${completedColor}88`:(S.cellBorder||S.border));
+                  const cellBg=isActive?`linear-gradient(${160+selIdx*30}deg, ${S.cell}ee 0%, ${S.cell}cc 40%, ${S.dark||S.cell}dd 100%)`:(isCompleted?`${completedColor}15`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell);
 
                   return(
                     <div key={c} ref={el=>{if(el)cellRefs.current[`${r},${c}`]=el;}} style={{width:"18%",aspectRatio:"0.866",position:"relative",
                       transition:"transform 0.2s cubic-bezier(0.34,1.56,0.64,1)",
                       transform:isActive?(isLast?"scale(1.12)":"scale(1.05)"):"none",
                       zIndex:isActive?10:0}}>
-                      <div style={{position:"absolute",inset:isActive?"-1px":"0",clipPath:hexClip,
-                        background:borderBg,transition:"all 0.2s ease",
-                        boxShadow:isActive?`0 0 12px ${activeColor}66`:"none"}}/>
-                      <div style={{position:"absolute",inset:isActive?"2px":"1px",clipPath:hexClip,
+                      {/* Outer border — prismatic when active */}
+                      <div style={{position:"absolute",inset:isActive?"-2px":"0",clipPath:hexClip,
+                        background:borderBg,
+                        backgroundSize:isActive?"300% 100%":"100% 100%",
+                        animation:isActive?"hexPrismatic 6s linear infinite":"none",
+                        transition:"all 0.2s ease",
+                        boxShadow:isActive?`0 0 12px ${S.green}88, 0 0 20px #aa66ff44`:"none"}}/>
+                      {/* Glow ring */}
+                      {isActive&&<div style={{position:"absolute",inset:"-5px",clipPath:hexClip,
+                        background:"radial-gradient(ellipse at 50% 50%, #44ffaa33 0%, #8866ff22 40%, transparent 70%)",
+                        pointerEvents:"none"}}/>}
+                      {/* Inner cell */}
+                      <div style={{position:"absolute",inset:isActive?"3px":"1px",clipPath:hexClip,
                         background:cellBg,
                         display:"flex",alignItems:"center",justifyContent:"center",
                         fontSize:"clamp(14px,4.5vw,22px)",fontFamily:S.letterFont,fontWeight:"700",
                         textTransform:"uppercase",transition:"all 0.2s ease",
                         color:isActive?"#ffffff":(isCompleted?completedColor:(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa"))),
-                        textShadow:isActive?`0 0 10px ${activeColor}88`:"none"}}>
-                        {letter}
+                        textShadow:isActive?`0 0 12px #44ffaa99, 0 0 24px #8866ff66, 0 1px 2px #000000aa`:"none"}}>
+                        <span style={{position:"relative",zIndex:2,
+                          filter:isActive?"drop-shadow(0 0 4px #44ffaa88) drop-shadow(0 0 8px #8866ff44)":"none",
+                        }}>{letter}</span>
                       </div>
                     </div>
                   );
@@ -1156,22 +1168,30 @@ function QuickTutorial({lang,theme,onClose}){
               const px=p1.x+(p2.x-p1.x)*segProgress;
               const py=p1.y+(p2.y-p1.y)*segProgress;
               return(
-                <div style={{position:"absolute",left:`${px}px`,top:`${py}px`,transform:"translate(-12px, -6px)",
-                  pointerEvents:"none",zIndex:50,transition:"none",filter:"drop-shadow(0 3px 8px #00000088)"}}>
-                  <svg width="36" height="44" viewBox="0 0 48 56" fill="none">
-                    {/* Pointing/dragging finger */}
-                    <ellipse cx="20" cy="6" rx="5" ry="6" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1.2"/>
-                    <rect x="15" y="10" width="10" height="14" rx="4" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1.2"/>
-                    <rect x="11" y="22" width="26" height="20" rx="6" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1.2"/>
-                    <ellipse cx="18" cy="45" rx="3.5" ry="4" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1"/>
-                    <ellipse cx="25" cy="46" rx="3.5" ry="4.5" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1"/>
-                    <ellipse cx="32" cy="45" rx="3.5" ry="4" fill="#f5d0b0" stroke="#c49a6c" strokeWidth="1"/>
-                    {/* Fingernail */}
-                    <ellipse cx="20" cy="3" rx="3.5" ry="2.5" fill="#fce4d0" stroke="#ddb898" strokeWidth="0.8"/>
-                    {/* Touch ripple */}
-                    <circle cx="20" cy="4" r="10" fill="none" stroke="#44ff8866" strokeWidth="1.5" opacity="0.5">
-                      <animate attributeName="r" values="6;14;6" dur="1.5s" repeatCount="indefinite"/>
-                      <animate attributeName="opacity" values="0.6;0;0.6" dur="1.5s" repeatCount="indefinite"/>
+                <div style={{position:"absolute",left:`${px}px`,top:`${py}px`,transform:"translate(-10px, -2px)",
+                  pointerEvents:"none",zIndex:50,transition:"none",filter:"drop-shadow(0 3px 6px #00000077)"}}>
+                  <svg width="40" height="48" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* White glove pointing hand — index finger up, others curled */}
+                    {/* Index finger */}
+                    <path d="M42 8 C42 3, 48 0, 52 0 C56 0, 62 3, 62 8 L62 42 L42 42 Z" fill="white" stroke="#222" strokeWidth="3" strokeLinejoin="round"/>
+                    <ellipse cx="52" cy="8" rx="7" ry="4" fill="#e8e8e8" opacity="0.5"/>
+                    {/* Palm */}
+                    <rect x="28" y="42" width="48" height="36" rx="10" fill="white" stroke="#222" strokeWidth="3"/>
+                    {/* Thumb */}
+                    <path d="M28 52 C20 50, 14 56, 16 64 C18 70, 26 72, 30 68" fill="white" stroke="#222" strokeWidth="3" strokeLinejoin="round"/>
+                    {/* Curled fingers (bottom of palm) */}
+                    <path d="M36 78 C36 88, 40 92, 44 92 C48 92, 50 88, 50 82" fill="white" stroke="#222" strokeWidth="2.5" strokeLinecap="round"/>
+                    <path d="M50 78 C50 90, 54 94, 58 94 C62 94, 64 90, 64 82" fill="white" stroke="#222" strokeWidth="2.5" strokeLinecap="round"/>
+                    <path d="M64 78 C64 86, 66 90, 70 88 C74 86, 74 80, 72 76" fill="white" stroke="#222" strokeWidth="2.5" strokeLinecap="round"/>
+                    {/* Knuckle lines on index finger */}
+                    <line x1="44" y1="22" x2="60" y2="22" stroke="#ccc" strokeWidth="1.5" strokeLinecap="round"/>
+                    <line x1="44" y1="32" x2="60" y2="32" stroke="#ccc" strokeWidth="1.5" strokeLinecap="round"/>
+                    {/* Cuff */}
+                    <rect x="24" y="76" width="52" height="10" rx="3" fill="white" stroke="#222" strokeWidth="2.5"/>
+                    {/* Touch ripple at fingertip */}
+                    <circle cx="52" cy="4" r="8" fill="none" stroke="#44ffaa" strokeWidth="2" opacity="0.6">
+                      <animate attributeName="r" values="6;16;6" dur="1.5s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0.7;0;0.7" dur="1.5s" repeatCount="indefinite"/>
                     </circle>
                   </svg>
                 </div>
@@ -1696,6 +1716,7 @@ function ModernIcon({icon,color="currentColor",size=2,style={}}){
     person:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
     arrow:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>,
     infinity:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18.178 8c5.096 0 5.096 8 0 8-5.095 0-7.133-8-12.739-8-4.585 0-4.585 8 0 8 5.606 0 7.644-8 12.74-8z"/></svg>,
+    refresh:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>,
   };
   return <span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle",flexShrink:0,...style}}>{icons[icon]||null}</span>;
 }
@@ -3148,7 +3169,7 @@ export default function Piilosana(){
       setBattleMsg(null);
       setEmojiFeed([]);
       setLobbyState("playing");
-      setCountdown(3);setState("countdown");
+      setState("play");startTimeRef.current=Date.now();
     });
     
     newSocket.on("timer_tick",({remaining})=>{
