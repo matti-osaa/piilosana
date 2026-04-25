@@ -3253,8 +3253,8 @@ export default function Piilosana(){
     newSocket.on("public_countdown",({grid:g,validWords:vw,roundNumber,hex})=>{
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
       setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);setEnding(null);setDropKey(0);
-      setPublicState("countdown");setPublicCountdown(5);setPublicRound(roundNumber);
-      setPublicRankings(null);setState("countdown");setCountdown(3);setPublicHex(!!hex);
+      setPublicState("playing");setPublicCountdown(0);setPublicRound(roundNumber);
+      setPublicRankings(null);setState("play");setPublicHex(!!hex);startTimeRef.current=Date.now();
     });
     newSocket.on("public_join_midgame",({grid:g,validWords:vw,timeLeft:tl,roundNumber,hex})=>{
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
@@ -4593,9 +4593,9 @@ export default function Piilosana(){
               style={{padding:isLarge?"4px 0":"2px 0",background:"transparent",
                 touchAction:"none",position:"relative"}}>
               {grid.map((row,r)=>(
-                <div key={r} style={{display:"flex",justifyContent:"center",gap:"2px",
-                  marginTop:r>0?"calc(-4.764% + 2px)":"0",
-                  transform:r%2===1?"translateX(calc(16.5% / 4 + 0.5px))":"translateX(calc(-16.5% / 4 - 0.5px))",
+                <div key={r} style={{display:"flex",justifyContent:"center",gap:"0px",
+                  marginTop:r>0?"calc(-4.764% + 1px)":"0",
+                  transform:r%2===1?"translateX(calc(16.5% / 4))":"translateX(calc(-16.5% / 4))",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
                     const s=isSel(r,c);
