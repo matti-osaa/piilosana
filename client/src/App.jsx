@@ -241,6 +241,7 @@ const T={
     tutorialBtn:"PIKAOHJE",
     exitConfirm:"Poistu pelistä?",exitYes:"POISTU",exitNo:"JATKA",
     menuSound:"ÄÄNET",menuMusic:"MUSIIKKI",menuTheme:"TEEMA",menuShare:"JAA",menuExit:"POISTU",on:"PÄÄLLÄ",off:"POIS",
+    menuExitGame:"POISTU PELISTÄ",menuClose:"SULJE VALIKKO",menuMuteEmoji:"EMOTICONIT",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"MULTIPLAYER",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -303,6 +304,7 @@ const T={
     tutorialBtn:"QUICK GUIDE",
     exitConfirm:"Quit the game?",exitYes:"QUIT",exitNo:"CONTINUE",
     menuSound:"SOUNDS",menuMusic:"MUSIC",menuTheme:"THEME",menuShare:"SHARE",menuExit:"EXIT",on:"ON",off:"OFF",
+    menuExitGame:"EXIT GAME",menuClose:"CLOSE MENU",menuMuteEmoji:"EMOTICONS",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"FLERSPELARE",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -365,6 +367,7 @@ const T={
     tutorialBtn:"SNABBGUIDE",
     exitConfirm:"Avsluta spelet?",exitYes:"AVSLUTA",exitNo:"FORTSÄTT",
     menuSound:"LJUD",menuMusic:"MUSIK",menuTheme:"TEMA",menuShare:"DELA",menuExit:"AVSLUTA",on:"PÅ",off:"AV",
+    menuExitGame:"AVSLUTA SPELET",menuClose:"STÄNG MENYN",menuMuteEmoji:"EMOTIKONER",
   },
 };
 
@@ -2169,6 +2172,9 @@ export default function Piilosana(){
   const[showTutorial,setShowTutorial]=useState(false);
   const[showExitConfirm,setShowExitConfirm]=useState(false);
   const[showHamburger,setShowHamburger]=useState(false);
+  const[muteEmojis,setMuteEmojis]=useState(()=>localStorage.getItem("piilosana_mute_emoji")==="on");
+  const muteEmojisRef=useRef(muteEmojis);
+  useEffect(()=>{muteEmojisRef.current=muteEmojis;},[muteEmojis]);
   const[gearBlend,setGearBlend]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
   const[themeTransition,setThemeTransition]=useState(false);
@@ -3592,6 +3598,7 @@ export default function Piilosana(){
       setPublicNextCountdown(seconds);
     });
     newSocket.on("emoji_feed",({nickname,emoji})=>{
+      if(muteEmojisRef.current)return;
       const id=++emojiFeedIdRef.current;
       setEmojiFeed(prev=>[...prev.slice(-7),{id,nickname,emoji,fading:false}]);
       setTimeout(()=>setEmojiFeed(prev=>prev.map(e=>e.id===id?{...e,fading:true}:e)),5200);
@@ -4207,10 +4214,6 @@ export default function Piilosana(){
           <h1 className="piilosana-title" style={{fontSize:"28px",letterSpacing:"4px",margin:0,display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
             animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
             {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>{
-              if(i===tc.gearIdx)return <span key={i} onClick={()=>setShowSettings(v=>!v)} style={{
-                cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",
-                marginRight:"4px"}}>
-                <Icon icon="gear" color={gearBlend?S.yellow:S.textSoft} size={S.cellGradient?3.5:1.7} style={{transition:"filter 2s ease"}}/></span>;
               return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:S.titleFont}}>{ch}</span>;
             });})()}
             {!currentLangLoaded&&<span style={{fontSize:"10px",color:S.green,marginLeft:"6px",animation:"pulse 1s ease-in-out infinite",display:"inline-flex",alignItems:"center",gap:"2px"}}><span style={{width:"6px",height:"6px",borderRadius:"50%",border:`2px solid ${S.green}`,borderTopColor:"transparent",display:"inline-block",animation:"spin 0.8s linear infinite"}}></span></span>}
@@ -4903,7 +4906,7 @@ export default function Piilosana(){
       {(state==="play"||state==="ending"||state==="scramble")&&(
         <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:(soloMode==="hex"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD */}
-          <div style={{marginBottom:isHexMode?"1px":"4px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022"}}>
+          <div style={{marginBottom:isHexMode?"1px":"4px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022",overflow:"hidden"}}>
 
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
@@ -4954,7 +4957,7 @@ export default function Piilosana(){
             {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
             <div ref={wordBarRef} key={flashKey} style={{padding:S.cellGradient?"4px 10px":"2px 8px",textAlign:"center",position:"relative",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
               {/* Hamburger menu button */}
-              <button onClick={()=>setShowHamburger(true)} style={{position:"absolute",left:"4px",top:"50%",transform:"translateY(-50%)",background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"2px 8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"6px",transition:"all 0.15s",zIndex:2,fontSize:"16px",color:S.textMuted,lineHeight:1}}
+              <button onClick={()=>setShowHamburger(true)} style={{position:"absolute",left:"6px",top:"50%",transform:"translateY(-50%)",background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"4px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"8px",transition:"all 0.15s",zIndex:2,fontSize:"20px",color:S.textMuted,lineHeight:1}}
                 onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.background=S.green+"15";e.currentTarget.style.color=S.green;}}
                 onMouseLeave={e=>{e.currentTarget.style.borderColor=S.textMuted+"44";e.currentTarget.style.background="transparent";e.currentTarget.style.color=S.textMuted;}}>
                 &#9776;
@@ -4964,9 +4967,9 @@ export default function Piilosana(){
                  word?word.toUpperCase():
                  (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?(S.cellGradient?"16px":"12px"):(S.cellGradient?"14px":"10px"),fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted,fontSize:S.cellGradient?"20px":"18px"}}>···</span>)}
               </div>
-              {(mode==="multi"||mode==="public")&&<span onClick={e=>{e.stopPropagation();setShowSharePopup(true);}} style={{position:"absolute",right:"4px",top:"50%",transform:"translateY(-50%)",fontSize:"13px",color:S.textMuted,display:"flex",alignItems:"center",gap:"4px",cursor:"pointer",padding:"4px 8px",borderRadius:"4px",border:`1px solid ${S.border}`,background:S.dark,transition:"all 0.15s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;}} onMouseLeave={e=>{e.currentTarget.style.borderColor=S.border;e.currentTarget.style.color=S.textMuted;}}>
-                <Icon icon="person" color="currentColor" size={1.5}/>{mode==="public"?publicPlayerCount:players.length}
-                <Icon icon="share" color="currentColor" size={1.5}/>
+              {(mode==="multi"||mode==="public")&&<span style={{position:"absolute",right:"4px",top:"50%",transform:"translateY(-50%)",fontSize:"13px",color:S.textMuted,display:"flex",alignItems:"center",gap:"6px",padding:"4px 8px"}}>
+                <span style={{display:"flex",alignItems:"center",gap:"3px"}}><Icon icon="person" color={S.textMuted} size={1.5}/>{mode==="public"?publicPlayerCount:players.length}</span>
+                <button onClick={e=>{e.stopPropagation();setChatHidden(h=>!h);}} style={{background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"2px 6px",cursor:"pointer",borderRadius:"6px",fontSize:"14px",lineHeight:1,transition:"all 0.15s",color:chatHidden?S.textMuted:S.green}} onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;}} onMouseLeave={e=>{e.currentTarget.style.borderColor=S.textMuted+"44";e.currentTarget.style.color=chatHidden?S.textMuted:S.green;}}>💬</button>
               </span>}
             </div>
           </div>
@@ -4999,8 +5002,8 @@ export default function Piilosana(){
 
           {/* Hamburger menu overlay */}
           {showHamburger&&(
-            <div style={{position:"absolute",top:0,left:0,right:0,bottom:0,background:"#00000088",zIndex:100,animation:"fadeIn 0.15s ease",borderRadius:"8px"}} onClick={()=>setShowHamburger(false)}>
-              <div style={{position:"absolute",top:0,left:0,bottom:0,width:"230px",background:`${S.dark}f8`,borderRight:`1px solid ${S.border}`,padding:"16px",display:"flex",flexDirection:"column",gap:"6px",animation:"slideInLeft 0.2s ease",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderRadius:"12px 0 0 12px",boxShadow:"4px 0 24px #00000044"}} onClick={e=>e.stopPropagation()}>
+            <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"#00000088",zIndex:200,animation:"fadeIn 0.15s ease"}} onClick={()=>setShowHamburger(false)}>
+              <div style={{position:"absolute",top:0,left:0,bottom:0,width:"260px",background:`${S.dark}f8`,borderRight:`1px solid ${S.border}`,padding:"16px",display:"flex",flexDirection:"column",gap:"6px",animation:"slideInLeft 0.2s ease",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderRadius:"0 12px 12px 0",boxShadow:"4px 0 24px #00000044"}} onClick={e=>e.stopPropagation()}>
                 {/* Menu title */}
                 <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"6px",letterSpacing:"2px",display:"flex",alignItems:"center",gap:"6px"}}>
                   <span style={{fontSize:"16px"}}>&#9776;</span> {t.options||"ASETUKSET"}
@@ -5057,12 +5060,37 @@ export default function Piilosana(){
                   </div>
                 )}
 
-                {/* Exit */}
+                {/* Emoji mute toggle (multiplayer only) */}
+                {(mode==="multi"||mode==="public")&&(
+                <div onClick={()=>{const next=!muteEmojis;setMuteEmojis(next);localStorage.setItem("piilosana_mute_emoji",next?"on":"off");}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+                  onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+                  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                  <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
+                    <span style={{fontSize:"16px"}}>😀</span> {t.menuMuteEmoji||"EMOTICONS"}
+                  </span>
+                  <span style={{fontSize:"11px",fontFamily:S.font,color:!muteEmojis?S.green:S.textMuted,background:!muteEmojis?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${!muteEmojis?S.green+"44":S.textMuted+"44"}`}}>
+                    {!muteEmojis?(t.on||"ON"):(t.off||"OFF")}
+                  </span>
+                </div>
+                )}
+
+                <div style={{height:"1px",background:S.border,margin:"4px 0"}}/>
+
+                {/* Exit game */}
                 <div onClick={()=>{setShowHamburger(false);if(mode==="solo"){setShowExitConfirm(true);}else{returnToModeSelect();}}} style={{display:"flex",alignItems:"center",gap:"8px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
                   onMouseEnter={e=>{e.currentTarget.style.background=S.red+"22";}}
                   onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.red} strokeWidth="2" strokeLinecap="round"/></svg>
-                  <span style={{fontSize:"13px",color:S.red,fontFamily:S.font}}>{t.menuExit||"EXIT"}</span>
+                  <span style={{fontSize:"13px",color:S.red,fontFamily:S.font}}>{t.menuExitGame||"EXIT GAME"}</span>
+                </div>
+
+                <div style={{flex:1}}/>
+
+                {/* Close menu */}
+                <div onClick={()=>setShowHamburger(false)} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent",borderTop:`1px solid ${S.border}`,marginTop:"auto"}}
+                  onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+                  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                  <span style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font}}>{t.menuClose||"CLOSE MENU"}</span>
                 </div>
               </div>
             </div>
@@ -5290,7 +5318,7 @@ export default function Piilosana(){
           </div>
 
           {state==="play"&&(
-            <div className="piilosana-found" style={{marginTop:isHexMode?"2px":"8px",padding:"4px 6px",border:`2px solid ${S.border}`,background:S.dark,maxHeight:"100px",overflowY:"auto"}}>
+            <div className="piilosana-found" style={{marginTop:isHexMode?"2px":"8px",padding:"4px 6px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,maxHeight:"100px",overflowY:"auto",borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022"}}>
               <div style={{fontSize:"11px",color:S.textMuted,marginBottom:"2px"}}>{(gameMode==="battle"||(mode==="solo"&&(soloMode==="tetris"||soloMode==="rotate"||soloMode==="chess")))?`${t.found} (${found.length})`:`${t.found} (${found.length}/${valid.size}) ${valid.size>0?Math.round(found.length/valid.size*100):0}%`}</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"2px"}}>
                 {found.length===0?null:
@@ -5306,7 +5334,7 @@ export default function Piilosana(){
 
           {/* Glassmorphic chat overlay - multiplayer only */}
           {(mode==="public"||mode==="multi")&&state==="play"&&socket&&!chatHidden&&(
-            <div style={{position:"fixed",bottom:"16px",right:"16px",zIndex:100,
+            <div style={{position:"fixed",top:"8px",right:"8px",zIndex:100,
               width:"clamp(180px,30vw,220px)",
               background:"rgba(15,20,35,0.55)",
               backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",
@@ -5372,7 +5400,7 @@ export default function Piilosana(){
           {/* Chat hidden - small reopen button */}
           {(mode==="public"||mode==="multi")&&state==="play"&&socket&&chatHidden&&(
             <button onClick={()=>setChatHidden(false)}
-              style={{position:"fixed",bottom:"16px",right:"16px",zIndex:100,
+              style={{position:"fixed",top:"8px",right:"8px",zIndex:100,
                 fontSize:"16px",padding:"8px",lineHeight:1,
                 background:"rgba(15,20,35,0.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
                 border:"1px solid rgba(255,255,255,0.1)",borderRadius:"14px",cursor:"pointer",
