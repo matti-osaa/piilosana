@@ -1400,6 +1400,21 @@ const ICON_PIXELS={
     ],
     colors:{R:"currentColor"},
   },
+  share:{ // 9x9 share nodes with lines
+    cols:9,
+    rows:[
+      "......SS.",
+      "......SS.",
+      "....SS...",
+      "..SS.....",
+      "..SS.....",
+      "....SS...",
+      "......SS.",
+      "......SS.",
+      ".........",
+    ],
+    colors:{S:"currentColor"},
+  },
   stop:{ // 7x7 stop square
     cols:7,
     rows:[
@@ -1725,6 +1740,7 @@ function ModernIcon({icon,color="currentColor",size=2,style={}}){
     arrow:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>,
     infinity:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18.178 8c5.096 0 5.096 8 0 8-5.095 0-7.133-8-12.739-8-4.585 0-4.585 8 0 8 5.606 0 7.644-8 12.74-8z"/></svg>,
     refresh:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>,
+    share:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>,
   };
   return <span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle",flexShrink:0,...style}}>{icons[icon]||null}</span>;
 }
@@ -4672,7 +4688,13 @@ export default function Piilosana(){
                  word?word.toUpperCase():
                  (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?(S.cellGradient?"16px":"12px"):(S.cellGradient?"14px":"10px"),fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted,fontSize:S.cellGradient?"20px":"18px"}}>···</span>)}
               </div>
-              {(mode==="multi"||mode==="public")&&<span style={{position:"absolute",right:"6px",top:"50%",transform:"translateY(-50%)",fontSize:"10px",color:S.textMuted,display:"flex",alignItems:"center",gap:"2px"}}><Icon icon="person" color={S.textMuted} size={1}/>{mode==="public"?publicPlayerCount:players.length}</span>}
+              {(mode==="multi"||mode==="public")&&<span style={{position:"absolute",right:"6px",top:"50%",transform:"translateY(-50%)",fontSize:"10px",color:S.textMuted,display:"flex",alignItems:"center",gap:"4px"}}>
+                <Icon icon="person" color={S.textMuted} size={1}/>{mode==="public"?publicPlayerCount:players.length}
+                <span onClick={e=>{e.stopPropagation();const url=mode==="public"?`${window.location.origin}?arena`:`${window.location.origin}?room=${roomCode}`;navigator.clipboard.writeText(url).then(()=>{setLinkCopied(true);setTimeout(()=>setLinkCopied(false),1500);}).catch(()=>{});}} style={{cursor:"pointer",padding:"2px",borderRadius:"3px",display:"inline-flex",alignItems:"center",position:"relative",opacity:linkCopied?1:0.6,transition:"opacity 0.2s"}} onMouseEnter={e=>e.currentTarget.style.opacity="1"} onMouseLeave={e=>{if(!linkCopied)e.currentTarget.style.opacity="0.6";}}>
+                  <Icon icon="share" color={linkCopied?S.green:S.textMuted} size={1}/>
+                  {linkCopied&&<span style={{position:"absolute",right:"100%",marginRight:"4px",whiteSpace:"nowrap",fontSize:"10px",color:S.green,fontWeight:"bold",animation:"fadeIn 0.2s ease"}}>{t.copied}</span>}
+                </span>
+              </span>}
             </div>
           </div>
 
