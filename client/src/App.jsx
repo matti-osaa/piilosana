@@ -765,94 +765,118 @@ function useMusic(){
     await Tone.start();
     startedRef.current=true;
 
-    // Soft synth lead — warm, dreamy, slightly bouncy
+    // --- Instruments ---
+    // Lead synth — bright, melodic
     const synth=new Tone.PolySynth(Tone.Synth,{
-      oscillator:{type:"fatsine3",spread:12},
-      envelope:{attack:0.05,decay:0.6,sustain:0.2,release:1.8},
-      volume:-19
+      oscillator:{type:"fatsawtooth",spread:8,count:2},
+      envelope:{attack:0.01,decay:0.3,sustain:0.15,release:0.6},
+      volume:-20
     }).toDestination();
 
-    // Bell / sparkle — bright, playful
-    const bell=new Tone.Synth({
+    // Pluck / arpeggio — shimmery accents
+    const pluck=new Tone.Synth({
       oscillator:{type:"triangle"},
-      envelope:{attack:0.005,decay:1.5,sustain:0.0,release:2},
+      envelope:{attack:0.003,decay:0.4,sustain:0.0,release:0.5},
+      volume:-21
+    }).toDestination();
+
+    // Pad — warm, supportive chords
+    const pad=new Tone.PolySynth(Tone.Synth,{
+      oscillator:{type:"fatsine2",spread:15},
+      envelope:{attack:1.0,decay:1.5,sustain:0.3,release:2.5},
+      volume:-28
+    }).toDestination();
+
+    // Bass — rhythmic, driving
+    const bass=new Tone.Synth({
+      oscillator:{type:"sine"},
+      envelope:{attack:0.01,decay:0.3,sustain:0.1,release:0.4},
       volume:-22
     }).toDestination();
 
-    // Pad — warm, wider, slightly brighter
-    const pad=new Tone.PolySynth(Tone.Synth,{
-      oscillator:{type:"fatsine2",spread:20},
-      envelope:{attack:1.5,decay:2,sustain:0.35,release:3},
-      volume:-27
-    }).toDestination();
-
-    // Pluck bass — gentle rhythmic pulse
-    const bass=new Tone.Synth({
-      oscillator:{type:"sine"},
-      envelope:{attack:0.02,decay:0.8,sustain:0.0,release:1.2},
-      volume:-25
-    }).toDestination();
-
-    // C-pentatonic notes — upbeat range
-    const synthNotes=["C4","D4","E4","G4","A4","C5","D5","E5","G5","A5"];
-    const bellNotes=["E5","G5","A5","C6","D6","E6"];
-    const bassNotes=["C2","G2","A2","C3","D3"];
-    const padChords=[
-      ["C3","E3","G3","C4"],
-      ["A2","C3","E3","A3"],
-      ["G2","B2","D3","G3"],
-      ["D3","G3","A3","D4"],
-      ["C3","E3","G3","C4"],
+    // --- Chord progression: I - vi - IV - V in C major (4 bars, repeating) ---
+    const chords=[
+      {root:"C",pad:["C3","E3","G3"],bass:["C2","C2","G2","C2"],arp:["C4","E4","G4","C5","G4","E4"]},
+      {root:"A",pad:["A2","C3","E3"],bass:["A1","A1","E2","A1"],arp:["A3","C4","E4","A4","E4","C4"]},
+      {root:"F",pad:["F2","A2","C3"],bass:["F2","F2","C2","F2"],arp:["F4","A4","C5","F5","C5","A4"]},
+      {root:"G",pad:["G2","B2","D3"],bass:["G1","G1","D2","G1"],arp:["G4","B4","D5","G5","D5","B4"]},
     ];
 
-    // Synth melody: more frequent, playful pattern
-    let synthStep=0;
-    const synthLoop=new Tone.Loop((time)=>{
-      // 60% chance — busier but still breathing
-      if(Math.random()<0.6){
-        const note=synthNotes[Math.floor(Math.random()*synthNotes.length)];
-        synth.triggerAttackRelease(note,"4n",time);
-        // 30% chance of a quick follow-up note for bounce
-        if(Math.random()<0.3){
-          const note2=synthNotes[Math.floor(Math.random()*synthNotes.length)];
-          synth.triggerAttackRelease(note2,"8n",time+0.18);
-        }
-      }
-      synthStep++;
-    },"4n"); // every quarter note — more movement
+    // Melody phrases — 4 phrases, one per chord, each 8 eighth-notes long
+    const melodies=[
+      // Over C: uplifting ascending
+      [{n:"E4",d:"8n"},{n:"G4",d:"8n"},{n:"A4",d:"4n"},{n:"C5",d:"8n"},{n:"D5",d:"8n"},{n:"E5",d:"4n"}],
+      // Over Am: gentle descent
+      [{n:"E5",d:"8n"},{n:"D5",d:"8n"},{n:"C5",d:"4n"},{n:"A4",d:"8n"},{n:"G4",d:"8n"},{n:"A4",d:"4n"}],
+      // Over F: playful bounce
+      [{n:"A4",d:"8n"},{n:"C5",d:"8n"},{n:"A4",d:"8n"},{n:"F4",d:"8n"},{n:"A4",d:"4n"},{n:"C5",d:"4n"}],
+      // Over G: building tension, resolves
+      [{n:"B4",d:"8n"},{n:"D5",d:"8n"},{n:"G5",d:"4n"},{n:"D5",d:"8n"},{n:"E5",d:"8n"},{n:"C5",d:"4n"}],
+    ];
 
-    // Bell: playful sparkles, more frequent
-    const bellLoop=new Tone.Loop((time)=>{
-      if(Math.random()<0.4){
-        const note=bellNotes[Math.floor(Math.random()*bellNotes.length)];
-        bell.triggerAttackRelease(note,"2n",time);
-      }
-    },"2n"); // every half note
+    // Alternate melody set for variation (plays every other cycle)
+    const melodies2=[
+      [{n:"C5",d:"4n"},{n:"D5",d:"8n"},{n:"E5",d:"8n"},{n:"G5",d:"4n"},{n:"E5",d:"4n"}],
+      [{n:"A4",d:"4n"},{n:"C5",d:"8n"},{n:"E5",d:"8n"},{n:"D5",d:"4n"},{n:"C5",d:"4n"}],
+      [{n:"F4",d:"8n"},{n:"A4",d:"8n"},{n:"C5",d:"4n"},{n:"D5",d:"8n"},{n:"C5",d:"8n"},{n:"A4",d:"4n"}],
+      [{n:"G4",d:"8n"},{n:"B4",d:"8n"},{n:"D5",d:"4n"},{n:"E5",d:"8n"},{n:"D5",d:"8n"},{n:"C5",d:"4n"}],
+    ];
 
-    // Bass: gentle pulse on beats
-    const bassLoop=new Tone.Loop((time)=>{
-      if(Math.random()<0.5){
-        const note=bassNotes[Math.floor(Math.random()*bassNotes.length)];
-        bass.triggerAttackRelease(note,"8n",time);
-      }
-    },"2n");
+    let barCount=0;
+    let cycle=0;
 
-    // Pad: chord changes every measure — more harmonic movement
-    let padIdx=0;
+    // Pad: one chord per bar
     const padLoop=new Tone.Loop((time)=>{
-      const ch=padChords[padIdx%padChords.length];
-      pad.triggerAttackRelease(ch,"1m",time);
-      padIdx++;
-    },"1m"); // every measure
+      const ch=chords[barCount%4];
+      pad.triggerAttackRelease(ch.pad,"1m",time);
+      if(barCount%4===0)cycle++;
+      barCount++;
+    },"1m");
 
-    Tone.Transport.bpm.value=72; // upbeat but still chill
+    // Bass: rhythmic pattern — 4 notes per bar (quarter notes)
+    let bassStep=0;
+    const bassLoop=new Tone.Loop((time)=>{
+      const ch=chords[Math.floor(bassStep/4)%4];
+      const note=ch.bass[bassStep%4];
+      bass.triggerAttackRelease(note,"8n",time);
+      bassStep++;
+    },"4n");
+
+    // Arpeggio: 6 notes per bar on 8th notes, with gentle randomized gaps
+    let arpStep=0;let arpBar=0;
+    const arpLoop=new Tone.Loop((time)=>{
+      const pos=arpStep%6;
+      if(pos===0)arpBar++;
+      const ch=chords[(arpBar-1)%4];
+      if(Math.random()<0.8){ // occasional silence for breathing
+        pluck.triggerAttackRelease(ch.arp[pos],"16n",time);
+      }
+      arpStep++;
+    },"8n");
+
+    // Melody: plays phrase per bar, alternates between two melody sets
+    let melBar=0;
+    const melLoop=new Tone.Loop((time)=>{
+      const chIdx=melBar%4;
+      const mels=cycle%2===0?melodies:melodies2;
+      const phrase=mels[chIdx];
+      let offset=0;
+      phrase.forEach(({n,d})=>{
+        const durSec=Tone.Time(d).toSeconds();
+        synth.triggerAttackRelease(n,d,time+offset);
+        offset+=durSec;
+      });
+      melBar++;
+    },"1m");
+
+    Tone.Transport.bpm.value=100;
     padLoop.start(0);
     bassLoop.start(0);
-    synthLoop.start("1m"); // synth enters after first pad
-    bellLoop.start("1m"); // bells enter with synth
+    arpLoop.start("2m");    // arps enter after 2 bars
+    melLoop.start("1m");    // melody enters after 1 bar
     Tone.Transport.start();
 
-    partsRef.current={synth,bell,pad,bass,synthLoop,bellLoop,bassLoop,padLoop};
+    partsRef.current={synth,pluck,pad,bass,padLoop,bassLoop,arpLoop,melLoop};
   },[]);
 
   const stop=useCallback(()=>{
@@ -860,15 +884,15 @@ function useMusic(){
     startedRef.current=false;
     const p=partsRef.current;
     if(p){
-      p.synthLoop.stop();p.bellLoop.stop();p.bassLoop.stop();p.padLoop.stop();
+      p.melLoop.stop();p.arpLoop.stop();p.bassLoop.stop();p.padLoop.stop();
       Tone.Transport.stop();
       setTimeout(()=>{
         try{p.synth.dispose();}catch{}
-        try{p.bell.dispose();}catch{}
+        try{p.pluck.dispose();}catch{}
         try{p.pad.dispose();}catch{}
         try{p.bass.dispose();}catch{}
-        try{p.synthLoop.dispose();}catch{}
-        try{p.bellLoop.dispose();}catch{}
+        try{p.melLoop.dispose();}catch{}
+        try{p.arpLoop.dispose();}catch{}
         try{p.bassLoop.dispose();}catch{}
         try{p.padLoop.dispose();}catch{}
       },500);
