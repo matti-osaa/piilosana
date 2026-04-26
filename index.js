@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import initSqlJs from 'sql.js';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { gunzipSync } from 'zlib';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import bcrypt from 'bcryptjs';
@@ -205,6 +206,9 @@ function getLang(lang) { return LANGS[lang] || LANGS.fi; }
 
 // Full Finnish word list as Buffer for memory-efficient long word validation
 const FULL_WORDS_BUF = (() => {
+  // Try gzipped version first (saves ~120 Mt in repo)
+  const gzPath = join(__dirname, 'words_fi_full.txt.gz');
+  if (existsSync(gzPath)) return gunzipSync(readFileSync(gzPath));
   const fullPath = join(__dirname, 'words_fi_full.txt');
   if (!existsSync(fullPath)) return null;
   return readFileSync(fullPath);
@@ -757,7 +761,7 @@ io.on('connection', (socket) => {
     if (normalized.length < 3) return;
     if (!pg.validWords.has(normalized)) {
       // Check full word list for long words + verify grid traceability
-      if (gameLang === 'fi' && normalized.length > 10 && hasWordInBuf(FULL_WORDS_BUF, normalized) && canTraceWord(pg.grid, normalized, true)) {
+      if (gameLang === 'fi' && normalized.length > 8 && hasWordInBuf(FULL_WORDS_BUF, normalized) && canTraceWord(pg.grid, normalized, true)) {
         // Valid long word - add to validWords so it's counted
         pg.validWords.add(normalized);
         pg.validWordsList.push(normalized);
@@ -1011,7 +1015,7 @@ io.on('connection', (socket) => {
 
     // Check full word list for long Finnish words + verify grid traceability
     const isHexGrid = room.grid && room.grid.length === HEX_ROWS && room.grid[0].length === HEX_COLS;
-    if (!isValid && (room.lang || 'fi') === 'fi' && normalized.length > 10 && hasWordInBuf(FULL_WORDS_BUF, normalized) && canTraceWord(room.grid, normalized, isHexGrid)) {
+    if (!isValid && (room.lang || 'fi') === 'fi' && normalized.length > 8 && hasWordInBuf(FULL_WORDS_BUF, normalized) && canTraceWord(room.grid, normalized, isHexGrid)) {
       isValid = true;
       room.validWords.push(normalized);
     }

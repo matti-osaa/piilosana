@@ -189,7 +189,7 @@ const T={
     nextRound:"Seuraava kierros alkaa",playersInArena:"pelaajaa moninpelissä",playerInArena:"pelaaja moninpelissä",players:"pelaajaa",player:"pelaaja",
     getReady:"VALMISTAUDU",roundOver:"KIERROS PÄÄTTYI",yourScore:"PISTEESI",nextRoundIn:"Seuraava kierros",starts:"alkaa!",
     roundResults:"KIERROKSEN TULOKSET",foundWords:"LÖYDETYT SANAT",ownHighlighted:"Omat sanasi korostettu väreillä",defHint:"Klikkaa 3-kirjaimista sanaa nähdäksesi selitteen",
-    missed:"JÄIVÄT LÖYTÄMÄTTÄ",
+    missed:"JÄIVÄT LÖYTÄMÄTTÄ",missedLong:"Laudalta löytyi myös pidempiä sanoja",
     gameMode:"PELIMUOTO",classic:"KLASSINEN",battle:"TAISTELU",battleDesc:"Sanat näkyvät muille! Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä.",
     time:"AIKA",unlimited:"RAJATON",unlimitedDesc:"Ei aikarajaa! Vaihda ruudukko kun haluat.",
     letterMult:"PISTEYTYS",letterMultBtn:"KIRJAINARVOT",letterMultDesc:"Harvinaiset kirjaimet = enemmän pisteitä! (D,Ö=7 V,J,H,Y,P,U=4 ...)",
@@ -252,7 +252,7 @@ const T={
     nextRound:"Next round starts",playersInArena:"playing",playerInArena:"playing",players:"players",player:"player",
     getReady:"GET READY",roundOver:"ROUND OVER",yourScore:"YOUR SCORE",nextRoundIn:"Next round",starts:"starting!",
     roundResults:"ROUND RESULTS",foundWords:"FOUND WORDS",ownHighlighted:"Your words highlighted in color",defHint:"Tap a 3-letter word to see its definition",
-    missed:"NOT FOUND",
+    missed:"NOT FOUND",missedLong:"The board also had longer words",
     gameMode:"GAME MODE",classic:"CLASSIC",battle:"BATTLE",battleDesc:"Words visible to others! Found letters disappear and new ones drop from above.",
     time:"TIME",unlimited:"UNLIMITED",unlimitedDesc:"No time limit! Change grid whenever you want.",
     letterMult:"SCORING",letterMultBtn:"LETTER VALUES",letterMultDesc:"Rare letters = more points! (Q,Z=10 J,X=8 K=5 ...)",
@@ -315,7 +315,7 @@ const T={
     nextRound:"Nästa runda börjar",playersInArena:"spelar",playerInArena:"spelar",players:"spelare",player:"spelare",
     getReady:"GÖR DIG REDO",roundOver:"RUNDAN SLUT",yourScore:"DINA POÄNG",nextRoundIn:"Nästa runda",starts:"börjar!",
     roundResults:"RUNDANS RESULTAT",foundWords:"HITTADE ORD",ownHighlighted:"Dina ord markerade i färg",defHint:"Tryck på ett 3-bokstavsord för att se definitionen",
-    missed:"INTE HITTADE",
+    missed:"INTE HITTADE",missedLong:"Det fanns också längre ord på brädet",
     gameMode:"SPELLÄGE",classic:"KLASSISKT",battle:"STRID",battleDesc:"Ord syns för andra! Hittade bokstäver försvinner och nya faller uppifrån.",
     time:"TID",unlimited:"OBEGRÄNSAD",unlimitedDesc:"Ingen tidsgräns! Byt rutnät när du vill.",
     letterMult:"POÄNGSÄTTNING",letterMultBtn:"BOKSTAVSVÄRDEN",letterMultDesc:"Ovanliga bokstäver = mer poäng! (Z=10 X=8 J=7 ...)",
@@ -3190,8 +3190,8 @@ export default function Piilosana(){
     let isValidWord=valid.has(currentWord);
     const alreadyFound=found.includes(currentWord);
 
-    // For long words (>10 chars), validate server-side if not in local set
-    if(!isValidWord&&currentWord.length>10&&lang==="fi"){
+    // For long words (>8 chars), validate server-side if not in local set
+    if(!isValidWord&&currentWord.length>8&&lang==="fi"){
       const savedSel=[...currentSel];
       fetch(`${SERVER_URL}/api/validate-word`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({word:currentWord})})
         .then(r=>r.json()).then(({valid:v})=>{
@@ -3948,6 +3948,7 @@ export default function Piilosana(){
                     <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                   ))}
                 </div>
+                {(room?.lang||"fi")==="fi"&&<div style={{fontSize:"12px",color:S.textMuted,marginTop:"8px",fontStyle:"italic"}}>{t.missedLong||"Laudalta löytyi myös pidempiä sanoja"}</div>}
               </div>
             )}
           </>);
@@ -4720,6 +4721,7 @@ export default function Piilosana(){
                   <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 5px",border:"1px solid #ff444444",color:"#ff8877",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
+              {lang==="fi"&&<div style={{fontSize:"12px",color:S.textMuted,marginTop:"8px",fontStyle:"italic"}}>{t.missedLong||"Laudalta löytyi myös pidempiä sanoja"}</div>}
             </div>
           )}
 
@@ -5257,6 +5259,7 @@ export default function Piilosana(){
                   <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
+              {lang==="fi"&&<div style={{fontSize:"12px",color:S.textMuted,marginTop:"8px",fontStyle:"italic"}}>{t.missedLong||"Laudalta löytyi myös pidempiä sanoja"}</div>}
             </div>
           )}
 
