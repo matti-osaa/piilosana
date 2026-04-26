@@ -1439,6 +1439,36 @@ const ICON_PIXELS={
     ],
     colors:{S:"currentColor"},
   },
+  musicOn:{ // 9x9 music note
+    cols:9,
+    rows:[
+      "...MMMMMM",
+      "...M....M",
+      "...M....M",
+      "...M....M",
+      "...M..MMM",
+      "..MM..M..",
+      ".MMM..M..",
+      "..M..MM..",
+      "......M..",
+    ],
+    colors:{M:"currentColor"},
+  },
+  musicOff:{ // 9x9 music note with slash
+    cols:9,
+    rows:[
+      "X..MMMMMM",
+      ".X.m....m",
+      "..Xm....m",
+      "...X....m",
+      "...mX.mmm",
+      "..mm.Xm..",
+      ".mmm..X..",
+      "..m...mX.",
+      "......m.X",
+    ],
+    colors:{M:"currentColor",m:"mid",X:"currentColor"},
+  },
   stop:{ // 7x7 stop square
     cols:7,
     rows:[
@@ -1765,6 +1795,8 @@ function ModernIcon({icon,color="currentColor",size=2,style={}}){
     infinity:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18.178 8c5.096 0 5.096 8 0 8-5.095 0-7.133-8-12.739-8-4.585 0-4.585 8 0 8 5.606 0 7.644-8 12.74-8z"/></svg>,
     refresh:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>,
     share:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>,
+    musicOn:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>,
+    musicOff:<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13" opacity="0.3"/><circle cx="6" cy="18" r="3" opacity="0.3"/><circle cx="18" cy="16" r="3" opacity="0.3"/><line x1="2" y1="2" x2="22" y2="22" strokeWidth="2.5"/></svg>,
   };
   return <span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle",flexShrink:0,...style}}>{icons[icon]||null}</span>;
 }
@@ -3742,6 +3774,11 @@ export default function Piilosana(){
             display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s",minHeight:"36px",minWidth:"36px",borderRadius:S.btnRadius}}>
             <Icon icon="gear" color={S.textSoft} size={S.cellGradient?3.5:2.5}/>
           </button>
+          <button onClick={()=>{const next=!musicOn;setMusicOn(next);localStorage.setItem("piilosana_music",next?"on":"off");if(!next&&music)music.stop();}} style={{fontFamily:S.font,fontSize:"13px",color:musicOn?S.green:S.textMuted,
+            background:"transparent",border:`2px solid ${musicOn?S.green+"44":S.border}`,padding:"2px",cursor:"pointer",
+            display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s",minHeight:"36px",minWidth:"36px",borderRadius:S.btnRadius}}>
+            <Icon icon={musicOn?"musicOn":"musicOff"} color={musicOn?S.green:S.textMuted} size={S.cellGradient?3.5:2.5}/>
+          </button>
           <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,
             background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
             display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",position:"relative",minHeight:"36px",borderRadius:S.btnRadius}}>
@@ -3757,7 +3794,7 @@ export default function Piilosana(){
           </button>
         </div>
         {/* Info links */}
-        <div style={{fontSize:"14px",color:S.textMuted,marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString("fi-FI")} {t.words}</div>
+        <div style={{fontSize:"14px",color:S.textMuted,marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString("fi-FI")} {lang==="fi"?"sanaa ja taivutusmuotoa":lang==="sv"?"ord och böjningsformer":`words & inflections`}{lang==="fi"&&" "}{lang==="fi"&&<span onClick={()=>setShowInflection(true)} style={{color:S.green,cursor:"pointer",textDecoration:"underline dotted",textUnderlineOffset:"3px",fontSize:"12px"}}>(katso taivutusmuodot)</span>}</div>
         <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
           <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.howToPlay}</button>
           <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
@@ -3937,7 +3974,7 @@ export default function Piilosana(){
               <div><span style={{color:S.yellow}}>🔥</span> {t.helpCombo}</div>
               <div><span style={{color:S.yellow}}>✦</span> {t.helpMultiplier}</div>
               <div><span style={{color:S.yellow}}>🌐</span> {t.helpLang}</div>
-              <div><span style={{color:S.yellow}}>🔤</span> {t.helpInflection}{" "}<span onClick={()=>setShowInflection(true)} style={{color:S.yellow,cursor:"pointer",textDecoration:"underline dotted",textUnderlineOffset:"3px"}}>{t.helpInflectionLink}</span></div>
+              <div><span style={{color:S.yellow}}>🔤</span> {t.helpInflection}</div>
               {t.helpDefs&&<div><span style={{color:S.yellow}}>💬</span> {t.helpDefs}</div>}
             </div>
           </div>
@@ -4860,6 +4897,11 @@ export default function Piilosana(){
                 <Icon icon="person" color="currentColor" size={1.5}/>{mode==="public"?publicPlayerCount:players.length}
                 <Icon icon="share" color="currentColor" size={1.5}/>
               </span>}
+              <span onClick={e=>{e.stopPropagation();const next=!musicOn;setMusicOn(next);localStorage.setItem("piilosana_music",next?"on":"off");if(!next&&music)music.stop();}} style={{position:"absolute",left:mode==="solo"&&state==="play"?"30px":"4px",top:"50%",transform:"translateY(-50%)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:"2px 4px",borderRadius:"4px",border:`1px solid ${musicOn?S.green+"44":S.textMuted+"44"}`,background:"transparent",transition:"all 0.15s",zIndex:2}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.background=S.green+"15";}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor=musicOn?S.green+"44":S.textMuted+"44";e.currentTarget.style.background="transparent";}}>
+                <Icon icon={musicOn?"musicOn":"musicOff"} color={musicOn?S.green:S.textMuted} size={S.cellGradient?2:1.5}/>
+              </span>
             </div>
           </div>
 
