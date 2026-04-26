@@ -2345,6 +2345,8 @@ export default function Piilosana(){
   const[flashKey,setFlashKey]=useState(0);
   const[scrambleGrid,setScrambleGrid]=useState(null); // grid of random letters shown during scramble
   const[scrambleStep,setScrambleStep]=useState(0); // how many letters have "settled" into final position
+  const[scrambleStyle,setScrambleStyle]=useState("random"); // intro animation variant
+  const[settledCells,setSettledCells]=useState(new Set()); // which cells have settled during wave/spiral/rain
   // Solo nickname for hall of fame
   const[soloNickname,setSoloNickname]=useState(()=>{
     try{const a=JSON.parse(localStorage.getItem("piilosana_auth")||"null");if(a?.nickname)return a.nickname;}catch{}
@@ -2557,32 +2559,85 @@ export default function Piilosana(){
     if(state!=="countdown")return;
     if(countdown<=0){
       if(mode==="public"){sounds.playGo();setState("play");return;}
-      setState("scramble");setScrambleStep(0);setScrambleGrid(soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(soloMode==="chess"?8:SZ,lang));return;
+      {const styles=["random","wave","rain","spiral","scatter"];setScrambleStyle(styles[Math.floor(Math.random()*styles.length)]);}
+      setSettledCells(new Set());setState("scramble");setScrambleStep(0);setScrambleGrid(soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(soloMode==="chess"?8:SZ,lang));return;
     }
     sounds.playCountdown(countdown);
     const t=setTimeout(()=>setCountdown(c=>c-1),1000);
     return()=>clearTimeout(t);
   },[state,countdown,sounds]);
 
-  // Scramble animation — letters randomize ~0.8s then snap to final grid
+  // Scramble animation — letters randomize then settle into final grid
   useEffect(()=>{
     if(state!=="scramble")return;
-    let step=0;
-    const interval=setInterval(()=>{
-      step++;
-      if(step<=10){
-        // Randomize letters rapidly (10 × 80ms = 800ms)
-        setScrambleGrid(soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(soloMode==="chess"?8:SZ,lang));
+    const isHex=soloMode==="hex"||publicHex||(mode==="public");
+    const rows=isHex?HEX_ROWS:soloMode==="chess"?8:SZ;
+    const cols=isHex?HEX_COLS:soloMode==="chess"?8:SZ;
+    const totalCells=rows*cols;
+    const mkRand=()=>isHex?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(rows,lang,cols!==rows?cols:undefined);
+    const style=scrambleStyle;
+
+    if(style==="random"){
+      // Classic: all letters randomize together, then snap
+      let step=0;
+      const interval=setInterval(()=>{
+        step++;
+        if(step<=10){
+          setScrambleGrid(mkRand());
+        }else{
+          clearInterval(interval);
+          sounds.playGo();
+          setScrambleGrid(null);setScrambleStep(0);setSettledCells(new Set());
+          setState("play");
+        }
+      },70);
+      return()=>clearInterval(interval);
+    }
+
+    if(style==="wave"||style==="rain"||style==="spiral"||style==="scatter"){
+      // Phase 1: randomize all cells (400ms), Phase 2: settle cells progressively
+      let step=0;
+      const scrambleFrames=6;
+      // Build settle order based on style
+      const cellOrder=[];
+      for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)cellOrder.push({r,c,idx:r*cols+c});
+      if(style==="wave"){
+        cellOrder.sort((a,b)=>a.c-b.c||(a.c%2===0?a.r-b.r:b.r-a.r));
+      }else if(style==="rain"){
+        cellOrder.sort((a,b)=>a.r-b.r||a.c-b.c);
+      }else if(style==="spiral"){
+        const cr=(rows-1)/2,cc=(cols-1)/2;
+        cellOrder.sort((a,b)=>{const da=Math.sqrt((a.r-cr)**2+(a.c-cc)**2);const db=Math.sqrt((b.r-cr)**2+(b.c-cc)**2);return da-db;});
       }else{
-        // Done — snap to real grid and start playing
-        clearInterval(interval);
-        sounds.playGo();
-        setScrambleGrid(null);setScrambleStep(0);
-        setState("play");
+        // scatter: random order
+        for(let i=cellOrder.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cellOrder[i],cellOrder[j]]=[cellOrder[j],cellOrder[i]];}
       }
-    },80);
-    return()=>clearInterval(interval);
-  },[state,lang,sounds]);
+      // Group cells into ~6-8 batches
+      const batchCount=Math.min(8,Math.ceil(totalCells/4));
+      const batchSize=Math.ceil(totalCells/batchCount);
+
+      const settled=new Set();
+      const interval=setInterval(()=>{
+        step++;
+        if(step<=scrambleFrames){
+          setScrambleGrid(mkRand());
+        }else{
+          const settleStep=step-scrambleFrames;
+          const settleEnd=Math.min(settleStep*batchSize,totalCells);
+          for(let i=0;i<settleEnd;i++)settled.add(cellOrder[i].idx);
+          setSettledCells(new Set(settled));
+          setScrambleGrid(mkRand());
+          if(settleEnd>=totalCells){
+            clearInterval(interval);
+            sounds.playGo();
+            setScrambleGrid(null);setScrambleStep(0);setSettledCells(new Set());
+            setState("play");
+          }
+        }
+      },70);
+      return()=>clearInterval(interval);
+    }
+  },[state,lang,sounds,scrambleStyle]);
 
   // Timer (solo mode only — multiplayer uses server timer_tick + game_over)
   const startTimeRef=useRef(null);
@@ -3264,7 +3319,13 @@ export default function Piilosana(){
       setBattleMsg(null);
       setEmojiFeed([]);
       setLobbyState("playing");
-      setState("play");startTimeRef.current=Date.now();
+      startTimeRef.current=Date.now();
+      // Scramble intro
+      {const styles=["random","wave","rain","spiral","scatter"];setScrambleStyle(styles[Math.floor(Math.random()*styles.length)]);}
+      setSettledCells(new Set());setScrambleStep(0);
+      const isHex=g&&g.length===HEX_ROWS&&g[0]?.length===HEX_COLS;
+      setScrambleGrid(isHex?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang));
+      setState("scramble");
     });
     
     newSocket.on("timer_tick",({remaining})=>{
@@ -3349,7 +3410,10 @@ export default function Piilosana(){
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
       setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);setEnding(null);setDropKey(0);
       setTime(120);setPublicState("playing");setPublicCountdown(0);setPublicRound(roundNumber);
-      setPublicRankings(null);setState("play");setPublicHex(!!hex);startTimeRef.current=Date.now();
+      setPublicRankings(null);setPublicHex(!!hex);startTimeRef.current=Date.now();
+      // Scramble intro
+      {const styles=["random","wave","rain","spiral","scatter"];setScrambleStyle(styles[Math.floor(Math.random()*styles.length)]);}
+      setSettledCells(new Set());setScrambleStep(0);setScrambleGrid(makeGrid(HEX_ROWS,lang,HEX_COLS));setState("scramble");
     });
     newSocket.on("public_join_midgame",({grid:g,validWords:vw,timeLeft:tl,roundNumber,hex})=>{
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
@@ -4753,7 +4817,7 @@ export default function Piilosana(){
                     const endAnim=eaten&&ending?ending.cellAnim(cellIdx,totalHexCells):"none";
                     const endColor=eaten&&ending?ending.cellColor(cellIdx):null;
                     const isScrambling=state==="scramble"||(state==="ending"&&scrambleGrid);
-                    const settled=state==="scramble"&&scrambleStep>cellIdx;
+                    const settled=state==="scramble"&&(scrambleStep>cellIdx||settledCells.has(cellIdx));
                     const scrambleLetter=isScrambling&&scrambleGrid?scrambleGrid[r]?.[c]||letter:letter;
                     const displayLetter=isScrambling&&!settled&&scrambleGrid?scrambleLetter:letter;
                     const scrambleColor=isScrambling&&!settled?`hsl(${(cellIdx*37+scrambleStep*73)%360},70%,65%)`:null;
