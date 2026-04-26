@@ -2801,15 +2801,16 @@ export default function Piilosana(){
     return()=>clearInterval(t);
   },[state,mode]);
 
-  // Background music control
+  // Background music control — only after user interaction (browser autoplay policy)
   useEffect(()=>{
+    if(!audioStarted)return;
     if(musicOn){
       music.start();
     }else{
       music.stop();
     }
     return()=>music.stop();
-  },[state,musicOn,music]);
+  },[state,musicOn,music,audioStarted]);
 
   // Bomb mode timer
   useEffect(()=>{
