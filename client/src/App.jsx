@@ -195,7 +195,7 @@ const T={
     waiting:"ODOTETAAN PELAAJIA",playersCount:"PELAAJAT",youTag:"SINÄ",createGame:"LUO PELI",connecting:"YHDISTETÄÄN...",
     startGame:"ALOITA PELI",waitForPlayers:"Odota, että joku liittyy peliisi...",waitForHost:"Odota, että isäntä aloittaa pelin...",
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
-    shareLink:"JAA LINKKI",copied:"Kopioitu!",scanToJoin:"Skannaa liittyäksesi",inviteFriends:"Kutsu kavereita:",arenaLink:"Suora linkki moninpeliin:",
+    shareLink:"JAA LINKKI",copied:"Kopioitu!",scanToJoin:"Skannaa liittyäksesi",inviteFriends:"Kutsu kavereita:",arenaLink:"Suora linkki moninpeliin:",invitePlayer:"KUTSU PELAAJA",shareGame:"Jaa linkki peliin",
     newCustom:"UUSI OMA NETTIPELI",menu:"VALIKKO",newPractice:"UUSI HARJOITUS",
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
@@ -225,8 +225,9 @@ const T={
     helpScoring:"Pisteytys: 3 kirjainta = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7 = 10p · 8+ = 14p",
     helpCombo:"Löydä sanoja nopeasti peräkkäin → combo! 3+ peräkkäin = x2, 5+ = x3 pisteet.",
     helpMultiplier:"Kultaiset kirjaimet antavat 2× tai 3× pistekertoimen sanaan.",
-    helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi yli miljoona sanaa (3–15 kirjainta), englanniksi ja ruotsiksi omat sanalistansa.",
+    helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi yli 90 000 sanaa ja niiden taivutusmuotoja, yhteensä yli 6 miljoonaa muotoa (3–15 kirjainta). Englanniksi ja ruotsiksi omat sanalistansa.",
     helpInflection:"Taivutusmuodot kelpaavat! Esim. sametti → sametin, samettia, samettiin, sametilla, sametteja, samettien… Kaikki suomen sijamuodot toimivat, joten kokeile rohkeasti eri päätteitä.",
+    helpInflectionLink:"Katso kaikki taivutusmuodot →",
     helpDefs:"Klikkaa lyhyitä sanoja tulosnäkymässä nähdäksesi niiden merkityksen. Selitteet löytyvät 3-kirjaimisille sanoille.",
     tutorialBtn:"PIKAOHJE",
     exitConfirm:"Poistu pelistä?",exitYes:"POISTU",exitNo:"JATKA",
@@ -255,7 +256,7 @@ const T={
     waiting:"WAITING FOR PLAYERS",playersCount:"PLAYERS",youTag:"YOU",createGame:"CREATE GAME",connecting:"CONNECTING...",
     startGame:"START GAME",waitForPlayers:"Wait for someone to join...",waitForHost:"Waiting for host to start...",
     joinGame:"JOIN GAME",roomCode:"ROOM CODE",noRooms:"No open rooms",orJoinRoom:"or join with code",
-    shareLink:"SHARE LINK",copied:"Copied!",scanToJoin:"Scan to join",inviteFriends:"Invite friends:",arenaLink:"Direct link to multiplayer:",
+    shareLink:"SHARE LINK",copied:"Copied!",scanToJoin:"Scan to join",inviteFriends:"Invite friends:",arenaLink:"Direct link to multiplayer:",invitePlayer:"INVITE PLAYER",shareGame:"Share game link",
     newCustom:"NEW CUSTOM GAME",menu:"MENU",newPractice:"NEW PRACTICE",
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
@@ -285,8 +286,9 @@ const T={
     helpScoring:"Scoring: 3 letters = 1pt · 4 = 2pt · 5 = 4pt · 6 = 6pt · 7 = 10pt · 8+ = 14pt",
     helpCombo:"Find words quickly in a row → combo! 3+ in a row = x2, 5+ = x3 points.",
     helpMultiplier:"Golden letters give a 2× or 3× score multiplier for the word.",
-    helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has over a million words (3–15 letters), English and Swedish have their own vocabularies.",
+    helpLang:"You can switch language from the main menu. Each language has its own word list — Finnish has over 90,000 words and their inflections, totaling over 6 million forms (3–15 letters). English and Swedish have their own vocabularies.",
     helpInflection:"Inflected forms count! E.g. velvet → sametin, samettia, samettiin, sametilla, sametteja… All Finnish case forms work, so try different endings boldly.",
+    helpInflectionLink:"See all inflection forms →",
     helpDefs:"Tap short words in the results screen to see their meaning. Definitions are available for 3-letter words.",
     tutorialBtn:"QUICK GUIDE",
     exitConfirm:"Quit the game?",exitYes:"QUIT",exitNo:"CONTINUE",
@@ -315,7 +317,7 @@ const T={
     waiting:"VÄNTAR PÅ SPELARE",playersCount:"SPELARE",youTag:"DU",createGame:"SKAPA SPEL",connecting:"ANSLUTER...",
     startGame:"STARTA SPEL",waitForPlayers:"Vänta tills någon går med...",waitForHost:"Väntar på att värden startar...",
     joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
-    shareLink:"DELA LÄNK",copied:"Kopierat!",scanToJoin:"Skanna för att gå med",inviteFriends:"Bjud in vänner:",arenaLink:"Direktlänk till flerspelare:",
+    shareLink:"DELA LÄNK",copied:"Kopierat!",scanToJoin:"Skanna för att gå med",inviteFriends:"Bjud in vänner:",arenaLink:"Direktlänk till flerspelare:",invitePlayer:"BJUD IN SPELARE",shareGame:"Dela spellänk",
     newCustom:"NYTT EGET SPEL",menu:"MENY",newPractice:"NY ÖVNING",
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
@@ -345,8 +347,9 @@ const T={
     helpScoring:"Poäng: 3 bokstäver = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7 = 10p · 8+ = 14p",
     helpCombo:"Hitta ord snabbt i rad → kombo! 3+ i rad = x2, 5+ = x3 poäng.",
     helpMultiplier:"Gyllene bokstäver ger 2× eller 3× poängmultiplikator för ordet.",
-    helpLang:"Du kan byta språk från huvudmenyn. Varje språk har sin egen ordlista — finska har över en miljon ord (3–15 bokstäver), engelska och svenska har egna vokabulär.",
+    helpLang:"Du kan byta språk från huvudmenyn. Varje språk har sin egen ordlista — finska har över 90 000 ord och deras böjningsformer, totalt över 6 miljoner former (3–15 bokstäver). Engelska och svenska har egna vokabulär.",
     helpInflection:"Böjningsformer räknas! T.ex. sammet → sammeten, sammets, sammeterna… Prova olika ändelser.",
+    helpInflectionLink:"Se alla böjningsformer →",
     helpDefs:"Tryck på korta ord i resultatvyn för att se deras betydelse. Definitioner finns för 3-bokstavsord.",
     tutorialBtn:"SNABBGUIDE",
     exitConfirm:"Avsluta spelet?",exitYes:"AVSLUTA",exitNo:"FORTSÄTT",
@@ -2067,6 +2070,7 @@ export default function Piilosana(){
   const[flagBubbleFading,setFlagBubbleFading]=useState(false);
   const[showWordInfo,setShowWordInfo]=useState(false);
   const[showHelp,setShowHelp]=useState(false);
+  const[showInflection,setShowInflection]=useState(false);
   const[showTutorial,setShowTutorial]=useState(false);
   const[showExitConfirm,setShowExitConfirm]=useState(false);
   const[gearBlend,setGearBlend]=useState(false);
@@ -2424,6 +2428,7 @@ export default function Piilosana(){
   const[lobbyState,setLobbyState]=useState("enter_name");
   const[lobbyError,setLobbyError]=useState("");
   const[linkCopied,setLinkCopied]=useState(false);
+  const[showSharePopup,setShowSharePopup]=useState(false);
   const[socketConnected,setSocketConnected]=useState(false);
   const[publicRooms,setPublicRooms]=useState([]);
   const[currentMultiGrid,setCurrentMultiGrid]=useState([]);
@@ -3932,12 +3937,84 @@ export default function Piilosana(){
               <div><span style={{color:S.yellow}}>🔥</span> {t.helpCombo}</div>
               <div><span style={{color:S.yellow}}>✦</span> {t.helpMultiplier}</div>
               <div><span style={{color:S.yellow}}>🌐</span> {t.helpLang}</div>
-              <div><span style={{color:S.yellow}}>🔤</span> {t.helpInflection}</div>
+              <div><span style={{color:S.yellow}}>🔤</span> {t.helpInflection}{" "}<span onClick={()=>setShowInflection(true)} style={{color:S.yellow,cursor:"pointer",textDecoration:"underline dotted",textUnderlineOffset:"3px"}}>{t.helpInflectionLink}</span></div>
               {t.helpDefs&&<div><span style={{color:S.yellow}}>💬</span> {t.helpDefs}</div>}
             </div>
           </div>
         </div>
       )}
+
+      {/* Inflection table modal */}
+      {showInflection&&(
+        <div onClick={()=>setShowInflection(false)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"#000000cc",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"20px",animation:"fadeIn 0.3s ease"}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:S.bg,border:`3px solid ${S.green}`,padding:"24px",maxWidth:"520px",width:"100%",maxHeight:"85vh",overflowY:"auto",position:"relative"}}>
+            <button onClick={()=>setShowInflection(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius}}>✕</button>
+            <div style={{fontSize:"14px",color:S.green,marginBottom:"4px",fontWeight:"bold"}}>{lang==="fi"?"TAIVUTUSMUODOT":lang==="sv"?"BÖJNINGSFORMER":"INFLECTION FORMS"}</div>
+            <div style={{fontSize:"12px",color:S.textMuted,marginBottom:"16px"}}>{lang==="fi"?"Esimerkki: sametti (substantiivi, tyyppi 5-C)":lang==="sv"?"Exempel: sametti (substantiv, typ 5-C)":"Example: sametti (noun, type 5-C)"}</div>
+            <table style={{width:"100%",borderCollapse:"collapse",fontSize:"13px"}}>
+              <thead>
+                <tr style={{borderBottom:`2px solid ${S.border}`}}>
+                  <th style={{textAlign:"left",padding:"6px 8px",color:S.textSoft,fontWeight:"bold"}}>{lang==="fi"?"Sijamuoto":lang==="sv"?"Kasus":"Case"}</th>
+                  <th style={{textAlign:"left",padding:"6px 8px",color:S.textSoft,fontWeight:"bold"}}>{lang==="fi"?"Yksikkö":lang==="sv"?"Singular":"Singular"}</th>
+                  <th style={{textAlign:"left",padding:"6px 8px",color:S.textSoft,fontWeight:"bold"}}>{lang==="fi"?"Monikko":lang==="sv"?"Plural":"Plural"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ["Nominatiivi","sametti","sametit"],
+                  ["Genetiivi","sametin","samettien"],
+                  ["Partitiivi","samettia","sametteja"],
+                  ["Akkusatiivi","sametti / sametin","sametit"],
+                  ["Inessiivi","sametissa","sameteissa"],
+                  ["Elatiivi","sametista","sameteista"],
+                  ["Illatiivi","samettiin","sametteihin"],
+                  ["Adessiivi","sametilla","sameteilla"],
+                  ["Ablatiivi","sametilta","sameteilta"],
+                  ["Allatiivi","sametille","sameteille"],
+                  ["Essiivi","samettina","sametteina"],
+                  ["Translatiivi","sametiksi","sameteiksi"],
+                  ["Abessiivi","sametitta","sameteitta"],
+                  ["Instruktiivi","—","samettein"],
+                  ["Komitatiivi","—","sametteine-"],
+                ].map(([c,s,p],i)=>(
+                  <tr key={i} style={{borderBottom:`1px solid ${S.border}`,background:i%2===0?"transparent":S.dark}}>
+                    <td style={{padding:"5px 8px",color:S.yellow,fontSize:"12px",whiteSpace:"nowrap"}}>{c}</td>
+                    <td style={{padding:"5px 8px",color:S.green}}>{s}</td>
+                    <td style={{padding:"5px 8px",color:S.green}}>{p}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div style={{marginTop:"12px",fontSize:"12px",color:S.textMuted,lineHeight:"1.6"}}>
+              {lang==="fi"?"Lisäksi jokaiseen muotoon voi liittyä possessiivisuffiksi (-ni, -si, -nsa, -mme, -nne) → yhteensä yli 100 muotoa per sana. Kaikki hyväksytään pelissä!":lang==="sv"?"Dessutom kan varje form ha possessivsuffix (-ni, -si, -nsa, -mme, -nne) → totalt över 100 former per ord. Alla godkänns i spelet!":"Each form can also have possessive suffixes (-ni, -si, -nsa, -mme, -nne) → over 100 forms per word. All are accepted in the game!"}
+            </div>
+            <div style={{marginTop:"8px",fontSize:"11px",color:S.textMuted}}>
+              {lang==="fi"?"Lähde: Wikisanakirja":lang==="sv"?"Källa: Wiktionary":"Source: Wiktionary"} — <span onClick={()=>window.open("https://fi.wiktionary.org/wiki/sametti","_blank")} style={{color:S.green,cursor:"pointer",textDecoration:"underline"}}>fi.wiktionary.org/wiki/sametti</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share popup — game link + QR */}
+      {showSharePopup&&(()=>{
+        const shareUrl=mode==="public"?`${window.location.origin}?arena`:`${window.location.origin}?room=${roomCode}`;
+        const copyLink=()=>{navigator.clipboard.writeText(shareUrl).then(()=>{setLinkCopied(true);setTimeout(()=>setLinkCopied(false),2000);}).catch(()=>{});};
+        return(
+        <div onClick={()=>setShowSharePopup(false)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"#000000cc",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"20px",animation:"fadeIn 0.3s ease"}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:S.bg,border:`3px solid ${S.green}`,padding:"24px",maxWidth:"360px",width:"100%",textAlign:"center"}}>
+            <div style={{fontSize:"14px",color:S.green,marginBottom:"16px",fontWeight:"bold"}}>{t.shareGame}</div>
+            <div style={{display:"flex",gap:"6px",alignItems:"center",justifyContent:"center",marginBottom:"16px"}}>
+              <input readOnly value={shareUrl} style={{fontFamily:S.font,fontSize:"12px",color:S.textSoft,background:S.dark,border:`1px solid ${S.border}`,padding:"8px",flex:1,outline:"none",textAlign:"center"}} onClick={e=>e.target.select()}/>
+              <button onClick={copyLink} style={{fontFamily:S.font,fontSize:"12px",color:linkCopied?S.bg:S.green,background:linkCopied?S.green:"transparent",border:`2px solid ${S.green}`,padding:"8px 14px",cursor:"pointer",minWidth:"90px",transition:"all 0.2s"}}>{linkCopied?t.copied:t.shareLink}</button>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"8px",marginBottom:"16px"}}>
+              <QRCodeSVG value={shareUrl} size={140} bgColor="transparent" fgColor={S.textSoft} level="L"/>
+              <p style={{fontSize:"12px",color:S.textMuted}}>{t.scanToJoin}</p>
+            </div>
+            <button onClick={()=>setShowSharePopup(false)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 24px",cursor:"pointer"}}>{t.exitNo||"SULJE"}</button>
+          </div>
+        </div>);
+      })()}
       <style>{fontCSS}</style>
       <style>{`
         @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
@@ -4592,7 +4669,10 @@ export default function Piilosana(){
             <div style={{fontSize:"13px",color:publicNextCountdown<=10?"#ffaa33":S.textSoft,marginTop:"12px",fontWeight:publicNextCountdown<=10?"bold":"normal"}}>
               {t.nextRoundIn}: {publicNextCountdown>0?`${publicNextCountdown}s`:t.starts}
             </div>
-            <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",marginTop:"10px"}}>{t.exit}</button>
+            <div style={{display:"flex",gap:"8px",justifyContent:"center",marginTop:"10px"}}>
+              <button onClick={()=>setShowSharePopup(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow||"#ffcc00",border:`2px solid ${S.yellow||"#ffcc00"}`,background:"transparent",padding:"8px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px"}}><Icon icon="share" color={S.yellow||"#ffcc00"} size={1.5}/>{t.invitePlayer}</button>
+              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer"}}>{t.exit}</button>
+            </div>
           </div>
 
           {/* Rankings with medals */}
@@ -4776,12 +4856,9 @@ export default function Piilosana(){
                  word?word.toUpperCase():
                  (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?(S.cellGradient?"16px":"12px"):(S.cellGradient?"14px":"10px"),fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted,fontSize:S.cellGradient?"20px":"18px"}}>···</span>)}
               </div>
-              {(mode==="multi"||mode==="public")&&<span style={{position:"absolute",right:"6px",top:"50%",transform:"translateY(-50%)",fontSize:"10px",color:S.textMuted,display:"flex",alignItems:"center",gap:"4px"}}>
-                <Icon icon="person" color={S.textMuted} size={1}/>{mode==="public"?publicPlayerCount:players.length}
-                <span onClick={e=>{e.stopPropagation();const url=mode==="public"?`${window.location.origin}?arena`:`${window.location.origin}?room=${roomCode}`;navigator.clipboard.writeText(url).then(()=>{setLinkCopied(true);setTimeout(()=>setLinkCopied(false),1500);}).catch(()=>{});}} style={{cursor:"pointer",padding:"2px",borderRadius:"3px",display:"inline-flex",alignItems:"center",position:"relative",opacity:linkCopied?1:0.6,transition:"opacity 0.2s"}} onMouseEnter={e=>e.currentTarget.style.opacity="1"} onMouseLeave={e=>{if(!linkCopied)e.currentTarget.style.opacity="0.6";}}>
-                  <Icon icon="share" color={linkCopied?S.green:S.textMuted} size={1}/>
-                  {linkCopied&&<span style={{position:"absolute",right:"100%",marginRight:"4px",whiteSpace:"nowrap",fontSize:"10px",color:S.green,fontWeight:"bold",animation:"fadeIn 0.2s ease"}}>{t.copied}</span>}
-                </span>
+              {(mode==="multi"||mode==="public")&&<span onClick={e=>{e.stopPropagation();setShowSharePopup(true);}} style={{position:"absolute",right:"4px",top:"50%",transform:"translateY(-50%)",fontSize:"13px",color:S.textMuted,display:"flex",alignItems:"center",gap:"4px",cursor:"pointer",padding:"4px 8px",borderRadius:"4px",border:`1px solid ${S.border}`,background:S.dark,transition:"all 0.15s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;}} onMouseLeave={e=>{e.currentTarget.style.borderColor=S.border;e.currentTarget.style.color=S.textMuted;}}>
+                <Icon icon="person" color="currentColor" size={1.5}/>{mode==="public"?publicPlayerCount:players.length}
+                <Icon icon="share" color="currentColor" size={1.5}/>
               </span>}
             </div>
           </div>
