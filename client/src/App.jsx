@@ -765,118 +765,82 @@ function useMusic(){
     await Tone.start();
     startedRef.current=true;
 
-    // --- Instruments ---
-    // Lead synth — bright, melodic
-    const synth=new Tone.PolySynth(Tone.Synth,{
-      oscillator:{type:"fatsawtooth",spread:8,count:2},
-      envelope:{attack:0.01,decay:0.3,sustain:0.15,release:0.6},
-      volume:-20
+    // --- Sunny Puzzle ---
+    // Lead — triangle, marimba-like
+    const lead=new Tone.Synth({
+      oscillator:{type:"triangle"},
+      envelope:{attack:0.005,decay:0.25,sustain:0.0,release:0.3},
+      volume:-16
     }).toDestination();
 
-    // Pluck / arpeggio — shimmery accents
-    const pluck=new Tone.Synth({
-      oscillator:{type:"triangle"},
-      envelope:{attack:0.003,decay:0.4,sustain:0.0,release:0.5},
+    // Bass — warm sine
+    const bass=new Tone.Synth({
+      oscillator:{type:"sine"},
+      envelope:{attack:0.01,decay:0.2,sustain:0.1,release:0.25},
       volume:-21
     }).toDestination();
 
-    // Pad — warm, supportive chords
-    const pad=new Tone.PolySynth(Tone.Synth,{
-      oscillator:{type:"fatsine2",spread:15},
-      envelope:{attack:1.0,decay:1.5,sustain:0.3,release:2.5},
-      volume:-28
+    // Chord stabs — triangle, soft
+    const chord=new Tone.PolySynth(Tone.Synth,{
+      oscillator:{type:"triangle"},
+      envelope:{attack:0.01,decay:0.4,sustain:0.05,release:0.5},
+      volume:-24
     }).toDestination();
 
-    // Bass — rhythmic, driving
-    const bass=new Tone.Synth({
-      oscillator:{type:"sine"},
-      envelope:{attack:0.01,decay:0.3,sustain:0.1,release:0.4},
-      volume:-22
+    // Hi-hat — light texture
+    const hihat=new Tone.NoiseSynth({
+      noise:{type:"white"},
+      envelope:{attack:0.001,decay:0.05,sustain:0,release:0.02},
+      volume:-30
     }).toDestination();
 
-    // --- Chord progression: I - vi - IV - V in C major (4 bars, repeating) ---
-    const chords=[
-      {root:"C",pad:["C3","E3","G3"],bass:["C2","C2","G2","C2"],arp:["C4","E4","G4","C5","G4","E4"]},
-      {root:"A",pad:["A2","C3","E3"],bass:["A1","A1","E2","A1"],arp:["A3","C4","E4","A4","E4","C4"]},
-      {root:"F",pad:["F2","A2","C3"],bass:["F2","F2","C2","F2"],arp:["F4","A4","C5","F5","C5","A4"]},
-      {root:"G",pad:["G2","B2","D3"],bass:["G1","G1","D2","G1"],arp:["G4","B4","D5","G5","D5","B4"]},
+    // Melody A — catchy, uplifting
+    const melodyA=[
+      {n:"E5",d:"8n"},{n:"G5",d:"8n"},{n:"A5",d:"4n"},{n:"G5",d:"8n"},{n:"E5",d:"8n"},{n:"D5",d:"4n"},
+      {n:"E5",d:"8n"},{n:"D5",d:"8n"},{n:"C5",d:"4n"},{n:"D5",d:"4n"},{n:"E5",d:"2n"},
+    ];
+    // Melody B — response phrase
+    const melodyB=[
+      {n:"C5",d:"8n"},{n:"D5",d:"8n"},{n:"E5",d:"4n"},{n:"G5",d:"8n"},{n:"A5",d:"8n"},{n:"G5",d:"4n"},
+      {n:"E5",d:"8n"},{n:"G5",d:"8n"},{n:"A5",d:"4n"},{n:"G5",d:"4n"},{n:"C6",d:"2n"},
     ];
 
-    // Melody phrases — 4 phrases, one per chord, each 8 eighth-notes long
-    const melodies=[
-      // Over C: uplifting ascending
-      [{n:"E4",d:"8n"},{n:"G4",d:"8n"},{n:"A4",d:"4n"},{n:"C5",d:"8n"},{n:"D5",d:"8n"},{n:"E5",d:"4n"}],
-      // Over Am: gentle descent
-      [{n:"E5",d:"8n"},{n:"D5",d:"8n"},{n:"C5",d:"4n"},{n:"A4",d:"8n"},{n:"G4",d:"8n"},{n:"A4",d:"4n"}],
-      // Over F: playful bounce
-      [{n:"A4",d:"8n"},{n:"C5",d:"8n"},{n:"A4",d:"8n"},{n:"F4",d:"8n"},{n:"A4",d:"4n"},{n:"C5",d:"4n"}],
-      // Over G: building tension, resolves
-      [{n:"B4",d:"8n"},{n:"D5",d:"8n"},{n:"G5",d:"4n"},{n:"D5",d:"8n"},{n:"E5",d:"8n"},{n:"C5",d:"4n"}],
+    const prog=[
+      {b:"C3",ch:["C4","E4","G4"]},
+      {b:"A2",ch:["A3","C4","E4"]},
+      {b:"F2",ch:["F3","A3","C4"]},
+      {b:"G2",ch:["G3","B3","D4"]},
     ];
 
-    // Alternate melody set for variation (plays every other cycle)
-    const melodies2=[
-      [{n:"C5",d:"4n"},{n:"D5",d:"8n"},{n:"E5",d:"8n"},{n:"G5",d:"4n"},{n:"E5",d:"4n"}],
-      [{n:"A4",d:"4n"},{n:"C5",d:"8n"},{n:"E5",d:"8n"},{n:"D5",d:"4n"},{n:"C5",d:"4n"}],
-      [{n:"F4",d:"8n"},{n:"A4",d:"8n"},{n:"C5",d:"4n"},{n:"D5",d:"8n"},{n:"C5",d:"8n"},{n:"A4",d:"4n"}],
-      [{n:"G4",d:"8n"},{n:"B4",d:"8n"},{n:"D5",d:"4n"},{n:"E5",d:"8n"},{n:"D5",d:"8n"},{n:"C5",d:"4n"}],
-    ];
+    let bar=0;
+    const melLoop=new Tone.Loop((time)=>{
+      const mel=bar%4<2?melodyA:melodyB;
+      let off=0;
+      mel.forEach(({n,d})=>{
+        lead.triggerAttackRelease(n,d,time+off);
+        off+=Tone.Time(d).toSeconds();
+      });
+      bar++;
+    },"2m");
 
-    let barCount=0;
-    let cycle=0;
-
-    // Pad: one chord per bar
-    const padLoop=new Tone.Loop((time)=>{
-      const ch=chords[barCount%4];
-      pad.triggerAttackRelease(ch.pad,"1m",time);
-      if(barCount%4===0)cycle++;
-      barCount++;
+    let chordStep=0;
+    const chordLoop=new Tone.Loop((time)=>{
+      const p=prog[chordStep%4];
+      chord.triggerAttackRelease(p.ch,"2n",time);
+      bass.triggerAttackRelease(p.b,"4n",time);
+      bass.triggerAttackRelease(p.b,"4n",time+Tone.Time("2n").toSeconds());
+      chordStep++;
     },"1m");
 
-    // Bass: rhythmic pattern — 4 notes per bar (quarter notes)
-    let bassStep=0;
-    const bassLoop=new Tone.Loop((time)=>{
-      const ch=chords[Math.floor(bassStep/4)%4];
-      const note=ch.bass[bassStep%4];
-      bass.triggerAttackRelease(note,"8n",time);
-      bassStep++;
-    },"4n");
-
-    // Arpeggio: 6 notes per bar on 8th notes, with gentle randomized gaps
-    let arpStep=0;let arpBar=0;
-    const arpLoop=new Tone.Loop((time)=>{
-      const pos=arpStep%6;
-      if(pos===0)arpBar++;
-      const ch=chords[(arpBar-1)%4];
-      if(Math.random()<0.8){ // occasional silence for breathing
-        pluck.triggerAttackRelease(ch.arp[pos],"16n",time);
-      }
-      arpStep++;
+    const hatLoop=new Tone.Loop((time)=>{
+      hihat.triggerAttackRelease("16n",time);
     },"8n");
 
-    // Melody: plays phrase per bar, alternates between two melody sets
-    let melBar=0;
-    const melLoop=new Tone.Loop((time)=>{
-      const chIdx=melBar%4;
-      const mels=cycle%2===0?melodies:melodies2;
-      const phrase=mels[chIdx];
-      let offset=0;
-      phrase.forEach(({n,d})=>{
-        const durSec=Tone.Time(d).toSeconds();
-        synth.triggerAttackRelease(n,d,time+offset);
-        offset+=durSec;
-      });
-      melBar++;
-    },"1m");
-
-    Tone.Transport.bpm.value=100;
-    padLoop.start(0);
-    bassLoop.start(0);
-    arpLoop.start("2m");    // arps enter after 2 bars
-    melLoop.start("1m");    // melody enters after 1 bar
+    Tone.Transport.bpm.value=110;
+    chordLoop.start(0);hatLoop.start(0);melLoop.start("1m");
     Tone.Transport.start();
 
-    partsRef.current={synth,pluck,pad,bass,padLoop,bassLoop,arpLoop,melLoop};
+    partsRef.current={lead,bass,chord,hihat,melLoop,chordLoop,hatLoop};
   },[]);
 
   const stop=useCallback(()=>{
@@ -884,17 +848,16 @@ function useMusic(){
     startedRef.current=false;
     const p=partsRef.current;
     if(p){
-      p.melLoop.stop();p.arpLoop.stop();p.bassLoop.stop();p.padLoop.stop();
+      p.melLoop.stop();p.chordLoop.stop();p.hatLoop.stop();
       Tone.Transport.stop();
       setTimeout(()=>{
-        try{p.synth.dispose();}catch{}
-        try{p.pluck.dispose();}catch{}
-        try{p.pad.dispose();}catch{}
+        try{p.lead.dispose();}catch{}
         try{p.bass.dispose();}catch{}
+        try{p.chord.dispose();}catch{}
+        try{p.hihat.dispose();}catch{}
         try{p.melLoop.dispose();}catch{}
-        try{p.arpLoop.dispose();}catch{}
-        try{p.bassLoop.dispose();}catch{}
-        try{p.padLoop.dispose();}catch{}
+        try{p.chordLoop.dispose();}catch{}
+        try{p.hatLoop.dispose();}catch{}
       },500);
       partsRef.current=null;
     }
