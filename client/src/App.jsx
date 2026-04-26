@@ -240,6 +240,7 @@ const T={
     helpDefs:"Klikkaa lyhyitä sanoja tulosnäkymässä nähdäksesi niiden merkityksen. Selitteet löytyvät 3-kirjaimisille sanoille.",
     tutorialBtn:"PIKAOHJE",
     exitConfirm:"Poistu pelistä?",exitYes:"POISTU",exitNo:"JATKA",
+    menuSound:"ÄÄNET",menuMusic:"MUSIIKKI",menuTheme:"TEEMA",menuShare:"JAA",menuExit:"POISTU",on:"PÄÄLLÄ",off:"POIS",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"MULTIPLAYER",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -301,6 +302,7 @@ const T={
     helpDefs:"Tap short words in the results screen to see their meaning. Definitions are available for 3-letter words.",
     tutorialBtn:"QUICK GUIDE",
     exitConfirm:"Quit the game?",exitYes:"QUIT",exitNo:"CONTINUE",
+    menuSound:"SOUNDS",menuMusic:"MUSIC",menuTheme:"THEME",menuShare:"SHARE",menuExit:"EXIT",on:"ON",off:"OFF",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"FLERSPELARE",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -362,6 +364,7 @@ const T={
     helpDefs:"Tryck på korta ord i resultatvyn för att se deras betydelse. Definitioner finns för 3-bokstavsord.",
     tutorialBtn:"SNABBGUIDE",
     exitConfirm:"Avsluta spelet?",exitYes:"AVSLUTA",exitNo:"FORTSÄTT",
+    menuSound:"LJUD",menuMusic:"MUSIK",menuTheme:"TEMA",menuShare:"DELA",menuExit:"AVSLUTA",on:"PÅ",off:"AV",
   },
 };
 
@@ -2165,6 +2168,7 @@ export default function Piilosana(){
   const[showInflection,setShowInflection]=useState(false);
   const[showTutorial,setShowTutorial]=useState(false);
   const[showExitConfirm,setShowExitConfirm]=useState(false);
+  const[showHamburger,setShowHamburger]=useState(false);
   const[gearBlend,setGearBlend]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
   const[themeTransition,setThemeTransition]=useState(false);
@@ -4124,6 +4128,7 @@ export default function Piilosana(){
         @keyframes snowfall{0%{transform:translateY(0);opacity:0.6}100%{transform:translateY(30px);opacity:0}}
         @keyframes fadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
         @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        @keyframes slideInLeft{0%{transform:translateX(-100%);opacity:0}100%{transform:translateX(0);opacity:1}}
         @keyframes bubbleIn{0%{opacity:0;transform:scale(0.3) translateY(10px)}40%{opacity:1;transform:scale(1.08) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
         @keyframes bubbleOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.6) translateY(-10px)}}
         @keyframes chatSlideIn{0%{opacity:0;transform:translateX(-30px) scale(0.7)}30%{opacity:1;transform:translateX(4px) scale(1.04)}60%{transform:translateX(-2px) scale(0.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
@@ -4898,7 +4903,8 @@ export default function Piilosana(){
       {(state==="play"||state==="ending"||state==="scramble")&&(
         <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:(soloMode==="hex"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD */}
-          <div style={{marginBottom:isHexMode?"1px":"4px",border:`1px solid ${S.border}`,background:S.dark}}>
+          <div style={{marginBottom:isHexMode?"1px":"4px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022"}}>
+
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
             {mode==="solo"&&soloMode==="rotate"&&(
@@ -4947,13 +4953,12 @@ export default function Piilosana(){
             {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="infinity" color="#44ddff" size={1}/>{t.unlimitedLabel}</div>}
             {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
             <div ref={wordBarRef} key={flashKey} style={{padding:S.cellGradient?"4px 10px":"2px 8px",textAlign:"center",position:"relative",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
-              {mode==="solo"&&state==="play"&&(
-                <button onClick={()=>setShowExitConfirm(true)} style={{position:"absolute",left:"4px",top:"50%",transform:"translateY(-50%)",background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"2px 6px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"4px",transition:"all 0.15s",zIndex:2}}
-                  onMouseEnter={e=>{e.currentTarget.style.borderColor=S.red;e.currentTarget.style.background=S.red+"15";}}
-                  onMouseLeave={e=>{e.currentTarget.style.borderColor=S.textMuted+"44";e.currentTarget.style.background="transparent";}}>
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.textMuted} strokeWidth="2" strokeLinecap="round"/></svg>
-                </button>
-              )}
+              {/* Hamburger menu button */}
+              <button onClick={()=>setShowHamburger(true)} style={{position:"absolute",left:"4px",top:"50%",transform:"translateY(-50%)",background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"2px 8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"6px",transition:"all 0.15s",zIndex:2,fontSize:"16px",color:S.textMuted,lineHeight:1}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.background=S.green+"15";e.currentTarget.style.color=S.green;}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor=S.textMuted+"44";e.currentTarget.style.background="transparent";e.currentTarget.style.color=S.textMuted;}}>
+                &#9776;
+              </button>
               <div style={{fontSize:S.cellGradient?"28px":"18px",minHeight:S.cellGradient?"32px":"20px",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
                 {state==="ending"?<span style={{color:ending?.color,fontSize:S.cellGradient?"18px":"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
                  word?word.toUpperCase():
@@ -4963,11 +4968,6 @@ export default function Piilosana(){
                 <Icon icon="person" color="currentColor" size={1.5}/>{mode==="public"?publicPlayerCount:players.length}
                 <Icon icon="share" color="currentColor" size={1.5}/>
               </span>}
-              <span onClick={e=>{e.stopPropagation();const next=!musicOn;setMusicOn(next);localStorage.setItem("piilosana_music",next?"on":"off");if(!next&&music)music.stop();}} style={{position:"absolute",left:mode==="solo"&&state==="play"?"30px":"4px",top:"50%",transform:"translateY(-50%)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:"2px 4px",borderRadius:"4px",border:`1px solid ${musicOn?S.green+"44":S.textMuted+"44"}`,background:"transparent",transition:"all 0.15s",zIndex:2}}
-                onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.background=S.green+"15";}}
-                onMouseLeave={e=>{e.currentTarget.style.borderColor=musicOn?S.green+"44":S.textMuted+"44";e.currentTarget.style.background="transparent";}}>
-                <Icon icon={musicOn?"musicOn":"musicOff"} color={musicOn?S.green:S.textMuted} size={S.cellGradient?2:1.5}/>
-              </span>
             </div>
           </div>
 
@@ -4992,6 +4992,77 @@ export default function Piilosana(){
                 <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
                   <button onClick={()=>{setShowExitConfirm(false);returnToModeSelect();}} style={{fontFamily:S.font,fontSize:"14px",color:"#fff",background:S.red,border:"none",padding:"10px 24px",cursor:"pointer",borderRadius:S.btnRadius}}>{t.exitYes}</button>
                   <button onClick={()=>setShowExitConfirm(false)} style={{fontFamily:S.font,fontSize:"14px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,padding:"10px 24px",cursor:"pointer",borderRadius:S.btnRadius}}>{t.exitNo}</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Hamburger menu overlay */}
+          {showHamburger&&(
+            <div style={{position:"absolute",top:0,left:0,right:0,bottom:0,background:"#00000088",zIndex:100,animation:"fadeIn 0.15s ease",borderRadius:"8px"}} onClick={()=>setShowHamburger(false)}>
+              <div style={{position:"absolute",top:0,left:0,bottom:0,width:"230px",background:`${S.dark}f8`,borderRight:`1px solid ${S.border}`,padding:"16px",display:"flex",flexDirection:"column",gap:"6px",animation:"slideInLeft 0.2s ease",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderRadius:"12px 0 0 12px",boxShadow:"4px 0 24px #00000044"}} onClick={e=>e.stopPropagation()}>
+                {/* Menu title */}
+                <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"6px",letterSpacing:"2px",display:"flex",alignItems:"center",gap:"6px"}}>
+                  <span style={{fontSize:"16px"}}>&#9776;</span> {t.options||"ASETUKSET"}
+                </div>
+                <div style={{height:"1px",background:S.border,marginBottom:"4px"}}/>
+
+                {/* Sound toggle */}
+                <div onClick={()=>{const next=soundTheme==="modern"?"off":"modern";setSoundTheme(next);localStorage.setItem("piilosana_sound",next);}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+                  onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+                  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                  <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
+                    <span style={{fontSize:"16px"}}>{soundTheme==="modern"?"🔊":"🔇"}</span> {t.menuSound||"SOUNDS"}
+                  </span>
+                  <span style={{fontSize:"11px",fontFamily:S.font,color:soundTheme==="modern"?S.green:S.textMuted,background:soundTheme==="modern"?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${soundTheme==="modern"?S.green+"44":S.textMuted+"44"}`}}>
+                    {soundTheme==="modern"?(t.on||"ON"):(t.off||"OFF")}
+                  </span>
+                </div>
+
+                {/* Music toggle */}
+                <div onClick={()=>{const next=!musicOn;setMusicOn(next);localStorage.setItem("piilosana_music",next?"on":"off");if(!next&&music)music.stop();}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+                  onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+                  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                  <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
+                    <Icon icon={musicOn?"musicOn":"musicOff"} color={musicOn?S.green:S.textMuted} size={2}/> {t.menuMusic||"MUSIC"}
+                  </span>
+                  <span style={{fontSize:"11px",fontFamily:S.font,color:musicOn?S.green:S.textMuted,background:musicOn?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${musicOn?S.green+"44":S.textMuted+"44"}`}}>
+                    {musicOn?(t.on||"ON"):(t.off||"OFF")}
+                  </span>
+                </div>
+
+                {/* Theme picker */}
+                <div style={{padding:"8px"}}>
+                  <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"8px",letterSpacing:"1px"}}>{t.menuTheme||"THEME"}</div>
+                  <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
+                    {Object.entries(THEMES).map(([id,th])=>(
+                      <div key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);if(typeof syncSettings==="function")syncSettings({theme:id});}}
+                        style={{width:"28px",height:"28px",borderRadius:"50%",background:th.bg,border:themeId===id?`3px solid ${S.green}`:`2px solid ${th.border||"#555"}`,cursor:"pointer",transition:"all 0.15s",boxShadow:themeId===id?`0 0 8px ${S.green}66`:"0 1px 4px #00000033",display:"flex",alignItems:"center",justifyContent:"center"}}
+                        title={lang==="en"?(th.nameEn||th.name):lang==="sv"?(th.nameSv||th.name):th.name}>
+                        <div style={{width:"14px",height:"14px",borderRadius:"50%",background:th.green||th.cell}}/>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{height:"1px",background:S.border,margin:"4px 0"}}/>
+
+                {/* Share (multi/public only) */}
+                {(mode==="multi"||mode==="public")&&(
+                  <div onClick={()=>{setShowHamburger(false);setShowSharePopup(true);}} style={{display:"flex",alignItems:"center",gap:"8px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+                    onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+                    onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                    <Icon icon="share" color={S.green} size={2}/>
+                    <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font}}>{t.menuShare||"SHARE"}</span>
+                  </div>
+                )}
+
+                {/* Exit */}
+                <div onClick={()=>{setShowHamburger(false);if(mode==="solo"){setShowExitConfirm(true);}else{returnToModeSelect();}}} style={{display:"flex",alignItems:"center",gap:"8px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+                  onMouseEnter={e=>{e.currentTarget.style.background=S.red+"22";}}
+                  onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.red} strokeWidth="2" strokeLinecap="round"/></svg>
+                  <span style={{fontSize:"13px",color:S.red,fontFamily:S.font}}>{t.menuExit||"EXIT"}</span>
                 </div>
               </div>
             </div>
@@ -5074,6 +5145,8 @@ export default function Piilosana(){
                           color:eaten?endColor||"transparent":scrambleColor||(s?"#ffffff":(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
                           textShadow:eaten?"none":s?`0 0 12px #44ffaa99, 0 0 24px #8866ff66, 0 1px 2px #000000aa`:(S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${letterMult?letterColor(letter,lang):"#22ccaa"}44`),
                         }}>
+                          {/* Subtle top highlight for unselected hex cells */}
+                          {!s&&!eaten&&<div style={{position:"absolute",inset:0,clipPath:hexClip,background:"linear-gradient(180deg, #ffffff08 0%, transparent 40%)",pointerEvents:"none",zIndex:0}}/>}
                           {eaten?"":<>
                             {/* Letter — bouncy scale + white glow when selected */}
                             <span style={{position:"relative",zIndex:2,
@@ -5169,7 +5242,7 @@ export default function Piilosana(){
                       border:chessIsPos?`2px solid #ddaa33`:chessIsValid?`2px dashed #ddaa3366`:chessIsInvalid?`2px solid #ff4444`:chessInPath?`2px solid #ddaa3355`:S.cellGradient?`1px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
                       borderRadius:S.cellRadius,
                       cursor:state==="play"?(rotateActive?"grab":"pointer"):"default",transition:isScrambling?"color 0.07s, transform 0.15s":(S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s"),transform:cellTransform,
-                      boxShadow:eaten?"none":isScrambling&&settled?`0 0 12px ${S.green}66`:(s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:S.cellShadow),
+                      boxShadow:eaten?"none":isScrambling&&settled?`0 0 12px ${S.green}66`:(s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:(S.cellShadow?(S.cellShadow+", inset 0 1px 2px #ffffff08"):("inset 0 1px 2px #ffffff08"))),
                       textTransform:"uppercase",textShadow:isScrambling&&!settled?`0 0 8px ${scrambleColor}88`:(s||eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${otherSelColor||(letterMult?letterColor(letter,lang):S.green)}44`),
                       animation:chessIsInvalid?"shake 0.3s ease":eaten?endAnim:useDropAnim?`cellDrop 0.3s ${c*0.03}s ease-out`:(rotateAnim&&((rotateAnim.type==="row"&&rotateAnim.idx===r)||(rotateAnim.type==="col"&&rotateAnim.idx===c)))?`${rotateAnim.type==="row"?(rotateAnim.dir>0?"rotateRowRight":"rotateRowLeft"):(rotateAnim.dir>0?"rotateColDown":"rotateColUp")} 0.3s ease-out`:(isScrambling&&settled?"pop 0.2s ease":"none"),
                       "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
