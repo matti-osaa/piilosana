@@ -241,7 +241,7 @@ const T={
     tutorialBtn:"PIKAOHJE",
     exitConfirm:"Poistu pelistä?",exitYes:"POISTU",exitNo:"JATKA",
     menuSound:"ÄÄNET",menuMusic:"MUSIIKKI",menuTheme:"TEEMA",menuShare:"JAA",menuExit:"POISTU",on:"PÄÄLLÄ",off:"POIS",
-    menuExitGame:"POISTU PELISTÄ",menuClose:"SULJE VALIKKO",menuMuteEmoji:"EMOTICONIT",
+    menuExitGame:"POISTU PELISTÄ",menuClose:"SULJE VALIKKO",menuMuteEmoji:"VAIMENNA ELEET",
   },
   en:{
     selectMode:"SELECT GAME MODE",arena:"MULTIPLAYER",arenaDesc:"24/7 online game",arenaCta:"PLAY NOW",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
@@ -304,7 +304,7 @@ const T={
     tutorialBtn:"QUICK GUIDE",
     exitConfirm:"Quit the game?",exitYes:"QUIT",exitNo:"CONTINUE",
     menuSound:"SOUNDS",menuMusic:"MUSIC",menuTheme:"THEME",menuShare:"SHARE",menuExit:"EXIT",on:"ON",off:"OFF",
-    menuExitGame:"EXIT GAME",menuClose:"CLOSE MENU",menuMuteEmoji:"EMOTICONS",
+    menuExitGame:"EXIT GAME",menuClose:"CLOSE MENU",menuMuteEmoji:"MUTE GESTURES",
   },
   sv:{
     selectMode:"VÄLJ SPELLÄGE",arena:"FLERSPELARE",arenaDesc:"24/7 onlinespel",arenaCta:"SPELA NU",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
@@ -367,7 +367,7 @@ const T={
     tutorialBtn:"SNABBGUIDE",
     exitConfirm:"Avsluta spelet?",exitYes:"AVSLUTA",exitNo:"FORTSÄTT",
     menuSound:"LJUD",menuMusic:"MUSIK",menuTheme:"TEMA",menuShare:"DELA",menuExit:"AVSLUTA",on:"PÅ",off:"AV",
-    menuExitGame:"AVSLUTA SPELET",menuClose:"STÄNG MENYN",menuMuteEmoji:"EMOTIKONER",
+    menuExitGame:"AVSLUTA SPELET",menuClose:"STÄNG MENYN",menuMuteEmoji:"TYSTA GESTER",
   },
 };
 
@@ -3601,8 +3601,8 @@ export default function Piilosana(){
       if(muteEmojisRef.current)return;
       const id=++emojiFeedIdRef.current;
       setEmojiFeed(prev=>[...prev.slice(-7),{id,nickname,emoji,fading:false}]);
-      setTimeout(()=>setEmojiFeed(prev=>prev.map(e=>e.id===id?{...e,fading:true}:e)),5200);
-      setTimeout(()=>setEmojiFeed(prev=>prev.filter(e=>e.id!==id)),6000);
+      setTimeout(()=>setEmojiFeed(prev=>prev.map(e=>e.id===id?{...e,fading:true}:e)),3500);
+      setTimeout(()=>setEmojiFeed(prev=>prev.filter(e=>e.id!==id)),4300);
     });
 
     setSocket(newSocket);
@@ -4969,10 +4969,48 @@ export default function Piilosana(){
               </div>
               {(mode==="multi"||mode==="public")&&<span style={{position:"absolute",right:"4px",top:"50%",transform:"translateY(-50%)",fontSize:"13px",color:S.textMuted,display:"flex",alignItems:"center",gap:"6px",padding:"4px 8px"}}>
                 <span style={{display:"flex",alignItems:"center",gap:"3px"}}><Icon icon="person" color={S.textMuted} size={1.5}/>{mode==="public"?publicPlayerCount:players.length}</span>
-                <button onClick={e=>{e.stopPropagation();setChatHidden(h=>!h);}} style={{background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"2px 6px",cursor:"pointer",borderRadius:"6px",fontSize:"14px",lineHeight:1,transition:"all 0.15s",color:chatHidden?S.textMuted:S.green}} onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;}} onMouseLeave={e=>{e.currentTarget.style.borderColor=S.textMuted+"44";e.currentTarget.style.color=chatHidden?S.textMuted:S.green;}}>💬</button>
+                <button onClick={e=>{e.stopPropagation();setEmojiOpen(o=>o==="open"?false:"open");}} style={{background:emojiOpen==="open"?S.green+"22":"transparent",border:`1px solid ${emojiOpen==="open"?S.green+"66":S.textMuted+"44"}`,padding:"2px 6px",cursor:"pointer",borderRadius:"6px",fontSize:"14px",lineHeight:1,transition:"all 0.15s",color:emojiOpen==="open"?S.green:S.textMuted}} onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;}} onMouseLeave={e=>{e.currentTarget.style.borderColor=emojiOpen==="open"?S.green+"66":S.textMuted+"44";e.currentTarget.style.color=emojiOpen==="open"?S.green:S.textMuted;}}>💬</button>
               </span>}
             </div>
           </div>
+
+          {/* Emoji picker dropdown - multiplayer only */}
+          {(mode==="multi"||mode==="public")&&emojiOpen==="open"&&socket&&state==="play"&&(
+            <div style={{position:"relative",zIndex:50,animation:"fadeIn 0.15s ease"}}>
+              <div style={{background:`${S.dark}f0`,border:`1px solid ${S.border}`,borderRadius:"12px",padding:"8px",marginBottom:"4px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 4px 16px #00000033"}}>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(8,1fr)",gap:"2px"}}>
+                  {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
+                    <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});setEmojiOpen(false);}}
+                      style={{fontSize:"20px",padding:"6px",background:"transparent",border:"none",borderRadius:"8px",cursor:"pointer",lineHeight:1,
+                      transition:"transform 0.12s, background 0.12s"}}
+                      onMouseDown={e=>{e.currentTarget.style.transform="scale(1.2)";e.currentTarget.style.background=S.green+"22";}}
+                      onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
+                      onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
+                      onTouchStart={e=>{e.currentTarget.style.transform="scale(1.2)";e.currentTarget.style.background=S.green+"22";}}
+                      onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}>{em}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Emoji feed - shows reactions from other players briefly */}
+          {(mode==="multi"||mode==="public")&&emojiFeed.length>0&&state==="play"&&(
+            <div style={{display:"flex",flexWrap:"wrap",gap:"4px",justifyContent:"center",marginBottom:"4px",animation:"fadeIn 0.2s ease"}}>
+              {emojiFeed.map(e=>(
+                <span key={e.id} style={{
+                  display:"inline-flex",alignItems:"center",gap:"4px",
+                  padding:"2px 8px",
+                  background:`${S.dark}cc`,border:`1px solid ${S.border}`,
+                  borderRadius:"16px",fontSize:"12px",
+                  backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",
+                  animation:e.fading?"chatFadeOut 0.8s ease forwards":"pop 0.3s ease-out"}}>
+                  <span style={{fontSize:"10px",color:S.green,fontFamily:S.font,fontWeight:"600"}}>{e.nickname}</span>
+                  <span style={{fontSize:"16px",lineHeight:1}}>{e.emoji}</span>
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Battle mode: flash when someone finds a word */}
           {gameMode==="battle"&&battleMsg&&state==="play"&&(
@@ -5066,7 +5104,7 @@ export default function Piilosana(){
                   onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
                   onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                   <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
-                    <span style={{fontSize:"16px"}}>😀</span> {t.menuMuteEmoji||"EMOTICONS"}
+                    <span style={{fontSize:"16px"}}>💬</span> {t.menuMuteEmoji||"MUTE GESTURES"}
                   </span>
                   <span style={{fontSize:"11px",fontFamily:S.font,color:!muteEmojis?S.green:S.textMuted,background:!muteEmojis?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${!muteEmojis?S.green+"44":S.textMuted+"44"}`}}>
                     {!muteEmojis?(t.on||"ON"):(t.off||"OFF")}
@@ -5332,84 +5370,6 @@ export default function Piilosana(){
             </div>
           )}
 
-          {/* Glassmorphic chat overlay - multiplayer only */}
-          {(mode==="public"||mode==="multi")&&state==="play"&&socket&&!chatHidden&&(
-            <div style={{position:"fixed",top:"8px",right:"8px",zIndex:100,
-              width:"clamp(180px,30vw,220px)",
-              background:"rgba(15,20,35,0.55)",
-              backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",
-              border:"1px solid rgba(255,255,255,0.12)",
-              borderRadius:"18px",
-              boxShadow:"0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
-              overflow:"hidden",
-              animation:"fadeIn 0.4s ease"}}>
-              {/* Glass light reflection */}
-              <div style={{position:"absolute",top:0,left:0,right:0,height:"40%",
-                background:"linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 60%, transparent 100%)",
-                borderRadius:"18px 18px 0 0",pointerEvents:"none"}}/>
-              {/* Header with close */}
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 12px 4px",position:"relative",zIndex:1}}>
-                <button onClick={()=>emojiOpen==="open"?closeEmojiPicker():setEmojiOpen("open")}
-                  style={{fontSize:"16px",padding:"4px 10px",background:emojiOpen?"rgba(255,255,255,0.12)":"transparent",
-                  border:"1px solid rgba(255,255,255,0.15)",borderRadius:"12px",cursor:"pointer",lineHeight:1,
-                  transition:"all 0.15s",color:S.green,fontFamily:S.font,fontSize:"12px",display:"flex",alignItems:"center",gap:"4px"}}
-                >💬</button>
-                <button onClick={()=>setChatHidden(true)}
-                  style={{fontSize:"11px",padding:"2px 6px",background:"transparent",border:"none",cursor:"pointer",
-                  color:"rgba(255,255,255,0.4)",fontFamily:S.font,transition:"color 0.15s"}}
-                  onMouseEnter={e=>{e.currentTarget.style.color="rgba(255,255,255,0.8)";}}
-                  onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,0.4)";}}
-                >✕</button>
-              </div>
-              {/* Emoji picker */}
-              {emojiOpen&&(
-                <div style={{padding:"4px 8px 8px",position:"relative",zIndex:1,
-                  animation:"fadeIn 0.2s ease"}}>
-                  <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"2px"}}>
-                    {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
-                      <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});closeEmojiPicker();}}
-                        style={{fontSize:"18px",padding:"5px",background:"transparent",border:"none",borderRadius:"8px",cursor:"pointer",lineHeight:1,
-                        transition:"transform 0.12s, background 0.12s"}}
-                        onMouseDown={e=>{e.currentTarget.style.transform="scale(1.2)";e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
-                        onMouseUp={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
-                        onMouseLeave={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}
-                        onTouchStart={e=>{e.currentTarget.style.transform="scale(1.2)";e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
-                        onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";e.currentTarget.style.background="transparent";}}>{em}</button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {/* Chat feed */}
-              {emojiFeed.length>0&&(
-                <div style={{padding:"0 8px 8px",maxHeight:"120px",overflowY:"auto",position:"relative",zIndex:1}}>
-                  {emojiFeed.map(e=>(
-                    <div key={e.id} style={{
-                      display:"flex",alignItems:"center",gap:"6px",
-                      padding:"4px 8px",marginBottom:"3px",
-                      background:"rgba(255,255,255,0.06)",
-                      borderRadius:"10px",
-                      animation:e.fading?"chatFadeOut 0.8s ease forwards":"chatSlideIn 0.3s ease-out"}}>
-                      <span style={{fontSize:"11px",fontWeight:"600",color:S.green,fontFamily:S.font,whiteSpace:"nowrap",opacity:0.9}}>{e.nickname}</span>
-                      <span style={{fontSize:"20px",lineHeight:1}}>{e.emoji}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-          {/* Chat hidden - small reopen button */}
-          {(mode==="public"||mode==="multi")&&state==="play"&&socket&&chatHidden&&(
-            <button onClick={()=>setChatHidden(false)}
-              style={{position:"fixed",top:"8px",right:"8px",zIndex:100,
-                fontSize:"16px",padding:"8px",lineHeight:1,
-                background:"rgba(15,20,35,0.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
-                border:"1px solid rgba(255,255,255,0.1)",borderRadius:"14px",cursor:"pointer",
-                boxShadow:"0 4px 16px rgba(0,0,0,0.2)",
-                transition:"all 0.2s",opacity:0.6}}
-              onMouseEnter={e=>{e.currentTarget.style.opacity="1";}}
-              onMouseLeave={e=>{e.currentTarget.style.opacity="0.6";}}
-            >💬</button>
-          )}
 
           {/* Unlimited mode: refresh + end buttons */}
           {state==="play"&&mode==="solo"&&gameTime===0&&(
