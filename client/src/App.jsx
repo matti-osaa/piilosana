@@ -1315,15 +1315,15 @@ const TITLE_CONFIG={
     ]
   },
   sv:{
-    title:"ORDJAKT",
-    gearIdx:0, // the O in ⚙RDJAKT
-    // O(0) R(1) D(2) J(3) A(4) K(5) T(6)
+    title:"ORDLETARE",
+    gearIdx:5, // the A in ORDLE⚙ARE
+    // O(0) R(1) D(2) L(3) E(4) T(5) A(6) R(7) E(8)
     demos:[
       {word:"ORD",indices:[0,1,2],color:"#44ff88"},
-      {word:"JAKT",indices:[3,4,5,6],color:"#4488ff"},
-      {word:"AKT",indices:[4,5,6],color:"#ff8844"},
-      {word:"ORDJA",indices:[0,1,2,3,4],color:"#ff44cc"},
-      {word:"ORDJAKT",indices:[0,1,2,3,4,5,6],color:"#ff6644"},
+      {word:"LET",indices:[3,4,5],color:"#4488ff"},
+      {word:"LETA",indices:[3,4,5,6],color:"#ff8844"},
+      {word:"ARE",indices:[6,7,8],color:"#ff44cc"},
+      {word:"ORDLETARE",indices:[0,1,2,3,4,5,6,7,8],color:"#ff6644"},
     ]
   },
 };
