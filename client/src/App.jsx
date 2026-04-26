@@ -590,9 +590,11 @@ const SOUND_THEMES={
     notes:{
       find3:n=>[["D5","16n",n]],
       find4:n=>[["F5","16n",n],["A5","16n",n+0.06]],
-      find5:n=>[["D5","16n",n],["F5","16n",n+0.05],["A5","8n",n+0.1]],
-      find6:n=>({synth:[["D5","16n",n],["F5","16n",n+0.05],["A5","16n",n+0.1],["D6","8n",n+0.15]],bass:[["D3","4n",n]]}),
-      find7:n=>({synth:[["D5","16n",n],["F5","16n",n+0.04],["A5","16n",n+0.08],["D6","16n",n+0.12],["F6","16n",n+0.16],["A6","4n",n+0.2]],bass:[["D3","8n",n],["A2","4n",n+0.12]]}),
+      find5:n=>({synth:[["D5","16n",n],["F5","16n",n+0.05],["A5","8n",n+0.1]],bass:[["D3","8n",n+0.08]]}),
+      find6:n=>({synth:[["D5","16n",n],["F5","16n",n+0.04],["A5","16n",n+0.08],["D6","8n",n+0.12]],bass:[["D2","4n",n],["A2","8n",n+0.1]]}),
+      find7:n=>({synth:[["D5","16n",n],["F5","16n",n+0.03],["A5","16n",n+0.06],["D6","16n",n+0.09],["F6","16n",n+0.12],["A6","4n",n+0.16]],bass:[["D2","4n",n],["A1","2n",n+0.1]]}),
+      find8:n=>({synth:[["D5","16n",n],["F5","16n",n+0.03],["A5","16n",n+0.06],["D6","16n",n+0.09],["F6","16n",n+0.12],["A6","16n",n+0.15],["D7","4n",n+0.19]],bass:[["D2","4n",n],["A1","4n",n+0.1],["D2","2n",n+0.2]]}),
+      find10:n=>({synth:[["D5","16n",n],["F5","16n",n+0.025],["A5","16n",n+0.05],["D6","16n",n+0.075],["F6","16n",n+0.1],["A6","16n",n+0.125],["D7","16n",n+0.15],["F7","8n",n+0.2],["A7","4n",n+0.3]],bass:[["D1","2n",n],["A1","4n",n+0.15],["D2","2n",n+0.3]]}),
       combo3:n=>[["D5","8n"],["F5","8n"],["A5","8n"],["D6","8n"]],
       combo5:n=>[["D5","8n"],["F5","8n"],["A5","8n"],["C#6","8n"],["E6","8n"]],
       wrong:n=>[["F3","16n",n],["E3","8n",n+0.08]],
@@ -654,7 +656,18 @@ function useSounds(soundTheme){
     else if(len===4)playSynthNotes(notes.find4);
     else if(len===5)playSynthNotes(notes.find5);
     else if(len===6)playSynthNotes(notes.find6);
-    else playSynthNotes(notes.find7);
+    else if(len===7)playSynthNotes(notes.find7);
+    else if(len<10)playSynthNotes(notes.find8);
+    else{
+      // 10+ letters: epic fanfare + crowd roar via noise
+      playSynthNotes(notes.find10);
+      // Crowd "woo!" effect using filtered noise burst
+      if(btnNoiseRef.current){
+        const n=Tone.now();
+        btnNoiseRef.current.triggerAttackRelease("4n",n+0.2,0.6);
+        btnNoiseRef.current.triggerAttackRelease("8n",n+0.5,0.3);
+      }
+    }
   },[playSynthNotes,getNotes]);
 
   const playCombo=useCallback((combo)=>{
@@ -957,7 +970,15 @@ function ScorePopup({text,color,x,y}){
   return(<div style={{position:"fixed",left:x,top:y,transform:"translate(-50%,-50%)",pointerEvents:"none",zIndex:200,fontFamily:"inherit",fontSize:"20px",fontWeight:"700",color,textShadow:`0 0 10px ${color}88`,animation:"floatUp 1s ease-out forwards"}}>{text}</div>);
 }
 function WordPopup({text,color,x,y,font}){
-  return(<div style={{position:"fixed",left:x,top:y,transform:"translate(-50%,-50%)",pointerEvents:"none",zIndex:199,fontFamily:font||"inherit",fontSize:"22px",fontWeight:"700",letterSpacing:"3px",color,textShadow:`0 0 12px ${color}66, 0 2px 4px #00000044`,animation:"wordRise 1.2s ease-out forwards"}}>{text}</div>);
+  const len=text.length;
+  const isEpic=len>=10;
+  const isBig=len>=8;
+  const sz=isEpic?"32px":isBig?"26px":"22px";
+  const glow=isEpic?`0 0 24px ${color}88, 0 0 48px ${color}44, 0 2px 6px #00000066`:isBig?`0 0 16px ${color}66, 0 2px 4px #00000044`:`0 0 12px ${color}66, 0 2px 4px #00000044`;
+  return(<div style={{position:"fixed",left:x,top:y,transform:"translate(-50%,-50%)",pointerEvents:"none",zIndex:199,fontFamily:font||"inherit",fontSize:sz,fontWeight:"700",letterSpacing:isEpic?"4px":"3px",color,textShadow:glow,animation:isEpic?"wordRiseEpic 1.8s ease-out forwards":isBig?"wordRiseBig 1.5s ease-out forwards":"wordRise 1.2s ease-out forwards"}}>
+    {isEpic&&<span style={{fontSize:"16px",display:"block",textAlign:"center",marginBottom:"2px",animation:"pulse 0.3s ease"}}>WOW!</span>}
+    {text}
+  </div>);
 }
 
 // ============================================
@@ -2500,7 +2521,8 @@ export default function Piilosana(){
     }
     const id=++popupIdRef.current;
     setWordPopups(p=>[...p,{id,text:word.toUpperCase(),color,x:px,y:py}]);
-    setTimeout(()=>setWordPopups(p=>p.filter(pp=>pp.id!==id)),1300);
+    const popDuration=word.length>=10?2000:word.length>=8?1600:1300;
+    setTimeout(()=>setWordPopups(p=>p.filter(pp=>pp.id!==id)),popDuration);
   },[]);
 
   const startSolo=useCallback(async(overrideMode,overrideTime)=>{
@@ -3931,6 +3953,8 @@ export default function Piilosana(){
         @keyframes arenaPulse{0%,100%{box-shadow:4px 4px 0 #d4888b,0 0 20px #e5989b33}50%{box-shadow:4px 4px 0 #d4888b,0 0 35px #e5989b55}}
         @keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}50%{opacity:1;transform:translate(-50%,-100%) scale(1.5)}100%{opacity:0;transform:translate(-50%,-180%) scale(1.8)}}
         @keyframes wordRise{0%{opacity:0.9;transform:translate(-50%,-50%) scale(0.8)}20%{opacity:1;transform:translate(-50%,-80%) scale(1.1)}60%{opacity:0.8;transform:translate(-50%,-140%) scale(1)}100%{opacity:0;transform:translate(-50%,-200%) scale(0.9)}}
+        @keyframes wordRiseBig{0%{opacity:0.9;transform:translate(-50%,-50%) scale(0.6)}15%{opacity:1;transform:translate(-50%,-70%) scale(1.3)}30%{transform:translate(-50%,-90%) scale(1.15)}60%{opacity:0.8;transform:translate(-50%,-150%) scale(1.05)}100%{opacity:0;transform:translate(-50%,-220%) scale(0.95)}}
+        @keyframes wordRiseEpic{0%{opacity:0.9;transform:translate(-50%,-50%) scale(0.4)}10%{opacity:1;transform:translate(-50%,-60%) scale(1.5)}25%{transform:translate(-50%,-80%) scale(1.2)}40%{transform:translate(-50%,-100%) scale(1.3)}60%{opacity:0.9;transform:translate(-50%,-140%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-240%) scale(1)}}
         @keyframes comboGlow{0%,100%{box-shadow:0 0 5px #ffcc0044}50%{box-shadow:0 0 25px #ffcc0088,0 0 50px #ff66ff44}}
         @keyframes epicPulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
         @keyframes wordFlash{0%{background:#00ff8833;box-shadow:0 0 20px #00ff8866}100%{background:transparent;box-shadow:none}}
