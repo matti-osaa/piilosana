@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import * as Tone from "tone";
 import { io } from "socket.io-client";
+import { QRCodeSVG } from "qrcode.react";
 import DEFS_FI from "./defs_fi.js";
 
 // ============================================
@@ -194,6 +195,7 @@ const T={
     waiting:"ODOTETAAN PELAAJIA",playersCount:"PELAAJAT",youTag:"SINÄ",createGame:"LUO PELI",connecting:"YHDISTETÄÄN...",
     startGame:"ALOITA PELI",waitForPlayers:"Odota, että joku liittyy peliisi...",waitForHost:"Odota, että isäntä aloittaa pelin...",
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
+    shareLink:"JAA LINKKI",copied:"Kopioitu!",scanToJoin:"Skannaa liittyäksesi",inviteFriends:"Kutsu kavereita:",arenaLink:"Suora linkki moninpeliin:",
     newCustom:"UUSI OMA NETTIPELI",menu:"VALIKKO",newPractice:"UUSI HARJOITUS",
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
@@ -253,6 +255,7 @@ const T={
     waiting:"WAITING FOR PLAYERS",playersCount:"PLAYERS",youTag:"YOU",createGame:"CREATE GAME",connecting:"CONNECTING...",
     startGame:"START GAME",waitForPlayers:"Wait for someone to join...",waitForHost:"Waiting for host to start...",
     joinGame:"JOIN GAME",roomCode:"ROOM CODE",noRooms:"No open rooms",orJoinRoom:"or join with code",
+    shareLink:"SHARE LINK",copied:"Copied!",scanToJoin:"Scan to join",inviteFriends:"Invite friends:",arenaLink:"Direct link to multiplayer:",
     newCustom:"NEW CUSTOM GAME",menu:"MENU",newPractice:"NEW PRACTICE",
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
@@ -312,6 +315,7 @@ const T={
     waiting:"VÄNTAR PÅ SPELARE",playersCount:"SPELARE",youTag:"DU",createGame:"SKAPA SPEL",connecting:"ANSLUTER...",
     startGame:"STARTA SPEL",waitForPlayers:"Vänta tills någon går med...",waitForHost:"Väntar på att värden startar...",
     joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
+    shareLink:"DELA LÄNK",copied:"Kopierat!",scanToJoin:"Skanna för att gå med",inviteFriends:"Bjud in vänner:",arenaLink:"Direktlänk till flerspelare:",
     newCustom:"NYTT EGET SPEL",menu:"MENY",newPractice:"NY ÖVNING",
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
@@ -2339,6 +2343,12 @@ export default function Piilosana(){
   const[mode,setMode]=useState(null);
   const[socket,setSocket]=useState(null);
   const[roomCode,setRoomCode]=useState("");
+  const[pendingDeepLink,setPendingDeepLink]=useState(()=>{
+    const p=new URLSearchParams(window.location.search);
+    if(p.has("arena"))return{type:"arena"};
+    if(p.get("room"))return{type:"room",code:p.get("room").toUpperCase()};
+    return null;
+  });
   const[nickname,setNickname]=useState(()=>{
     try{const a=JSON.parse(localStorage.getItem("piilosana_auth")||"null");if(a?.nickname)return a.nickname;}catch{}
     return "";
@@ -2351,6 +2361,21 @@ export default function Piilosana(){
       localStorage.setItem("piilosana_nick",authUser.nickname);
     }
   },[authUser]);
+  // Deep link handling: ?arena or ?room=XXXX
+  useEffect(()=>{
+    if(!pendingDeepLink)return;
+    // Clean URL without reload
+    window.history.replaceState({},"",window.location.pathname);
+    if(pendingDeepLink.type==="arena"){
+      setMode("public");
+      if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}
+    }else if(pendingDeepLink.type==="room"){
+      setMode("multi");
+      if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");}
+      setRoomCode(pendingDeepLink.code);
+    }
+    setPendingDeepLink(null);
+  },[]);
 
   const[players,setPlayers]=useState([]);
   const[playerId,setPlayerId]=useState(null);
@@ -2359,6 +2384,7 @@ export default function Piilosana(){
   const[multiRankings,setMultiRankings]=useState(null);
   const[lobbyState,setLobbyState]=useState("enter_name");
   const[lobbyError,setLobbyError]=useState("");
+  const[linkCopied,setLinkCopied]=useState(false);
   const[socketConnected,setSocketConnected]=useState(false);
   const[publicRooms,setPublicRooms]=useState([]);
   const[currentMultiGrid,setCurrentMultiGrid]=useState([]);
@@ -3151,6 +3177,14 @@ export default function Piilosana(){
           newSocket.emit("join_public",{nickname:auth.nickname,lang});
         }
       }
+      // Auto-join room from deep link (?room=XXXX)
+      if(mode==="multi"&&roomCode){
+        const auth=(() => {try{return JSON.parse(localStorage.getItem("piilosana_auth")||"null")}catch{return null}})();
+        if(auth?.nickname){
+          setLobbyState("joining");
+          newSocket.emit("join_room",{roomCode,nickname:auth.nickname,mode:"multi"});
+        }
+      }
     });
 
     newSocket.on("disconnect",()=>{
@@ -3455,6 +3489,8 @@ export default function Piilosana(){
       if(mode==="public")socket.emit("leave_public");
       socket.disconnect();
     }
+    // Clean URL params
+    if(window.location.search)window.history.replaceState({},"",window.location.pathname);
     setSocket(null);
     setMode(null);
     setPlayers([]);
@@ -4288,6 +4324,16 @@ export default function Piilosana(){
                 </div>
               ))}
             </div>
+            {/* Join with room code */}
+            <div style={{marginBottom:"12px"}}>
+              <p style={{fontSize:"13px",color:S.textMuted,marginBottom:"6px"}}>{t.orJoinRoom}</p>
+              <div style={{display:"flex",gap:"6px",justifyContent:"center",alignItems:"center"}}>
+                <input type="text" maxLength="6" value={roomCode} onChange={e=>setRoomCode(e.target.value.toUpperCase())} placeholder={t.roomCode}
+                  style={{fontFamily:S.font,fontSize:"14px",color:S.green,background:S.dark,border:`2px solid ${S.border}`,padding:"8px",width:"120px",textAlign:"center",outline:"none",letterSpacing:"2px"}}
+                  onKeyDown={e=>{if(e.key==="Enter"&&roomCode.trim())joinRoom(roomCode.trim());}}/>
+                <button onClick={()=>{if(roomCode.trim())joinRoom(roomCode.trim());}} disabled={!socketConnected||!roomCode.trim()} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:roomCode.trim()&&socketConnected?S.yellow:S.border,border:"none",padding:"8px 14px",cursor:roomCode.trim()&&socketConnected?"pointer":"default"}}>{t.joinGame}</button>
+              </div>
+            </div>
             <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
               <button onClick={createRoom} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:socketConnected?S.green:S.border,border:"none",padding:"12px 20px",cursor:socketConnected?"pointer":"default",boxShadow:socketConnected?"3px 3px 0 #008844":"none"}}>{socketConnected?t.createGame:t.connecting}</button>
               <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"18px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"10px 20px",cursor:"pointer"}}>{t.back}</button>
@@ -4303,6 +4349,23 @@ export default function Piilosana(){
             <div style={{background:S.dark,padding:"8px",border:`1px solid ${S.border}`,marginBottom:"16px",minHeight:"60px"}}>
               {players.map((p,i)=><div key={i} style={{fontSize:"13px",color:p.playerId===playerId?S.yellow:S.green,padding:"4px"}}>{i+1}. {p.nickname}{p.playerId===playerId?` (${t.youTag})`:""}</div>)}
             </div>
+            {/* Share link & QR code */}
+            {roomCode&&(()=>{
+              const shareUrl=`${window.location.origin}?room=${roomCode}`;
+              const copyLink=()=>{navigator.clipboard.writeText(shareUrl).then(()=>{setLinkCopied(true);setTimeout(()=>setLinkCopied(false),2000);}).catch(()=>{});};
+              return(
+              <div style={{marginBottom:"16px",padding:"12px",background:S.gridBg,border:`1px solid ${S.border}`,borderRadius:"4px"}}>
+                <p style={{fontSize:"13px",color:S.textSoft,marginBottom:"8px"}}>{t.inviteFriends}</p>
+                <div style={{display:"flex",gap:"8px",alignItems:"center",justifyContent:"center",marginBottom:"10px"}}>
+                  <input readOnly value={shareUrl} style={{fontFamily:S.font,fontSize:"12px",color:S.textSoft,background:S.dark,border:`1px solid ${S.border}`,padding:"6px 8px",flex:1,maxWidth:"280px",outline:"none"}} onClick={e=>e.target.select()}/>
+                  <button onClick={copyLink} style={{fontFamily:S.font,fontSize:"12px",color:linkCopied?S.bg:S.green,background:linkCopied?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 12px",cursor:"pointer",minWidth:"80px",transition:"all 0.2s"}}>{linkCopied?t.copied:t.shareLink}</button>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"4px"}}>
+                  <QRCodeSVG value={shareUrl} size={120} bgColor="transparent" fgColor={S.textSoft} level="L"/>
+                  <p style={{fontSize:"11px",color:S.textMuted}}>{t.scanToJoin}</p>
+                </div>
+              </div>);
+            })()}
             {isHost&&(
               <div style={{marginBottom:"12px"}}>
                 <p style={{fontSize:"13px",color:S.green,marginBottom:"8px"}}>{t.gameMode}</p>
@@ -4371,7 +4434,10 @@ export default function Piilosana(){
       )}
 
       {/* AREENA - waiting for round */}
-      {mode==="public"&&publicState==="waiting"&&(
+      {mode==="public"&&publicState==="waiting"&&(()=>{
+        const arenaUrl=`${window.location.origin}?arena`;
+        const copyArena=()=>{navigator.clipboard.writeText(arenaUrl).then(()=>{setLinkCopied(true);setTimeout(()=>setLinkCopied(false),2000);}).catch(()=>{});};
+        return(
         <div style={{textAlign:"center",marginTop:"60px",animation:"fadeIn 0.5s ease"}}>
           <p style={{fontSize:"22px",color:"#ff6644"}}>{t.arena}</p>
           {publicNextCountdown>0?(
@@ -4383,9 +4449,18 @@ export default function Piilosana(){
             <p style={{fontSize:"15px",color:S.textMuted,marginTop:"12px",animation:"pulse 1s infinite"}}>{lang==="en"?"Connecting...":lang==="sv"?"Ansluter...":"Yhdistetään..."}</p>
           )}
           <p style={{fontSize:"15px",color:S.textSoft||"#88ccaa",marginTop:"8px"}}>{publicPlayerCount} {publicPlayerCount===1?t.playerInArena:t.playersInArena}</p>
+          {/* Share arena link */}
+          <div style={{marginTop:"20px",padding:"12px",background:S.gridBg,border:`1px solid ${S.border}`,borderRadius:"4px",maxWidth:"320px",margin:"20px auto 0"}}>
+            <p style={{fontSize:"12px",color:S.textMuted,marginBottom:"8px"}}>{t.arenaLink}</p>
+            <div style={{display:"flex",gap:"6px",alignItems:"center",justifyContent:"center",marginBottom:"10px"}}>
+              <input readOnly value={arenaUrl} style={{fontFamily:S.font,fontSize:"11px",color:S.textSoft,background:S.dark,border:`1px solid ${S.border}`,padding:"5px 8px",flex:1,outline:"none"}} onClick={e=>e.target.select()}/>
+              <button onClick={copyArena} style={{fontFamily:S.font,fontSize:"11px",color:linkCopied?S.bg:S.green,background:linkCopied?S.green:"transparent",border:`2px solid ${S.green}`,padding:"5px 10px",cursor:"pointer",minWidth:"70px",transition:"all 0.2s"}}>{linkCopied?t.copied:t.shareLink}</button>
+            </div>
+            <QRCodeSVG value={arenaUrl} size={100} bgColor="transparent" fgColor={S.textSoft} level="L"/>
+          </div>
           <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",marginTop:"16px"}}>{t.back}</button>
-        </div>
-      )}
+        </div>);
+      })()}
 
       {/* PIILOSAUNA - countdown */}
       {mode==="public"&&publicState==="countdown"&&(
