@@ -3901,7 +3901,7 @@ export default function Piilosana(){
   const ResultsScreen=()=>(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 1s ease",position:"relative"}}>
       <ConfettiCelebration isWinner={isWinner}/>
-      <div style={{position:"relative",zIndex:1,border:`3px solid ${isWinner?S.yellow:S.green}`,padding:"20px",boxShadow:`0 0 30px ${isWinner?S.yellow:S.green}33`,background:S.dark,maxWidth:"600px"}}>
+      <div style={{position:"relative",zIndex:1,border:`1px solid ${isWinner?S.yellow:S.green}44`,padding:"24px",boxShadow:`0 4px 24px ${isWinner?S.yellow:S.green}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,maxWidth:"600px",borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
         {myRank===0&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🏆</div>}
         {myRank===1&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🥈</div>}
         {myRank===2&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🥉</div>}
@@ -3911,7 +3911,7 @@ export default function Piilosana(){
           const medals=["🥇","🥈","🥉"];
           const isMe=p.playerId===playerId;
           return(
-            <div key={i} style={{fontSize:"13px",color:isMe?S.yellow:S.green,padding:"6px 10px",borderBottom:`1px solid ${S.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:isMe?"#ffcc0011":"transparent",animation:isMe?"pop 0.4s ease":"none"}}>
+            <div key={i} style={{fontSize:"13px",color:isMe?S.yellow:S.green,padding:"8px 12px",borderBottom:`1px solid ${S.border}33`,display:"flex",justifyContent:"space-between",alignItems:"center",background:isMe?`${S.yellow}15`:"transparent",animation:isMe?"pop 0.4s ease":"none",borderRadius:"8px",marginBottom:"2px"}}>
               <span>{medals[i]||`${i+1}.`} {p.nickname}</span>
               <span>{p.score}p ({p.wordsFound} {t.words})</span>
             </div>
@@ -3929,8 +3929,8 @@ export default function Piilosana(){
           const nickMap={};
           if(multiRankings)multiRankings.forEach(p=>{nickMap[p.playerId]=p.nickname;});
           return foundWords.length>0&&(
-            <div style={{marginTop:"16px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,textAlign:"left",animation:"fadeIn 0.8s ease"}}>
-              <div style={{fontSize:"14px",color:S.purple,marginBottom:"6px",display:"flex",alignItems:"center",gap:"6px"}}><Icon icon="swords" color={S.purple} size={2}/>LÖYDETYT ({foundWords.length})</div>
+            <div style={{marginTop:"16px",padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,textAlign:"left",animation:"fadeIn 0.8s ease",borderRadius:"12px"}}>
+              <div style={{fontSize:"14px",color:S.purple,marginBottom:"8px",display:"flex",alignItems:"center",gap:"6px",fontWeight:"600"}}><Icon icon="swords" color={S.purple} size={2}/>LÖYDETYT ({foundWords.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {foundWords.map((w,i)=>{
                   const finders=Object.entries(multiAllFoundWords).filter(([,ws])=>ws.includes(w)).map(([pid])=>nickMap[pid]||"?");
@@ -3951,8 +3951,8 @@ export default function Piilosana(){
           if(multiRankings)multiRankings.forEach(p=>{nickMap[p.playerId]=p.nickname;});
           return(<>
             {foundWords.length>0&&(
-              <div style={{marginTop:"16px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,textAlign:"left",animation:"fadeIn 0.8s ease"}}>
-                <div style={{fontSize:"14px",color:S.green,marginBottom:"6px"}}>LÖYDETYT ({foundWords.length})</div>
+              <div style={{marginTop:"16px",padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,textAlign:"left",animation:"fadeIn 0.8s ease",borderRadius:"12px"}}>
+                <div style={{fontSize:"14px",color:S.green,marginBottom:"8px",fontWeight:"600"}}>LÖYDETYT ({foundWords.length})</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                   {foundWords.map((w,i)=>{
                     const finders=Object.entries(multiAllFoundWords).filter(([,ws])=>ws.includes(w)).map(([pid])=>nickMap[pid]||"?");
@@ -3964,8 +3964,8 @@ export default function Piilosana(){
               </div>
             )}
             {missedWords.length>0&&(
-              <div style={{marginTop:"10px",padding:"8px",border:`2px solid ${S.border}`,background:S.dark,textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
-                <div style={{fontSize:"14px",color:"#ff6666",marginBottom:"6px"}}>JÄIVÄT LÖYTÄMÄTTÄ ({missedWords.length})</div>
+              <div style={{marginTop:"10px",padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease",borderRadius:"12px"}}>
+                <div style={{fontSize:"14px",color:"#ff6666",marginBottom:"8px",fontWeight:"600"}}>JÄIVÄT LÖYTÄMÄTTÄ ({missedWords.length})</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                   {missedWords.map((w,i)=>(
                     <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
@@ -3976,9 +3976,9 @@ export default function Piilosana(){
           </>);
         })()}
         <div style={{marginTop:"16px",display:"flex",flexDirection:"column",gap:"8px",alignItems:"center"}}>
-          {isHost&&<button onClick={playAgain} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>{t.newCustom}</button>}
-          <button onClick={switchToSolo} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>{t.practice}</button>
-          <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",width:"280px"}}>{t.menu}</button>
+          {isHost&&<button onClick={playAgain} style={{fontFamily:S.font,fontSize:"15px",color:S.bg,background:S.green,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.green}33`,fontWeight:"600"}}>{t.newCustom}</button>}
+          <button onClick={switchToSolo} style={{fontFamily:S.font,fontSize:"15px",color:S.bg,background:S.yellow,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.yellow}33`,fontWeight:"600"}}>{t.practice}</button>
+          <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`1px solid ${S.green}44`,background:"transparent",padding:"10px 20px",cursor:"pointer",width:"280px",borderRadius:"10px"}}>{t.menu}</button>
         </div>
       </div>
     </div>
@@ -4635,10 +4635,10 @@ export default function Piilosana(){
       )}
       {mode==="multi"&&lobbyState==="waiting"&&(
         <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{border:`3px solid ${S.yellow}`,padding:"24px",boxShadow:`0 0 20px ${S.yellow}44`,maxWidth:"600px"}}>
+          <div style={{border:`1px solid ${S.yellow}44`,padding:"24px",boxShadow:`0 4px 24px ${S.yellow}22, 0 8px 32px #00000022`,maxWidth:"600px",borderRadius:"16px",background:`${S.dark}f0`,backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
             <p style={{fontSize:"18px",lineHeight:"2",marginBottom:"12px",color:S.yellow}}>{t.waiting}</p>
             <p style={{fontSize:"13px",lineHeight:"2",color:S.green,marginBottom:"12px"}}>{t.playersCount} ({players.length})</p>
-            <div style={{background:S.dark,padding:"8px",border:`1px solid ${S.border}`,marginBottom:"16px",minHeight:"60px"}}>
+            <div style={{background:`${S.dark}cc`,padding:"10px",border:`1px solid ${S.border}`,marginBottom:"16px",minHeight:"60px",borderRadius:"10px"}}>
               {players.map((p,i)=><div key={i} style={{fontSize:"13px",color:p.playerId===playerId?S.yellow:S.green,padding:"4px"}}>{i+1}. {p.nickname}{p.playerId===playerId?` (${t.youTag})`:""}</div>)}
             </div>
             {/* Share link & QR code */}
@@ -4646,7 +4646,7 @@ export default function Piilosana(){
               const shareUrl=`${window.location.origin}?room=${roomCode}`;
               const copyLink=()=>{navigator.clipboard.writeText(shareUrl).then(()=>{setLinkCopied(true);setTimeout(()=>setLinkCopied(false),2000);}).catch(()=>{});};
               return(
-              <div style={{marginBottom:"16px",padding:"12px",background:S.gridBg,border:`1px solid ${S.border}`,borderRadius:"4px"}}>
+              <div style={{marginBottom:"16px",padding:"14px",background:`${S.gridBg||S.dark}cc`,border:`1px solid ${S.border}`,borderRadius:"12px"}}>
                 <p style={{fontSize:"13px",color:S.textSoft,marginBottom:"8px"}}>{t.inviteFriends}</p>
                 <div style={{display:"flex",gap:"8px",alignItems:"center",justifyContent:"center",marginBottom:"10px"}}>
                   <input readOnly value={shareUrl} style={{fontFamily:S.font,fontSize:"12px",color:S.textSoft,background:S.dark,border:`1px solid ${S.border}`,padding:"6px 8px",flex:1,maxWidth:"280px",outline:"none"}} onClick={e=>e.target.select()}/>
@@ -4662,15 +4662,15 @@ export default function Piilosana(){
               <div style={{marginBottom:"12px"}}>
                 <p style={{fontSize:"13px",color:S.green,marginBottom:"8px"}}>{t.gameMode}</p>
                 <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
-                  <button onClick={()=>setGameMode("classic")} style={{fontFamily:S.font,fontSize:"13px",color:gameMode==="classic"?S.bg:S.green,background:gameMode==="classic"?S.green:"transparent",border:`2px solid ${S.green}`,padding:"8px 16px",cursor:"pointer"}}>{t.classic}</button>
-                  <button onClick={()=>setGameMode("battle")} style={{fontFamily:S.font,fontSize:"13px",color:gameMode==="battle"?S.bg:S.purple,background:gameMode==="battle"?S.purple:"transparent",border:`2px solid ${S.purple}`,padding:"8px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px"}}><Icon icon="swords" color={gameMode==="battle"?S.bg:S.purple} size={2}/>{t.battle}</button>
+                  <button onClick={()=>setGameMode("classic")} style={{fontFamily:S.font,fontSize:"13px",color:gameMode==="classic"?S.bg:S.green,background:gameMode==="classic"?S.green:"transparent",border:`1px solid ${gameMode==="classic"?S.green:S.green+"66"}`,padding:"8px 16px",cursor:"pointer",borderRadius:"10px",transition:"all 0.15s"}}>{t.classic}</button>
+                  <button onClick={()=>setGameMode("battle")} style={{fontFamily:S.font,fontSize:"13px",color:gameMode==="battle"?S.bg:S.purple,background:gameMode==="battle"?S.purple:"transparent",border:`1px solid ${gameMode==="battle"?S.purple:S.purple+"66"}`,padding:"8px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px",borderRadius:"10px",transition:"all 0.15s"}}><Icon icon="swords" color={gameMode==="battle"?S.bg:S.purple} size={2}/>{t.battle}</button>
                 </div>
                 {gameMode==="battle"&&<p style={{fontSize:"13px",color:S.purple,marginTop:"8px",lineHeight:"1.8"}}>{t.battleDesc}</p>}
                 <div style={{marginTop:"12px"}}>
                   <p style={{fontSize:"13px",color:S.green,marginBottom:"8px"}}>{t.time}</p>
                   <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
-                    <button onClick={()=>setGameTime(120)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===120?S.bg:S.green,background:gameTime===120?S.green:"transparent",border:`2px solid ${S.green}`,padding:"8px 16px",cursor:"pointer"}}>2 MIN</button>
-                    <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"8px 16px",cursor:"pointer"}}>{lang==="en"?"6.7":"6,7"} MIN</button>
+                    <button onClick={()=>setGameTime(120)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===120?S.bg:S.green,background:gameTime===120?S.green:"transparent",border:`1px solid ${gameTime===120?S.green:S.green+"66"}`,padding:"8px 16px",cursor:"pointer",borderRadius:"10px",transition:"all 0.15s"}}>2 MIN</button>
+                    <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`1px solid ${gameTime===402?S.yellow:S.yellow+"66"}`,padding:"8px 16px",cursor:"pointer",borderRadius:"10px",transition:"all 0.15s"}}>{lang==="en"?"6.7":"6,7"} MIN</button>
                   </div>
                 </div>
                 {gameMode!=="battle"&&(
@@ -4683,10 +4683,10 @@ export default function Piilosana(){
                 )}
               </div>
             )}
-            {isHost&&<button onClick={()=>startGame(gameMode)} disabled={players.length<2} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:players.length>=2?S.green:S.border,border:"none",padding:"12px 24px",cursor:players.length>=2?"pointer":"default",boxShadow:"4px 4px 0 #008844"}}>{t.startGame}</button>}
+            {isHost&&<button onClick={()=>startGame(gameMode)} disabled={players.length<2} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:players.length>=2?S.green:S.border,border:"none",padding:"14px 28px",cursor:players.length>=2?"pointer":"default",borderRadius:"12px",boxShadow:players.length>=2?`0 4px 12px ${S.green}33`:"none",fontWeight:"600",transition:"all 0.15s"}}>{t.startGame}</button>}
             {isHost&&players.length<2&&<p style={{fontSize:"18px",color:"#666",marginTop:"8px"}}>{t.waitForPlayers}</p>}
             {!isHost&&<p style={{fontSize:"18px",color:"#666"}}>{t.waitForHost}</p>}
-            <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",marginTop:"12px"}}>{t.exit}</button>
+            <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`1px solid ${S.green}44`,background:"transparent",padding:"10px 20px",cursor:"pointer",marginTop:"12px",borderRadius:"10px"}}>{t.exit}</button>
           </div>
         </div>
       )}
@@ -4695,7 +4695,7 @@ export default function Piilosana(){
       {/* PIILOSAUNA - nickname entry */}
       {mode==="public"&&publicState==="nickname"&&(
         <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{border:"3px solid #ff6644",padding:"24px",boxShadow:"0 0 20px #ff664444",maxWidth:"600px"}}>
+          <div style={{border:"1px solid #ff664444",padding:"24px",boxShadow:"0 4px 24px #ff664422, 0 8px 32px #00000022",maxWidth:"600px",borderRadius:"16px",background:`${S.dark}f0`,backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
             <p style={{fontSize:"18px",color:"#ff6644",marginBottom:"8px"}}>{t.arena}</p>
             <p style={{fontSize:"14px",color:S.textSoft||"#88ccaa",marginBottom:"16px",lineHeight:"1.8"}}>{t.arenaJoinDesc}</p>
             <p style={{fontSize:"13px",color:S.green,marginBottom:"8px"}}>{t.nickname}</p>
@@ -4768,12 +4768,12 @@ export default function Piilosana(){
         const MEDALS=["🥇","🥈","🥉"];
         const publicMissed=valid.size>0?[...valid].filter(w=>!publicAllFound.includes(w)).sort((a,b)=>b.length-a.length):[];
         const publicFoundSorted=[...publicAllFound].sort((a,b)=>b.length-a.length);
-        const secStyle={border:`2px solid ${S.border}`,padding:"12px",background:S.dark,marginBottom:"10px",textAlign:"left"};
+        const secStyle={border:`1px solid ${S.border}`,padding:"14px",background:`${S.dark}ee`,marginBottom:"12px",textAlign:"left",borderRadius:"12px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"};
         const secTitle={fontSize:"14px",fontWeight:"bold",marginBottom:"8px",letterSpacing:"0.5px"};
         return(
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease"}}>
           {/* Your score */}
-          <div style={{border:`3px solid ${S.green}`,padding:"20px",marginBottom:"12px",boxShadow:`0 0 30px ${S.green}33`,background:S.dark}}>
+          <div style={{border:`1px solid ${S.green}44`,padding:"24px",marginBottom:"16px",boxShadow:`0 4px 24px ${S.green}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
             <div style={{fontSize:"13px",color:S.green,marginBottom:"4px",letterSpacing:"1px"}}>{t.roundOver}</div>
             <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",marginTop:"8px",animation:"pop 0.3s ease"}}>{score}<span style={{fontSize:"14px",color:S.textSoft,marginLeft:"4px"}}>/ {[...valid].reduce((s,w)=>s+pts(w.length),0)}p</span></div>
             <div style={{fontSize:"13px",color:S.textSoft,marginTop:"6px"}}>{found.length} / {valid.size} {t.words} ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>
@@ -4795,7 +4795,7 @@ export default function Piilosana(){
                   <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 8px",
                     background:i<3?["#ffcc0015","#cccccc10","#cc884410"][i]:"transparent",
                     border:i<3?`1px solid ${["#ffcc0033","#cccccc33","#cc884433"][i]}`:"1px solid transparent",
-                    borderRadius:"3px"}}>
+                    borderRadius:"8px"}}>
                     <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
                       <span style={{fontSize:"16px",minWidth:"24px"}}>{i<3?MEDALS[i]:<span style={{fontSize:"13px",color:S.textMuted}}>{i+1}.</span>}</span>
                       <span style={{fontSize:"14px",color:r.nickname===soloNickname?S.green:i===0?S.green:i<3?"#cccccc":S.textSoft,fontWeight:r.nickname===soloNickname||i<3?"bold":"normal"}}>{r.nickname}</span>
@@ -5385,17 +5385,17 @@ export default function Piilosana(){
       {mode==="solo"&&state==="end"&&(
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease",position:"relative"}}>
           {confettiOn&&<ConfettiCelebration isWinner={true}/>}
-          <div style={{position:"relative",zIndex:1,border:`3px solid ${ending?.color||S.yellow}`,padding:"20px",marginBottom:"12px",boxShadow:`0 0 30px ${ending?.color||S.yellow}33`,background:S.dark}}>
+          <div style={{position:"relative",zIndex:1,border:`1px solid ${ending?.color||S.yellow}44`,padding:"24px",marginBottom:"16px",boxShadow:`0 4px 24px ${ending?.color||S.yellow}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
             <div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.score}</div>
-            <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",animation:"pop 0.3s ease"}}>{score}{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted}}> / {totalPossible}</span>:null}</div>
+            <div style={{fontSize:"36px",color:S.green,marginBottom:"4px",animation:"pop 0.3s ease",fontWeight:"700",letterSpacing:"2px"}}>{score}<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}>p</span>{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}> / {totalPossible}p</span>:null}</div>
             {(soloMode!=="normal"||gameTime===0)?<div style={{fontSize:"13px",color:S.textMuted,marginTop:"6px"}}>{found.length} {t.words}</div>:<>
             <div style={{fontSize:"13px",color:S.textSoft,marginTop:"6px"}}>{found.length} / {valid.size} {t.words} ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>
             </>}
 
             {/* Hall of Fame submit */}
             {gameTime!==0&&score>0&&!hofSubmitted&&(
-              <div style={{marginTop:"12px",padding:"10px",border:`1px solid ${S.yellow}44`,background:"#ffcc0008"}}>
+              <div style={{marginTop:"16px",padding:"14px",border:`1px solid ${S.yellow}33`,background:`${S.yellow}08`,borderRadius:"12px"}}>
                 {soloNickname.trim()?(
                   <button onClick={async()=>{
                     await submitToHallOfFame({nickname:soloNickname.trim(),score,wordsFound:found.length,
@@ -5433,21 +5433,21 @@ export default function Piilosana(){
               const text=t.shareText.replace("{words}",found.length).replace("{score}",score)+"\nhttps://piilosana.up.railway.app";
               if(navigator.share){try{await navigator.share({text});return;}catch{}}
               try{await navigator.clipboard.writeText(text);addPopup(t.shareCopied,S.green);}catch{}
-            }} style={{fontFamily:S.font,fontSize:"13px",color:"#44ddff",border:"2px solid #44ddff",background:"transparent",
-              padding:"8px 16px",cursor:"pointer",marginTop:"10px",width:"280px"}}>
+            }} style={{fontFamily:S.font,fontSize:"13px",color:"#44ddff",border:`1px solid #44ddff66`,background:"#44ddff08",
+              padding:"10px 16px",cursor:"pointer",marginTop:"12px",width:"280px",borderRadius:"10px",transition:"all 0.15s"}}>
               {t.share}
             </button>
 
             <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center",marginTop:"10px"}}>
-              <button onClick={()=>{setHofSubmitted(false);start();}} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.green,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #008844",width:"280px"}}>{t.newPractice}</button>
-              <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"10px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"280px"}}>{t.customGame}</button>
-              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",width:"280px"}}>{t.menu}</button>
+              <button onClick={()=>{setHofSubmitted(false);start();}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.green}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.newPractice}</button>
+              <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.yellow,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.yellow}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.customGame}</button>
+              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`1px solid ${S.green}44`,background:"transparent",padding:"10px 20px",cursor:"pointer",width:"280px",borderRadius:"10px",transition:"all 0.15s"}}>{t.menu}</button>
             </div>
           </div>
 
           {found.length>0&&(
-            <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"10px",textAlign:"left",animation:"fadeIn 0.8s ease"}}>
-              <div style={{fontSize:"18px",color:S.green,marginBottom:"6px"}}>{t.foundOf} ({found.length})</div>
+            <div style={{padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,marginBottom:"12px",textAlign:"left",animation:"fadeIn 0.8s ease",borderRadius:"12px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
+              <div style={{fontSize:"14px",color:S.green,marginBottom:"8px",fontWeight:"600",letterSpacing:"0.5px"}}>{t.foundOf} ({found.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {[...found].sort((a,b)=>b.length-a.length).map((w,i)=>(
                   <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"18px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
@@ -5457,8 +5457,8 @@ export default function Piilosana(){
           )}
 
           {soloMode==="normal"&&gameTime!==0&&missed.length>0&&(
-            <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
-              <div style={{fontSize:"13px",color:"#ff6666",marginBottom:"6px"}}>{t.missed} ({missed.length})</div>
+            <div style={{padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease",borderRadius:"12px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
+              <div style={{fontSize:"14px",color:"#ff6666",marginBottom:"8px",fontWeight:"600",letterSpacing:"0.5px"}}>{t.missed} ({missed.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {missed.map((w,i)=>(
                   <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
