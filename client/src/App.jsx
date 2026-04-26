@@ -178,7 +178,7 @@ const T={
     arenaJoinDesc:"Jatkuva peli kaikille! Liity mukaan ja etsi sanoja. Kierros kestää 2 min.",
     nextRound:"Seuraava kierros alkaa",playersInArena:"pelaajaa moninpelissä",playerInArena:"pelaaja moninpelissä",players:"pelaajaa",player:"pelaaja",
     getReady:"VALMISTAUDU",roundOver:"KIERROS PÄÄTTYI",yourScore:"PISTEESI",nextRoundIn:"Seuraava kierros",starts:"alkaa!",
-    roundResults:"KIERROKSEN TULOKSET",foundWords:"LÖYDETYT SANAT",ownHighlighted:"Omat sanasi korostettu väreillä",
+    roundResults:"KIERROKSEN TULOKSET",foundWords:"LÖYDETYT SANAT",ownHighlighted:"Omat sanasi korostettu väreillä",defHint:"Klikkaa 3-kirjaimista sanaa nähdäksesi selitteen",
     missed:"JÄIVÄT LÖYTÄMÄTTÄ",
     gameMode:"PELIMUOTO",classic:"KLASSINEN",battle:"TAISTELU",battleDesc:"Sanat näkyvät muille! Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä.",
     time:"AIKA",unlimited:"RAJATON",unlimitedDesc:"Ei aikarajaa! Vaihda ruudukko kun haluat.",
@@ -237,7 +237,7 @@ const T={
     arenaJoinDesc:"Continuous game for everyone! Join in and find words. Round lasts 2 min.",
     nextRound:"Next round starts",playersInArena:"playing",playerInArena:"playing",players:"players",player:"player",
     getReady:"GET READY",roundOver:"ROUND OVER",yourScore:"YOUR SCORE",nextRoundIn:"Next round",starts:"starting!",
-    roundResults:"ROUND RESULTS",foundWords:"FOUND WORDS",ownHighlighted:"Your words highlighted in color",
+    roundResults:"ROUND RESULTS",foundWords:"FOUND WORDS",ownHighlighted:"Your words highlighted in color",defHint:"Tap a 3-letter word to see its definition",
     missed:"NOT FOUND",
     gameMode:"GAME MODE",classic:"CLASSIC",battle:"BATTLE",battleDesc:"Words visible to others! Found letters disappear and new ones drop from above.",
     time:"TIME",unlimited:"UNLIMITED",unlimitedDesc:"No time limit! Change grid whenever you want.",
@@ -296,7 +296,7 @@ const T={
     arenaJoinDesc:"Löpande spel för alla! Gå med och hitta ord. Rundan varar 2 min.",
     nextRound:"Nästa runda börjar",playersInArena:"spelar",playerInArena:"spelar",players:"spelare",player:"spelare",
     getReady:"GÖR DIG REDO",roundOver:"RUNDAN SLUT",yourScore:"DINA POÄNG",nextRoundIn:"Nästa runda",starts:"börjar!",
-    roundResults:"RUNDANS RESULTAT",foundWords:"HITTADE ORD",ownHighlighted:"Dina ord markerade i färg",
+    roundResults:"RUNDANS RESULTAT",foundWords:"HITTADE ORD",ownHighlighted:"Dina ord markerade i färg",defHint:"Tryck på ett 3-bokstavsord för att se definitionen",
     missed:"INTE HITTADE",
     gameMode:"SPELLÄGE",classic:"KLASSISKT",battle:"STRID",battleDesc:"Ord syns för andra! Hittade bokstäver försvinner och nya faller uppifrån.",
     time:"TID",unlimited:"OBEGRÄNSAD",unlimitedDesc:"Ingen tidsgräns! Byt rutnät när du vill.",
@@ -4401,15 +4401,16 @@ export default function Piilosana(){
         const MEDALS=["🥇","🥈","🥉"];
         const publicMissed=valid.size>0?[...valid].filter(w=>!publicAllFound.includes(w)).sort((a,b)=>b.length-a.length):[];
         const publicFoundSorted=[...publicAllFound].sort((a,b)=>b.length-a.length);
+        const secStyle={border:`2px solid ${S.border}`,padding:"12px",background:S.dark,marginBottom:"10px",textAlign:"left"};
+        const secTitle={fontSize:"14px",fontWeight:"bold",marginBottom:"8px",letterSpacing:"0.5px"};
         return(
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease"}}>
           {/* Your score */}
-          <div style={{border:"3px solid #ff6644",padding:"20px",marginBottom:"12px",boxShadow:"0 0 30px #ff664433",background:S.dark}}>
-            <div style={{fontSize:"13px",color:"#ff6644",marginBottom:"4px"}}>{t.roundOver}</div>
-            <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.yourScore}</div>
-            <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",animation:"pop 0.3s ease"}}>{score}</div>
+          <div style={{border:`3px solid ${S.green}`,padding:"20px",marginBottom:"12px",boxShadow:`0 0 30px ${S.green}33`,background:S.dark}}>
+            <div style={{fontSize:"13px",color:S.green,marginBottom:"4px",letterSpacing:"1px"}}>{t.roundOver}</div>
+            <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",marginTop:"8px",animation:"pop 0.3s ease"}}>{score}<span style={{fontSize:"14px",color:S.textSoft,marginLeft:"4px"}}>/ {[...valid].reduce((s,w)=>s+pts(w.length),0)}p</span></div>
             <div style={{fontSize:"13px",color:S.textSoft,marginTop:"6px"}}>{found.length} / {valid.size} {t.words} ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>
-            <div style={{fontSize:"13px",color:publicNextCountdown<=10?S.yellow:S.textSoft,marginTop:"12px"}}>
+            <div style={{fontSize:"13px",color:publicNextCountdown<=10?"#ffaa33":S.textSoft,marginTop:"12px",fontWeight:publicNextCountdown<=10?"bold":"normal"}}>
               {t.nextRoundIn}: {publicNextCountdown>0?`${publicNextCountdown}s`:t.starts}
             </div>
             <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer",marginTop:"10px"}}>{t.exit}</button>
@@ -4417,20 +4418,20 @@ export default function Piilosana(){
 
           {/* Rankings with medals */}
           {publicRankings&&publicRankings.length>0&&(
-            <div style={{border:`2px solid ${S.border}`,padding:"8px",background:S.dark,marginBottom:"10px",animation:"fadeIn 0.8s ease"}}>
-              <div style={{fontSize:"13px",color:S.yellow,marginBottom:"8px"}}>{t.roundResults}</div>
-              <div style={{display:"flex",flexDirection:"column",gap:"2px",textAlign:"left"}}>
+            <div style={{...secStyle,animation:"fadeIn 0.8s ease"}}>
+              <div style={{...secTitle,color:S.textSoft}}>{t.roundResults}</div>
+              <div style={{display:"flex",flexDirection:"column",gap:"2px"}}>
                 {publicRankings.slice(0,10).map((r,i)=>(
-                  <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 8px",
+                  <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 8px",
                     background:i<3?["#ffcc0015","#cccccc10","#cc884410"][i]:"transparent",
                     border:i<3?`1px solid ${["#ffcc0033","#cccccc33","#cc884433"][i]}`:"1px solid transparent",
-                    borderRadius:"2px"}}>
+                    borderRadius:"3px"}}>
                     <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
                       <span style={{fontSize:"16px",minWidth:"24px"}}>{i<3?MEDALS[i]:<span style={{fontSize:"13px",color:S.textMuted}}>{i+1}.</span>}</span>
-                      <span style={{fontSize:"13px",color:r.nickname===soloNickname?S.green:i===0?S.yellow:i<3?"#cccccc":"#aaa",fontWeight:r.nickname===soloNickname?"bold":"normal"}}>{r.nickname}</span>
+                      <span style={{fontSize:"14px",color:r.nickname===soloNickname?S.green:i===0?"#ffd700":i<3?"#cccccc":S.textSoft,fontWeight:r.nickname===soloNickname||i<3?"bold":"normal"}}>{r.nickname}</span>
                     </div>
                     <div style={{display:"flex",gap:"12px",alignItems:"center"}}>
-                      <span style={{fontSize:"13px",color:S.yellow}}>{r.score}p</span>
+                      <span style={{fontSize:"14px",color:"#ffd700",fontWeight:"bold"}}>{r.score}p</span>
                       <span style={{fontSize:"13px",color:S.textSoft}}>{r.percentage}%</span>
                       <span style={{fontSize:"13px",color:S.textMuted}}>{r.wordsFound} {t.words}</span>
                     </div>
@@ -4442,26 +4443,26 @@ export default function Piilosana(){
 
           {/* All found words (collective) */}
           {publicFoundSorted.length>0&&(
-            <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"10px",textAlign:"left",animation:"fadeIn 0.8s ease"}}>
-              <div style={{fontSize:"16px",color:S.green,marginBottom:"6px"}}>{t.foundWords} ({publicFoundSorted.length})</div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
+            <div style={{...secStyle,animation:"fadeIn 0.8s ease"}}>
+              <div style={{...secTitle,color:S.green}}>{t.foundWords} ({publicFoundSorted.length})</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
                 {publicFoundSorted.map((w,i)=>(
-                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"16px",background:found.includes(w)?S.dark:S.gridBg,padding:"2px 4px",
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:found.includes(w)?S.dark:S.gridBg,padding:"2px 5px",
                     border:`1px solid ${found.includes(w)?wordColor(w.length)+"44":"#33333366"}`,
                     color:found.includes(w)?wordColor(w.length):"#667",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
-              <div style={{fontSize:"13px",color:S.textMuted,marginTop:"4px"}}>{t.ownHighlighted}</div>
+              <div style={{fontSize:"12px",color:S.textMuted,marginTop:"6px"}}>{t.ownHighlighted}{DEFS?" · "+t.defHint:""}</div>
             </div>
           )}
 
           {/* Missed words */}
           {publicMissed.length>0&&(
-            <div style={{padding:"8px",border:`2px solid ${S.border}`,background:S.dark,marginBottom:"10px",textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
-              <div style={{fontSize:"13px",color:"#ff6666",marginBottom:"6px"}}>{t.missed} ({publicMissed.length})</div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
+            <div style={{...secStyle,maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
+              <div style={{...secTitle,color:"#ff8877"}}>{t.missed} ({publicMissed.length})</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
                 {publicMissed.map((w,i)=>(
-                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 5px",border:"1px solid #ff444444",color:"#ff8877",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
             </div>
