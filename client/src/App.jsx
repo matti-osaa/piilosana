@@ -240,7 +240,7 @@ const T={
     helpDefs:"Klikkaa lyhyitä sanoja tulosnäkymässä nähdäksesi niiden merkityksen. Selitteet löytyvät 3-kirjaimisille sanoille.",
     tutorialBtn:"PIKAOHJE",
     exitConfirm:"Poistu pelistä?",exitYes:"POISTU",exitNo:"JATKA",
-    menuSound:"ÄÄNET",menuMusic:"MUSIIKKI",menuTheme:"TEEMA",menuShare:"JAA",menuExit:"POISTU",on:"PÄÄLLÄ",off:"POIS",
+    menuSound:"ÄÄNET",menuMusic:"MUSIIKKI",menuTheme:"TEEMA",menuShare:"KUTSU",menuExit:"POISTU",on:"PÄÄLLÄ",off:"POIS",
     menuExitGame:"POISTU PELISTÄ",menuClose:"SULJE VALIKKO",menuMuteEmoji:"VAIMENNA ELEET",
   },
   en:{
@@ -303,7 +303,7 @@ const T={
     helpDefs:"Tap short words in the results screen to see their meaning. Definitions are available for 3-letter words.",
     tutorialBtn:"QUICK GUIDE",
     exitConfirm:"Quit the game?",exitYes:"QUIT",exitNo:"CONTINUE",
-    menuSound:"SOUNDS",menuMusic:"MUSIC",menuTheme:"THEME",menuShare:"SHARE",menuExit:"EXIT",on:"ON",off:"OFF",
+    menuSound:"SOUNDS",menuMusic:"MUSIC",menuTheme:"THEME",menuShare:"INVITE",menuExit:"EXIT",on:"ON",off:"OFF",
     menuExitGame:"EXIT GAME",menuClose:"CLOSE MENU",menuMuteEmoji:"MUTE GESTURES",
   },
   sv:{
@@ -366,7 +366,7 @@ const T={
     helpDefs:"Tryck på korta ord i resultatvyn för att se deras betydelse. Definitioner finns för 3-bokstavsord.",
     tutorialBtn:"SNABBGUIDE",
     exitConfirm:"Avsluta spelet?",exitYes:"AVSLUTA",exitNo:"FORTSÄTT",
-    menuSound:"LJUD",menuMusic:"MUSIK",menuTheme:"TEMA",menuShare:"DELA",menuExit:"AVSLUTA",on:"PÅ",off:"AV",
+    menuSound:"LJUD",menuMusic:"MUSIK",menuTheme:"TEMA",menuShare:"BJUD IN",menuExit:"AVSLUTA",on:"PÅ",off:"AV",
     menuExitGame:"AVSLUTA SPELET",menuClose:"STÄNG MENYN",menuMuteEmoji:"TYSTA GESTER",
   },
 };
@@ -3844,15 +3844,12 @@ export default function Piilosana(){
         {/* Flag language bubble — moved near bottom flags */}
         {/* Action buttons row */}
         <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap",marginBottom:"12px"}}>
-          <button onClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} style={{fontFamily:S.font,fontSize:"13px",color:S.textSoft,
-            background:"transparent",border:`2px solid ${S.border}`,padding:"2px",cursor:"pointer",
-            display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s",minHeight:"36px",minWidth:"36px",borderRadius:S.btnRadius}}>
-            <Icon icon="gear" color={S.textSoft} size={S.cellGradient?3.5:2.5}/>
-          </button>
-          <button onClick={()=>{const next=!musicOn;setMusicOn(next);localStorage.setItem("piilosana_music",next?"on":"off");if(!next&&music)music.stop();}} style={{fontFamily:S.font,fontSize:"13px",color:musicOn?S.green:S.textMuted,
-            background:"transparent",border:`2px solid ${musicOn?S.green+"44":S.border}`,padding:"2px",cursor:"pointer",
-            display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.2s",minHeight:"36px",minWidth:"36px",borderRadius:S.btnRadius}}>
-            <Icon icon={musicOn?"musicOn":"musicOff"} color={musicOn?S.green:S.textMuted} size={S.cellGradient?3.5:2.5}/>
+          <button onClick={()=>setShowHamburger(true)} style={{fontFamily:S.font,fontSize:"20px",color:S.textSoft,
+            background:"transparent",border:`1px solid ${S.border}`,padding:"4px 10px",cursor:"pointer",
+            display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.15s",minHeight:"36px",minWidth:"36px",borderRadius:"10px",lineHeight:1}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;e.currentTarget.style.background=S.green+"15";}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=S.border;e.currentTarget.style.color=S.textSoft;e.currentTarget.style.background="transparent";}}>
+            &#9776;
           </button>
           <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,
             background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
@@ -4202,7 +4199,7 @@ export default function Piilosana(){
       {wordPopups.map(p=><WordPopup key={p.id}{...p} font={S.font}/>)}
 
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
-        <TitleDemo active={true} lang={lang} onGearClick={()=>{setShowSettings(v=>!v);setSettingsBubble(false);}} showBubble={mode!==null&&settingsBubble} bubbleFading={bubbleFading} hideGear={mode===null} theme={S}/>
+        <TitleDemo active={true} lang={lang} onGearClick={()=>setShowHamburger(true)} showBubble={mode!==null&&settingsBubble} bubbleFading={bubbleFading} hideGear={mode===null} theme={S}/>
       ):(
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%",maxWidth:"600px",margin:"6px 0",position:"relative"}}>
           {(state==="play"||state==="ending"||state==="scramble")&&gameTime!==0&&(
@@ -4299,108 +4296,6 @@ export default function Piilosana(){
         </div>
       )}
 
-      {/* Settings panel - overlay below title */}
-      {showSettings&&(
-        <div style={{width:"100%",maxWidth:"500px",padding:"18px",border:`2px solid ${S.green}`,background:S.dark,
-          boxShadow:S.panelShadow!=="none"?S.panelShadow:`0 0 20px ${S.green}33`,borderRadius:S.panelRadius,animation:"fadeIn 0.3s ease",marginBottom:"8px",zIndex:100,position:"relative"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px",borderBottom:`1px solid ${S.border}`,paddingBottom:"10px"}}>
-            <div style={{fontFamily:S.font,fontSize:"16px",fontWeight:"700",color:S.yellow,letterSpacing:"1px"}}>
-              {lang==="en"?"SETTINGS":lang==="sv"?"INSTÄLLNINGAR":"ASETUKSET"}
-            </div>
-            <button onClick={()=>setShowSettings(false)} style={{fontFamily:S.font,fontSize:"14px",color:S.green,background:"transparent",border:`1px solid ${S.green}`,padding:"4px 12px",cursor:"pointer",borderRadius:S.btnRadius}}>✕</button>
-          </div>
-          {/* Theme */}
-          <div style={{marginBottom:"14px"}}>
-            <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
-              {lang==="en"?"Color Theme":lang==="sv"?"Färgtema":"Väriteema"}
-            </div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
-              {Object.entries(THEMES).map(([id,th])=>(
-                <button key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);syncSettings({theme:id});}}
-                  style={{fontFamily:S.font,fontSize:"13px",
-                    color:themeId===id?th.bg:th.green,
-                    background:themeId===id?th.green:"transparent",
-                    border:`2px solid ${th.green}`,padding:"5px 8px",cursor:"pointer",
-                    boxShadow:themeId===id?`0 0 8px ${th.green}66`:"none",
-                    borderRadius:S.btnRadius}}>
-                  {lang==="en"?th.nameEn:lang==="sv"?th.nameSv:th.name}
-                </button>
-              ))}
-            </div>
-          </div>
-          {/* Size */}
-          <div style={{marginBottom:"14px"}}>
-            <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
-              {lang==="en"?"Grid Size":lang==="sv"?"Rutstorlek":"Ruudukon koko"}
-            </div>
-            <div style={{display:"flex",gap:"4px"}}>
-              <button onClick={()=>{setUiSize("normal");localStorage.setItem("piilosana_size","normal");syncSettings({size:"normal"});}}
-                style={{fontFamily:S.font,fontSize:"13px",
-                  color:uiSize==="normal"?S.bg:S.green,background:uiSize==="normal"?S.green:"transparent",
-                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
-                {lang==="en"?"NORMAL":lang==="sv"?"NORMAL":"NORMAALI"}
-              </button>
-              <button onClick={()=>{setUiSize("large");localStorage.setItem("piilosana_size","large");syncSettings({size:"large"});}}
-                style={{fontFamily:S.font,fontSize:"13px",
-                  color:uiSize==="large"?S.bg:S.green,background:uiSize==="large"?S.green:"transparent",
-                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
-                {lang==="en"?"LARGE":lang==="sv"?"STOR":"ISO"}
-              </button>
-            </div>
-          </div>
-          {/* Sound */}
-          <div style={{marginBottom:"14px"}}>
-            <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
-              {lang==="en"?"Sound Effects":lang==="sv"?"Ljudeffekter":"Ääniefektit"}
-            </div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
-              {[["modern",{fi:"PÄÄLLÄ",en:"ON",sv:"PÅ"}],["off",{fi:"POIS",en:"OFF",sv:"AV"}]].map(([id,names])=>(
-                <button key={id} onClick={()=>{setSoundTheme(id);localStorage.setItem("piilosana_sound",id);syncSettings({sound:id});}}
-                  style={{fontFamily:S.font,fontSize:"13px",
-                    color:soundTheme===id?S.bg:S.green,background:soundTheme===id?S.green:"transparent",
-                    border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer",
-                    boxShadow:soundTheme===id?`0 0 8px ${S.green}66`:"none"}}>
-                  {names[lang]||names.en}
-                </button>
-              ))}
-            </div>
-          </div>
-          {/* Background Music */}
-          <div style={{marginBottom:"14px"}}>
-            <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
-              {lang==="en"?"Background Music":lang==="sv"?"Bakgrundsmusik":"Taustamusiikki"}
-            </div>
-            <div style={{display:"flex",gap:"4px"}}>
-              <button onClick={()=>{setMusicOn(true);localStorage.setItem("piilosana_music","on");}}
-                style={{fontFamily:S.font,fontSize:"13px",
-                  color:musicOn?S.bg:S.green,background:musicOn?S.green:"transparent",
-                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer",
-                  boxShadow:musicOn?`0 0 8px ${S.green}66`:"none"}}>
-                {lang==="en"?"ON":lang==="sv"?"PÅ":"PÄÄLLÄ"}
-              </button>
-              <button onClick={()=>{setMusicOn(false);localStorage.setItem("piilosana_music","off");music.stop();}}
-                style={{fontFamily:S.font,fontSize:"13px",
-                  color:!musicOn?S.bg:S.green,background:!musicOn?S.green:"transparent",
-                  border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer",
-                  boxShadow:!musicOn?`0 0 8px ${S.green}66`:"none"}}>
-                {lang==="en"?"OFF":lang==="sv"?"AV":"POIS"}
-              </button>
-            </div>
-          </div>
-          {/* Confetti */}
-          <div>
-            <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"600",color:S.textMuted,marginBottom:"8px",letterSpacing:"2px",textTransform:"uppercase"}}>
-              {lang==="en"?"Visual Effects":lang==="sv"?"Visuella effekter":"Visuaaliset tehosteet"}
-            </div>
-            <button onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");syncSettings({confetti:v});}}
-              style={{fontFamily:S.font,fontSize:"13px",
-                color:confettiOn?S.bg:S.green,background:confettiOn?S.green:"transparent",
-                border:`2px solid ${S.green}`,padding:"5px 8px",cursor:"pointer"}}>
-              {confettiOn?"✓ ":""}{lang==="en"?"CONFETTI ON WIN":lang==="sv"?"KONFETTI VID VINST":"KONFETTI VOITOSTA"}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* AUTH PANEL */}
       {showAuth&&(
@@ -4974,10 +4869,10 @@ export default function Piilosana(){
             </div>
           </div>
 
-          {/* Emoji picker dropdown - multiplayer only */}
+          {/* Emoji picker dropdown - multiplayer only — absolute so it doesn't push grid */}
           {(mode==="multi"||mode==="public")&&emojiOpen==="open"&&socket&&state==="play"&&(
-            <div style={{position:"relative",zIndex:50,animation:"fadeIn 0.15s ease"}}>
-              <div style={{background:`${S.dark}f0`,border:`1px solid ${S.border}`,borderRadius:"12px",padding:"8px",marginBottom:"4px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 4px 16px #00000033"}}>
+            <div style={{position:"absolute",top:"100%",left:0,right:0,zIndex:50,animation:"fadeIn 0.15s ease",pointerEvents:"none"}} onClick={()=>setEmojiOpen(false)}>
+              <div style={{background:`${S.dark}f0`,border:`1px solid ${S.border}`,borderRadius:"12px",padding:"8px",margin:"2px 0",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 4px 16px #00000033",pointerEvents:"auto"}} onClick={e=>e.stopPropagation()}>
                 <div style={{display:"grid",gridTemplateColumns:"repeat(8,1fr)",gap:"2px"}}>
                   {["😀","😎","🤔","😮","🔥","💪","🎯","👀","😭","🤣","😱","🥳","👏","❤️","💀","🫡"].map(em=>(
                     <button key={em} onClick={()=>{socket.emit("emoji_reaction",{emoji:em});setEmojiOpen(false);}}
@@ -4994,9 +4889,9 @@ export default function Piilosana(){
             </div>
           )}
 
-          {/* Emoji feed - shows reactions from other players briefly */}
+          {/* Emoji feed - shows reactions briefly — absolute so it doesn't push grid */}
           {(mode==="multi"||mode==="public")&&emojiFeed.length>0&&state==="play"&&(
-            <div style={{display:"flex",flexWrap:"wrap",gap:"4px",justifyContent:"center",marginBottom:"4px",animation:"fadeIn 0.2s ease"}}>
+            <div style={{position:"absolute",top:"100%",left:0,right:0,zIndex:40,display:"flex",flexWrap:"wrap",gap:"4px",justifyContent:"center",padding:"4px 0",pointerEvents:"none",animation:"fadeIn 0.2s ease"}}>
               {emojiFeed.map(e=>(
                 <span key={e.id} style={{
                   display:"inline-flex",alignItems:"center",gap:"4px",
@@ -5038,101 +4933,6 @@ export default function Piilosana(){
             </div>
           )}
 
-          {/* Hamburger menu overlay */}
-          {showHamburger&&(
-            <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"#00000088",zIndex:200,animation:"fadeIn 0.15s ease"}} onClick={()=>setShowHamburger(false)}>
-              <div style={{position:"absolute",top:0,left:0,bottom:0,width:"260px",background:`${S.dark}f8`,borderRight:`1px solid ${S.border}`,padding:"16px",display:"flex",flexDirection:"column",gap:"6px",animation:"slideInLeft 0.2s ease",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderRadius:"0 12px 12px 0",boxShadow:"4px 0 24px #00000044"}} onClick={e=>e.stopPropagation()}>
-                {/* Menu title */}
-                <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"6px",letterSpacing:"2px",display:"flex",alignItems:"center",gap:"6px"}}>
-                  <span style={{fontSize:"16px"}}>&#9776;</span> {t.options||"ASETUKSET"}
-                </div>
-                <div style={{height:"1px",background:S.border,marginBottom:"4px"}}/>
-
-                {/* Sound toggle */}
-                <div onClick={()=>{const next=soundTheme==="modern"?"off":"modern";setSoundTheme(next);localStorage.setItem("piilosana_sound",next);}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-                  onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-                  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                  <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
-                    <span style={{fontSize:"16px"}}>{soundTheme==="modern"?"🔊":"🔇"}</span> {t.menuSound||"SOUNDS"}
-                  </span>
-                  <span style={{fontSize:"11px",fontFamily:S.font,color:soundTheme==="modern"?S.green:S.textMuted,background:soundTheme==="modern"?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${soundTheme==="modern"?S.green+"44":S.textMuted+"44"}`}}>
-                    {soundTheme==="modern"?(t.on||"ON"):(t.off||"OFF")}
-                  </span>
-                </div>
-
-                {/* Music toggle */}
-                <div onClick={()=>{const next=!musicOn;setMusicOn(next);localStorage.setItem("piilosana_music",next?"on":"off");if(!next&&music)music.stop();}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-                  onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-                  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                  <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
-                    <Icon icon={musicOn?"musicOn":"musicOff"} color={musicOn?S.green:S.textMuted} size={2}/> {t.menuMusic||"MUSIC"}
-                  </span>
-                  <span style={{fontSize:"11px",fontFamily:S.font,color:musicOn?S.green:S.textMuted,background:musicOn?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${musicOn?S.green+"44":S.textMuted+"44"}`}}>
-                    {musicOn?(t.on||"ON"):(t.off||"OFF")}
-                  </span>
-                </div>
-
-                {/* Theme picker */}
-                <div style={{padding:"8px"}}>
-                  <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"8px",letterSpacing:"1px"}}>{t.menuTheme||"THEME"}</div>
-                  <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
-                    {Object.entries(THEMES).map(([id,th])=>(
-                      <div key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);if(typeof syncSettings==="function")syncSettings({theme:id});}}
-                        style={{width:"28px",height:"28px",borderRadius:"50%",background:th.bg,border:themeId===id?`3px solid ${S.green}`:`2px solid ${th.border||"#555"}`,cursor:"pointer",transition:"all 0.15s",boxShadow:themeId===id?`0 0 8px ${S.green}66`:"0 1px 4px #00000033",display:"flex",alignItems:"center",justifyContent:"center"}}
-                        title={lang==="en"?(th.nameEn||th.name):lang==="sv"?(th.nameSv||th.name):th.name}>
-                        <div style={{width:"14px",height:"14px",borderRadius:"50%",background:th.green||th.cell}}/>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{height:"1px",background:S.border,margin:"4px 0"}}/>
-
-                {/* Share (multi/public only) */}
-                {(mode==="multi"||mode==="public")&&(
-                  <div onClick={()=>{setShowHamburger(false);setShowSharePopup(true);}} style={{display:"flex",alignItems:"center",gap:"8px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-                    onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-                    onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                    <Icon icon="share" color={S.green} size={2}/>
-                    <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font}}>{t.menuShare||"SHARE"}</span>
-                  </div>
-                )}
-
-                {/* Emoji mute toggle (multiplayer only) */}
-                {(mode==="multi"||mode==="public")&&(
-                <div onClick={()=>{const next=!muteEmojis;setMuteEmojis(next);localStorage.setItem("piilosana_mute_emoji",next?"on":"off");}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-                  onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-                  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                  <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
-                    <span style={{fontSize:"16px"}}>💬</span> {t.menuMuteEmoji||"MUTE GESTURES"}
-                  </span>
-                  <span style={{fontSize:"11px",fontFamily:S.font,color:!muteEmojis?S.green:S.textMuted,background:!muteEmojis?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${!muteEmojis?S.green+"44":S.textMuted+"44"}`}}>
-                    {!muteEmojis?(t.on||"ON"):(t.off||"OFF")}
-                  </span>
-                </div>
-                )}
-
-                <div style={{height:"1px",background:S.border,margin:"4px 0"}}/>
-
-                {/* Exit game */}
-                <div onClick={()=>{setShowHamburger(false);if(mode==="solo"){setShowExitConfirm(true);}else{returnToModeSelect();}}} style={{display:"flex",alignItems:"center",gap:"8px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-                  onMouseEnter={e=>{e.currentTarget.style.background=S.red+"22";}}
-                  onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.red} strokeWidth="2" strokeLinecap="round"/></svg>
-                  <span style={{fontSize:"13px",color:S.red,fontFamily:S.font}}>{t.menuExitGame||"EXIT GAME"}</span>
-                </div>
-
-                <div style={{flex:1}}/>
-
-                {/* Close menu */}
-                <div onClick={()=>setShowHamburger(false)} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent",borderTop:`1px solid ${S.border}`,marginTop:"auto"}}
-                  onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-                  onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                  <span style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font}}>{t.menuClose||"CLOSE MENU"}</span>
-                </div>
-              </div>
-            </div>
-          )}
 
           {gameTime!==0&&(
           <div style={{height:"3px",background:S.dark,marginBottom:isHexMode?"1px":"6px",border:`1px solid ${S.border}`}}>
@@ -5475,6 +5275,146 @@ export default function Piilosana(){
       {/* Ad banner placeholder */}
       <div style={{width:"100%",maxWidth:"600px",minHeight:"60px",marginTop:"16px",flexShrink:0}}/>
 
+
+      {/* Universal hamburger menu overlay */}
+      {showHamburger&&(
+        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"#00000088",zIndex:200,animation:"fadeIn 0.15s ease"}} onClick={()=>setShowHamburger(false)}>
+          <div style={{position:"absolute",top:0,left:0,bottom:0,width:"260px",background:`${S.dark}f8`,borderRight:`1px solid ${S.border}`,padding:"16px",display:"flex",flexDirection:"column",gap:"6px",animation:"slideInLeft 0.2s ease",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderRadius:"0 12px 12px 0",boxShadow:"4px 0 24px #00000044"}} onClick={e=>e.stopPropagation()}>
+            {/* Menu title */}
+            <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"6px",letterSpacing:"2px",display:"flex",alignItems:"center",gap:"6px"}}>
+              <span style={{fontSize:"16px"}}>&#9776;</span> {t.options||"ASETUKSET"}
+            </div>
+            <div style={{height:"1px",background:S.border,marginBottom:"4px"}}/>
+
+            {/* Sound toggle */}
+            <div onClick={()=>{const next=soundTheme==="modern"?"off":"modern";setSoundTheme(next);localStorage.setItem("piilosana_sound",next);}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+              onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
+                <span style={{fontSize:"16px"}}>{soundTheme==="modern"?"🔊":"🔇"}</span> {t.menuSound||"SOUNDS"}
+              </span>
+              <span style={{fontSize:"11px",fontFamily:S.font,color:soundTheme==="modern"?S.green:S.textMuted,background:soundTheme==="modern"?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${soundTheme==="modern"?S.green+"44":S.textMuted+"44"}`}}>
+                {soundTheme==="modern"?(t.on||"ON"):(t.off||"OFF")}
+              </span>
+            </div>
+
+            {/* Music toggle */}
+            <div onClick={()=>{const next=!musicOn;setMusicOn(next);localStorage.setItem("piilosana_music",next?"on":"off");if(!next&&music)music.stop();}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+              onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
+                <Icon icon={musicOn?"musicOn":"musicOff"} color={musicOn?S.green:S.textMuted} size={2}/> {t.menuMusic||"MUSIC"}
+              </span>
+              <span style={{fontSize:"11px",fontFamily:S.font,color:musicOn?S.green:S.textMuted,background:musicOn?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${musicOn?S.green+"44":S.textMuted+"44"}`}}>
+                {musicOn?(t.on||"ON"):(t.off||"OFF")}
+              </span>
+            </div>
+
+            {/* Theme picker */}
+            <div style={{padding:"8px"}}>
+              <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"8px",letterSpacing:"1px"}}>{t.menuTheme||"THEME"}</div>
+              <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
+                {Object.entries(THEMES).map(([id,th])=>(
+                  <div key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);if(typeof syncSettings==="function")syncSettings({theme:id});}}
+                    style={{width:"28px",height:"28px",borderRadius:"50%",background:th.bg,border:themeId===id?`3px solid ${S.green}`:`2px solid ${th.border||"#555"}`,cursor:"pointer",transition:"all 0.15s",boxShadow:themeId===id?`0 0 8px ${S.green}66`:"0 1px 4px #00000033",display:"flex",alignItems:"center",justifyContent:"center"}}
+                    title={lang==="en"?(th.nameEn||th.name):lang==="sv"?(th.nameSv||th.name):th.name}>
+                    <div style={{width:"14px",height:"14px",borderRadius:"50%",background:th.green||th.cell}}/>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Grid size */}
+            <div style={{padding:"8px"}}>
+              <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"6px",letterSpacing:"1px"}}>{lang==="en"?"SIZE":lang==="sv"?"STORLEK":"KOKO"}</div>
+              <div style={{display:"flex",gap:"6px"}}>
+                {[["normal",{fi:"NORMAALI",en:"NORMAL",sv:"NORMAL"}],["large",{fi:"ISO",en:"LARGE",sv:"STOR"}]].map(([id,names])=>(
+                  <button key={id} onClick={()=>{setUiSize(id);localStorage.setItem("piilosana_size",id);if(typeof syncSettings==="function")syncSettings({size:id});}}
+                    style={{fontFamily:S.font,fontSize:"11px",color:uiSize===id?S.bg:S.textMuted,background:uiSize===id?S.green:"transparent",
+                      border:`1px solid ${uiSize===id?S.green:S.textMuted+"44"}`,padding:"4px 10px",cursor:"pointer",borderRadius:"8px",transition:"all 0.15s"}}>
+                    {names[lang]||names.en}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Confetti toggle */}
+            <div onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");if(typeof syncSettings==="function")syncSettings({confetti:v});}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+              onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
+                <span style={{fontSize:"16px"}}>🎊</span> {lang==="en"?"CONFETTI":lang==="sv"?"KONFETTI":"KONFETTI"}
+              </span>
+              <span style={{fontSize:"11px",fontFamily:S.font,color:confettiOn?S.green:S.textMuted,background:confettiOn?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${confettiOn?S.green+"44":S.textMuted+"44"}`}}>
+                {confettiOn?(t.on||"ON"):(t.off||"OFF")}
+              </span>
+            </div>
+
+            {/* Language */}
+            <div style={{padding:"8px"}}>
+              <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"6px",letterSpacing:"1px"}}>{lang==="en"?"LANGUAGE":lang==="sv"?"SPRÅK":"KIELI"}</div>
+              <div style={{display:"flex",gap:"6px"}}>
+                {Object.entries(LANG_CONFIG).map(([code,lc])=>(
+                  <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);if(typeof syncSettings==="function")syncSettings({lang:code});}}
+                    style={{fontFamily:S.font,fontSize:"11px",background:lang===code?S.green+"22":"transparent",
+                      border:`1px solid ${lang===code?S.green+"66":S.textMuted+"44"}`,
+                      padding:"4px 8px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
+                      borderRadius:"8px",transition:"all 0.15s",display:"flex",alignItems:"center",gap:"4px"}}>
+                    <PixelFlag lang={code} size={1.5}/> {code.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{height:"1px",background:S.border,margin:"4px 0"}}/>
+
+            {/* Share (multi/public only) */}
+            {(mode==="multi"||mode==="public")&&(
+              <div onClick={()=>{setShowHamburger(false);setShowSharePopup(true);}} style={{display:"flex",alignItems:"center",gap:"8px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+                onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+                onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                <Icon icon="share" color={S.green} size={2}/>
+                <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font}}>{t.menuShare||"INVITE"}</span>
+              </div>
+            )}
+
+            {/* Emoji mute toggle (multiplayer only) */}
+            {(mode==="multi"||mode==="public")&&(
+            <div onClick={()=>{const next=!muteEmojis;setMuteEmojis(next);localStorage.setItem("piilosana_mute_emoji",next?"on":"off");}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+              onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
+                <span style={{fontSize:"16px"}}>💬</span> {t.menuMuteEmoji||"MUTE GESTURES"}
+              </span>
+              <span style={{fontSize:"11px",fontFamily:S.font,color:!muteEmojis?S.green:S.textMuted,background:!muteEmojis?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${!muteEmojis?S.green+"44":S.textMuted+"44"}`}}>
+                {!muteEmojis?(t.on||"ON"):(t.off||"OFF")}
+              </span>
+            </div>
+            )}
+
+            <div style={{height:"1px",background:S.border,margin:"4px 0"}}/>
+
+            {/* Exit game — only shown when in a game or lobby */}
+            {mode!==null&&(
+            <div onClick={()=>{setShowHamburger(false);if(mode==="solo"&&(state==="play"||state==="ending"||state==="scramble")){setShowExitConfirm(true);}else{returnToModeSelect();}}} style={{display:"flex",alignItems:"center",gap:"8px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
+              onMouseEnter={e=>{e.currentTarget.style.background=S.red+"22";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.red} strokeWidth="2" strokeLinecap="round"/></svg>
+              <span style={{fontSize:"13px",color:S.red,fontFamily:S.font}}>{(state==="play"||state==="ending"||state==="scramble")?(t.menuExitGame||"EXIT GAME"):(t.menu||"VALIKKO")}</span>
+            </div>
+            )}
+
+            <div style={{flex:1}}/>
+
+            {/* Close menu */}
+            <div onClick={()=>setShowHamburger(false)} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent",borderTop:`1px solid ${S.border}`,marginTop:"auto"}}
+              onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <span style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font}}>{t.menuClose||"CLOSE MENU"}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Ivory Light — warm golden shimmer */}
       {themeId==="light"&&(
