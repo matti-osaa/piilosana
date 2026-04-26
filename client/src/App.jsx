@@ -3844,13 +3844,6 @@ export default function Piilosana(){
         {/* Flag language bubble — moved near bottom flags */}
         {/* Action buttons row */}
         <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap",marginBottom:"12px"}}>
-          <button onClick={()=>setShowHamburger(true)} style={{fontFamily:S.font,fontSize:"20px",color:S.textSoft,
-            background:"transparent",border:`1px solid ${S.border}`,padding:"4px 10px",cursor:"pointer",
-            display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.15s",minHeight:"36px",minWidth:"36px",borderRadius:"10px",lineHeight:1}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;e.currentTarget.style.background=S.green+"15";}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor=S.border;e.currentTarget.style.color=S.textSoft;e.currentTarget.style.background="transparent";}}>
-            &#9776;
-          </button>
           <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,
             background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
             display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",position:"relative",minHeight:"36px",borderRadius:S.btnRadius}}>
@@ -3985,6 +3978,16 @@ export default function Piilosana(){
   return(
     <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100dvh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflowX:"hidden",animation:themeTransition?"themeResolve 0.6s ease-out":"none"}}
       onMouseMove={e=>onDragMove(e.clientX,e.clientY)} onMouseUp={onDragEnd} onTouchEnd={onDragEnd}>
+
+      {/* Global hamburger — top-left, always visible */}
+      {state!=="play"&&state!=="ending"&&state!=="scramble"&&(
+        <button onClick={()=>setShowHamburger(true)} style={{position:"fixed",left:"10px",top:"10px",zIndex:100,background:`${S.dark}cc`,border:`1px solid ${S.border}`,padding:"4px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"10px",transition:"all 0.15s",fontSize:"20px",color:S.textMuted,lineHeight:1,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}
+          onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;e.currentTarget.style.background=S.green+"15";}}
+          onMouseLeave={e=>{e.currentTarget.style.borderColor=S.border;e.currentTarget.style.color=S.textMuted;e.currentTarget.style.background=`${S.dark}cc`;}}>
+          &#9776;
+        </button>
+      )}
+
       {/* Word definition popup */}
       {defPopup&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",zIndex:300}} onClick={()=>setDefPopup(null)}>
@@ -5352,24 +5355,6 @@ export default function Piilosana(){
                 {confettiOn?(t.on||"ON"):(t.off||"OFF")}
               </span>
             </div>
-
-            {/* Language */}
-            <div style={{padding:"8px"}}>
-              <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"6px",letterSpacing:"1px"}}>{lang==="en"?"LANGUAGE":lang==="sv"?"SPRÅK":"KIELI"}</div>
-              <div style={{display:"flex",gap:"6px"}}>
-                {Object.entries(LANG_CONFIG).map(([code,lc])=>(
-                  <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);if(typeof syncSettings==="function")syncSettings({lang:code});}}
-                    style={{fontFamily:S.font,fontSize:"11px",background:lang===code?S.green+"22":"transparent",
-                      border:`1px solid ${lang===code?S.green+"66":S.textMuted+"44"}`,
-                      padding:"4px 8px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
-                      borderRadius:"8px",transition:"all 0.15s",display:"flex",alignItems:"center",gap:"4px"}}>
-                    <PixelFlag lang={code} size={1.5}/> {code.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div style={{height:"1px",background:S.border,margin:"4px 0"}}/>
 
             {/* Share (multi/public only) */}
             {(mode==="multi"||mode==="public")&&(
