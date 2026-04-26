@@ -11,41 +11,50 @@ import DEFS_FI from "./defs_fi.js";
 const VERSION = "2.1.0";
 const SERVER_URL = window.location.origin;
 
-import WORDS_RAW_FI from "./words.js";
-import WORDS_RAW_EN from "./words_en.js";
-import WORDS_RAW_SV from "./words_sv.js";
+// Word lists are loaded lazily for fast initial page load
+// import() splits them into separate chunks loaded in background
 
 class TrieNode{constructor(){this.c={};this.w=false;}}
 function buildTrie(words){const root=new TrieNode();for(const word of words){let n=root;for(const ch of word){if(!n.c[ch])n.c[ch]=new TrieNode();n=n.c[ch];}n.w=true;}return root;}
 
+const EMPTY_SET=new Set();
+const EMPTY_TRIE=new TrieNode();
+
 // Per-language configuration
 const LANG_CONFIG={
   fi:{
-    words:null, trie:null,
+    words:EMPTY_SET, trie:EMPTY_TRIE, loaded:false,
     lw:{a:120,i:108,t:87,n:88,e:80,s:79,l:58,o:53,k:51,u:51,"ä":37,m:33,v:25,r:29,j:20,h:19,y:19,p:18,d:10,"ö":4},
     letterValues:{a:1,i:1,n:1,s:1,t:1,e:1,l:2,o:2,k:2,u:4,"ä":2,m:3,v:4,r:2,j:4,h:4,y:4,p:4,d:7,"ö":7},
     flag:"🇫🇮", name:"Suomi", code:"fi",
   },
   en:{
-    words:null, trie:null,
+    words:EMPTY_SET, trie:EMPTY_TRIE, loaded:false,
     lw:{e:127,t:91,a:82,o:75,i:70,n:67,s:63,h:61,r:60,d:43,l:40,c:28,u:28,m:24,w:24,f:22,g:20,y:20,p:19,b:15,v:10,k:8,j:2,x:2,q:1,z:1},
     letterValues:{e:1,a:1,i:1,o:1,n:1,r:1,t:1,l:1,s:1,u:1,d:2,g:2,b:3,c:3,m:3,p:3,f:4,h:4,v:4,w:4,y:4,k:5,j:8,x:8,q:10,z:10},
     flag:"🇬🇧", name:"English", code:"en",
   },
   sv:{
-    words:null, trie:null,
+    words:EMPTY_SET, trie:EMPTY_TRIE, loaded:false,
     lw:{a:93,e:100,n:82,r:84,s:63,t:76,i:58,l:52,d:45,k:32,o:41,g:33,m:35,v:24,h:21,f:20,u:18,p:17,b:15,"ä":15,"ö":13,c:13,y:7,"å":13,j:7,x:2,z:1,w:1,q:1},
     letterValues:{a:1,e:1,n:1,r:1,s:1,t:1,d:1,i:1,l:1,o:2,g:2,k:2,m:2,h:3,b:3,f:3,u:3,v:3,p:4,c:4,y:4,"ä":4,"å":4,"ö":4,j:7,x:8,z:10,w:10,q:10},
     flag:"🇸🇪", name:"Svenska", code:"sv",
   },
 };
-// Build word sets + tries
-LANG_CONFIG.fi.words=new Set(WORDS_RAW_FI.split("|"));
-LANG_CONFIG.fi.trie=buildTrie(LANG_CONFIG.fi.words);
-LANG_CONFIG.en.words=new Set(WORDS_RAW_EN.split("|"));
-LANG_CONFIG.en.trie=buildTrie(LANG_CONFIG.en.words);
-LANG_CONFIG.sv.words=new Set(WORDS_RAW_SV.split("|"));
-LANG_CONFIG.sv.trie=buildTrie(LANG_CONFIG.sv.words);
+
+// Lazy loaders — each returns a promise, cached after first call
+const _wordLoaders={
+  fi:()=>import("./words.js").then(m=>{const w=new Set(m.default.split("|"));LANG_CONFIG.fi.words=w;LANG_CONFIG.fi.trie=buildTrie(w);LANG_CONFIG.fi.loaded=true;return w.size;}),
+  en:()=>import("./words_en.js").then(m=>{const w=new Set(m.default.split("|"));LANG_CONFIG.en.words=w;LANG_CONFIG.en.trie=buildTrie(w);LANG_CONFIG.en.loaded=true;return w.size;}),
+  sv:()=>import("./words_sv.js").then(m=>{const w=new Set(m.default.split("|"));LANG_CONFIG.sv.words=w;LANG_CONFIG.sv.trie=buildTrie(w);LANG_CONFIG.sv.loaded=true;return w.size;}),
+};
+const _wordPromises={};
+function loadWords(langCode){
+  if(!_wordPromises[langCode])_wordPromises[langCode]=_wordLoaders[langCode]();
+  return _wordPromises[langCode];
+}
+// Start loading ALL languages immediately in background (fi first as it's largest)
+loadWords("fi");loadWords("en");loadWords("sv");
 
 function getLangConf(lang){return LANG_CONFIG[lang]||LANG_CONFIG.fi;}
 
@@ -2093,6 +2102,19 @@ export default function Piilosana(){
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[soundTheme,setSoundTheme]=useState(()=>{const s=localStorage.getItem("piilosana_sound");return s==="modern"||s==="off"?s:"modern";});
   const[musicOn,setMusicOn]=useState(()=>localStorage.getItem("piilosana_music")!=="off");
+  const[wordsLoaded,setWordsLoaded]=useState(()=>({fi:LANG_CONFIG.fi.loaded,en:LANG_CONFIG.en.loaded,sv:LANG_CONFIG.sv.loaded}));
+  useEffect(()=>{
+    let mounted=true;
+    Promise.all([loadWords("fi"),loadWords("en"),loadWords("sv")]).then(()=>{
+      if(mounted)setWordsLoaded({fi:true,en:true,sv:true});
+    });
+    // Also update as each individual language loads
+    loadWords("fi").then(()=>{if(mounted)setWordsLoaded(p=>({...p,fi:true}));});
+    loadWords("en").then(()=>{if(mounted)setWordsLoaded(p=>({...p,en:true}));});
+    loadWords("sv").then(()=>{if(mounted)setWordsLoaded(p=>({...p,sv:true}));});
+    return()=>{mounted=false;};
+  },[]);
+  const currentLangLoaded=wordsLoaded[lang]||false;
   const[audioStarted,setAudioStarted]=useState(false);
   const[showSettings,setShowSettings]=useState(false);
   const[showMenuOptions,setShowMenuOptions]=useState(false);
@@ -2331,8 +2353,9 @@ export default function Piilosana(){
 
   const theme=getTheme(themeId);
   const langConf=getLangConf(lang);
-  const WORDS_SET=langConf.words;
-  const trie=useMemo(()=>langConf.trie,[lang]);
+  // Re-derive when wordsLoaded changes (lazy loading completes)
+  const WORDS_SET=currentLangLoaded?langConf.words:EMPTY_SET;
+  const trie=useMemo(()=>currentLangLoaded?langConf.trie:EMPTY_TRIE,[lang,currentLangLoaded]);
   const t=T[lang]||T.fi;
   const rawSounds=useSounds(soundTheme);
   const music=useMusic();
@@ -2563,6 +2586,8 @@ export default function Piilosana(){
   },[]);
 
   const startSolo=useCallback(async(overrideMode,overrideTime)=>{
+    // Ensure word list is loaded before starting
+    if(!LANG_CONFIG[lang].loaded){await loadWords(lang);setWordsLoaded(p=>({...p,[lang]:true}));}
     sounds.init().catch(()=>{});
     const gt=overrideTime!==undefined?overrideTime:gameTime;
     const sm=overrideMode!==undefined?overrideMode:soloMode;
@@ -3794,7 +3819,7 @@ export default function Piilosana(){
           </button>
         </div>
         {/* Info links */}
-        <div style={{fontSize:"14px",color:S.textMuted,marginBottom:"4px"}}>{WORDS_SET.size.toLocaleString("fi-FI")} {lang==="fi"?"sanaa ja taivutusmuotoa":lang==="sv"?"ord och böjningsformer":`words & inflections`}{lang==="fi"&&" "}{lang==="fi"&&<span onClick={()=>setShowInflection(true)} style={{color:S.green,cursor:"pointer",textDecoration:"underline dotted",textUnderlineOffset:"3px",fontSize:"12px"}}>(katso taivutusmuodot)</span>}</div>
+        <div style={{fontSize:"14px",color:S.textMuted,marginBottom:"4px"}}>{currentLangLoaded?<>{WORDS_SET.size.toLocaleString("fi-FI")} {lang==="fi"?"sanaa ja taivutusmuotoa":lang==="sv"?"ord och böjningsformer":`words & inflections`}{lang==="fi"&&" "}{lang==="fi"&&<span onClick={()=>setShowInflection(true)} style={{color:S.green,cursor:"pointer",textDecoration:"underline dotted",textUnderlineOffset:"3px",fontSize:"12px"}}>(katso taivutusmuodot)</span>}</>:<span style={{color:S.textMuted,animation:"pulse 1.5s ease-in-out infinite"}}>{lang==="fi"?"Ladataan sanalistaa...":lang==="sv"?"Laddar ordlistan...":"Loading word list..."}</span>}</div>
         <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
           <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.howToPlay}</button>
           <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
@@ -4059,6 +4084,7 @@ export default function Piilosana(){
         @keyframes chessArrive{0%{transform:translate(var(--chess-dx),var(--chess-dy)) scale(1.2);opacity:0.6}60%{transform:translate(0,0) scale(1.1);opacity:1}100%{transform:translate(0,0) scale(1);opacity:1}}
         @keyframes snowfall{0%{transform:translateY(0);opacity:0.6}100%{transform:translateY(30px);opacity:0}}
         @keyframes fadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         @keyframes bubbleIn{0%{opacity:0;transform:scale(0.3) translateY(10px)}40%{opacity:1;transform:scale(1.08) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
         @keyframes bubbleOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.6) translateY(-10px)}}
         @keyframes chatSlideIn{0%{opacity:0;transform:translateX(-30px) scale(0.7)}30%{opacity:1;transform:translateX(4px) scale(1.04)}60%{transform:translateX(-2px) scale(0.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
@@ -4143,6 +4169,7 @@ export default function Piilosana(){
                 <Icon icon="gear" color={gearBlend?S.yellow:S.textSoft} size={S.cellGradient?3.5:1.7} style={{transition:"filter 2s ease"}}/></span>;
               return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:S.titleFont}}>{ch}</span>;
             });})()}
+            {!currentLangLoaded&&<span style={{fontSize:"10px",color:S.green,marginLeft:"6px",animation:"pulse 1s ease-in-out infinite",display:"inline-flex",alignItems:"center",gap:"2px"}}><span style={{width:"6px",height:"6px",borderRadius:"50%",border:`2px solid ${S.green}`,borderTopColor:"transparent",display:"inline-block",animation:"spin 0.8s linear infinite"}}></span></span>}
           </h1>
           {(state==="play"||state==="ending"||state==="scramble")&&(
             <span style={{position:"absolute",right:"4px",fontSize:"18px",fontWeight:"700",color:S.yellow,fontVariantNumeric:"tabular-nums",fontFamily:S.font}}>{score}p.</span>
