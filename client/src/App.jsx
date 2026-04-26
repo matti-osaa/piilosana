@@ -4800,8 +4800,10 @@ export default function Piilosana(){
       {/* PLAYING + ENDING + SCRAMBLE */}
       {(state==="play"||state==="ending"||state==="scramble")&&(
         <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:(soloMode==="hex"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
+          {/* HUD + emoji picker wrapper */}
+          <div style={{position:"relative",zIndex:10,marginBottom:isHexMode?"1px":"4px"}}>
           {/* HUD */}
-          <div style={{marginBottom:isHexMode?"1px":"4px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022",overflow:"hidden"}}>
+          <div style={{border:`1px solid ${S.border}`,background:`${S.dark}ee`,borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022",overflow:"hidden"}}>
 
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
@@ -4869,7 +4871,7 @@ export default function Piilosana(){
             </div>
           </div>
 
-          {/* Emoji picker dropdown - multiplayer only — absolute so it doesn't push grid */}
+          {/* Emoji picker dropdown - multiplayer only — absolute, anchored to HUD wrapper */}
           {(mode==="multi"||mode==="public")&&emojiOpen==="open"&&socket&&state==="play"&&(
             <div style={{position:"absolute",top:"100%",left:0,right:0,zIndex:50,animation:"fadeIn 0.15s ease",pointerEvents:"none"}} onClick={()=>setEmojiOpen(false)}>
               <div style={{background:`${S.dark}f0`,border:`1px solid ${S.border}`,borderRadius:"12px",padding:"8px",margin:"2px 0",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 4px 16px #00000033",pointerEvents:"auto"}} onClick={e=>e.stopPropagation()}>
@@ -4888,6 +4890,7 @@ export default function Piilosana(){
               </div>
             </div>
           )}
+          </div>{/* end HUD + emoji picker wrapper */}
 
           {/* Emoji feed - shows reactions briefly — absolute so it doesn't push grid */}
           {(mode==="multi"||mode==="public")&&emojiFeed.length>0&&state==="play"&&(
