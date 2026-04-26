@@ -3298,7 +3298,7 @@ export default function Piilosana(){
     newSocket.on("public_countdown",({grid:g,validWords:vw,roundNumber,hex})=>{
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
       setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);setEnding(null);setDropKey(0);
-      setPublicState("playing");setPublicCountdown(0);setPublicRound(roundNumber);
+      setTime(120);setPublicState("playing");setPublicCountdown(0);setPublicRound(roundNumber);
       setPublicRankings(null);setState("play");setPublicHex(!!hex);startTimeRef.current=Date.now();
     });
     newSocket.on("public_join_midgame",({grid:g,validWords:vw,timeLeft:tl,roundNumber,hex})=>{
