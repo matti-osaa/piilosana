@@ -918,6 +918,37 @@ function EndingOverlay({ending, progress, gridRect}){
 }
 
 // ============================================
+// ADSENSE BANNER
+// ============================================
+function AdBanner(){
+  const adRef=useRef(null);
+  const pushed=useRef(false);
+  useEffect(()=>{
+    if(pushed.current)return;
+    // Wait for adsbygoogle script to load, then push
+    const tryPush=()=>{
+      if(window.adsbygoogle&&adRef.current){
+        try{(window.adsbygoogle=window.adsbygoogle||[]).push({});}catch(e){}
+        pushed.current=true;
+      }else{
+        setTimeout(tryPush,500);
+      }
+    };
+    tryPush();
+  },[]);
+  return(
+    <div style={{width:"100%",maxWidth:"728px",margin:"12px auto 0",padding:"0 8px",zIndex:1,position:"relative",minHeight:"50px"}}>
+      <ins ref={adRef} className="adsbygoogle"
+        style={{display:"block"}}
+        data-ad-client="ca-pub-8582386927565062"
+        data-ad-slot="8910330266"
+        data-ad-format="auto"
+        data-full-width-responsive="true"/>
+    </div>
+  );
+}
+
+// ============================================
 // CONFETTI CELEBRATION (multiplayer end)
 // ============================================
 function ConfettiCelebration({isWinner}){
@@ -5388,6 +5419,9 @@ export default function Piilosana(){
             animation:"floatUnicorn 10s ease-in-out infinite 3s"}}/>
         </div>
       )}
+
+      {/* AdSense Banner — bottom of page, outside game area */}
+      <AdBanner/>
 
       {/* Dark Velvet — subtle purple mist */}
       {themeId==="dark"&&(
