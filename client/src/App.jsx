@@ -4428,10 +4428,10 @@ export default function Piilosana(){
                     borderRadius:"3px"}}>
                     <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
                       <span style={{fontSize:"16px",minWidth:"24px"}}>{i<3?MEDALS[i]:<span style={{fontSize:"13px",color:S.textMuted}}>{i+1}.</span>}</span>
-                      <span style={{fontSize:"14px",color:r.nickname===soloNickname?S.green:i===0?"#ffd700":i<3?"#cccccc":S.textSoft,fontWeight:r.nickname===soloNickname||i<3?"bold":"normal"}}>{r.nickname}</span>
+                      <span style={{fontSize:"14px",color:r.nickname===soloNickname?S.green:i===0?S.green:i<3?"#cccccc":S.textSoft,fontWeight:r.nickname===soloNickname||i<3?"bold":"normal"}}>{r.nickname}</span>
                     </div>
                     <div style={{display:"flex",gap:"12px",alignItems:"center"}}>
-                      <span style={{fontSize:"14px",color:"#ffd700",fontWeight:"bold"}}>{r.score}p</span>
+                      <span style={{fontSize:"14px",color:S.green,fontWeight:"bold"}}>{r.score}p</span>
                       <span style={{fontSize:"13px",color:S.textSoft}}>{r.percentage}%</span>
                       <span style={{fontSize:"13px",color:S.textMuted}}>{r.wordsFound} {t.words}</span>
                     </div>
