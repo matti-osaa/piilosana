@@ -3777,40 +3777,45 @@ export default function Piilosana(){
         onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #FF2D5544,${S.btnShadow}`:"4px 4px 0 #c41e3f,0 0 20px #FF2D5533"}}>
         {t.arenaDesc&&<span style={{fontSize:"13px",letterSpacing:"3px",opacity:0.9}}>{t.arenaDesc}</span>}
         <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%"}}><svg width="56" height="56" viewBox="0 0 120 110" style={{position:"absolute",left:"12px",top:"50%",transform:"translateY(-50%)"}}>
-          {/* Brain — side view, cartoon icon style */}
-          <g transform="translate(8,8) scale(0.88)">
-            {/* Brain stem — small nub */}
-            <path d="M34 86 L38 94 L46 94 L42 86" fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="2.5" strokeLinejoin="round"/>
-            {/* Main brain outline — cloud-bumpy, helmet shape: tall back, curved front */}
+          {/* Brain — side view icon, short curved fold strokes */}
+          <g transform="translate(4,6) scale(0.92)">
+            {/* Main brain shape + stem as one path — smooth, speech-bubble-like */}
             <path d={[
-              "M38 86",
-              "C30 86 22 82 16 76",
-              "C12 72 10 66 10 62",
-              "C8 58 6 52 8 46",
-              "C6 42 8 36 12 32",
-              "C10 26 12 20 18 16",
-              "C16 10 22 6 28 6",
-              "C30 2 36 0 42 2",
-              "C46 -2 52 -2 58 2",
-              "C62 -1 68 2 72 6",
-              "C76 4 82 8 86 14",
-              "C90 12 96 18 98 26",
-              "C102 32 104 40 102 48",
-              "C104 54 102 60 98 66",
-              "C96 72 90 76 84 78",
-              "C78 82 72 84 66 84",
-              "C60 86 52 86 46 86",
+              "M18 90 L10 100 L24 92",
+              "C20 92 14 88 12 82",
+              "C8 76 6 68 6 60",
+              "C4 52 6 44 10 36",
+              "C12 28 16 22 22 16",
+              "C28 10 36 6 44 4",
+              "C52 2 60 2 68 6",
+              "C76 4 82 8 88 14",
+              "C94 20 98 28 100 38",
+              "C104 46 104 56 100 64",
+              "C98 72 92 78 84 82",
+              "C76 86 66 88 56 88",
+              "C48 90 38 90 28 90",
               "Z"
             ].join(" ")} fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="3.5" strokeLinejoin="round"/>
-            {/* Folds — wavy S-curves at ~45° angle, like the reference icon */}
-            <path d="M76 14 C72 20 64 24 60 28 C54 34 48 32 42 38 C36 44 28 46 22 48" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M92 28 C86 34 80 36 74 40 C66 46 60 44 54 50 C46 56 40 56 32 60" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M100 46 C94 52 88 54 82 56 C74 60 68 58 62 64 C54 70 48 70 42 74" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M96 64 C90 68 84 70 78 72 C72 76 66 74 60 78 C56 80 52 82 48 82" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            {/* Cerebellum — small lines at back-bottom left */}
-            <path d="M16 76 C14 78 16 82 22 84 C28 86 34 86 38 86" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M20 78 C24 76 30 76 34 78" stroke="#2d2d2d" strokeWidth="2" fill="none" strokeLinecap="round"/>
-            <path d="M22 82 C26 80 30 80 34 82" stroke="#2d2d2d" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+            {/* Sylvian fissure — main horizontal divide */}
+            <path d="M14 62 C24 56 36 54 50 56 C64 58 78 54 92 52" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            {/* Upper folds — short curved strokes */}
+            <path d="M30 18 C36 22 42 24 46 22" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M54 10 C58 16 64 18 70 16" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M22 30 C30 34 38 34 44 30" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M50 24 C56 30 64 32 72 28" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M78 18 C82 24 88 28 94 26" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M16 44 C24 48 34 48 42 44" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M48 38 C56 44 66 44 74 40" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M80 34 C86 40 94 42 100 40" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            {/* Lower folds — below Sylvian fissure */}
+            <path d="M30 68 C38 72 48 72 56 68" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M62 64 C68 70 78 72 86 68" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M40 78 C50 82 62 82 72 78" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M78 74 C84 78 92 78 96 74" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            {/* Cerebellum area — back-bottom, small horizontal curves */}
+            <path d="M12 72 C16 68 22 68 26 72" stroke="#2d2d2d" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            <path d="M10 78 C14 74 20 74 24 78" stroke="#2d2d2d" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            <path d="M12 84 C16 80 22 80 26 84" stroke="#2d2d2d" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
           </g>
           {/* Oil drops falling on brain */}
           <ellipse cx="52" cy="4" rx="4" ry="5" fill="#ffe066" stroke="#cca000" strokeWidth="1">
