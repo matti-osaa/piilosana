@@ -5013,7 +5013,7 @@ export default function Piilosana(){
                             :(s?cellBg:`radial-gradient(ellipse at 40% 35%, ${S.cell} 0%, ${S.cell}dd 40%, ${S.dark||S.cell}bb 80%, ${S.dark||S.cell}99 100%)`)),
                           display:"flex",alignItems:"center",justifyContent:"center",
                           fontSize:isLarge?"clamp(42px,11vw,62px)":"clamp(38px,10.5vw,56px)",
-                          fontFamily:S.letterFont,fontWeight:"700",
+                          fontFamily:S.letterFont,fontWeight:"500",
                           textTransform:"uppercase",
                           transition:"all 0.2s ease",
                           color:eaten?endColor||"transparent":scrambleColor||(s?"#ffffff":(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
