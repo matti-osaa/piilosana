@@ -3776,57 +3776,50 @@ export default function Piilosana(){
         onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #FF2D5566":"6px 6px 0 #c41e3f,0 0 30px #FF2D5544"}}
         onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #FF2D5544,${S.btnShadow}`:"4px 4px 0 #c41e3f,0 0 20px #FF2D5533"}}>
         {t.arenaDesc&&<span style={{fontSize:"13px",letterSpacing:"3px",opacity:0.9}}>{t.arenaDesc}</span>}
-        <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%"}}><svg width="56" height="56" viewBox="0 0 120 110" style={{position:"absolute",left:"12px",top:"50%",transform:"translateY(-50%)"}}>
-          {/* Brain — side view icon matching reference */}
-          <g transform="translate(2,4) scale(0.95)">
-            {/* Brain stem */}
-            <path d="M62 82 L58 100 Q58 104 62 104 L68 104 Q72 104 72 100 L68 82" fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="3" strokeLinejoin="round"/>
-            {/* Cerebellum — small rounded bump at back-bottom */}
-            <path d="M18 68 C10 72 8 80 14 86 C20 90 30 90 38 86 C42 84 48 82 52 82" fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="3" strokeLinejoin="round"/>
-            {/* Main brain outline — smooth bumpy top, helmet shape */}
-            <path d="M52 82 C44 82 36 78 28 72 C20 66 14 58 10 50 C6 42 6 34 10 26 C14 18 20 12 28 8 C34 4 42 2 50 4 Q56 1 62 4 C68 2 74 4 80 8 C86 12 92 18 96 26 C100 34 102 44 100 54 C98 62 94 70 88 76 C82 80 76 82 68 82 Z" fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="3.5" strokeLinejoin="round"/>
-            {/* Sylvian fissure — the main S-curve across middle */}
-            <path d="M20 56 C28 50 38 52 48 48 C58 44 68 46 80 42 C88 40 94 44 98 50" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            {/* Upper folds — short S-curved strokes */}
-            <path d="M32 16 C38 20 46 20 52 16" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M58 10 C64 16 72 18 78 14" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M22 32 C30 28 40 30 50 26 C56 24 62 26 68 24" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M74 22 C80 28 88 30 94 28" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M16 44 C24 40 34 42 44 38" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M56 34 C64 38 74 36 82 34" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            {/* Lower folds — below Sylvian fissure */}
-            <path d="M56 58 C64 62 74 60 82 56" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M62 68 C70 72 80 70 88 66" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            {/* Cerebellum fold lines */}
-            <path d="M18 76 C24 74 30 74 36 78" stroke="#2d2d2d" strokeWidth="2" fill="none" strokeLinecap="round"/>
-            <path d="M16 82 C22 80 28 80 34 82" stroke="#2d2d2d" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%"}}><svg width="52" height="52" viewBox="0 0 100 85" style={{position:"absolute",left:"14px",top:"50%",transform:"translateY(-50%)"}}>
+          {/* Brain — smooth cartoon side view */}
+          <g transform="translate(5,2) scale(0.95)">
+            {/* Stem */}
+            <path d="M60 58 C60 58 62 68 60 72 C59 75 55 75 54 72 C52 68 52 60 52 58" fill="#f0b8b0" stroke="#ffffff" strokeWidth="2.8" strokeLinejoin="round" strokeLinecap="round"/>
+            {/* Main brain outline */}
+            <path d="M50 56 C42 58 34 56 28 52 C20 48 14 42 10 34 C6 26 8 18 14 12 C18 8 24 10 28 8 C32 5 36 10 40 8 C44 4 48 2 54 4 C60 2 66 6 72 10 C78 14 84 20 86 28 C88 36 88 42 84 48 C80 52 76 52 72 48 C68 42 66 46 62 50 C58 56 56 58 54 58 Z" fill="#f0b8b0" stroke="#ffffff" strokeWidth="3" strokeLinejoin="round"/>
+            {/* Sylvian fissure */}
+            <path d="M16 38 C24 32 36 36 46 38 C56 40 64 34 80 36" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+            {/* Upper folds */}
+            <path d="M22 18 C28 22 36 20 42 16" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+            <path d="M52 10 C58 16 66 14 72 10" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+            <path d="M14 28 C22 24 32 26 40 24" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+            <path d="M50 20 C58 24 68 22 76 18" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+            {/* Lower folds */}
+            <path d="M62 44 C68 48 76 44 82 42" stroke="#ffffff" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            <path d="M22 46 C28 42 36 44 42 46" stroke="#ffffff" strokeWidth="2" fill="none" strokeLinecap="round"/>
           </g>
-          {/* Oil drops falling on brain */}
-          <ellipse cx="52" cy="4" rx="4" ry="5" fill="#ffe066" stroke="#cca000" strokeWidth="1">
-            <animate attributeName="cy" values="0;16;0" dur="2s" repeatCount="indefinite"/>
-            <animate attributeName="ry" values="5;3;5" dur="2s" repeatCount="indefinite"/>
+          {/* Oil drops */}
+          <ellipse cx="50" cy="4" rx="3.5" ry="4.5" fill="#ffe066" stroke="#cca000" strokeWidth="0.8">
+            <animate attributeName="cy" values="0;14;0" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="ry" values="4.5;2.5;4.5" dur="2s" repeatCount="indefinite"/>
             <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
           </ellipse>
-          <ellipse cx="72" cy="2" rx="3" ry="4" fill="#ffcc00" stroke="#cca000" strokeWidth="1">
-            <animate attributeName="cy" values="-2;12;-2" dur="2.5s" repeatCount="indefinite"/>
+          <ellipse cx="68" cy="2" rx="2.5" ry="3.5" fill="#ffcc00" stroke="#cca000" strokeWidth="0.8">
+            <animate attributeName="cy" values="-2;10;-2" dur="2.5s" repeatCount="indefinite"/>
             <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.5s" repeatCount="indefinite"/>
           </ellipse>
-          <ellipse cx="38" cy="6" rx="3" ry="3.5" fill="#ffe066" stroke="#cca000" strokeWidth="0.8">
-            <animate attributeName="cy" values="4;18;4" dur="1.7s" repeatCount="indefinite"/>
+          <ellipse cx="34" cy="6" rx="2.5" ry="3" fill="#ffe066" stroke="#cca000" strokeWidth="0.6">
+            <animate attributeName="cy" values="4;16;4" dur="1.7s" repeatCount="indefinite"/>
             <animate attributeName="opacity" values="0.7;0.1;0.7" dur="1.7s" repeatCount="indefinite"/>
           </ellipse>
-          {/* Electric sparks — zapping around the brain */}
+          {/* Electric sparks */}
           <g>
-            <path d="M14 22 L8 28 L16 26 L10 34" stroke="#ffee44" strokeWidth="2.5" fill="none" strokeLinecap="round">
+            <path d="M8 18 L3 23 L10 21 L5 28" stroke="#ffee44" strokeWidth="2" fill="none" strokeLinecap="round">
               <animate attributeName="opacity" values="0;1;0;0;1;0" dur="1.5s" repeatCount="indefinite"/>
             </path>
-            <path d="M100 20 L106 26 L98 24 L104 32" stroke="#ffee44" strokeWidth="2.5" fill="none" strokeLinecap="round">
+            <path d="M92 16 L97 21 L90 19 L95 26" stroke="#ffee44" strokeWidth="2" fill="none" strokeLinecap="round">
               <animate attributeName="opacity" values="0;0;1;0;0;1" dur="1.8s" repeatCount="indefinite"/>
             </path>
-            <path d="M6 56 L0 60 L8 59 L2 66" stroke="#ffee44" strokeWidth="2" fill="none" strokeLinecap="round">
+            <path d="M4 46 L-1 50 L6 49 L1 55" stroke="#ffee44" strokeWidth="1.8" fill="none" strokeLinecap="round">
               <animate attributeName="opacity" values="1;0;0;1;0;0" dur="1.3s" repeatCount="indefinite"/>
             </path>
-            <path d="M106 50 L112 54 L104 53 L110 60" stroke="#ffee44" strokeWidth="2" fill="none" strokeLinecap="round">
+            <path d="M94 42 L99 46 L92 45 L97 51" stroke="#ffee44" strokeWidth="1.8" fill="none" strokeLinecap="round">
               <animate attributeName="opacity" values="0;1;0;1;0;0" dur="1.6s" repeatCount="indefinite"/>
             </path>
           </g>
