@@ -2085,7 +2085,7 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
   const hofEmpty=lang==="en"?"No results yet":lang==="sv"?"Inga resultat ännu":"Ei tuloksia vielä";
   return(
     <div style={{border:`1px solid ${S.border}`,padding:"14px",background:`${S.dark}ee`,marginTop:"12px",animation:"fadeIn 0.8s ease",borderRadius:"12px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
-      <div style={{fontSize:"13px",color:S.yellow,marginBottom:"10px",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",fontWeight:"600",letterSpacing:"0.5px"}}><PixelFlag lang={lang||"fi"} size={2}/>{hofTitle} — {label} {timeLabel}</div>
+      <div style={{fontSize:"14px",color:S.yellow,marginBottom:"8px",fontWeight:"bold",letterSpacing:"0.5px",display:"flex",alignItems:"center",gap:"6px"}}><PixelFlag lang={lang||"fi"} size={2}/>{hofTitle} <span style={{fontWeight:"normal",fontSize:"12px",color:S.textMuted}}>({label} {timeLabel})</span></div>
       {loading?<div style={{fontSize:"13px",color:S.textMuted,textAlign:"center"}}>{hofLoading}</div>:
       !scores||scores.length===0?<div style={{fontSize:"13px",color:S.textMuted,textAlign:"center"}}>{hofEmpty}</div>:
       <div style={{display:"flex",flexDirection:"column",gap:"2px"}}>
