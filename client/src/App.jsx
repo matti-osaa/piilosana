@@ -419,7 +419,7 @@ const THEMES={
     dark:"#f0ece4",border:"#d4cbbf",cell:"#ffffff",cellBorder:"#e0d8ce",
     gridBg:"#f5f0e8",textMuted:"#8b7e6e",textSoft:"#5c4f3d",
     inputBg:"#ffffff",
-    cellText:"#2c2416",cellTextSel:"#ffffff",
+    cellText:"#6b6050",cellTextSel:"#ffffff",
     btnYellowBg:"#8b7209",btnYellowShadow:"#5c4b06",
     ...MODERN_BASE,
     cellShadow:"inset 0 1px 3px #00000012, 0 1px 4px #00000008",
@@ -441,7 +441,7 @@ const THEMES={
     dark:"#ffe0ec",border:"#f0a0c0",cell:"#fff5f8",cellBorder:"#f5b8d0",
     gridBg:"#ffe8f0",textMuted:"#d0709a",textSoft:"#b03060",
     inputBg:"#fff5f8",
-    cellText:"#6b1040",cellTextSel:"#ffffff",
+    cellText:"#b05078",cellTextSel:"#ffffff",
     btnYellowBg:"#e64980",btnYellowShadow:"#c2255c",
     ...MODERN_BASE,
     cellShadow:"inset 0 1px 3px #ff80b020, 0 1px 4px #ff80b010",
@@ -4949,8 +4949,8 @@ export default function Piilosana(){
                 touchAction:"none",position:"relative"}}>
               {(()=>{const isLight=S.flavor==="ivory"||S.flavor==="dream";return grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"0px",
-                  marginTop:r>0?"-6.2%":"0",
-                  transform:r%2===1?"translateX(calc(18.2% / 4))":"translateX(calc(-18.2% / 4))",
+                  marginTop:r>0?"-6.8%":"0",
+                  transform:r%2===1?"translateX(calc(20% / 4))":"translateX(calc(-20% / 4))",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
                     const s=isSel(r,c);
@@ -4967,7 +4967,7 @@ export default function Piilosana(){
                     const displayLetter=isScrambling&&!settled&&scrambleGrid?scrambleLetter:letter;
                     const scrambleColor=isScrambling&&!settled?`hsl(${(cellIdx*37+scrambleStep*73)%360},70%,65%)`:null;
                     const hexClip="polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
-                    const hexClipInner="polygon(50% 1%, 99% 25.5%, 99% 74.5%, 50% 99%, 1% 74.5%, 1% 25.5%)";
+                    const hexClipInner="polygon(50% 4%, 96% 27%, 96% 73%, 50% 96%, 4% 73%, 4% 27%)";
                     // Border: bright & visible in all themes; selected = aurora prismatic
                     const selIdx=s?sel.findIndex(p=>p.r===r&&p.c===c):-1;
                     const borderBg=eaten?"transparent":s?`linear-gradient(${120+selIdx*60}deg, #00ffaa, #44bbff, #aa66ff, #ff66aa, #ffaa44, #00ffaa)`:(S.cellBorder||S.border);
@@ -4978,25 +4978,24 @@ export default function Piilosana(){
                         onMouseDown={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         onTouchStart={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         style={{
-                          width:"18.2%",aspectRatio:"0.866",
+                          width:"20%",aspectRatio:"0.866",
                           position:"relative",
                           cursor:state==="play"?"pointer":"default",
-                          transition:"transform 0.15s ease",
-                          transform:s?(last?"translateY(2px) scale(0.97)":"translateY(1.5px) scale(0.98)"):"none",
+                          transition:"transform 0.12s ease-out",
+                          transform:s?(last?"translateY(3px) scale(0.96)":"translateY(2px) scale(0.97)"):"none",
                           animation:eaten?endAnim:(isScrambling&&settled?"pop 0.2s ease":"none"),
                           zIndex:s?10:0,
                           "--ex":`${((c-Math.floor(hexCols/2))*40)}px`,"--ey":`${((r-Math.floor(grid.length/2))*40)}px`,
                         }}>
-                        {/* Drop shadow — subtle under the tile, stronger when not pressed */}
-                        {!eaten&&<div style={{position:"absolute",inset:"-1px",top:s?"1px":"2px",clipPath:hexClip,
-                          background:isLight?(s?"#00000008":"#00000012"):"#00000044",
-                          filter:s?"blur(2px)":"blur(3px)",
-                          transition:"all 0.15s ease",
+                        {/* Drop shadow — disappears when pressed */}
+                        {!eaten&&!s&&<div style={{position:"absolute",inset:"-1px",top:"2px",clipPath:hexClip,
+                          background:isLight?"#00000010":"#00000044",
+                          filter:"blur(3px)",
                           pointerEvents:"none"}}/>}
-                        {/* Base hex — nearly invisible rim on light theme */}
+                        {/* Base hex — soft rim for 3D depth */}
                         <div style={{position:"absolute",inset:s?"-2px":"0",clipPath:hexClip,
                           background:s?borderBg:(isLight
-                            ?`linear-gradient(180deg, #e8e4de 0%, #ddd8d0 50%, #d0cac0 100%)`
+                            ?`linear-gradient(180deg, #ece8e2 0%, #e0dbd4 40%, #d4cec6 100%)`
                             :`linear-gradient(175deg, ${S.cellBorder||S.border} 0%, #111111 100%)`),
                           backgroundSize:s?"300% 100%":"100% 100%",
                           animation:s?`hexPrismatic 6s linear infinite, hexAuroraShift 8s ease-in-out infinite`:"none",
@@ -5007,9 +5006,9 @@ export default function Piilosana(){
                           background:`radial-gradient(ellipse at 50% 50%, ${S.green}44 0%, transparent 60%)`,
                           pointerEvents:"none"}}/>}
                         {/* Pillow face — convex ceramic surface */}
-                        <div style={{position:"absolute",inset:"0.5px",top:"0.5px",bottom:"1px",clipPath:hexClipInner,
+                        <div style={{position:"absolute",inset:"1.5px",top:"1px",bottom:"2.5px",clipPath:hexClipInner,
                           background:eaten?(S.gridBg||"#111133"):(isLight
-                            ?`radial-gradient(ellipse 70% 65% at 45% 40%, #ffffff 0%, #faf8f4 15%, #f0ece6 35%, #e4ded6 55%, #d8d0c6 75%, #ccc4b8 100%)`
+                            ?`radial-gradient(ellipse 80% 75% at 48% 45%, #ffffff 0%, #fefefe 25%, #faf8f5 45%, #f2eeea 65%, #e8e4de 85%, #ddd8d0 100%)`
                             :(s?cellBg:`radial-gradient(ellipse at 40% 35%, ${S.cell} 0%, ${S.cell}dd 40%, ${S.dark||S.cell}bb 80%, ${S.dark||S.cell}99 100%)`)),
                           display:"flex",alignItems:"center",justifyContent:"center",
                           fontSize:isLarge?"clamp(42px,11vw,62px)":"clamp(38px,10.5vw,56px)",
@@ -5028,7 +5027,7 @@ export default function Piilosana(){
                           {/* Bottom-right shadow — strong edge darkening for convex ceramic shape */}
                           {!eaten&&<div style={{position:"absolute",inset:0,clipPath:hexClipInner,
                             background:isLight
-                              ?`radial-gradient(ellipse 60% 50% at 65% 72%, #00000028 0%, #00000012 35%, transparent 65%), linear-gradient(170deg, transparent 40%, #00000010 70%, #00000020 100%)`
+                              ?`radial-gradient(ellipse 50% 40% at 68% 75%, #00000010 0%, #00000006 30%, transparent 55%)`
                               :`radial-gradient(ellipse at 70% 75%, #00000033 0%, #00000015 30%, transparent 60%)`,
                             pointerEvents:"none",zIndex:0}}/>}
                           {eaten?"":<>
