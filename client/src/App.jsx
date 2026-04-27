@@ -2084,22 +2084,24 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
   const hofLoading=lang==="en"?"Loading...":lang==="sv"?"Laddar...":"Ladataan...";
   const hofEmpty=lang==="en"?"No results yet":lang==="sv"?"Inga resultat ännu":"Ei tuloksia vielä";
   return(
-    <div style={{border:`2px solid ${S.border}`,padding:"8px",background:S.dark,marginTop:"10px",animation:"fadeIn 0.8s ease"}}>
-      <div style={{fontSize:"13px",color:S.yellow,marginBottom:"6px",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><PixelFlag lang={lang||"fi"} size={2}/>{hofTitle} — {label} {timeLabel}</div>
+    <div style={{border:`1px solid ${S.border}`,padding:"14px",background:`${S.dark}ee`,marginTop:"12px",animation:"fadeIn 0.8s ease",borderRadius:"12px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
+      <div style={{fontSize:"13px",color:S.yellow,marginBottom:"10px",textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",fontWeight:"600",letterSpacing:"0.5px"}}><PixelFlag lang={lang||"fi"} size={2}/>{hofTitle} — {label} {timeLabel}</div>
       {loading?<div style={{fontSize:"13px",color:S.textMuted,textAlign:"center"}}>{hofLoading}</div>:
       !scores||scores.length===0?<div style={{fontSize:"13px",color:S.textMuted,textAlign:"center"}}>{hofEmpty}</div>:
       <div style={{display:"flex",flexDirection:"column",gap:"2px"}}>
         {scores.map((s,i)=>{
           const isHighlight=currentScore&&s.score===currentScore&&i<10;
-          return <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 6px",
-            background:i===0?"#ffcc0011":isHighlight?"#44ff8811":"transparent",
-            border:i===0?`1px solid ${S.yellow}33`:isHighlight?`1px solid ${S.green}33`:"1px solid transparent"}}>
+          const medals=["🥇","🥈","🥉"];
+          return <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 8px",
+            background:i===0?"#ffcc0015":isHighlight?"#44ff8815":i<3?`${S.border}08`:"transparent",
+            border:i===0?`1px solid ${S.yellow}33`:isHighlight?`1px solid ${S.green}33`:"1px solid transparent",
+            borderRadius:"8px",marginBottom:"1px"}}>
             <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
-              <span style={{fontSize:"13px",color:i===0?S.yellow:i<3?"#cccccc":S.textMuted,minWidth:"20px"}}>{i+1}.</span>
-              <span style={{fontSize:"13px",color:i===0?S.yellow:S.green}}>{s.nickname}</span>
+              <span style={{fontSize:i<3?"16px":"13px",minWidth:"24px"}}>{i<3?medals[i]:<span style={{color:S.textMuted}}>{i+1}.</span>}</span>
+              <span style={{fontSize:"13px",color:i===0?S.yellow:isHighlight?S.green:i<3?"#cccccc":S.textSoft,fontWeight:i<3||isHighlight?"600":"normal"}}>{s.nickname}</span>
             </div>
             <div style={{display:"flex",gap:"12px",alignItems:"center"}}>
-              <span style={{fontSize:"13px",color:S.yellow}}>{s.score}p</span>
+              <span style={{fontSize:i===0?"14px":"13px",color:S.yellow,fontWeight:i<3?"bold":"normal"}}>{s.score}p</span>
               <span style={{fontSize:"13px",color:S.textSoft||"#88ccaa"}}>{s.percentage}%</span>
             </div>
           </div>;
@@ -3888,9 +3890,9 @@ export default function Piilosana(){
           const medals=["🥇","🥈","🥉"];
           const isMe=p.playerId===playerId;
           return(
-            <div key={i} style={{fontSize:"13px",color:isMe?S.yellow:S.green,padding:"8px 12px",borderBottom:`1px solid ${S.border}33`,display:"flex",justifyContent:"space-between",alignItems:"center",background:isMe?`${S.yellow}15`:"transparent",animation:isMe?"pop 0.4s ease":"none",borderRadius:"8px",marginBottom:"2px"}}>
+            <div key={i} style={{fontSize:i===0?"15px":"13px",color:isMe?S.yellow:i===0?S.yellow:i<3?"#cccccc":S.green,padding:i===0?"10px 12px":"8px 12px",borderBottom:`1px solid ${S.border}33`,display:"flex",justifyContent:"space-between",alignItems:"center",background:i===0?`${S.yellow}15`:isMe?`${S.yellow}10`:"transparent",animation:isMe||i===0?"pop 0.4s ease":"none",borderRadius:"8px",marginBottom:"2px",fontWeight:i<3?"600":"normal"}}>
               <span>{medals[i]||`${i+1}.`} {p.nickname}</span>
-              <span>{p.score}p ({p.wordsFound} {t.words})</span>
+              <span style={{fontWeight:"bold"}}>{p.score}p <span style={{fontWeight:"normal",fontSize:"12px",opacity:0.7}}>({p.wordsFound} {t.words})</span></span>
             </div>
           );
         })}
@@ -4677,22 +4679,24 @@ export default function Piilosana(){
             <div style={{...secStyle,animation:"fadeIn 0.8s ease"}}>
               <div style={{...secTitle,color:S.textSoft}}>{t.roundResults}</div>
               <div style={{display:"flex",flexDirection:"column",gap:"2px"}}>
-                {publicRankings.slice(0,10).map((r,i)=>(
-                  <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 8px",
-                    background:i<3?["#ffcc0015","#cccccc10","#cc884410"][i]:"transparent",
-                    border:i<3?`1px solid ${["#ffcc0033","#cccccc33","#cc884433"][i]}`:"1px solid transparent",
-                    borderRadius:"8px"}}>
+                {publicRankings.slice(0,10).map((r,i)=>{
+                  const isMe=r.nickname===soloNickname;
+                  return(
+                  <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:i===0?"7px 8px":"5px 8px",
+                    background:isMe?`${S.green}15`:i<3?["#ffcc0015","#cccccc10","#cc884410"][i]:"transparent",
+                    border:isMe?`1px solid ${S.green}33`:i<3?`1px solid ${["#ffcc0033","#cccccc33","#cc884433"][i]}`:"1px solid transparent",
+                    borderRadius:"8px",marginBottom:"1px"}}>
                     <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
                       <span style={{fontSize:"16px",minWidth:"24px"}}>{i<3?MEDALS[i]:<span style={{fontSize:"13px",color:S.textMuted}}>{i+1}.</span>}</span>
-                      <span style={{fontSize:"14px",color:r.nickname===soloNickname?S.green:i===0?S.green:i<3?"#cccccc":S.textSoft,fontWeight:r.nickname===soloNickname||i<3?"bold":"normal"}}>{r.nickname}</span>
+                      <span style={{fontSize:i===0?"15px":"14px",color:isMe?S.green:i===0?S.yellow:i<3?"#cccccc":S.textSoft,fontWeight:isMe||i<3?"bold":"normal"}}>{r.nickname}</span>
                     </div>
                     <div style={{display:"flex",gap:"12px",alignItems:"center"}}>
-                      <span style={{fontSize:"14px",color:S.green,fontWeight:"bold"}}>{r.score}p</span>
+                      <span style={{fontSize:i===0?"15px":"14px",color:i===0?S.yellow:S.green,fontWeight:"bold"}}>{r.score}p</span>
                       <span style={{fontSize:"13px",color:S.textSoft}}>{r.percentage}%</span>
-                      <span style={{fontSize:"13px",color:S.textMuted}}>{r.wordsFound} {t.words}</span>
+                      <span style={{fontSize:"12px",color:S.textMuted}}>{r.wordsFound} {t.words}</span>
                     </div>
-                  </div>
-                ))}
+                  </div>);
+                })}
               </div>
             </div>
           )}
