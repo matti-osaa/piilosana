@@ -4987,6 +4987,10 @@ export default function Piilosana(){
                           zIndex:s?10:0,
                           "--ex":`${((c-Math.floor(hexCols/2))*40)}px`,"--ey":`${((r-Math.floor(grid.length/2))*40)}px`,
                         }}>
+                        {/* 3D shadow layer — darker hex offset below to create depth */}
+                        {!eaten&&<div style={{position:"absolute",inset:0,top:"3px",clipPath:hexClip,
+                          background:"#00000055",
+                          pointerEvents:"none"}}/>}
                         {/* Outer hex = border — prismatic gradient when selected */}
                         <div style={{position:"absolute",inset:s?"-2px":"0",clipPath:hexClip,
                           background:borderBg,
@@ -5000,24 +5004,31 @@ export default function Piilosana(){
                           animation:"hexGlowPulse 4s ease-in-out infinite",
                           pointerEvents:"none"}}/>}
                         {/* Inner hex = cell content */}
-                        <div style={{position:"absolute",inset:innerInset,clipPath:hexClip,
+                        <div style={{position:"absolute",inset:innerInset,clipPath:hexClipInner,
                           background:cellBg,
                           display:"flex",alignItems:"center",justifyContent:"center",
                           fontSize:isLarge?"clamp(26px,6.5vw,40px)":"clamp(22px,6vw,34px)",
-                          fontFamily:S.letterFont,fontWeight:S.cellGradient||s?"700":"normal",
+                          fontFamily:S.letterFont,fontWeight:"700",
                           textTransform:"uppercase",
                           transition:"all 0.2s ease",
                           color:eaten?endColor||"transparent":scrambleColor||(s?"#ffffff":(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
-                          textShadow:eaten?"none":s?`0 0 12px #44ffaa99, 0 0 24px #8866ff66, 0 1px 2px #000000aa`:(S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${letterMult?letterColor(letter,lang):"#22ccaa"}44`),
+                          textShadow:eaten?"none":s?`0 0 12px #44ffaa99, 0 0 24px #8866ff66, 0 1px 3px #000000cc`:`0 1px 2px #000000aa, 0 -1px 1px #ffffff11`,
                         }}>
-                          {/* Subtle top highlight for unselected hex cells */}
-                          {!s&&!eaten&&<div style={{position:"absolute",inset:0,clipPath:hexClip,background:"linear-gradient(180deg, #ffffff08 0%, transparent 40%)",pointerEvents:"none",zIndex:0}}/>}
+                          {/* 3D top highlight — light from above */}
+                          {!eaten&&<div style={{position:"absolute",inset:0,clipPath:hexClipInner,
+                            background:"linear-gradient(170deg, #ffffff18 0%, #ffffff08 25%, transparent 50%, #00000015 80%, #00000025 100%)",
+                            pointerEvents:"none",zIndex:0}}/>}
+                          {/* Edge bevel — subtle inner ring for rounded feel */}
+                          {!eaten&&<div style={{position:"absolute",inset:"-1px",clipPath:hexClip,
+                            background:"transparent",
+                            boxShadow:"inset 0 2px 4px #ffffff15, inset 0 -2px 4px #00000030",
+                            pointerEvents:"none",zIndex:0}}/>}
                           {eaten?"":<>
-                            {/* Letter — bouncy scale + white glow when selected */}
+                            {/* Letter — bouncy scale + 3D depth shadow */}
                             <span style={{position:"relative",zIndex:2,
                               transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1), text-shadow 0.2s ease, filter 0.2s ease",
                               transform:s?(last?"scale(1.25)":"scale(1.12)"):"none",
-                              filter:s?"drop-shadow(0 0 4px #44ffaa88) drop-shadow(0 0 8px #8866ff44)":"none",
+                              filter:s?"drop-shadow(0 0 4px #44ffaa88) drop-shadow(0 0 8px #8866ff44)":"drop-shadow(0 1px 1px #00000066)",
                             }}>{displayLetter}</span>
                             {/* Prismatic light sweep on selected cells */}
                             {s&&!isScrambling&&<>
@@ -5025,7 +5036,7 @@ export default function Piilosana(){
                                 background:`linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.25) 35%, rgba(68,255,170,0.12) 45%, rgba(136,102,255,0.12) 55%, rgba(255,255,255,0.2) 65%, transparent 80%)`,
                                 backgroundSize:"300% 300%",
                                 animation:"hexPrismatic 8s ease-in-out infinite",
-                                pointerEvents:"none",zIndex:1,clipPath:hexClip}}/>
+                                pointerEvents:"none",zIndex:1,clipPath:hexClipInner}}/>
                               <span style={{position:"absolute",inset:0,
                                 background:`radial-gradient(circle at ${30+selIdx*10}% ${25+selIdx*8}%, rgba(255,255,255,0.3) 0%, transparent 50%)`,
                                 pointerEvents:"none",zIndex:1}}/>
@@ -5100,15 +5111,15 @@ export default function Piilosana(){
                     onTouchStart={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                     style={{
                       width:"100%",aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",
-                      fontSize:isChessMode?"clamp(14px,4vw,22px)":(isLarge?"clamp(34px,10vw,56px)":"clamp(28px,8vw,48px)"),fontFamily:S.letterFont,fontWeight:S.cellGradient?"700":"normal",
+                      fontSize:isChessMode?"clamp(14px,4vw,22px)":(isLarge?"clamp(34px,10vw,56px)":"clamp(28px,8vw,48px)"),fontFamily:S.letterFont,fontWeight:"700",
                       letterSpacing:S.cellGradient?"1px":"0",
                       color:eaten?endColor||"transparent":scrambleColor||(chessIsPos?"#ddaa33":chessInPath?"#ddaa33":chessIsInvalid?"#ff4444":s?(S.cellTextSel||"#0f1720"):otherSelColor||(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":S.green)))),
                       background:eaten?(S.gridBg||"#111133"):chessIsPos?"#ddaa3355":chessInPath?"#ddaa3330":chessIsValid?"#ddaa3320":chessIsInvalid?"#ff444433":(isChessMode&&chessPlacing&&chessBottomRow)?"#ddaa3322":isChessMode?(chessSquareLight?"#2a2a3a":"#1a1a28"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":(soloMode==="bomb"&&bombCell&&r===bombCell.r&&c===bombCell.c)?`linear-gradient(135deg, #ff444433 0%, #ff880033 100%)`:(soloMode==="mystery"&&mysteryCell&&r===mysteryCell.r&&c===mysteryCell.c&&!mysteryRevealed)?`linear-gradient(135deg, #aa66ff33 0%, #6644ff33 100%)`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
                       border:chessIsPos?`2px solid #ddaa33`:chessIsValid?`2px dashed #ddaa3366`:chessIsInvalid?`2px solid #ff4444`:chessInPath?`2px solid #ddaa3355`:S.cellGradient?`1px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
                       borderRadius:S.cellRadius,
                       cursor:state==="play"?(rotateActive?"grab":"pointer"):"default",transition:isScrambling?"color 0.07s, transform 0.15s":(S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s"),transform:cellTransform,
-                      boxShadow:eaten?"none":isScrambling&&settled?`0 0 12px ${S.green}66`:(s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:(S.cellShadow?(S.cellShadow+", inset 0 1px 2px #ffffff08"):("inset 0 1px 2px #ffffff08"))),
-                      textTransform:"uppercase",textShadow:isScrambling&&!settled?`0 0 8px ${scrambleColor}88`:(s||eaten?"none":S.cellGradient?`0 1px 2px #00000066`:`0 0 8px ${otherSelColor||(letterMult?letterColor(letter,lang):S.green)}44`),
+                      boxShadow:eaten?"none":isScrambling&&settled?`0 0 12px ${S.green}66`:(s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:(S.cellShadow?(S.cellShadow+", inset 0 1px 3px #ffffff12, inset 0 -1px 3px #00000030, 0 2px 4px #00000044"):("inset 0 1px 3px #ffffff12, inset 0 -1px 3px #00000030, 0 2px 4px #00000044"))),
+                      textTransform:"uppercase",textShadow:isScrambling&&!settled?`0 0 8px ${scrambleColor}88`:(s||eaten?"none":`0 1px 2px #000000aa, 0 -1px 1px #ffffff11`),
                       animation:chessIsInvalid?"shake 0.3s ease":eaten?endAnim:useDropAnim?`cellDrop 0.3s ${c*0.03}s ease-out`:(rotateAnim&&((rotateAnim.type==="row"&&rotateAnim.idx===r)||(rotateAnim.type==="col"&&rotateAnim.idx===c)))?`${rotateAnim.type==="row"?(rotateAnim.dir>0?"rotateRowRight":"rotateRowLeft"):(rotateAnim.dir>0?"rotateColDown":"rotateColUp")} 0.3s ease-out`:(isScrambling&&settled?"pop 0.2s ease":"none"),
                       "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
                       position:"relative",
