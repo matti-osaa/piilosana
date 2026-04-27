@@ -4987,14 +4987,16 @@ export default function Piilosana(){
                           zIndex:s?10:0,
                           "--ex":`${((c-Math.floor(hexCols/2))*40)}px`,"--ey":`${((r-Math.floor(grid.length/2))*40)}px`,
                         }}>
-                        {/* 3D shadow layer — darker hex offset below to create depth */}
-                        {!eaten&&<div style={{position:"absolute",inset:0,top:"4px",left:"1px",clipPath:hexClip,
-                          background:isLight?"#00000022":"#00000055",
-                          filter:isLight?"blur(2px)":"blur(1px)",
+                        {/* Drop shadow — soft blur under the tile */}
+                        {!eaten&&<div style={{position:"absolute",inset:"-2px",top:"3px",clipPath:hexClip,
+                          background:isLight?"#00000018":"#00000044",
+                          filter:"blur(3px)",
                           pointerEvents:"none"}}/>}
-                        {/* Outer hex = border/base — creates the 3D "side" */}
+                        {/* Base hex — the "side" edge visible at bottom */}
                         <div style={{position:"absolute",inset:s?"-2px":"0",clipPath:hexClip,
-                          background:s?borderBg:(isLight?`linear-gradient(180deg, ${S.cellBorder||S.border} 0%, #b0a898 100%)`:`linear-gradient(180deg, ${S.cellBorder||S.border} 0%, #111111 100%)`),
+                          background:s?borderBg:(isLight
+                            ?`linear-gradient(175deg, #e8e2d8 0%, #d0c8b8 50%, #b8b0a0 100%)`
+                            :`linear-gradient(175deg, ${S.cellBorder||S.border} 0%, #111111 100%)`),
                           backgroundSize:s?"300% 100%":"100% 100%",
                           animation:s?`hexPrismatic 6s linear infinite, hexAuroraShift 8s ease-in-out infinite`:"none",
                           transition:"background 0.2s ease, inset 0.2s ease",
@@ -5004,29 +5006,37 @@ export default function Piilosana(){
                           background:`radial-gradient(ellipse at 50% 50%, ${S.green}33 0%, #8866ff22 40%, transparent 70%)`,
                           animation:"hexGlowPulse 4s ease-in-out infinite",
                           pointerEvents:"none"}}/>}
-                        {/* Inner hex = cell content — inset to show border as 3D edge */}
-                        <div style={{position:"absolute",inset:s?"3px":"2.5px",top:s?"3px":"2px",bottom:s?"3px":"3.5px",clipPath:hexClipInner,
-                          background:eaten?(S.gridBg||"#111133"):(isLight?`linear-gradient(170deg, #ffffff 0%, #f8f6f2 40%, #f0ece4 100%)`:(s?cellBg:`linear-gradient(170deg, ${S.cell}ee 0%, ${S.cell}cc 50%, ${S.dark||S.cell}dd 100%)`)),
+                        {/* Pillow face — convex surface with radial highlight */}
+                        <div style={{position:"absolute",inset:"2px",top:"1.5px",bottom:"3px",clipPath:hexClipInner,
+                          background:eaten?(S.gridBg||"#111133"):(isLight
+                            ?`radial-gradient(ellipse at 40% 35%, #ffffff 0%, #faf8f4 30%, #ede8e0 60%, #ddd6ca 85%, #ccc4b6 100%)`
+                            :(s?cellBg:`radial-gradient(ellipse at 40% 35%, ${S.cell} 0%, ${S.cell}dd 40%, ${S.dark||S.cell}bb 80%, ${S.dark||S.cell}99 100%)`)),
                           display:"flex",alignItems:"center",justifyContent:"center",
                           fontSize:isLarge?"clamp(26px,6.5vw,40px)":"clamp(22px,6vw,34px)",
                           fontFamily:S.letterFont,fontWeight:"700",
                           textTransform:"uppercase",
                           transition:"all 0.2s ease",
                           color:eaten?endColor||"transparent":scrambleColor||(s?"#ffffff":(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
-                          textShadow:eaten?"none":s?`0 0 12px ${S.green}99, 0 0 24px #8866ff66, 0 1px 3px #000000cc`:(isLight?`0 1px 1px #00000030`:`0 1px 2px #000000aa`),
+                          textShadow:eaten?"none":s?`0 0 12px ${S.green}99, 0 0 24px #8866ff66, 0 1px 3px #000000cc`:(isLight?`0 1px 1px #00000020`:`0 1px 2px #000000aa`),
                         }}>
-                          {/* 3D top highlight — strong light from above */}
+                          {/* Specular highlight — bright spot upper-left like the ceramic bead */}
                           {!eaten&&<div style={{position:"absolute",inset:0,clipPath:hexClipInner,
                             background:isLight
-                              ?"linear-gradient(170deg, #ffffff 0%, #ffffffcc 15%, transparent 45%, #00000008 75%, #00000015 100%)"
-                              :"linear-gradient(170deg, #ffffff18 0%, #ffffff08 25%, transparent 50%, #00000015 80%, #00000025 100%)",
+                              ?`radial-gradient(ellipse at 35% 28%, #ffffff 0%, #ffffffcc 15%, #ffffff66 30%, transparent 55%)`
+                              :`radial-gradient(ellipse at 35% 28%, #ffffff22 0%, #ffffff11 20%, transparent 50%)`,
+                            pointerEvents:"none",zIndex:0}}/>}
+                          {/* Bottom-right shadow — edge darkening for convex shape */}
+                          {!eaten&&<div style={{position:"absolute",inset:0,clipPath:hexClipInner,
+                            background:isLight
+                              ?`radial-gradient(ellipse at 70% 75%, #00000018 0%, #00000008 30%, transparent 60%)`
+                              :`radial-gradient(ellipse at 70% 75%, #00000033 0%, #00000015 30%, transparent 60%)`,
                             pointerEvents:"none",zIndex:0}}/>}
                           {eaten?"":<>
-                            {/* Letter — bouncy scale + 3D depth shadow */}
+                            {/* Letter */}
                             <span style={{position:"relative",zIndex:2,
                               transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1), text-shadow 0.2s ease, filter 0.2s ease",
                               transform:s?(last?"scale(1.25)":"scale(1.12)"):"none",
-                              filter:s?`drop-shadow(0 0 4px ${S.green}88) drop-shadow(0 0 8px #8866ff44)`:(isLight?"drop-shadow(0 1px 1px #00000025)":"drop-shadow(0 1px 1px #00000066)"),
+                              filter:s?`drop-shadow(0 0 4px ${S.green}88) drop-shadow(0 0 8px #8866ff44)`:"none",
                             }}>{displayLetter}</span>
                             {/* Prismatic light sweep on selected cells */}
                             {s&&!isScrambling&&<>
