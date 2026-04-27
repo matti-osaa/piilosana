@@ -1289,6 +1289,14 @@ function QuickTutorial({lang,theme,onClose}){
 // TITLE DEMO COMPONENT - shows word-finding animation in menu
 // ============================================
 // Per-language titles and demo words (subsequences to highlight)
+// Activity-ring inspired title colors: red, lime-green, cyan, purple
+const TITLE_COLORS=["#FF2D55","#FF375F","#E8254A","#A8FF00","#8CE600","#00E5FF","#00C8E0","#BF5AF2","#A040D0"];
+function titleColor(i,len){
+  // Spread the 4 ring colors across the title letters
+  const colors=["#FF2D55","#FF6040","#A8FF00","#70E000","#00E5FF","#00C8E0","#BF5AF2","#A040D0","#FF2D55"];
+  return colors[i%colors.length];
+}
+function titleShadow(color){return `2px 2px 0 ${color}44, 0 0 16px ${color}66`;}
 const TITLE_CONFIG={
   fi:{
     title:"PIILOSANA",
@@ -1945,13 +1953,14 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
       {displayChars.map((ch,i)=>{
         const isLit=lit.has(i);
         const isGear=!scramble&&i===tc.gearIdx;
+        const tColor=titleColor(i,displayChars.length);
         const baseStyle={
-          color:scramble?"#ffcc0088":"#ffcc00",
+          color:scramble?tColor+"88":tColor,
           textShadow:scramble
-            ?"3px 3px 0 #cc6600, 0 0 10px #ffcc0044"
+            ?`2px 2px 0 ${tColor}44, 0 0 10px ${tColor}44`
             :isLit
-            ?`3px 3px 0 #cc6600, 0 0 20px ${dw.color}cc, 0 0 40px ${dw.color}66`
-            :"3px 3px 0 #cc6600, 0 0 20px #ffcc0066",
+            ?`2px 2px 0 ${tColor}44, 0 0 20px ${dw.color}cc, 0 0 40px ${dw.color}66`
+            :titleShadow(tColor),
           transition:scramble?"none":"text-shadow 0.25s ease, transform 0.25s ease",
           transform:scramble?`translateY(${Math.random()>0.5?-2:2}px)`:isLit?"translateY(-2px)":"none",
           fontFamily:titleTheme?.titleFont||"'Press Start 2P',monospace",
@@ -3763,9 +3772,9 @@ export default function Piilosana(){
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
       {/* ARENA CTA — player count inside button */}
-      <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#5a3e2b",background:"linear-gradient(135deg,#ffb4a2 0%,#e5989b 100%)",border:"none",padding:"28px 32px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #e5989b44,${S.btnShadow}`:"4px 4px 0 #d4888b,0 0 20px #e5989b33",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"8px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
-        onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #e5989b66":"6px 6px 0 #d4888b,0 0 30px #e5989b44"}}
-        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #e5989b44,${S.btnShadow}`:"4px 4px 0 #d4888b,0 0 20px #e5989b33"}}>
+      <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#ffffff",background:"linear-gradient(135deg,#FF2D55 0%,#FF375F 50%,#E8254A 100%)",border:"none",padding:"28px 32px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #FF2D5544,${S.btnShadow}`:"4px 4px 0 #c41e3f,0 0 20px #FF2D5533",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"8px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
+        onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #FF2D5566":"6px 6px 0 #c41e3f,0 0 30px #FF2D5544"}}
+        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #FF2D5544,${S.btnShadow}`:"4px 4px 0 #c41e3f,0 0 20px #FF2D5533"}}>
         <span style={{fontSize:"13px",letterSpacing:"3px",opacity:0.9}}>{t.arenaDesc}</span>
         <span>{t.arenaCta}</span>
         <span style={{fontSize:"12px",opacity:0.8,display:"flex",alignItems:"center",gap:"4px",marginTop:"2px"}}><span style={{fontSize:"14px",fontWeight:"700"}}>{publicOnlineCount}</span> {publicOnlineCount===1?t.playerInArena:t.playersInArena}</span>
@@ -3773,21 +3782,21 @@ export default function Piilosana(){
 
       {/* Three buttons side by side: Practice, Custom Game, Quick Guide */}
       <div style={{display:"flex",gap:"8px"}}>
-        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"14px",color:"#2d5240",background:"#a8d8b9",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #7bb89a",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #7bb89a"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #7bb89a"}}>
+        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"14px",color:"#1a3a00",background:"linear-gradient(180deg,#A8FF00 0%,#8CE600 100%)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #6db300"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300"}}>
           <span>{t.practice}</span>
           <span style={{fontSize:"12px",opacity:0.7}}>{t.practiceDesc}</span>
         </button>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:"#5a4520",background:"#f5d89a",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #d4b870",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #d4b870"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #d4b870"}}>
+        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:"#003040",background:"linear-gradient(180deg,#00E5FF 0%,#00C8E0 100%)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #009db8",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #009db8"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #009db8"}}>
           <span>{t.customGame}</span>
           <span style={{fontSize:"12px",opacity:0.7}}>{t.customDesc}</span>
         </button>
-        <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"14px",color:"#3d4a6b",background:"#b8c8e8",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #8a9bc0",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #8a9bc0"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #8a9bc0"}}>
+        <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"14px",color:"#2a2040",background:"linear-gradient(180deg,#BF5AF2 0%,#A040D0 100%)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #8030a8",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #8030a8"}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #8030a8"}}>
           <span>{t.tutorialBtn}</span>
           <span style={{fontSize:"12px",opacity:0.7}}>▶</span>
         </button>
@@ -4204,7 +4213,8 @@ export default function Piilosana(){
           <h1 className="piilosana-title" style={{fontSize:"28px",letterSpacing:"4px",margin:0,display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
             animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
             {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>{
-              return <span key={i} style={{color:S.yellow,textShadow:`3px 3px 0 #cc6600, 0 0 20px ${S.yellow}66`,fontFamily:S.titleFont}}>{ch}</span>;
+              const tC=titleColor(i,tc.title.length);
+              return <span key={i} style={{color:tC,textShadow:titleShadow(tC),fontFamily:S.titleFont}}>{ch}</span>;
             });})()}
             {!currentLangLoaded&&<span style={{fontSize:"10px",color:S.green,marginLeft:"6px",animation:"pulse 1s ease-in-out infinite",display:"inline-flex",alignItems:"center",gap:"2px"}}><span style={{width:"6px",height:"6px",borderRadius:"50%",border:`2px solid ${S.green}`,borderTopColor:"transparent",display:"inline-block",animation:"spin 0.8s linear infinite"}}></span></span>}
           </h1>
