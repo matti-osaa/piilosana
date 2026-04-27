@@ -3940,13 +3940,13 @@ export default function Piilosana(){
         {myRank===0&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🏆</div>}
         {myRank===1&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🥈</div>}
         {myRank===2&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🥉</div>}
-        <div style={{fontSize:"16px",color:isWinner?S.yellow:myRank<=2?"#cccccc":S.green,marginBottom:"4px",animation:myRank<=2?"pop 0.6s ease":"none"}}>{isWinner?t.youWon:myRank===1?"2.":myRank===2?"3.":t.gameOver}</div>
+        <div style={{fontSize:"16px",color:isWinner?S.yellow:myRank<=2?S.yellow:S.green,marginBottom:"4px",animation:myRank<=2?"pop 0.6s ease":"none"}}>{isWinner?t.youWon:myRank===1?"2.":myRank===2?"3.":t.gameOver}</div>
         <p style={{fontSize:"13px",color:S.green,marginBottom:"12px"}}>{t.results}</p>
         {multiRankings&&multiRankings.slice(0,5).map((p,i)=>{
           const medals=["🥇","🥈","🥉"];
           const isMe=p.playerId===playerId;
           return(
-            <div key={i} style={{fontSize:i===0?"15px":"13px",color:isMe?S.yellow:i===0?S.yellow:i<3?"#cccccc":S.green,padding:i===0?"10px 12px":"8px 12px",borderBottom:`1px solid ${S.border}33`,display:"flex",justifyContent:"space-between",alignItems:"center",background:i===0?`${S.yellow}15`:isMe?`${S.yellow}10`:"transparent",animation:isMe||i===0?"pop 0.4s ease":"none",borderRadius:"8px",marginBottom:"2px",fontWeight:i<3?"600":"normal"}}>
+            <div key={i} style={{fontSize:i===0?"15px":"13px",color:isMe?S.yellow:i===0?S.yellow:i<3?S.yellow:S.green,padding:i===0?"10px 12px":"8px 12px",borderBottom:`1px solid ${S.border}33`,display:"flex",justifyContent:"space-between",alignItems:"center",background:i===0?`${S.yellow}15`:isMe?`${S.yellow}10`:"transparent",animation:isMe||i===0?"pop 0.4s ease":"none",borderRadius:"8px",marginBottom:"2px",fontWeight:i<3?"600":"normal"}}>
               <span>{medals[i]||`${i+1}.`} {p.nickname}</span>
               <span style={{fontWeight:"bold"}}>{p.score}p <span style={{fontWeight:"normal",fontSize:"12px",opacity:0.7}}>({p.wordsFound} {t.words})</span></span>
             </div>
@@ -4037,14 +4037,12 @@ export default function Piilosana(){
       {/* Word definition popup */}
       {defPopup&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",zIndex:300}} onClick={()=>setDefPopup(null)}>
-          <div style={{position:"absolute",left:Math.min(defPopup.x,window.innerWidth-160),top:Math.max(defPopup.y-44,8),
-            transform:"translateX(-50%)",background:S.dark||"#1a1a2e",border:`2px solid ${S.green}`,
-            padding:"6px 12px",borderRadius:"8px",boxShadow:`0 4px 20px #00000066`,
-            maxWidth:"280px",zIndex:301,animation:"pop 0.2s ease"}} onClick={e=>e.stopPropagation()}>
-            <div style={{fontSize:"14px",fontWeight:"700",color:S.yellow,marginBottom:"2px"}}>{defPopup.word.toUpperCase()}</div>
-            <div style={{fontSize:"12px",color:S.green,lineHeight:"1.4"}}>{defPopup.def}</div>
-            <div style={{position:"absolute",bottom:"-7px",left:"50%",transform:"translateX(-50%)",
-              width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderTop:`6px solid ${S.green}`}}/>
+          <div style={{position:"fixed",left:"50%",top:"40%",
+            transform:"translate(-50%,-50%)",background:S.dark||"#1a1a2e",border:`2px solid ${S.green}`,
+            padding:"10px 16px",borderRadius:"12px",boxShadow:`0 4px 20px #00000066`,
+            maxWidth:"280px",width:"auto",zIndex:301,animation:"pop 0.2s ease"}} onClick={e=>e.stopPropagation()}>
+            <div style={{fontSize:"16px",fontWeight:"700",color:S.yellow,marginBottom:"4px"}}>{defPopup.word.toUpperCase()}</div>
+            <div style={{fontSize:"13px",color:S.green,lineHeight:"1.5"}}>{defPopup.def}</div>
           </div>
         </div>
       )}
@@ -4259,9 +4257,9 @@ export default function Piilosana(){
           )}
           <h1 className="piilosana-title" style={{fontSize:"28px",letterSpacing:"4px",margin:0,display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
             animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
-            {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;return tc.title.split("").map((ch,i)=>{
-              const tC=titleColor(i,tc.title.length);
-              return <span key={i} style={{color:tC,textShadow:titleShadow(tC),fontFamily:S.titleFont}}>{ch}</span>;
+            {(()=>{const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;const lowTime=state==="play"&&gameTime!==0&&time<=15;return tc.title.split("").map((ch,i)=>{
+              const tC=lowTime?"#FF2D55":titleColor(i,tc.title.length);
+              return <span key={i} style={{color:tC,textShadow:lowTime?`0 0 12px #FF2D55, 0 0 24px #FF2D5588, 2px 2px 0 #FF2D5544`:titleShadow(tC),fontFamily:S.titleFont,transition:"color 0.5s, text-shadow 0.5s"}}>{ch}</span>;
             });})()}
             {!currentLangLoaded&&<span style={{fontSize:"10px",color:S.green,marginLeft:"6px",animation:"pulse 1s ease-in-out infinite",display:"inline-flex",alignItems:"center",gap:"2px"}}><span style={{width:"6px",height:"6px",borderRadius:"50%",border:`2px solid ${S.green}`,borderTopColor:"transparent",display:"inline-block",animation:"spin 0.8s linear infinite"}}></span></span>}
           </h1>
@@ -4539,14 +4537,14 @@ export default function Piilosana(){
       )}
       {mode==="multi"&&lobbyState==="choose"&&(
         <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{border:`3px solid ${S.green}`,padding:"24px",boxShadow:`0 0 20px ${S.green}44`,maxWidth:"600px"}}>
+          <div style={{border:`3px solid ${S.green}`,padding:"24px",boxShadow:`0 0 20px ${S.green}44`,maxWidth:"600px",borderRadius:"16px"}}>
             {lobbyError&&<p style={{fontSize:"13px",color:S.red,marginBottom:"8px"}}>{lobbyError}</p>}
             {!socketConnected&&<p style={{fontSize:"13px",color:S.yellow,marginBottom:"12px",animation:"pulse 1s infinite"}}>{t.connecting}</p>}
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
               <p style={{fontSize:"13px",lineHeight:"2",color:S.green,margin:0}}>{t.openGames}</p>
-              <button onClick={refreshRooms} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.green,border:`1px solid ${S.green}`,background:"transparent",padding:"4px 10px",cursor:"pointer",display:"flex",alignItems:"center"}}><Icon icon="refresh" color={S.green} size={2}/></button>
+              <button onClick={refreshRooms} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.green,border:`1px solid ${S.green}`,background:"transparent",padding:"4px 10px",cursor:"pointer",display:"flex",alignItems:"center",borderRadius:"8px"}}><Icon icon="refresh" color={S.green} size={2}/></button>
             </div>
-            <div style={{background:S.dark,padding:"8px",border:`1px solid ${S.border}`,marginBottom:"16px",minHeight:"80px",maxHeight:"200px",overflowY:"auto"}}>
+            <div style={{background:S.dark,padding:"8px",border:`1px solid ${S.border}`,marginBottom:"16px",minHeight:"80px",maxHeight:"200px",overflowY:"auto",borderRadius:"10px"}}>
               {publicRooms.length===0&&(
                 <p style={{fontSize:"18px",color:S.textMuted,padding:"16px 0"}}>{t.noRooms}</p>
               )}
@@ -4557,7 +4555,7 @@ export default function Piilosana(){
                     <span style={{fontSize:"13px",color:S.yellow}}>{r.hostNickname}</span>
                     <span style={{fontSize:"18px",color:"#888",marginLeft:"8px"}}>{r.playerCount}/{r.maxPlayers}</span>
                   </div>
-                  <button onClick={()=>joinRoom(r.roomCode)} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"6px 14px",cursor:"pointer",boxShadow:"2px 2px 0 #cc8800"}}>{t.join}</button>
+                  <button onClick={()=>joinRoom(r.roomCode)} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"6px 14px",cursor:"pointer",boxShadow:"2px 2px 0 #cc8800",borderRadius:"8px"}}>{t.join}</button>
                 </div>
               ))}
             </div>
@@ -4566,14 +4564,14 @@ export default function Piilosana(){
               <p style={{fontSize:"13px",color:S.textMuted,marginBottom:"6px"}}>{t.orJoinRoom}</p>
               <div style={{display:"flex",gap:"6px",justifyContent:"center",alignItems:"center"}}>
                 <input type="text" maxLength="6" value={roomCode} onChange={e=>setRoomCode(e.target.value.toUpperCase())} placeholder={t.roomCode}
-                  style={{fontFamily:S.font,fontSize:"14px",color:S.green,background:S.dark,border:`2px solid ${S.border}`,padding:"8px",width:"120px",textAlign:"center",outline:"none",letterSpacing:"2px"}}
+                  style={{fontFamily:S.font,fontSize:"14px",color:S.green,background:S.dark,border:`2px solid ${S.border}`,padding:"8px",width:"140px",textAlign:"center",outline:"none",letterSpacing:"2px",borderRadius:"8px"}}
                   onKeyDown={e=>{if(e.key==="Enter"&&roomCode.trim())joinRoom(roomCode.trim());}}/>
-                <button onClick={()=>{if(roomCode.trim())joinRoom(roomCode.trim());}} disabled={!socketConnected||!roomCode.trim()} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:roomCode.trim()&&socketConnected?S.yellow:S.border,border:"none",padding:"8px 14px",cursor:roomCode.trim()&&socketConnected?"pointer":"default"}}>{t.joinGame}</button>
+                <button onClick={()=>{if(roomCode.trim())joinRoom(roomCode.trim());}} disabled={!socketConnected||!roomCode.trim()} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:roomCode.trim()&&socketConnected?S.yellow:S.border,border:"none",padding:"8px 14px",cursor:roomCode.trim()&&socketConnected?"pointer":"default",borderRadius:"8px"}}>{t.joinGame}</button>
               </div>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
-              <button onClick={createRoom} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:socketConnected?S.green:S.border,border:"none",padding:"12px 20px",cursor:socketConnected?"pointer":"default",boxShadow:socketConnected?"3px 3px 0 #008844":"none"}}>{socketConnected?t.createGame:t.connecting}</button>
-              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"18px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"10px 20px",cursor:"pointer"}}>{t.back}</button>
+              <button onClick={createRoom} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:socketConnected?S.green:S.border,border:"none",padding:"12px 20px",cursor:socketConnected?"pointer":"default",boxShadow:socketConnected?"3px 3px 0 #008844":"none",borderRadius:"10px"}}>{socketConnected?t.createGame:t.connecting}</button>
+              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"18px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"10px 20px",cursor:"pointer",borderRadius:"10px"}}>{t.back}</button>
             </div>
           </div>
         </div>
