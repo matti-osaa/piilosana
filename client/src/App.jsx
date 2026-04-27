@@ -4988,14 +4988,14 @@ export default function Piilosana(){
                           "--ex":`${((c-Math.floor(hexCols/2))*40)}px`,"--ey":`${((r-Math.floor(grid.length/2))*40)}px`,
                         }}>
                         {/* Drop shadow — soft blur under the tile */}
-                        {!eaten&&<div style={{position:"absolute",inset:"-2px",top:"3px",clipPath:hexClip,
-                          background:isLight?"#00000018":"#00000044",
-                          filter:"blur(3px)",
+                        {!eaten&&<div style={{position:"absolute",inset:"-3px",top:"2px",clipPath:hexClip,
+                          background:isLight?"#00000015":"#00000044",
+                          filter:"blur(4px)",
                           pointerEvents:"none"}}/>}
-                        {/* Base hex — the "side" edge visible at bottom */}
+                        {/* Base hex — the dark rim / "side" edge like ceramic bead */}
                         <div style={{position:"absolute",inset:s?"-2px":"0",clipPath:hexClip,
                           background:s?borderBg:(isLight
-                            ?`linear-gradient(175deg, #e8e2d8 0%, #d0c8b8 50%, #b8b0a0 100%)`
+                            ?`linear-gradient(180deg, #c8c0b4 0%, #a89e90 40%, #908678 100%)`
                             :`linear-gradient(175deg, ${S.cellBorder||S.border} 0%, #111111 100%)`),
                           backgroundSize:s?"300% 100%":"100% 100%",
                           animation:s?`hexPrismatic 6s linear infinite, hexAuroraShift 8s ease-in-out infinite`:"none",
@@ -5006,10 +5006,10 @@ export default function Piilosana(){
                           background:`radial-gradient(ellipse at 50% 50%, ${S.green}33 0%, #8866ff22 40%, transparent 70%)`,
                           animation:"hexGlowPulse 4s ease-in-out infinite",
                           pointerEvents:"none"}}/>}
-                        {/* Pillow face — convex surface with radial highlight */}
-                        <div style={{position:"absolute",inset:"2px",top:"1.5px",bottom:"3px",clipPath:hexClipInner,
+                        {/* Pillow face — convex ceramic surface with strong radial highlight */}
+                        <div style={{position:"absolute",inset:"3px",top:"2px",bottom:"4px",clipPath:hexClipInner,
                           background:eaten?(S.gridBg||"#111133"):(isLight
-                            ?`radial-gradient(ellipse at 40% 35%, #ffffff 0%, #faf8f4 30%, #ede8e0 60%, #ddd6ca 85%, #ccc4b6 100%)`
+                            ?`radial-gradient(ellipse 70% 65% at 45% 40%, #ffffff 0%, #f5f2ee 25%, #e8e2da 45%, #d4ccc0 65%, #bfb5a8 80%, #a89e90 100%)`
                             :(s?cellBg:`radial-gradient(ellipse at 40% 35%, ${S.cell} 0%, ${S.cell}dd 40%, ${S.dark||S.cell}bb 80%, ${S.dark||S.cell}99 100%)`)),
                           display:"flex",alignItems:"center",justifyContent:"center",
                           fontSize:isLarge?"clamp(26px,6.5vw,40px)":"clamp(22px,6vw,34px)",
@@ -5017,18 +5017,18 @@ export default function Piilosana(){
                           textTransform:"uppercase",
                           transition:"all 0.2s ease",
                           color:eaten?endColor||"transparent":scrambleColor||(s?"#ffffff":(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
-                          textShadow:eaten?"none":s?`0 0 12px ${S.green}99, 0 0 24px #8866ff66, 0 1px 3px #000000cc`:(isLight?`0 1px 1px #00000020`:`0 1px 2px #000000aa`),
+                          textShadow:eaten?"none":s?`0 0 12px ${S.green}99, 0 0 24px #8866ff66, 0 1px 3px #000000cc`:(isLight?`0 1px 0 #ffffff66, 0 -1px 1px #00000010`:`0 1px 2px #000000aa`),
                         }}>
-                          {/* Specular highlight — bright spot upper-left like the ceramic bead */}
+                          {/* Specular highlight — double-layer ceramic glaze reflection */}
                           {!eaten&&<div style={{position:"absolute",inset:0,clipPath:hexClipInner,
                             background:isLight
-                              ?`radial-gradient(ellipse at 35% 28%, #ffffff 0%, #ffffffcc 15%, #ffffff66 30%, transparent 55%)`
+                              ?`radial-gradient(ellipse 50% 40% at 38% 30%, #ffffffee 0%, #ffffffaa 20%, #ffffff44 40%, transparent 65%), radial-gradient(ellipse 30% 25% at 32% 25%, #ffffff 0%, transparent 50%)`
                               :`radial-gradient(ellipse at 35% 28%, #ffffff22 0%, #ffffff11 20%, transparent 50%)`,
                             pointerEvents:"none",zIndex:0}}/>}
-                          {/* Bottom-right shadow — edge darkening for convex shape */}
+                          {/* Bottom-right shadow — strong edge darkening for convex ceramic shape */}
                           {!eaten&&<div style={{position:"absolute",inset:0,clipPath:hexClipInner,
                             background:isLight
-                              ?`radial-gradient(ellipse at 70% 75%, #00000018 0%, #00000008 30%, transparent 60%)`
+                              ?`radial-gradient(ellipse 60% 50% at 65% 72%, #00000028 0%, #00000012 35%, transparent 65%), linear-gradient(170deg, transparent 40%, #00000010 70%, #00000020 100%)`
                               :`radial-gradient(ellipse at 70% 75%, #00000033 0%, #00000015 30%, transparent 60%)`,
                             pointerEvents:"none",zIndex:0}}/>}
                           {eaten?"":<>
