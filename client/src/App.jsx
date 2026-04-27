@@ -3777,21 +3777,40 @@ export default function Piilosana(){
         onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #FF2D5544,${S.btnShadow}`:"4px 4px 0 #c41e3f,0 0 20px #FF2D5533"}}>
         {t.arenaDesc&&<span style={{fontSize:"13px",letterSpacing:"3px",opacity:0.9}}>{t.arenaDesc}</span>}
         <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%"}}><svg width="56" height="56" viewBox="0 0 120 110" style={{position:"absolute",left:"12px",top:"50%",transform:"translateY(-50%)"}}>
-          {/* Brain — side view, cartoon style with bumpy cloud outline */}
-          <g transform="translate(6,8) scale(0.9)">
-            {/* Brain stem — triangle pointing DOWN */}
-            <path d="M36 84 L30 98 L44 98 Z" fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="3" strokeLinejoin="round"/>
-            {/* Main brain outline — bumpy cloud-edge all around, helmet shape */}
-            <path d="M36 84 C28 84 20 80 16 74 C12 68 8 62 8 54 C6 48 8 42 12 36 C10 30 14 24 20 20 C18 14 24 8 32 8 C34 4 40 2 48 4 C52 0 60 0 66 4 C72 2 78 6 82 12 C88 10 94 16 96 24 C100 28 102 36 100 44 C104 50 102 58 98 64 C100 70 96 76 90 78 C86 82 80 84 74 84 C66 86 58 86 50 84 C44 86 40 86 36 84 Z" fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="3.5" strokeLinejoin="round"/>
-            {/* Folds — diagonal wavy lines going top-right to bottom-left ~45deg */}
-            <path d="M72 16 C66 22 58 24 52 30 C46 36 38 38 30 42" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M88 28 C80 34 72 36 64 42 C56 48 48 50 38 54" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M96 44 C88 50 80 52 72 56 C64 60 56 62 46 66" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M94 60 C86 64 78 66 70 70 C64 74 56 76 50 78" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            {/* Cerebellum — small horizontal lines at back-bottom */}
-            <path d="M16 74 C14 78 16 82 22 84 C26 84 32 84 36 84" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-            <path d="M20 76 C24 74 30 74 34 76" stroke="#2d2d2d" strokeWidth="2" fill="none" strokeLinecap="round"/>
-            <path d="M22 80 C26 78 30 78 34 80" stroke="#2d2d2d" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+          {/* Brain — side view, cartoon icon style */}
+          <g transform="translate(8,8) scale(0.88)">
+            {/* Brain stem — small nub */}
+            <path d="M34 86 L38 94 L46 94 L42 86" fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="2.5" strokeLinejoin="round"/>
+            {/* Main brain outline — cloud-bumpy, helmet shape: tall back, curved front */}
+            <path d={[
+              "M38 86",
+              "C30 86 22 82 16 76",
+              "C12 72 10 66 10 62",
+              "C8 58 6 52 8 46",
+              "C6 42 8 36 12 32",
+              "C10 26 12 20 18 16",
+              "C16 10 22 6 28 6",
+              "C30 2 36 0 42 2",
+              "C46 -2 52 -2 58 2",
+              "C62 -1 68 2 72 6",
+              "C76 4 82 8 86 14",
+              "C90 12 96 18 98 26",
+              "C102 32 104 40 102 48",
+              "C104 54 102 60 98 66",
+              "C96 72 90 76 84 78",
+              "C78 82 72 84 66 84",
+              "C60 86 52 86 46 86",
+              "Z"
+            ].join(" ")} fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="3.5" strokeLinejoin="round"/>
+            {/* Folds — wavy S-curves at ~45° angle, like the reference icon */}
+            <path d="M76 14 C72 20 64 24 60 28 C54 34 48 32 42 38 C36 44 28 46 22 48" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M92 28 C86 34 80 36 74 40 C66 46 60 44 54 50 C46 56 40 56 32 60" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M100 46 C94 52 88 54 82 56 C74 60 68 58 62 64 C54 70 48 70 42 74" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M96 64 C90 68 84 70 78 72 C72 76 66 74 60 78 C56 80 52 82 48 82" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            {/* Cerebellum — small lines at back-bottom left */}
+            <path d="M16 76 C14 78 16 82 22 84 C28 86 34 86 38 86" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M20 78 C24 76 30 76 34 78" stroke="#2d2d2d" strokeWidth="2" fill="none" strokeLinecap="round"/>
+            <path d="M22 82 C26 80 30 80 34 82" stroke="#2d2d2d" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
           </g>
           {/* Oil drops falling on brain */}
           <ellipse cx="52" cy="4" rx="4" ry="5" fill="#ffe066" stroke="#cca000" strokeWidth="1">
