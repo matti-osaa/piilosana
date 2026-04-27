@@ -58,12 +58,25 @@ loadWords("fi");loadWords("en");loadWords("sv");
 
 function getLangConf(lang){return LANG_CONFIG[lang]||LANG_CONFIG.fi;}
 
-function randLetterLang(lang){
+function randLetterLang(lang,rng){
   const lw=getLangConf(lang).lw;
   const ls=Object.keys(lw),ws=Object.values(lw),tot=ws.reduce((a,b)=>a+b,0);
-  let r=Math.random()*tot;for(let i=0;i<ls.length;i++){r-=ws[i];if(r<=0)return ls[i];}return ls[ls.length-1];
+  let r=(rng?rng():Math.random())*tot;for(let i=0;i<ls.length;i++){r-=ws[i];if(r<=0)return ls[i];}return ls[ls.length-1];
 }
-function makeGrid(rows,lang='fi',cols){const c=cols||rows;return Array.from({length:rows},()=>Array.from({length:c},()=>randLetterLang(lang)));}
+function makeGrid(rows,lang='fi',cols,rng){const c=cols||rows;return Array.from({length:rows},()=>Array.from({length:c},()=>randLetterLang(lang,rng)));}
+
+// Seeded PRNG for daily challenge — mulberry32
+function seededRng(seed){let t=seed|0;return()=>{t=t+0x6D2B79F5|0;let x=Math.imul(t^(t>>>15),1|t);x^=x+Math.imul(x^(x>>>7),61|x);return((x^(x>>>14))>>>0)/4294967296;};}
+function dailySeed(dateStr){let h=0;for(let i=0;i<dateStr.length;i++){h=Math.imul(31,h)+dateStr.charCodeAt(i)|0;}return h;}
+// Daily challenge number: days since 2026-04-27
+const DAILY_EPOCH=new Date('2026-04-27').getTime();
+function dailyNumber(){return Math.floor((Date.now()-DAILY_EPOCH)/(1000*60*60*24))+1;}
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function makeDailyGrid(lang='fi'){const rng=seededRng(dailySeed(todayStr()+lang));return makeGrid(7,lang,5,rng);}
+function getDailyResult(){try{const d=JSON.parse(localStorage.getItem('piilosana_daily')||'{}');if(d.date===todayStr())return d;return null;}catch{return null;}}
+function saveDailyResult(score,wordsFound,totalWords){localStorage.setItem('piilosana_daily',JSON.stringify({date:todayStr(),num:dailyNumber(),score,wordsFound,totalWords,lang:'fi'}));}
+function getDailyStreak(){try{const s=JSON.parse(localStorage.getItem('piilosana_streak')||'{}');return s;}catch{return{};}}
+function updateDailyStreak(){const s=getDailyStreak();const today=todayStr();const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);if(s.lastDate===today)return s;const streak=(s.lastDate===yesterday)?(s.streak||0)+1:1;const best=Math.max(streak,s.best||0);const result={streak,best,lastDate:today};localStorage.setItem('piilosana_streak',JSON.stringify(result));return result;}
 
 // Client-side gravity: remove cells, drop letters down, fill new from top
 function applyGravityClient(grid,removedCells,lang='fi'){
@@ -206,6 +219,7 @@ const T={
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
     shareLink:"JAA LINKKI",copied:"Kopioitu!",scanToJoin:"Skannaa liittyäksesi",inviteFriends:"Kutsu kavereita:",arenaLink:"Suora linkki moninpeliin:",invitePlayer:"KUTSU PELAAJA",shareGame:"Jaa linkki peliin",
     newCustom:"UUSI OMA NETTIPELI",menu:"VALIKKO",newPractice:"UUSI HARJOITUS",
+    daily:"PÄIVÄN PIILOSANA",dailyDesc:"sama kaikille",dailyDone:"Jo pelattu tänään!",dailyShare:"JAA TULOS",dailyCopied:"Kopioitu leikepöydälle!",dailyStreak:"Putkessa",dailyBest:"Paras putki",dailyWords:"sanaa",dailyOf:"yhteensä",dailyChallenge:"Haaste",
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
     notValid:"Ei kelpaa",alreadyFound:"Jo löydetty",
@@ -269,6 +283,7 @@ const T={
     joinGame:"JOIN GAME",roomCode:"ROOM CODE",noRooms:"No open rooms",orJoinRoom:"or join with code",
     shareLink:"SHARE LINK",copied:"Copied!",scanToJoin:"Scan to join",inviteFriends:"Invite friends:",arenaLink:"Direct link to multiplayer:",invitePlayer:"INVITE PLAYER",shareGame:"Share game link",
     newCustom:"NEW CUSTOM GAME",menu:"MENU",newPractice:"NEW PRACTICE",
+    daily:"DAILY CHALLENGE",dailyDesc:"same for everyone",dailyDone:"Already played today!",dailyShare:"SHARE RESULT",dailyCopied:"Copied to clipboard!",dailyStreak:"Streak",dailyBest:"Best streak",dailyWords:"words",dailyOf:"total",dailyChallenge:"Challenge",
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
     notValid:"Not valid",alreadyFound:"Already found",
@@ -332,6 +347,7 @@ const T={
     joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
     shareLink:"DELA LÄNK",copied:"Kopierat!",scanToJoin:"Skanna för att gå med",inviteFriends:"Bjud in vänner:",arenaLink:"Direktlänk till flerspelare:",invitePlayer:"BJUD IN SPELARE",shareGame:"Dela spellänk",
     newCustom:"NYTT EGET SPEL",menu:"MENY",newPractice:"NY ÖVNING",
+    daily:"DAGENS UTMANING",dailyDesc:"samma för alla",dailyDone:"Redan spelat idag!",dailyShare:"DELA RESULTAT",dailyCopied:"Kopierat till urklipp!",dailyStreak:"Svit",dailyBest:"Bästa svit",dailyWords:"ord",dailyOf:"totalt",dailyChallenge:"Utmaning",
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
     notValid:"Ogiltigt",alreadyFound:"Redan hittat",
@@ -2168,6 +2184,9 @@ export default function Piilosana(){
   const[showHelp,setShowHelp]=useState(false);
   const[showInflection,setShowInflection]=useState(false);
   const[showTutorial,setShowTutorial]=useState(false);
+  const[dailyMode,setDailyMode]=useState(false);
+  const[dailyResult,setDailyResult]=useState(()=>getDailyResult());
+  const[dailyShareMsg,setDailyShareMsg]=useState(null);
   const[showExitConfirm,setShowExitConfirm]=useState(false);
   const[showHamburger,setShowHamburger]=useState(false);
   const[muteEmojis,setMuteEmojis]=useState(()=>localStorage.getItem("piilosana_mute_emoji")==="on");
@@ -2678,6 +2697,41 @@ export default function Piilosana(){
     window.scrollTo(0,0);
   },[trie,sounds,gameTime,soloMode,lang]);
 
+  const startDaily=useCallback(async()=>{
+    if(getDailyResult())return; // already played today
+    if(!LANG_CONFIG[lang].loaded){await loadWords(lang);setWordsLoaded(p=>({...p,[lang]:true}));}
+    sounds.init().catch(()=>{});
+    // Generate deterministic grid from today's date
+    const rng=seededRng(dailySeed(todayStr()+lang));
+    let bg=null,bw=new Set();
+    for(let i=0;i<30;i++){const g=makeGrid(7,lang,5,rng);const w=findWordsHex(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=25)break;}
+    // If seeded RNG exhausted good options, use first attempt
+    if(!bg){bg=makeGrid(7,lang,5,seededRng(dailySeed(todayStr()+lang)));bw=findWordsHex(bg,trie);}
+    setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(180);setScore(0);setMsg(null);
+    setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);
+    setEnding(null);setEndingProgress(0);setDropKey(0);
+    setActiveTheme(null);setThemeFound([]);setBombCell(null);setBombTimer(0);
+    setMysteryCell(null);setMysteryRevealed(false);
+    setChessPiece(null);setChessPos(null);setChessPath([]);setChessWord("");setChessValidCells([]);setChessInvalid(null);setChessMoves(0);setChessGrid([]);setChessPlacing(false);
+    setDailyMode(true);
+    setSoloMode("hex");setGameTime(180);
+    setMode("solo");setCountdown(3);setState("countdown");
+    window.scrollTo(0,0);
+    // Fetch long words
+    if(lang==="fi"&&bg){fetch(`${SERVER_URL}/api/find-long-words`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({grid:bg,hex:true})}).then(r=>r.json()).then(({words})=>{if(words&&words.length>0)setValid(prev=>{const n=new Set(prev);words.forEach(w=>n.add(w));return n;});}).catch(()=>{});}
+  },[trie,sounds,lang]);
+
+  const shareDailyResult=useCallback(()=>{
+    const dr=getDailyResult();if(!dr)return;
+    const stars=dr.wordsFound>=20?"⭐⭐⭐":dr.wordsFound>=12?"⭐⭐":dr.wordsFound>=5?"⭐":"";
+    const pct=dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0;
+    const streak=getDailyStreak();
+    const text=`Piilosana #${dr.num} ${stars}\n${dr.score}p · ${dr.wordsFound}/${dr.totalWords} sanaa (${pct}%)${streak.streak>1?`\n🔥 ${streak.streak} päivää putkeen!`:""}\n\nhttps://piilosana.com`;
+    const emoji=`🧩 Piilosana #${dr.num}\n${"🟩".repeat(Math.min(dr.wordsFound,20))}${"⬜".repeat(Math.max(0,20-dr.wordsFound))}\n${dr.score}p · ${dr.wordsFound}/${dr.totalWords} (${pct}%)${streak.streak>1?` · 🔥${streak.streak}`:""}\npiilosana.com`;
+    if(navigator.share){navigator.share({title:`Piilosana #${dr.num}`,text}).catch(()=>{});}
+    else{navigator.clipboard.writeText(emoji).then(()=>setDailyShareMsg(t.dailyCopied)).catch(()=>{});setTimeout(()=>setDailyShareMsg(null),2000);}
+  },[t]);
+
   const start=useCallback(async()=>{
     if(mode==="solo"){
       await startSolo();
@@ -2842,10 +2896,20 @@ export default function Piilosana(){
         setState("end");
         if(mode==="multi")setLobbyState("results");
         if(mode==="public")setPublicState("end");
+        // daily save handled in separate useEffect
       }
     },80);
     return()=>clearInterval(t);
   },[state,mode]);
+
+  // Save daily result when game ends
+  useEffect(()=>{
+    if(state==="end"&&dailyMode&&!getDailyResult()){
+      saveDailyResult(score,found.length,valid.size);
+      updateDailyStreak();
+      setDailyResult(getDailyResult());
+    }
+  },[state,dailyMode,score,found,valid]);
 
   // Background music control — only after user interaction (browser autoplay policy)
   useEffect(()=>{
@@ -3722,6 +3786,8 @@ export default function Piilosana(){
     setPublicState(null);
     setPublicScores([]);
     setPublicRankings(null);
+    setDailyMode(false);
+    setDailyResult(getDailyResult());
     setState("menu");
   },[socket,mode]);
   
@@ -3825,6 +3891,30 @@ export default function Piilosana(){
           </g>
         </svg><span>{t.arenaCta}</span></span>
         {publicOnlineCount>=3&&<span style={{fontSize:"12px",opacity:0.8,display:"flex",alignItems:"center",gap:"4px",marginTop:"2px"}}><span style={{fontSize:"14px",fontWeight:"700"}}>{publicOnlineCount}</span> {t.playersInArena}</span>}
+      </button>
+
+      {/* Daily Challenge button */}
+      <button onClick={()=>{if(dailyResult){/* show result */}else{startDaily();}}} style={{fontFamily:S.font,fontSize:"16px",color:"#fff",background:dailyResult?"linear-gradient(135deg,#444 0%,#555 100%)":"linear-gradient(135deg,#FF9500 0%,#FF6B00 100%)",border:"none",padding:"16px 20px",cursor:"pointer",boxShadow:dailyResult?"none":S.btnShadow!=="none"?`0 4px 16px #FF950044,${S.btnShadow}`:"3px 3px 0 #cc7000",borderRadius:S.btnRadius,width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"8px",position:"relative",overflow:"hidden"}}
+        onMouseEnter={e=>{if(!dailyResult){e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";}}}
+        onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
+        <span style={{display:"flex",flexDirection:"column",alignItems:"flex-start",gap:"2px"}}>
+          <span style={{display:"flex",alignItems:"center",gap:"8px"}}>
+            <span style={{fontSize:"20px"}}>📅</span>
+            <span style={{fontWeight:"700"}}>{t.daily} #{dailyNumber()}</span>
+          </span>
+          <span style={{fontSize:"12px",opacity:0.8}}>{dailyResult?t.dailyDone:t.dailyDesc}</span>
+        </span>
+        {dailyResult?(
+          <span style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:"2px"}}>
+            <span style={{fontSize:"18px",fontWeight:"700"}}>{dailyResult.score}p</span>
+            <span style={{fontSize:"12px",opacity:0.8}}>{dailyResult.wordsFound}/{dailyResult.totalWords} {t.dailyWords}</span>
+          </span>
+        ):(
+          <span style={{display:"flex",alignItems:"center",gap:"4px"}}>
+            {(()=>{const s=getDailyStreak();return s.streak>1?<span style={{fontSize:"13px"}}>🔥{s.streak}</span>:null;})()}
+            <span style={{fontSize:"22px"}}>▶</span>
+          </span>
+        )}
       </button>
 
       {/* Three buttons side by side: Practice, Custom Game, Quick Guide */}
@@ -5310,8 +5400,20 @@ export default function Piilosana(){
               {t.share}
             </button>
 
+            {dailyMode&&dailyResult&&(
+              <div style={{margin:"12px 0",padding:"16px",background:"linear-gradient(135deg,#FF950022,#FF6B0022)",border:"2px solid #FF9500",borderRadius:"14px",textAlign:"center"}}>
+                <div style={{fontSize:"18px",fontWeight:"700",color:"#FF9500",marginBottom:"4px"}}>📅 {t.daily} #{dailyResult.num}</div>
+                <div style={{fontSize:"24px",fontWeight:"800",color:S.yellow,marginBottom:"4px"}}>{dailyResult.score}p</div>
+                <div style={{fontSize:"14px",color:S.green,marginBottom:"8px"}}>{dailyResult.wordsFound}/{dailyResult.totalWords} {t.dailyWords} ({dailyResult.totalWords>0?Math.round(dailyResult.wordsFound/dailyResult.totalWords*100):0}%)</div>
+                {(()=>{const s=getDailyStreak();return s.streak>0?<div style={{fontSize:"14px",color:"#FF9500",marginBottom:"8px"}}>🔥 {t.dailyStreak}: {s.streak} · {t.dailyBest}: {s.best}</div>:null;})()}
+                <button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"15px",color:"#fff",background:"linear-gradient(135deg,#FF9500,#FF6B00)",border:"none",padding:"10px 24px",cursor:"pointer",borderRadius:"10px",fontWeight:"700",boxShadow:"0 4px 12px #FF950044"}}>
+                  {dailyShareMsg||t.dailyShare}
+                </button>
+              </div>
+            )}
+
             <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center",marginTop:"10px"}}>
-              <button onClick={()=>{setHofSubmitted(false);start();}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.green}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.newPractice}</button>
+              <button onClick={()=>{setHofSubmitted(false);setDailyMode(false);start();}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.green}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.newPractice}</button>
               <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.yellow,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.yellow}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.customGame}</button>
               <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`1px solid ${S.green}44`,background:"transparent",padding:"10px 20px",cursor:"pointer",width:"280px",borderRadius:"10px",transition:"all 0.15s"}}>{t.menu}</button>
             </div>
