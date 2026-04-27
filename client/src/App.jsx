@@ -181,7 +181,7 @@ function scrambleArea(grid,centerR,centerC,radius,lang){
 // UI translations
 const T={
   fi:{
-    selectMode:"VALITSE PELIMUOTO",arena:"MONINPELI",arenaDesc:"",arenaCta:"ETSI SANOJA",arenaWelcome:"Tervetuloa — liity peliin!",customGame:"OMA MONINPELI",customDesc:"kutsu kavereita",practice:"HARJOITTELU",practiceDesc:"yksinpeli",
+    selectMode:"VALITSE PELIMUOTO",arena:"MONINPELI",arenaDesc:"24/7 nonstop-moninpeli",arenaCta:"ETSI SANOJA",arenaWelcome:"Tervetuloa — liity peliin!",customGame:"OMA MONINPELI",customDesc:"kutsu kavereita",practice:"HARJOITTELU",practiceDesc:"yksinpeli",
     findWords:"Etsi sanoja ruudukosta!",dragHint:"VEDÄ kirjaimien yli kaikkiin suuntiin. Aikaa 2 min.",comboHint:"Löydä sanoja nopeasti putkeen = kombo ja lisäpisteet!",
     scoring:"PISTEYTYS: 3kir=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"sanaa",
     nickname:"NIMIMERKKI",join:"LIITY",back:"TAKAISIN",exit:"POISTU",play:"PELAA",
@@ -244,7 +244,7 @@ const T={
     menuExitGame:"POISTU PELISTÄ",menuClose:"SULJE VALIKKO",menuMuteEmoji:"VAIMENNA ELEET",
   },
   en:{
-    selectMode:"SELECT GAME MODE",arena:"MULTIPLAYER",arenaDesc:"",arenaCta:"FIND WORDS",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
+    selectMode:"SELECT GAME MODE",arena:"MULTIPLAYER",arenaDesc:"24/7 online game",arenaCta:"FIND WORDS",arenaWelcome:"Welcome — join the game!",customGame:"CUSTOM GAME",customDesc:"various modes",practice:"PRACTICE",practiceDesc:"solo play",
     findWords:"Find words from the grid!",dragHint:"DRAG across letters in all directions. 2 min timer.",comboHint:"Find words quickly in a row = combo and bonus points!",
     scoring:"SCORING: 3let=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"COMBO x2 (3+) · COMBO x3 (5+)",words:"words",
     nickname:"NICKNAME",join:"JOIN",back:"BACK",exit:"EXIT",play:"PLAY",
@@ -307,7 +307,7 @@ const T={
     menuExitGame:"EXIT GAME",menuClose:"CLOSE MENU",menuMuteEmoji:"MUTE GESTURES",
   },
   sv:{
-    selectMode:"VÄLJ SPELLÄGE",arena:"FLERSPELARE",arenaDesc:"",arenaCta:"HITTA ORD",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
+    selectMode:"VÄLJ SPELLÄGE",arena:"FLERSPELARE",arenaDesc:"24/7 onlinespel",arenaCta:"HITTA ORD",arenaWelcome:"Välkommen — gå med i spelet!",customGame:"EGET SPEL",customDesc:"olika lägen",practice:"ÖVNING",practiceDesc:"ensam",
     findWords:"Hitta ord i rutnätet!",dragHint:"DRA över bokstäverna i alla riktningar. 2 min tid.",comboHint:"Hitta ord snabbt i rad = kombo och bonuspoäng!",
     scoring:"POÄNG: 3bok=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"ord",
     nickname:"SMEKNAMN",join:"GÅ MED",back:"TILLBAKA",exit:"LÄMNA",play:"SPELA",
@@ -3776,28 +3776,55 @@ export default function Piilosana(){
         onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #FF2D5566":"6px 6px 0 #c41e3f,0 0 30px #FF2D5544"}}
         onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #FF2D5544,${S.btnShadow}`:"4px 4px 0 #c41e3f,0 0 20px #FF2D5533"}}>
         {t.arenaDesc&&<span style={{fontSize:"13px",letterSpacing:"3px",opacity:0.9}}>{t.arenaDesc}</span>}
-        <span style={{display:"flex",alignItems:"center",gap:"12px"}}><svg width="48" height="48" viewBox="0 0 100 100" style={{flexShrink:0}}>
-          {/* Brain */}
-          <ellipse cx="42" cy="45" rx="28" ry="30" fill="#ffb8c6" stroke="#ffffff88" strokeWidth="2"/>
-          <path d="M42 18 Q55 18 58 30 Q62 22 68 28 Q74 34 70 44 Q76 50 70 58 Q72 66 64 72 Q56 78 46 76 Q36 78 28 72 Q20 66 22 58 Q16 50 22 44 Q18 34 24 28 Q30 22 36 26 Q38 18 42 18Z" fill="#ff9cb8" stroke="#ffffff" strokeWidth="1.5"/>
-          <path d="M42 24 L42 72" stroke="#ffb8c6" strokeWidth="1.5" strokeLinecap="round"/>
-          <path d="M42 34 Q32 36 30 42" stroke="#ffb8c6" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M42 44 Q52 46 56 52" stroke="#ffb8c6" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          <path d="M42 54 Q34 56 30 60" stroke="#ffb8c6" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-          {/* Oil can */}
-          <rect x="64" y="58" width="20" height="16" rx="3" fill="#ffe066" stroke="#cc9900" strokeWidth="1.5"/>
-          <path d="M84 64 L94 60 L94 64 L84 68Z" fill="#ffe066" stroke="#cc9900" strokeWidth="1"/>
-          <rect x="70" y="54" width="8" height="5" rx="1.5" fill="#ffcc00" stroke="#cc9900" strokeWidth="1"/>
-          {/* Oil drops */}
-          <ellipse cx="96" cy="66" rx="3" ry="4" fill="#ffe066" opacity="0.9">
-            <animate attributeName="cy" values="64;72;64" dur="1.5s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.9;0.4;0.9" dur="1.5s" repeatCount="indefinite"/>
+        <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%"}}><svg width="56" height="56" viewBox="0 0 120 120" style={{position:"absolute",left:"12px",top:"50%",transform:"translateY(-50%)"}}>
+          {/* Brain — cartoon style with black outlines */}
+          <g transform="translate(10,10) scale(0.85)">
+            {/* Brain body fill */}
+            <path d="M55 10 C68 8 78 14 82 24 C90 18 98 24 98 34 C104 38 106 48 100 56 C106 64 102 74 94 78 C96 86 90 94 80 94 C76 98 66 100 58 96 C50 100 40 98 34 94 C24 96 16 90 16 80 C8 76 4 66 10 56 C4 48 8 38 16 34 C14 24 22 18 32 22 C36 12 46 8 55 10Z" fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="3.5" strokeLinejoin="round"/>
+            {/* Brain center line */}
+            <path d="M55 16 C56 30 54 50 55 90" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            {/* Left folds */}
+            <path d="M55 28 C44 30 34 34 28 42" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M55 48 C42 50 30 56 22 64" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M55 66 C46 68 38 74 34 80" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            {/* Right folds */}
+            <path d="M55 32 C66 34 78 38 84 44" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M55 52 C68 54 80 58 88 64" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            <path d="M55 72 C64 74 74 78 80 84" stroke="#2d2d2d" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+            {/* Brain stem */}
+            <path d="M50 90 L46 104 L64 104 L60 90" fill="#f8a4b8" stroke="#2d2d2d" strokeWidth="3" strokeLinejoin="round"/>
+          </g>
+          {/* Oil drops falling on brain */}
+          <ellipse cx="52" cy="6" rx="4" ry="5" fill="#ffe066" stroke="#cca000" strokeWidth="1">
+            <animate attributeName="cy" values="2;18;2" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="ry" values="5;3;5" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
           </ellipse>
-          <ellipse cx="92" cy="70" rx="2" ry="3" fill="#ffcc00" opacity="0.7">
-            <animate attributeName="cy" values="68;78;68" dur="1.8s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.7;0.2;0.7" dur="1.8s" repeatCount="indefinite"/>
+          <ellipse cx="68" cy="4" rx="3" ry="4" fill="#ffcc00" stroke="#cca000" strokeWidth="1">
+            <animate attributeName="cy" values="0;14;0" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="ry" values="4;2;4" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.5s" repeatCount="indefinite"/>
           </ellipse>
-        </svg>{t.arenaCta}</span>
+          <ellipse cx="40" cy="8" rx="3" ry="3.5" fill="#ffe066" stroke="#cca000" strokeWidth="0.8">
+            <animate attributeName="cy" values="6;20;6" dur="1.7s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.7;0.1;0.7" dur="1.7s" repeatCount="indefinite"/>
+          </ellipse>
+          {/* Electric sparks */}
+          <g opacity="0.9">
+            <path d="M22 30 L18 36 L24 34 L20 42" stroke="#ffee44" strokeWidth="2" fill="none" strokeLinecap="round">
+              <animate attributeName="opacity" values="0;1;0;0;1;0" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+            <path d="M92 24 L96 30 L90 28 L94 36" stroke="#ffee44" strokeWidth="2" fill="none" strokeLinecap="round">
+              <animate attributeName="opacity" values="0;0;1;0;0;1" dur="1.8s" repeatCount="indefinite"/>
+            </path>
+            <path d="M16 60 L12 64 L18 63 L14 68" stroke="#ffee44" strokeWidth="1.5" fill="none" strokeLinecap="round">
+              <animate attributeName="opacity" values="1;0;0;1;0;0" dur="1.3s" repeatCount="indefinite"/>
+            </path>
+            <path d="M100 52 L104 56 L98 55 L102 60" stroke="#ffee44" strokeWidth="1.5" fill="none" strokeLinecap="round">
+              <animate attributeName="opacity" values="0;1;0;1;0;0" dur="1.6s" repeatCount="indefinite"/>
+            </path>
+          </g>
+        </svg><span>{t.arenaCta}</span></span>
         {publicOnlineCount>=3&&<span style={{fontSize:"12px",opacity:0.8,display:"flex",alignItems:"center",gap:"4px",marginTop:"2px"}}><span style={{fontSize:"14px",fontWeight:"700"}}>{publicOnlineCount}</span> {t.playersInArena}</span>}
       </button>
 
