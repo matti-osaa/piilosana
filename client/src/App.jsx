@@ -74,7 +74,15 @@ function dailyNumber(){return Math.floor((Date.now()-DAILY_EPOCH)/(1000*60*60*24
 function todayStr(){return new Date().toISOString().slice(0,10);}
 function makeDailyGrid(lang='fi'){const rng=seededRng(dailySeed(todayStr()+lang));return makeGrid(7,lang,5,rng);}
 function getDailyResult(){try{const d=JSON.parse(localStorage.getItem('piilosana_daily')||'{}');if(d.date===todayStr())return d;return null;}catch{return null;}}
-function saveDailyResult(score,wordsFound,totalWords){localStorage.setItem('piilosana_daily',JSON.stringify({date:todayStr(),num:dailyNumber(),score,wordsFound,totalWords,lang:'fi'}));}
+function saveDailyResult(score,wordsFound,totalWords){
+  const result={date:todayStr(),num:dailyNumber(),score,wordsFound,totalWords,lang:'fi'};
+  localStorage.setItem('piilosana_daily',JSON.stringify(result));
+  // Save to history (last 7 days)
+  try{const hist=JSON.parse(localStorage.getItem('piilosana_daily_history')||'[]');
+  hist.unshift(result);const trimmed=hist.slice(0,7);
+  localStorage.setItem('piilosana_daily_history',JSON.stringify(trimmed));}catch{}
+}
+function getDailyHistory(){try{return JSON.parse(localStorage.getItem('piilosana_daily_history')||'[]');}catch{return [];}}
 function getDailyStreak(){try{const s=JSON.parse(localStorage.getItem('piilosana_streak')||'{}');return s;}catch{return{};}}
 function updateDailyStreak(){const s=getDailyStreak();const today=todayStr();const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);if(s.lastDate===today)return s;const streak=(s.lastDate===yesterday)?(s.streak||0)+1:1;const best=Math.max(streak,s.best||0);const result={streak,best,lastDate:today};localStorage.setItem('piilosana_streak',JSON.stringify(result));return result;}
 
@@ -2726,9 +2734,9 @@ export default function Piilosana(){
     const stars=dr.wordsFound>=20?"⭐⭐⭐":dr.wordsFound>=12?"⭐⭐":dr.wordsFound>=5?"⭐":"";
     const pct=dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0;
     const streak=getDailyStreak();
-    const text=`Piilosana #${dr.num} ${stars}\n${dr.score}p · ${dr.wordsFound}/${dr.totalWords} sanaa (${pct}%)${streak.streak>1?`\n🔥 ${streak.streak} päivää putkeen!`:""}\n\nhttps://piilosana.com`;
-    const emoji=`🧩 Piilosana #${dr.num}\n${"🟩".repeat(Math.min(dr.wordsFound,20))}${"⬜".repeat(Math.max(0,20-dr.wordsFound))}\n${dr.score}p · ${dr.wordsFound}/${dr.totalWords} (${pct}%)${streak.streak>1?` · 🔥${streak.streak}`:""}\npiilosana.com`;
-    if(navigator.share){navigator.share({title:`Piilosana #${dr.num}`,text}).catch(()=>{});}
+    const text=`Päivän Piilosana #${dr.num} ${stars}\n${dr.score}p · ${dr.wordsFound}/${dr.totalWords} sanaa (${pct}%)${streak.streak>1?`\n🔥 ${streak.streak} päivää putkeen!`:""}\n\nPelaa sinäkin: https://piilosana.com`;
+    const emoji=`📅 Päivän Piilosana #${dr.num}\n${"🟩".repeat(Math.min(dr.wordsFound,20))}${"⬜".repeat(Math.max(0,20-dr.wordsFound))}\n${dr.score}p · ${dr.wordsFound}/${dr.totalWords} (${pct}%)${streak.streak>1?` · 🔥${streak.streak}`:""}\nPelaa: piilosana.com`;
+    if(navigator.share){navigator.share({title:`Päivän Piilosana #${dr.num}`,text}).catch(()=>{});}
     else{navigator.clipboard.writeText(emoji).then(()=>setDailyShareMsg(t.dailyCopied)).catch(()=>{});setTimeout(()=>setDailyShareMsg(null),2000);}
   },[t]);
 
@@ -3893,29 +3901,52 @@ export default function Piilosana(){
         {publicOnlineCount>=3&&<span style={{fontSize:"12px",opacity:0.8,display:"flex",alignItems:"center",gap:"4px",marginTop:"2px"}}><span style={{fontSize:"14px",fontWeight:"700"}}>{publicOnlineCount}</span> {t.playersInArena}</span>}
       </button>
 
-      {/* Daily Challenge button */}
-      <button onClick={()=>{if(dailyResult){/* show result */}else{startDaily();}}} style={{fontFamily:S.font,fontSize:"16px",color:"#fff",background:dailyResult?"linear-gradient(135deg,#444 0%,#555 100%)":"linear-gradient(135deg,#FF9500 0%,#FF6B00 100%)",border:"none",padding:"16px 20px",cursor:"pointer",boxShadow:dailyResult?"none":S.btnShadow!=="none"?`0 4px 16px #FF950044,${S.btnShadow}`:"3px 3px 0 #cc7000",borderRadius:S.btnRadius,width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"8px",position:"relative",overflow:"hidden"}}
-        onMouseEnter={e=>{if(!dailyResult){e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";}}}
-        onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
-        <span style={{display:"flex",flexDirection:"column",alignItems:"flex-start",gap:"2px"}}>
-          <span style={{display:"flex",alignItems:"center",gap:"8px"}}>
-            <span style={{fontSize:"20px"}}>📅</span>
-            <span style={{fontWeight:"700"}}>{t.daily} #{dailyNumber()}</span>
+      {/* Daily Challenge button + history */}
+      <div style={{marginBottom:"8px"}}>
+        <button onClick={()=>{if(!dailyResult){startDaily();}}} style={{fontFamily:S.font,fontSize:"16px",color:"#fff",background:dailyResult?"linear-gradient(135deg,#555 0%,#666 100%)":"linear-gradient(135deg,#FF9500 0%,#FF6B00 100%)",border:"none",padding:"16px 20px",cursor:"pointer",boxShadow:dailyResult?"none":S.btnShadow!=="none"?`0 4px 16px #FF950044,${S.btnShadow}`:"3px 3px 0 #cc7000",borderRadius:`${S.btnRadius} ${S.btnRadius} 0 0`,width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",position:"relative",overflow:"hidden"}}
+          onMouseEnter={e=>{if(!dailyResult){e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";}}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
+          <span style={{display:"flex",flexDirection:"column",alignItems:"flex-start",gap:"2px"}}>
+            <span style={{display:"flex",alignItems:"center",gap:"8px"}}>
+              <span style={{fontSize:"20px"}}>📅</span>
+              <span style={{fontWeight:"700"}}>{t.daily} #{dailyNumber()}</span>
+            </span>
+            <span style={{fontSize:"12px",opacity:0.8}}>{dailyResult?t.dailyDone:t.dailyDesc}</span>
           </span>
-          <span style={{fontSize:"12px",opacity:0.8}}>{dailyResult?t.dailyDone:t.dailyDesc}</span>
-        </span>
-        {dailyResult?(
-          <span style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:"2px"}}>
-            <span style={{fontSize:"18px",fontWeight:"700"}}>{dailyResult.score}p</span>
-            <span style={{fontSize:"12px",opacity:0.8}}>{dailyResult.wordsFound}/{dailyResult.totalWords} {t.dailyWords}</span>
-          </span>
-        ):(
-          <span style={{display:"flex",alignItems:"center",gap:"4px"}}>
-            {(()=>{const s=getDailyStreak();return s.streak>1?<span style={{fontSize:"13px"}}>🔥{s.streak}</span>:null;})()}
-            <span style={{fontSize:"22px"}}>▶</span>
-          </span>
-        )}
-      </button>
+          {dailyResult?(
+            <span style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:"2px"}}>
+              <span style={{fontSize:"18px",fontWeight:"700"}}>{dailyResult.score}p</span>
+              <span style={{fontSize:"12px",opacity:0.8}}>{dailyResult.wordsFound}/{dailyResult.totalWords} {t.dailyWords}</span>
+            </span>
+          ):(
+            <span style={{display:"flex",alignItems:"center",gap:"4px"}}>
+              {(()=>{const s=getDailyStreak();return s.streak>1?<span style={{fontSize:"13px"}}>🔥{s.streak}</span>:null;})()}
+              <span style={{fontSize:"22px"}}>▶</span>
+            </span>
+          )}
+        </button>
+        {/* Daily history mini scoreboard + share */}
+        {(()=>{const hist=getDailyHistory();const hasHist=hist.length>0;const hasShare=!!dailyResult;if(!hasHist&&!hasShare)return null;return(
+          <div style={{background:S.dark||"#1a1a2e",border:`1px solid #FF950044`,borderTop:"none",borderRadius:`0 0 ${S.btnRadius} ${S.btnRadius}`,overflow:"hidden"}}>
+            {hasHist&&<div style={{padding:"8px 12px",display:"flex",gap:"6px",overflowX:"auto",justifyContent:"center"}}>
+              {hist.slice(0,7).map((h,i)=>{
+                const pct=h.totalWords>0?Math.round(h.wordsFound/h.totalWords*100):0;
+                const isToday=h.date===todayStr();
+                return(
+                  <div key={h.date} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"2px",minWidth:"44px",padding:"4px 6px",borderRadius:"8px",background:isToday?"#FF950022":"transparent"}}>
+                    <span style={{fontSize:"10px",color:isToday?"#FF9500":"#888",fontWeight:isToday?"700":"400"}}>{isToday?"tänään":h.date.slice(5)}</span>
+                    <span style={{fontSize:"14px",fontWeight:"700",color:isToday?"#FF9500":S.green||"#44ddaa"}}>{h.score}p</span>
+                    <span style={{fontSize:"9px",color:"#888"}}>{pct}%</span>
+                  </div>
+                );
+              })}
+            </div>}
+            {hasShare&&<button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"13px",color:"#FF9500",background:"transparent",borderTop:`1px solid #FF950022`,border:"none",width:"100%",padding:"8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>
+              {dailyShareMsg||`📤 ${t.dailyShare}`}
+            </button>}
+          </div>
+        );})()}
+      </div>
 
       {/* Three buttons side by side: Practice, Custom Game, Quick Guide */}
       <div style={{display:"flex",gap:"8px"}}>
