@@ -1940,7 +1940,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
   }
   return(
     <div style={{position:"relative",display:"inline-block"}}>
-    <div style={{display:"flex",justifyContent:"center",alignItems:"flex-start",gap:"6px",paddingTop:"8px"}}>
+    <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:"0",paddingTop:"8px",position:"relative"}}>
     <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"0 0 10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px"}}>
       {displayChars.map((ch,i)=>{
         const isLit=lit.has(i);
@@ -1969,7 +1969,7 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
       })}
     </h1>
       {/* Coffee cup illustration - steaming, spills on lang change */}
-      <svg width="64" height="64" viewBox="0 0 100 100" style={{flexShrink:0,marginTop:"-4px",transition:"transform 0.15s ease",transform:scramble?"rotate(-12deg)":"rotate(0deg)"}}>
+      <svg width="64" height="64" viewBox="0 0 100 100" style={{position:"absolute",right:"-70px",top:"-8px",flexShrink:0,transition:"transform 0.15s ease",transform:scramble?"rotate(-12deg)":"rotate(0deg)"}}>
         {/* Steam — hidden during spill */}
         {!scramble&&<>
         <path d="M35 30 Q30 20 35 10" fill="none" stroke="#aaaaaa" strokeWidth="2.5" strokeLinecap="round" opacity="0.5">
@@ -3971,7 +3971,7 @@ export default function Piilosana(){
 
       {/* Global hamburger — top-left, always visible */}
       {state!=="play"&&state!=="ending"&&state!=="scramble"&&(
-        <button onClick={()=>setShowHamburger(true)} style={{position:"fixed",left:"10px",top:"10px",zIndex:100,background:`${S.dark}cc`,border:`1px solid ${S.border}`,padding:"4px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"10px",transition:"all 0.15s",fontSize:"20px",color:S.textMuted,lineHeight:1,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}
+        <button onClick={()=>setShowHamburger(true)} style={{position:"fixed",left:"10px",top:"14px",zIndex:100,background:`${S.dark}cc`,border:`1px solid ${S.border}`,padding:"4px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"10px",transition:"all 0.15s",fontSize:"20px",color:S.textMuted,lineHeight:1,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}
           onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;e.currentTarget.style.background=S.green+"15";}}
           onMouseLeave={e=>{e.currentTarget.style.borderColor=S.border;e.currentTarget.style.color=S.textMuted;e.currentTarget.style.background=`${S.dark}cc`;}}>
           &#9776;
@@ -4949,8 +4949,8 @@ export default function Piilosana(){
                 touchAction:"none",position:"relative"}}>
               {(()=>{const isLight=S.flavor==="ivory"||S.flavor==="dream";return grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"0px",
-                  marginTop:r>0?"-6.8%":"0",
-                  transform:r%2===1?"translateX(calc(20% / 4))":"translateX(calc(-20% / 4))",
+                  marginTop:r>0?"-5.254%":"0",
+                  transform:r%2===1?"translateX(calc(18.2% / 4))":"translateX(calc(-18.2% / 4))",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
                     const s=isSel(r,c);
@@ -4978,7 +4978,7 @@ export default function Piilosana(){
                         onMouseDown={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         onTouchStart={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                         style={{
-                          width:"20%",aspectRatio:"0.866",
+                          width:"18.2%",aspectRatio:"0.866",
                           position:"relative",
                           cursor:state==="play"?"pointer":"default",
                           transition:"transform 0.12s ease-out",
@@ -5011,7 +5011,7 @@ export default function Piilosana(){
                             ?`radial-gradient(ellipse 80% 75% at 48% 45%, #ffffff 0%, #fefefe 25%, #faf8f5 45%, #f2eeea 65%, #e8e4de 85%, #ddd8d0 100%)`
                             :(s?cellBg:`radial-gradient(ellipse at 40% 35%, ${S.cell} 0%, ${S.cell}dd 40%, ${S.dark||S.cell}bb 80%, ${S.dark||S.cell}99 100%)`)),
                           display:"flex",alignItems:"center",justifyContent:"center",
-                          fontSize:isLarge?"clamp(42px,11vw,62px)":"clamp(38px,10.5vw,56px)",
+                          fontSize:isLarge?"clamp(28px,7vw,42px)":"clamp(24px,6.5vw,36px)",
                           fontFamily:S.letterFont,fontWeight:"500",
                           textTransform:"uppercase",
                           transition:"all 0.2s ease",
