@@ -3778,11 +3778,11 @@ export default function Piilosana(){
         {t.arenaDesc&&<span style={{fontSize:"13px",letterSpacing:"3px",opacity:0.9}}>{t.arenaDesc}</span>}
         <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%"}}><svg width="52" height="52" viewBox="0 0 100 85" style={{position:"absolute",left:"14px",top:"50%",transform:"translateY(-50%)"}}>
           {/* Brain — smooth cartoon side view */}
-          <g transform="translate(5,2) scale(0.95)">
+          <g transform="translate(95,2) scale(-0.95,0.95)">
             {/* Stem */}
-            <path d="M60 58 C60 58 62 68 60 72 C59 75 55 75 54 72 C52 68 52 60 52 58" fill="#f0b8b0" stroke="#ffffff" strokeWidth="2.8" strokeLinejoin="round" strokeLinecap="round"/>
+            <path d="M60 58 C60 58 62 68 60 72 C59 75 55 75 54 72 C52 68 52 60 52 58" fill="#f4a0b0" stroke="#ffffff" strokeWidth="2.8" strokeLinejoin="round" strokeLinecap="round"/>
             {/* Main brain outline */}
-            <path d="M50 56 C42 58 34 56 28 52 C20 48 14 42 10 34 C6 26 8 18 14 12 C18 8 24 10 28 8 C32 5 36 10 40 8 C44 4 48 2 54 4 C60 2 66 6 72 10 C78 14 84 20 86 28 C88 36 88 42 84 48 C80 52 76 52 72 48 C68 42 66 46 62 50 C58 56 56 58 54 58 Z" fill="#f0b8b0" stroke="#ffffff" strokeWidth="3" strokeLinejoin="round"/>
+            <path d="M50 56 C42 58 34 56 28 52 C20 48 14 42 10 34 C6 26 8 18 14 12 C18 8 24 10 28 8 C32 5 36 10 40 8 C44 4 48 2 54 4 C60 2 66 6 72 10 C78 14 84 20 86 28 C88 36 88 42 84 48 C80 52 76 52 72 48 C68 42 66 46 62 50 C58 56 56 58 54 58 Z" fill="#f4a0b0" stroke="#ffffff" strokeWidth="3" strokeLinejoin="round"/>
             {/* Sylvian fissure */}
             <path d="M16 38 C24 32 36 36 46 38 C56 40 64 34 80 36" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
             {/* Upper folds */}
