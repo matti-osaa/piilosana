@@ -4947,7 +4947,7 @@ export default function Piilosana(){
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
               style={{padding:isLarge?"4px 0":"2px 0",background:"transparent",
                 touchAction:"none",position:"relative"}}>
-              {grid.map((row,r)=>(
+              {(()=>{const isLight=S.flavor==="ivory"||S.flavor==="dream";return grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"0px",
                   marginTop:r>0?"-5.254%":"0",
                   transform:r%2===1?"translateX(calc(18.2% / 4))":"translateX(calc(-18.2% / 4))",
@@ -4988,47 +4988,45 @@ export default function Piilosana(){
                           "--ex":`${((c-Math.floor(hexCols/2))*40)}px`,"--ey":`${((r-Math.floor(grid.length/2))*40)}px`,
                         }}>
                         {/* 3D shadow layer — darker hex offset below to create depth */}
-                        {!eaten&&<div style={{position:"absolute",inset:0,top:"3px",clipPath:hexClip,
-                          background:"#00000055",
+                        {!eaten&&<div style={{position:"absolute",inset:0,top:"4px",left:"1px",clipPath:hexClip,
+                          background:isLight?"#00000022":"#00000055",
+                          filter:isLight?"blur(2px)":"blur(1px)",
                           pointerEvents:"none"}}/>}
-                        {/* Outer hex = border — prismatic gradient when selected */}
+                        {/* Outer hex = border/base — creates the 3D "side" */}
                         <div style={{position:"absolute",inset:s?"-2px":"0",clipPath:hexClip,
-                          background:borderBg,
+                          background:s?borderBg:(isLight?`linear-gradient(180deg, ${S.cellBorder||S.border} 0%, #b0a898 100%)`:`linear-gradient(180deg, ${S.cellBorder||S.border} 0%, #111111 100%)`),
                           backgroundSize:s?"300% 100%":"100% 100%",
                           animation:s?`hexPrismatic 6s linear infinite, hexAuroraShift 8s ease-in-out infinite`:"none",
                           transition:"background 0.2s ease, inset 0.2s ease",
                           boxShadow:s?`0 0 16px ${S.green}88, 0 0 30px #aa66ff44, inset 0 0 8px #ffffff22`:"none"}}/>
                         {/* Glow ring behind selected cell */}
                         {s&&!isScrambling&&<div style={{position:"absolute",inset:"-6px",clipPath:hexClip,
-                          background:`radial-gradient(ellipse at 50% 50%, #44ffaa33 0%, #8866ff22 40%, transparent 70%)`,
+                          background:`radial-gradient(ellipse at 50% 50%, ${S.green}33 0%, #8866ff22 40%, transparent 70%)`,
                           animation:"hexGlowPulse 4s ease-in-out infinite",
                           pointerEvents:"none"}}/>}
-                        {/* Inner hex = cell content */}
-                        <div style={{position:"absolute",inset:innerInset,clipPath:hexClipInner,
-                          background:cellBg,
+                        {/* Inner hex = cell content — inset to show border as 3D edge */}
+                        <div style={{position:"absolute",inset:s?"3px":"2.5px",top:s?"3px":"2px",bottom:s?"3px":"3.5px",clipPath:hexClipInner,
+                          background:eaten?(S.gridBg||"#111133"):(isLight?`linear-gradient(170deg, #ffffff 0%, #f8f6f2 40%, #f0ece4 100%)`:(s?cellBg:`linear-gradient(170deg, ${S.cell}ee 0%, ${S.cell}cc 50%, ${S.dark||S.cell}dd 100%)`)),
                           display:"flex",alignItems:"center",justifyContent:"center",
                           fontSize:isLarge?"clamp(26px,6.5vw,40px)":"clamp(22px,6vw,34px)",
                           fontFamily:S.letterFont,fontWeight:"700",
                           textTransform:"uppercase",
                           transition:"all 0.2s ease",
                           color:eaten?endColor||"transparent":scrambleColor||(s?"#ffffff":(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
-                          textShadow:eaten?"none":s?`0 0 12px #44ffaa99, 0 0 24px #8866ff66, 0 1px 3px #000000cc`:`0 1px 2px #000000aa, 0 -1px 1px #ffffff11`,
+                          textShadow:eaten?"none":s?`0 0 12px ${S.green}99, 0 0 24px #8866ff66, 0 1px 3px #000000cc`:(isLight?`0 1px 1px #00000030`:`0 1px 2px #000000aa`),
                         }}>
-                          {/* 3D top highlight — light from above */}
+                          {/* 3D top highlight — strong light from above */}
                           {!eaten&&<div style={{position:"absolute",inset:0,clipPath:hexClipInner,
-                            background:"linear-gradient(170deg, #ffffff18 0%, #ffffff08 25%, transparent 50%, #00000015 80%, #00000025 100%)",
-                            pointerEvents:"none",zIndex:0}}/>}
-                          {/* Edge bevel — subtle inner ring for rounded feel */}
-                          {!eaten&&<div style={{position:"absolute",inset:"-1px",clipPath:hexClip,
-                            background:"transparent",
-                            boxShadow:"inset 0 2px 4px #ffffff15, inset 0 -2px 4px #00000030",
+                            background:isLight
+                              ?"linear-gradient(170deg, #ffffff 0%, #ffffffcc 15%, transparent 45%, #00000008 75%, #00000015 100%)"
+                              :"linear-gradient(170deg, #ffffff18 0%, #ffffff08 25%, transparent 50%, #00000015 80%, #00000025 100%)",
                             pointerEvents:"none",zIndex:0}}/>}
                           {eaten?"":<>
                             {/* Letter — bouncy scale + 3D depth shadow */}
                             <span style={{position:"relative",zIndex:2,
                               transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1), text-shadow 0.2s ease, filter 0.2s ease",
                               transform:s?(last?"scale(1.25)":"scale(1.12)"):"none",
-                              filter:s?"drop-shadow(0 0 4px #44ffaa88) drop-shadow(0 0 8px #8866ff44)":"drop-shadow(0 1px 1px #00000066)",
+                              filter:s?`drop-shadow(0 0 4px ${S.green}88) drop-shadow(0 0 8px #8866ff44)`:(isLight?"drop-shadow(0 1px 1px #00000025)":"drop-shadow(0 1px 1px #00000066)"),
                             }}>{displayLetter}</span>
                             {/* Prismatic light sweep on selected cells */}
                             {s&&!isScrambling&&<>
@@ -5048,7 +5046,7 @@ export default function Piilosana(){
                     );
                   })}
                 </div>
-              ))}
+              ));})()}
               {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true}/>}
             </div>
             ):(<>
@@ -5118,8 +5116,8 @@ export default function Piilosana(){
                       border:chessIsPos?`2px solid #ddaa33`:chessIsValid?`2px dashed #ddaa3366`:chessIsInvalid?`2px solid #ff4444`:chessInPath?`2px solid #ddaa3355`:S.cellGradient?`1px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`:`2px solid ${eaten?(S.gridBg||"#111133"):s?S.green:otherSelColor||S.cellBorder}`,
                       borderRadius:S.cellRadius,
                       cursor:state==="play"?(rotateActive?"grab":"pointer"):"default",transition:isScrambling?"color 0.07s, transform 0.15s":(S.cellGradient?"all 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)":"all 0.1s"),transform:cellTransform,
-                      boxShadow:eaten?"none":isScrambling&&settled?`0 0 12px ${S.green}66`:(s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:(S.cellShadow?(S.cellShadow+", inset 0 1px 3px #ffffff12, inset 0 -1px 3px #00000030, 0 2px 4px #00000044"):("inset 0 1px 3px #ffffff12, inset 0 -1px 3px #00000030, 0 2px 4px #00000044"))),
-                      textTransform:"uppercase",textShadow:isScrambling&&!settled?`0 0 8px ${scrambleColor}88`:(s||eaten?"none":`0 1px 2px #000000aa, 0 -1px 1px #ffffff11`),
+                      boxShadow:eaten?"none":isScrambling&&settled?`0 0 12px ${S.green}66`:(s?(S.cellGradient?`0 0 16px ${S.green}55, inset 0 0 8px ${S.green}22`:`0 0 12px ${S.green}66`):otherSelColor?`0 0 8px ${otherSelColor}44`:((S.flavor==="ivory"||S.flavor==="dream")?"inset 0 1px 2px #ffffff88, inset 0 -2px 4px #00000018, 0 2px 5px #00000020, 0 1px 2px #00000015":(S.cellShadow?(S.cellShadow+", inset 0 1px 3px #ffffff12, inset 0 -1px 3px #00000030, 0 2px 4px #00000044"):("inset 0 1px 3px #ffffff12, inset 0 -1px 3px #00000030, 0 2px 4px #00000044")))),
+                      textTransform:"uppercase",textShadow:isScrambling&&!settled?`0 0 8px ${scrambleColor}88`:(s||eaten?"none":((S.flavor==="ivory"||S.flavor==="dream")?`0 1px 1px #00000025`:`0 1px 2px #000000aa`)),
                       animation:chessIsInvalid?"shake 0.3s ease":eaten?endAnim:useDropAnim?`cellDrop 0.3s ${c*0.03}s ease-out`:(rotateAnim&&((rotateAnim.type==="row"&&rotateAnim.idx===r)||(rotateAnim.type==="col"&&rotateAnim.idx===c)))?`${rotateAnim.type==="row"?(rotateAnim.dir>0?"rotateRowRight":"rotateRowLeft"):(rotateAnim.dir>0?"rotateColDown":"rotateColUp")} 0.3s ease-out`:(isScrambling&&settled?"pop 0.2s ease":"none"),
                       "--ex":`${((c-2)*40)}px`,"--ey":`${((r-2)*40)}px`,
                       position:"relative",
