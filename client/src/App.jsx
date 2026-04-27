@@ -4949,7 +4949,7 @@ export default function Piilosana(){
                 touchAction:"none",position:"relative"}}>
               {(()=>{const isLight=S.flavor==="ivory"||S.flavor==="dream";return grid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"0px",
-                  marginTop:r>0?"-5.254%":"0",
+                  marginTop:r>0?"-5.8%":"0",
                   transform:r%2===1?"translateX(calc(18.2% / 4))":"translateX(calc(-18.2% / 4))",
                   position:"relative",zIndex:grid.length-r}}>
                   {row.map((letter,c)=>{
@@ -4967,7 +4967,7 @@ export default function Piilosana(){
                     const displayLetter=isScrambling&&!settled&&scrambleGrid?scrambleLetter:letter;
                     const scrambleColor=isScrambling&&!settled?`hsl(${(cellIdx*37+scrambleStep*73)%360},70%,65%)`:null;
                     const hexClip="polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
-                    const hexClipInner="polygon(50% 5%, 95% 27%, 95% 73%, 50% 95%, 5% 73%, 5% 27%)";
+                    const hexClipInner="polygon(50% 3%, 97% 26%, 97% 74%, 50% 97%, 3% 74%, 3% 26%)";
                     // Border: bright & visible in all themes; selected = aurora prismatic
                     const selIdx=s?sel.findIndex(p=>p.r===r&&p.c===c):-1;
                     const borderBg=eaten?"transparent":s?`linear-gradient(${120+selIdx*60}deg, #00ffaa, #44bbff, #aa66ff, #ff66aa, #ffaa44, #00ffaa)`:(S.cellBorder||S.border);
@@ -4981,43 +4981,43 @@ export default function Piilosana(){
                           width:"18.2%",aspectRatio:"0.866",
                           position:"relative",
                           cursor:state==="play"?"pointer":"default",
-                          transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1)",
-                          transform:s?(last?"scale(1.14)":"scale(1.06)"):"none",
-                          animation:eaten?endAnim:(s&&!isScrambling?`hexSelectPop 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards`:(isScrambling&&settled?"pop 0.2s ease":"none")),
+                          transition:"transform 0.15s ease",
+                          transform:s?(last?"translateY(2px) scale(0.97)":"translateY(1.5px) scale(0.98)"):"none",
+                          animation:eaten?endAnim:(isScrambling&&settled?"pop 0.2s ease":"none"),
                           zIndex:s?10:0,
                           "--ex":`${((c-Math.floor(hexCols/2))*40)}px`,"--ey":`${((r-Math.floor(grid.length/2))*40)}px`,
                         }}>
-                        {/* Drop shadow — soft blur under the tile */}
-                        {!eaten&&<div style={{position:"absolute",inset:"-3px",top:"2px",clipPath:hexClip,
-                          background:isLight?"#00000015":"#00000044",
-                          filter:"blur(4px)",
+                        {/* Drop shadow — subtle under the tile, stronger when not pressed */}
+                        {!eaten&&<div style={{position:"absolute",inset:"-1px",top:s?"1px":"2px",clipPath:hexClip,
+                          background:isLight?(s?"#00000008":"#00000012"):"#00000044",
+                          filter:s?"blur(2px)":"blur(3px)",
+                          transition:"all 0.15s ease",
                           pointerEvents:"none"}}/>}
-                        {/* Base hex — the dark rim / "side" edge like ceramic bead */}
+                        {/* Base hex — subtle edge, barely visible rim */}
                         <div style={{position:"absolute",inset:s?"-2px":"0",clipPath:hexClip,
                           background:s?borderBg:(isLight
-                            ?`linear-gradient(180deg, #c8c0b4 0%, #a89e90 40%, #908678 100%)`
+                            ?`linear-gradient(180deg, #ddd6cc 0%, #ccc4b8 50%, #bbb3a6 100%)`
                             :`linear-gradient(175deg, ${S.cellBorder||S.border} 0%, #111111 100%)`),
                           backgroundSize:s?"300% 100%":"100% 100%",
                           animation:s?`hexPrismatic 6s linear infinite, hexAuroraShift 8s ease-in-out infinite`:"none",
                           transition:"background 0.2s ease, inset 0.2s ease",
-                          boxShadow:s?`0 0 16px ${S.green}88, 0 0 30px #aa66ff44, inset 0 0 8px #ffffff22`:"none"}}/>
+                          boxShadow:s?`0 0 12px ${S.green}88, inset 0 0 6px #ffffff22`:"none"}}/>
                         {/* Glow ring behind selected cell */}
-                        {s&&!isScrambling&&<div style={{position:"absolute",inset:"-6px",clipPath:hexClip,
-                          background:`radial-gradient(ellipse at 50% 50%, ${S.green}33 0%, #8866ff22 40%, transparent 70%)`,
-                          animation:"hexGlowPulse 4s ease-in-out infinite",
+                        {s&&!isScrambling&&<div style={{position:"absolute",inset:"-4px",clipPath:hexClip,
+                          background:`radial-gradient(ellipse at 50% 50%, ${S.green}44 0%, transparent 60%)`,
                           pointerEvents:"none"}}/>}
-                        {/* Pillow face — convex ceramic surface with strong radial highlight */}
-                        <div style={{position:"absolute",inset:"3px",top:"2px",bottom:"4px",clipPath:hexClipInner,
+                        {/* Pillow face — convex ceramic surface */}
+                        <div style={{position:"absolute",inset:"1.5px",top:"1px",bottom:"2px",clipPath:hexClipInner,
                           background:eaten?(S.gridBg||"#111133"):(isLight
-                            ?`radial-gradient(ellipse 70% 65% at 45% 40%, #ffffff 0%, #f5f2ee 25%, #e8e2da 45%, #d4ccc0 65%, #bfb5a8 80%, #a89e90 100%)`
+                            ?`radial-gradient(ellipse 70% 65% at 45% 40%, #ffffff 0%, #f5f2ee 20%, #ece6dc 40%, #ddd6ca 60%, #ccc4b6 80%, #bbb3a6 100%)`
                             :(s?cellBg:`radial-gradient(ellipse at 40% 35%, ${S.cell} 0%, ${S.cell}dd 40%, ${S.dark||S.cell}bb 80%, ${S.dark||S.cell}99 100%)`)),
                           display:"flex",alignItems:"center",justifyContent:"center",
-                          fontSize:isLarge?"clamp(26px,6.5vw,40px)":"clamp(22px,6vw,34px)",
+                          fontSize:isLarge?"clamp(30px,7.5vw,44px)":"clamp(26px,7vw,38px)",
                           fontFamily:S.letterFont,fontWeight:"700",
                           textTransform:"uppercase",
                           transition:"all 0.2s ease",
                           color:eaten?endColor||"transparent":scrambleColor||(s?"#ffffff":(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":"#22ccaa")))),
-                          textShadow:eaten?"none":s?`0 0 12px ${S.green}99, 0 0 24px #8866ff66, 0 1px 3px #000000cc`:(isLight?`0 1px 0 #ffffff66, 0 -1px 1px #00000010`:`0 1px 2px #000000aa`),
+                          textShadow:eaten?"none":s?`0 0 8px ${S.green}99, 0 1px 2px #000000cc`:(isLight?`0 1px 0 #ffffff88`:`0 1px 2px #000000aa`),
                         }}>
                           {/* Specular highlight — double-layer ceramic glaze reflection */}
                           {!eaten&&<div style={{position:"absolute",inset:0,clipPath:hexClipInner,
@@ -5034,9 +5034,9 @@ export default function Piilosana(){
                           {eaten?"":<>
                             {/* Letter */}
                             <span style={{position:"relative",zIndex:2,
-                              transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1), text-shadow 0.2s ease, filter 0.2s ease",
-                              transform:s?(last?"scale(1.25)":"scale(1.12)"):"none",
-                              filter:s?`drop-shadow(0 0 4px ${S.green}88) drop-shadow(0 0 8px #8866ff44)`:"none",
+                              transition:"transform 0.15s ease, text-shadow 0.15s ease, filter 0.15s ease",
+                              transform:"none",
+                              filter:s?`drop-shadow(0 0 3px ${S.green}88)`:"none",
                             }}>{displayLetter}</span>
                             {/* Prismatic light sweep on selected cells */}
                             {s&&!isScrambling&&<>
