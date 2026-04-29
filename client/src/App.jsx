@@ -74,17 +74,31 @@ function dailyNumber(){return Math.floor((Date.now()-DAILY_EPOCH)/(1000*60*60*24
 function todayStr(){return new Date().toISOString().slice(0,10);}
 function makeDailyGrid(lang='fi'){const rng=seededRng(dailySeed(todayStr()+lang));return makeGrid(7,lang,5,rng);}
 function getDailyResult(){try{const d=JSON.parse(localStorage.getItem('piilosana_daily')||'{}');if(d.date===todayStr())return d;return null;}catch{return null;}}
-function saveDailyResult(score,wordsFound,totalWords){
-  const result={date:todayStr(),num:dailyNumber(),score,wordsFound,totalWords,lang:'fi'};
-  localStorage.setItem('piilosana_daily',JSON.stringify(result));
-  // Save to history (last 7 days)
-  try{const hist=JSON.parse(localStorage.getItem('piilosana_daily_history')||'[]');
-  hist.unshift(result);const trimmed=hist.slice(0,7);
-  localStorage.setItem('piilosana_daily_history',JSON.stringify(trimmed));}catch{}
+function saveDailyResult(score,wordsFound,totalWords,forDate){
+  const d=forDate||todayStr();
+  const result={date:d,num:dailyNumberForDate(d),score,wordsFound,totalWords,lang:'fi'};
+  if(d===todayStr())localStorage.setItem('piilosana_daily',JSON.stringify(result));
+  // Save to history (last 14 days, no duplicates)
+  try{let hist=JSON.parse(localStorage.getItem('piilosana_daily_history')||'[]');
+  hist=hist.filter(h=>h.date!==d);hist.unshift(result);
+  localStorage.setItem('piilosana_daily_history',JSON.stringify(hist.slice(0,14)));}catch{}
 }
 function getDailyHistory(){try{return JSON.parse(localStorage.getItem('piilosana_daily_history')||'[]');}catch{return [];}}
+function getDailyResultForDate(dateStr){const hist=getDailyHistory();return hist.find(h=>h.date===dateStr)||null;}
 function getDailyStreak(){try{const s=JSON.parse(localStorage.getItem('piilosana_streak')||'{}');return s;}catch{return{};}}
 function updateDailyStreak(){const s=getDailyStreak();const today=todayStr();const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);if(s.lastDate===today)return s;const streak=(s.lastDate===yesterday)?(s.streak||0)+1:1;const best=Math.max(streak,s.best||0);const result={streak,best,lastDate:today};localStorage.setItem('piilosana_streak',JSON.stringify(result));return result;}
+// Date helpers for daily challenge UI
+const WEEKDAYS_FI=["sunnuntai","maanantai","tiistai","keskiviikko","torstai","perjantai","lauantai"];
+const WEEKDAYS_EN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const WEEKDAYS_SV=["söndag","måndag","tisdag","onsdag","torsdag","fredag","lördag"];
+function dateLabel(dateStr,lang='fi'){
+  const d=new Date(dateStr+"T12:00:00");
+  const wd=lang==="sv"?WEEKDAYS_SV:lang==="en"?WEEKDAYS_EN:WEEKDAYS_FI;
+  return{weekday:wd[d.getDay()],short:d.getDate()+"."+(d.getMonth()+1)+".",full:wd[d.getDay()]+" "+d.getDate()+"."+(d.getMonth()+1)+"."};
+}
+function dailyNumberForDate(dateStr){return Math.floor((new Date(dateStr+"T12:00:00").getTime()-DAILY_EPOCH)/(1000*60*60*24))+1;}
+function daysAgoStr(n){const d=new Date(Date.now()-n*86400000);return d.toISOString().slice(0,10);}
+function tomorrowStr(){return daysAgoStr(-1);}
 
 // Client-side gravity: remove cells, drop letters down, fill new from top
 function applyGravityClient(grid,removedCells,lang='fi'){
@@ -226,7 +240,7 @@ const T={
     startGame:"ALOITA PELI",waitForPlayers:"Odota, että joku liittyy peliisi...",waitForHost:"Odota, että isäntä aloittaa pelin...",
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
     shareLink:"JAA LINKKI",copied:"Kopioitu!",scanToJoin:"Skannaa liittyäksesi",inviteFriends:"Kutsu kavereita:",arenaLink:"Suora linkki moninpeliin:",invitePlayer:"KUTSU PELAAJA",shareGame:"Jaa linkki peliin",
-    newCustom:"UUSI OMA NETTIPELI",menu:"VALIKKO",newPractice:"UUSI HARJOITUS",
+    newCustom:"UUSI OMA NETTIPELI",menu:"VALIKKO",newPractice:"UUSI HARJOITUS",backToMenu:"PALAA ALKUVALIKKOON",joinMulti:"LIITY MONINPELIIN",
     daily:"PÄIVÄN PIILOSANA",dailyDesc:"sama kaikille",dailyDone:"Jo pelattu tänään!",dailyShare:"JAA TULOS",dailyCopied:"Kopioitu leikepöydälle!",dailyStreak:"Putkessa",dailyBest:"Paras putki",dailyWords:"sanaa",dailyOf:"yhteensä",dailyChallenge:"Haaste",
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
@@ -290,7 +304,7 @@ const T={
     startGame:"START GAME",waitForPlayers:"Wait for someone to join...",waitForHost:"Waiting for host to start...",
     joinGame:"JOIN GAME",roomCode:"ROOM CODE",noRooms:"No open rooms",orJoinRoom:"or join with code",
     shareLink:"SHARE LINK",copied:"Copied!",scanToJoin:"Scan to join",inviteFriends:"Invite friends:",arenaLink:"Direct link to multiplayer:",invitePlayer:"INVITE PLAYER",shareGame:"Share game link",
-    newCustom:"NEW CUSTOM GAME",menu:"MENU",newPractice:"NEW PRACTICE",
+    newCustom:"NEW CUSTOM GAME",menu:"MENU",newPractice:"NEW PRACTICE",backToMenu:"BACK TO MENU",joinMulti:"JOIN MULTIPLAYER",
     daily:"DAILY CHALLENGE",dailyDesc:"same for everyone",dailyDone:"Already played today!",dailyShare:"SHARE RESULT",dailyCopied:"Copied to clipboard!",dailyStreak:"Streak",dailyBest:"Best streak",dailyWords:"words",dailyOf:"total",dailyChallenge:"Challenge",
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
@@ -354,7 +368,7 @@ const T={
     startGame:"STARTA SPEL",waitForPlayers:"Vänta tills någon går med...",waitForHost:"Väntar på att värden startar...",
     joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
     shareLink:"DELA LÄNK",copied:"Kopierat!",scanToJoin:"Skanna för att gå med",inviteFriends:"Bjud in vänner:",arenaLink:"Direktlänk till flerspelare:",invitePlayer:"BJUD IN SPELARE",shareGame:"Dela spellänk",
-    newCustom:"NYTT EGET SPEL",menu:"MENY",newPractice:"NY ÖVNING",
+    newCustom:"NYTT EGET SPEL",menu:"MENY",newPractice:"NY ÖVNING",backToMenu:"TILLBAKA TILL MENYN",joinMulti:"GÅ MED I FLERSPEL",
     daily:"DAGENS UTMANING",dailyDesc:"samma för alla",dailyDone:"Redan spelat idag!",dailyShare:"DELA RESULTAT",dailyCopied:"Kopierat till urklipp!",dailyStreak:"Svit",dailyBest:"Bästa svit",dailyWords:"ord",dailyOf:"totalt",dailyChallenge:"Utmaning",
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
@@ -2112,7 +2126,7 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
   },[gameMode,gameTime,currentScore,lang]);
   if(!gameMode||!gameTime||gameTime===0)return null;
   const label=gameMode==="tetris"?(lang==="en"?"Drop":lang==="sv"?"Fall":"Pudotus"):lang==="en"?"Normal":lang==="sv"?"Normal":"Normaali";
-  const timeLabel=gameTime===120?"2 min":lang==="en"?"6.7 min":"6,7 min";
+  const timeMins=gameTime/60;const timeLabel=Number.isInteger(timeMins)?`${timeMins} min`:lang==="en"?`${timeMins.toFixed(1)} min`:`${timeMins.toFixed(1).replace(".",",")} min`;
   const hofTitle=lang==="en"?"RECORDS":lang==="sv"?"REKORD":"ENNÄTYKSET";
   const hofLoading=lang==="en"?"Loading...":lang==="sv"?"Laddar...":"Ladataan...";
   const hofEmpty=lang==="en"?"No results yet":lang==="sv"?"Inga resultat ännu":"Ei tuloksia vielä";
@@ -2705,40 +2719,41 @@ export default function Piilosana(){
     window.scrollTo(0,0);
   },[trie,sounds,gameTime,soloMode,lang]);
 
-  const startDaily=useCallback(async()=>{
-    if(getDailyResult())return; // already played today
+  const[dailyDate,setDailyDate]=useState(todayStr()); // which date's daily we're playing
+  const startDaily=useCallback(async(forDate)=>{
+    const playDate=forDate||todayStr();
+    if(getDailyResultForDate(playDate))return; // already played this date
+    // Only allow today and past 6 days
+    const dayDiff=Math.floor((Date.now()-new Date(playDate+"T12:00:00").getTime())/(86400000));
+    if(dayDiff<0)return; // can't play future
     if(!LANG_CONFIG[lang].loaded){await loadWords(lang);setWordsLoaded(p=>({...p,[lang]:true}));}
     sounds.init().catch(()=>{});
-    // Generate deterministic grid from today's date
-    const rng=seededRng(dailySeed(todayStr()+lang));
+    const rng=seededRng(dailySeed(playDate+lang));
     let bg=null,bw=new Set();
     for(let i=0;i<30;i++){const g=makeGrid(7,lang,5,rng);const w=findWordsHex(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=25)break;}
-    // If seeded RNG exhausted good options, use first attempt
-    if(!bg){bg=makeGrid(7,lang,5,seededRng(dailySeed(todayStr()+lang)));bw=findWordsHex(bg,trie);}
+    if(!bg){bg=makeGrid(7,lang,5,seededRng(dailySeed(playDate+lang)));bw=findWordsHex(bg,trie);}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(180);setScore(0);setMsg(null);
     setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);
     setEnding(null);setEndingProgress(0);setDropKey(0);
     setActiveTheme(null);setThemeFound([]);setBombCell(null);setBombTimer(0);
     setMysteryCell(null);setMysteryRevealed(false);
     setChessPiece(null);setChessPos(null);setChessPath([]);setChessWord("");setChessValidCells([]);setChessInvalid(null);setChessMoves(0);setChessGrid([]);setChessPlacing(false);
-    setDailyMode(true);
+    setDailyMode(true);setDailyDate(playDate);
     setSoloMode("hex");setGameTime(180);
     setMode("solo");setCountdown(3);setState("countdown");
     window.scrollTo(0,0);
-    // Fetch long words
     if(lang==="fi"&&bg){fetch(`${SERVER_URL}/api/find-long-words`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({grid:bg,hex:true})}).then(r=>r.json()).then(({words})=>{if(words&&words.length>0)setValid(prev=>{const n=new Set(prev);words.forEach(w=>n.add(w));return n;});}).catch(()=>{});}
   },[trie,sounds,lang]);
 
   const shareDailyResult=useCallback(()=>{
-    const dr=getDailyResult();if(!dr)return;
-    const stars=dr.wordsFound>=20?"⭐⭐⭐":dr.wordsFound>=12?"⭐⭐":dr.wordsFound>=5?"⭐":"";
+    const dr=getDailyResult()||getDailyResultForDate(dailyDate);if(!dr)return;
+    const dl=dateLabel(dr.date,lang);
     const pct=dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0;
     const streak=getDailyStreak();
-    const text=`Päivän Piilosana #${dr.num} ${stars}\n${dr.score}p · ${dr.wordsFound}/${dr.totalWords} sanaa (${pct}%)${streak.streak>1?`\n🔥 ${streak.streak} päivää putkeen!`:""}\n\nPelaa sinäkin: https://piilosana.com`;
-    const emoji=`📅 Päivän Piilosana #${dr.num}\n${"🟩".repeat(Math.min(dr.wordsFound,20))}${"⬜".repeat(Math.max(0,20-dr.wordsFound))}\n${dr.score}p · ${dr.wordsFound}/${dr.totalWords} (${pct}%)${streak.streak>1?` · 🔥${streak.streak}`:""}\nPelaa: piilosana.com`;
-    if(navigator.share){navigator.share({title:`Päivän Piilosana #${dr.num}`,text}).catch(()=>{});}
-    else{navigator.clipboard.writeText(emoji).then(()=>setDailyShareMsg(t.dailyCopied)).catch(()=>{});setTimeout(()=>setDailyShareMsg(null),2000);}
-  },[t]);
+    const text=`Sain ${dl.full} päivän piilosanassa ${dr.score} pistettä (${dr.wordsFound}/${dr.totalWords} sanaa)! Pystytkö parempaan?${streak.streak>1?` 🔥 ${streak.streak} päivää putkeen!`:""}\n\nPelaa: https://piilosana.com`;
+    if(navigator.share){navigator.share({title:`Päivän Piilosana — ${dl.full}`,text}).catch(()=>{});}
+    else{navigator.clipboard.writeText(text).then(()=>setDailyShareMsg(t.dailyCopied)).catch(()=>{});setTimeout(()=>setDailyShareMsg(null),2000);}
+  },[t,lang,dailyDate]);
 
   const start=useCallback(async()=>{
     if(mode==="solo"){
@@ -2912,12 +2927,12 @@ export default function Piilosana(){
 
   // Save daily result when game ends
   useEffect(()=>{
-    if(state==="end"&&dailyMode&&!getDailyResult()){
-      saveDailyResult(score,found.length,valid.size);
-      updateDailyStreak();
+    if(state==="end"&&dailyMode&&!getDailyResultForDate(dailyDate)){
+      saveDailyResult(score,found.length,valid.size,dailyDate);
+      if(dailyDate===todayStr())updateDailyStreak();
       setDailyResult(getDailyResult());
     }
-  },[state,dailyMode,score,found,valid]);
+  },[state,dailyMode,score,found,valid,dailyDate]);
 
   // Background music control — only after user interaction (browser autoplay policy)
   useEffect(()=>{
@@ -3901,51 +3916,64 @@ export default function Piilosana(){
         {publicOnlineCount>=3&&<span style={{fontSize:"12px",opacity:0.8,display:"flex",alignItems:"center",gap:"4px",marginTop:"2px"}}><span style={{fontSize:"14px",fontWeight:"700"}}>{publicOnlineCount}</span> {t.playersInArena}</span>}
       </button>
 
-      {/* Daily Challenge button + history */}
+      {/* Streak bar */}
+      {(()=>{const s=getDailyStreak();return s.streak>0?(
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",padding:"6px 12px",marginBottom:"6px",fontSize:"13px",color:"#FF9500",fontWeight:"600"}}>
+          <span>🔥 {t.dailyStreak}: {s.streak}</span>
+          {s.best>s.streak&&<span style={{color:S.textMuted,fontWeight:"normal"}}>· {t.dailyBest}: {s.best}</span>}
+        </div>
+      ):null;})()}
+
+      {/* Daily Challenge — date cards */}
       <div style={{marginBottom:"8px"}}>
-        <button onClick={()=>{if(!dailyResult){startDaily();}}} style={{fontFamily:S.font,fontSize:"16px",color:"#fff",background:dailyResult?"linear-gradient(135deg,#555 0%,#666 100%)":"linear-gradient(135deg,#FF9500 0%,#FF6B00 100%)",border:"none",padding:"16px 20px",cursor:"pointer",boxShadow:dailyResult?"none":S.btnShadow!=="none"?`0 4px 16px #FF950044,${S.btnShadow}`:"3px 3px 0 #cc7000",borderRadius:`${S.btnRadius} ${S.btnRadius} 0 0`,width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",position:"relative",overflow:"hidden"}}
-          onMouseEnter={e=>{if(!dailyResult){e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";}}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
-          <span style={{display:"flex",flexDirection:"column",alignItems:"flex-start",gap:"2px"}}>
-            <span style={{display:"flex",alignItems:"center",gap:"8px"}}>
-              <span style={{fontSize:"20px"}}>📅</span>
-              <span style={{fontWeight:"700"}}>{t.daily} #{dailyNumber()}</span>
-            </span>
-            <span style={{fontSize:"12px",opacity:0.8}}>{dailyResult?t.dailyDone:t.dailyDesc}</span>
-          </span>
-          {dailyResult?(
-            <span style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:"2px"}}>
-              <span style={{fontSize:"18px",fontWeight:"700"}}>{dailyResult.score}p</span>
-              <span style={{fontSize:"12px",opacity:0.8}}>{dailyResult.wordsFound}/{dailyResult.totalWords} {t.dailyWords}</span>
-            </span>
-          ):(
-            <span style={{display:"flex",alignItems:"center",gap:"4px"}}>
-              {(()=>{const s=getDailyStreak();return s.streak>1?<span style={{fontSize:"13px"}}>🔥{s.streak}</span>:null;})()}
-              <span style={{fontSize:"22px"}}>▶</span>
-            </span>
-          )}
-        </button>
-        {/* Daily history mini scoreboard + share */}
-        {(()=>{const hist=getDailyHistory();const hasHist=hist.length>0;const hasShare=!!dailyResult;if(!hasHist&&!hasShare)return null;return(
-          <div style={{background:S.dark||"#1a1a2e",border:`1px solid #FF950044`,borderTop:"none",borderRadius:`0 0 ${S.btnRadius} ${S.btnRadius}`,overflow:"hidden"}}>
-            {hasHist&&<div style={{padding:"8px 12px",display:"flex",gap:"6px",overflowX:"auto",justifyContent:"center"}}>
-              {hist.slice(0,7).map((h,i)=>{
-                const pct=h.totalWords>0?Math.round(h.wordsFound/h.totalWords*100):0;
-                const isToday=h.date===todayStr();
-                return(
-                  <div key={h.date} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"2px",minWidth:"44px",padding:"4px 6px",borderRadius:"8px",background:isToday?"#FF950022":"transparent"}}>
-                    <span style={{fontSize:"10px",color:isToday?"#FF9500":"#888",fontWeight:isToday?"700":"400"}}>{isToday?"tänään":h.date.slice(5)}</span>
-                    <span style={{fontSize:"14px",fontWeight:"700",color:isToday?"#FF9500":S.green||"#44ddaa"}}>{h.score}p</span>
-                    <span style={{fontSize:"9px",color:"#888"}}>{pct}%</span>
-                  </div>
-                );
-              })}
-            </div>}
-            {hasShare&&<button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"13px",color:"#FF9500",background:"transparent",borderTop:`1px solid #FF950022`,border:"none",width:"100%",padding:"8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>
-              {dailyShareMsg||`📤 ${t.dailyShare}`}
-            </button>}
-          </div>
-        );})()}
+        <div style={{display:"flex",gap:"6px",width:"100%"}}>
+          {/* Previous days (scrollable) */}
+          {[3,2,1].map(daysAgo=>{
+            const d=daysAgoStr(daysAgo);const dl=dateLabel(d,lang);const res=getDailyResultForDate(d);const num=dailyNumberForDate(d);
+            if(num<1)return null;
+            return(
+              <button key={d} onClick={()=>{if(!res)startDaily(d);}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
+                padding:"10px 4px",border:`1px solid ${res?"#FF950044":"#FF950066"}`,borderRadius:S.btnRadius,cursor:res?"default":"pointer",
+                background:res?"transparent":"linear-gradient(135deg,#FF950022,#FF6B0022)",color:"#fff",fontSize:"11px",minWidth:0}}>
+                <span style={{fontSize:"10px",color:"#888",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
+                <span style={{fontSize:"13px",fontWeight:"600",color:res?"#888":"#FF9500"}}>{dl.short}</span>
+                {res?<span style={{fontSize:"14px",fontWeight:"700",color:S.green||"#44ddaa"}}>{res.score}p</span>
+                  :<span style={{fontSize:"12px",color:"#FF9500"}}>▶</span>}
+              </button>
+            );
+          })}
+          {/* Today — main card */}
+          {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();const num=dailyNumber();return(
+            <button onClick={()=>{if(!res)startDaily();}} style={{fontFamily:S.font,flex:2,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"3px",
+              padding:"12px 8px",border:res?`2px solid #FF950044`:`2px solid #FF9500`,borderRadius:S.btnRadius,cursor:res?"default":"pointer",
+              background:res?"linear-gradient(135deg,#555,#666)":"linear-gradient(135deg,#FF9500,#FF6B00)",color:"#fff",position:"relative",minWidth:0}}>
+              <span style={{fontSize:"10px",opacity:0.9,textTransform:"capitalize",letterSpacing:"0.5px"}}>{dl.weekday}</span>
+              <span style={{fontSize:"16px",fontWeight:"700"}}>{dl.short}</span>
+              {res?(
+                <><span style={{fontSize:"20px",fontWeight:"800"}}>{res.score}p</span>
+                <span style={{fontSize:"11px",opacity:0.8}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span></>
+              ):(
+                <span style={{fontSize:"18px",marginTop:"2px"}}>▶</span>
+              )}
+            </button>
+          );})()}
+          {/* Tomorrow — locked */}
+          {(()=>{const d=tomorrowStr();const dl=dateLabel(d,lang);return(
+            <button disabled style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
+              padding:"10px 4px",border:`1px solid #44444488`,borderRadius:S.btnRadius,cursor:"default",
+              background:"transparent",color:"#555",fontSize:"11px",opacity:0.5,minWidth:0}}>
+              <span style={{fontSize:"10px",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
+              <span style={{fontSize:"13px",fontWeight:"600"}}>{dl.short}</span>
+              <span style={{fontSize:"14px"}}>🔒</span>
+            </button>
+          );})()}
+        </div>
+        {/* Share button if today played */}
+        {dailyResult&&(
+          <button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"13px",color:"#FF9500",background:S.dark||"#1a1a2e",border:`1px solid #FF950044`,borderTop:"none",borderRadius:`0 0 ${S.btnRadius} ${S.btnRadius}`,width:"100%",padding:"8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",marginTop:"-1px"}}>
+            {dailyShareMsg||`📤 ${t.dailyShare}`}
+          </button>
+        )}
       </div>
 
       {/* Three buttons side by side: Practice, Custom Game, Quick Guide */}
@@ -5379,15 +5407,16 @@ export default function Piilosana(){
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease",position:"relative"}}>
           {confettiOn&&<ConfettiCelebration isWinner={true}/>}
           <div style={{position:"relative",zIndex:1,border:`1px solid ${ending?.color||S.yellow}44`,padding:"24px",marginBottom:"16px",boxShadow:`0 4px 24px ${ending?.color||S.yellow}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
-            <div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>
+            {dailyMode?<div style={{fontSize:"15px",color:"#FF9500",marginBottom:"4px",fontWeight:"700"}}>📅 {t.daily} {dateLabel(dailyDate,lang).short}</div>
+            :<div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>}
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.score}</div>
             <div style={{fontSize:"36px",color:S.green,marginBottom:"4px",animation:"pop 0.3s ease",fontWeight:"700",letterSpacing:"2px"}}>{score}<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}>p</span>{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}> / {totalPossible}p</span>:null}</div>
             {(soloMode!=="normal"||gameTime===0)?<div style={{fontSize:"13px",color:S.textMuted,marginTop:"6px"}}>{found.length} {t.words}</div>:<>
             <div style={{fontSize:"13px",color:S.textSoft,marginTop:"6px"}}>{found.length} / {valid.size} {t.words} ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>
             </>}
 
-            {/* Hall of Fame submit */}
-            {gameTime!==0&&score>0&&!hofSubmitted&&(
+            {/* Hall of Fame submit — skip for daily mode (auto-saved) */}
+            {!dailyMode&&gameTime!==0&&score>0&&!hofSubmitted&&(
               <div style={{marginTop:"16px",padding:"14px",border:`1px solid ${S.yellow}33`,background:`${S.yellow}08`,borderRadius:"12px"}}>
                 {soloNickname.trim()?(
                   <button onClick={async()=>{
@@ -5419,7 +5448,7 @@ export default function Piilosana(){
                 )}
               </div>
             )}
-            {hofSubmitted&&<div style={{fontSize:"13px",color:S.green,marginTop:"8px"}}>{t.saved}</div>}
+            {!dailyMode&&hofSubmitted&&<div style={{fontSize:"13px",color:S.green,marginTop:"8px"}}>{t.saved}</div>}
 
             {/* Share result */}
             <button onClick={async()=>{
@@ -5431,22 +5460,21 @@ export default function Piilosana(){
               {t.share}
             </button>
 
-            {dailyMode&&dailyResult&&(
+            {dailyMode&&(()=>{const dr=dailyResult||getDailyResultForDate(dailyDate);const dl=dateLabel(dailyDate,lang);return dr?(
               <div style={{margin:"12px 0",padding:"16px",background:"linear-gradient(135deg,#FF950022,#FF6B0022)",border:"2px solid #FF9500",borderRadius:"14px",textAlign:"center"}}>
-                <div style={{fontSize:"18px",fontWeight:"700",color:"#FF9500",marginBottom:"4px"}}>📅 {t.daily} #{dailyResult.num}</div>
-                <div style={{fontSize:"24px",fontWeight:"800",color:S.yellow,marginBottom:"4px"}}>{dailyResult.score}p</div>
-                <div style={{fontSize:"14px",color:S.green,marginBottom:"8px"}}>{dailyResult.wordsFound}/{dailyResult.totalWords} {t.dailyWords} ({dailyResult.totalWords>0?Math.round(dailyResult.wordsFound/dailyResult.totalWords*100):0}%)</div>
+                <div style={{fontSize:"18px",fontWeight:"700",color:"#FF9500",marginBottom:"4px"}}>📅 {t.daily} {dl.short}</div>
+                <div style={{fontSize:"24px",fontWeight:"800",color:S.yellow,marginBottom:"4px"}}>{dr.score}p</div>
+                <div style={{fontSize:"14px",color:S.green,marginBottom:"8px"}}>{dr.wordsFound}/{dr.totalWords} {t.dailyWords} ({dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0}%)</div>
                 {(()=>{const s=getDailyStreak();return s.streak>0?<div style={{fontSize:"14px",color:"#FF9500",marginBottom:"8px"}}>🔥 {t.dailyStreak}: {s.streak} · {t.dailyBest}: {s.best}</div>:null;})()}
                 <button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"15px",color:"#fff",background:"linear-gradient(135deg,#FF9500,#FF6B00)",border:"none",padding:"10px 24px",cursor:"pointer",borderRadius:"10px",fontWeight:"700",boxShadow:"0 4px 12px #FF950044"}}>
                   {dailyShareMsg||t.dailyShare}
                 </button>
               </div>
-            )}
+            ):null;})()}
 
             <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center",marginTop:"10px"}}>
-              <button onClick={()=>{setHofSubmitted(false);setDailyMode(false);start();}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.green}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.newPractice}</button>
-              <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.yellow,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.yellow}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.customGame}</button>
-              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`1px solid ${S.green}44`,background:"transparent",padding:"10px 20px",cursor:"pointer",width:"280px",borderRadius:"10px",transition:"all 0.15s"}}>{t.menu}</button>
+              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.green}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.backToMenu}</button>
+              <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.yellow,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.yellow}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.joinMulti}</button>
             </div>
           </div>
 
