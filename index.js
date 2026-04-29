@@ -15,6 +15,10 @@ import { OAuth2Client } from 'google-auth-library';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// App version — changes on every deploy (server restart)
+const APP_VERSION = Date.now().toString(36);
+console.log(`App version: ${APP_VERSION}`);
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -751,6 +755,9 @@ function broadcastRoomList() {
 io.on('connection', (socket) => {
   console.log(`Player connected: ${socket.id}`);
 
+  // Send app version — client detects changes after reconnect
+  socket.emit('app_version', { version: APP_VERSION });
+
   // Send room list on connect
   socket.emit('room_list', { rooms: getPublicRooms() });
 
@@ -1302,6 +1309,11 @@ app.get('/api/hall-of-fame/:gameMode/:gameTime', (req, res) => {
   const { gameMode, gameTime } = req.params;
   const lang = req.query.lang || 'fi';
   res.json(getHallOfFame(gameMode, Number(gameTime), lang));
+});
+
+// App version endpoint — clients poll this to detect deploys
+app.get('/api/version', (req, res) => {
+  res.json({ version: APP_VERSION });
 });
 
 // Daily leaderboard: get scores for a specific date

@@ -2305,6 +2305,7 @@ export default function Piilosana(){
   const[soundTheme,setSoundTheme]=useState(()=>{const s=localStorage.getItem("piilosana_sound");return s==="modern"||s==="off"?s:"modern";});
   const[musicOn,setMusicOn]=useState(()=>localStorage.getItem("piilosana_music")!=="off");
   const[musicTrack,setMusicTrack]=useState(()=>parseInt(localStorage.getItem("piilosana_music_track")||"0"));
+  const[updateAvailable,setUpdateAvailable]=useState(false);
   const[wordsLoaded,setWordsLoaded]=useState(()=>({fi:LANG_CONFIG.fi.loaded,en:LANG_CONFIG.en.loaded,sv:LANG_CONFIG.sv.loaded}));
   useEffect(()=>{
     let mounted=true;
@@ -2316,6 +2317,18 @@ export default function Piilosana(){
     loadWords("en").then(()=>{if(mounted)setWordsLoaded(p=>({...p,en:true}));});
     loadWords("sv").then(()=>{if(mounted)setWordsLoaded(p=>({...p,sv:true}));});
     return()=>{mounted=false;};
+  },[]);
+  // Version polling — detect deploys, show update banner
+  useEffect(()=>{
+    let v0=null,mounted=true;
+    const check=()=>fetch('/api/version').then(r=>r.json()).then(d=>{
+      if(!mounted)return;
+      if(!v0)v0=d.version;
+      else if(d.version!==v0)setUpdateAvailable(true);
+    }).catch(()=>{});
+    check();
+    const iv=setInterval(check,3*60*1000); // every 3 min
+    return()=>{mounted=false;clearInterval(iv);};
   },[]);
   const currentLangLoaded=wordsLoaded[lang]||false;
   const[audioStarted,setAudioStarted]=useState(false);
@@ -4310,6 +4323,13 @@ export default function Piilosana(){
   return(
     <div style={{fontFamily:S.font,background:S.bg,color:S.green,minHeight:"100dvh",display:"flex",flexDirection:"column",alignItems:"center",userSelect:"none",WebkitUserSelect:"none",padding:"8px 4px",position:"relative",overflowX:"hidden",animation:themeTransition?"themeResolve 0.6s ease-out":"none"}}
       onMouseMove={e=>onDragMove(e.clientX,e.clientY)} onMouseUp={onDragEnd} onTouchEnd={onDragEnd}>
+
+      {/* Update available banner */}
+      {updateAvailable&&<div style={{position:"fixed",top:0,left:0,right:0,zIndex:9999,background:"linear-gradient(135deg,#ffcc00,#ff9900)",color:"#1a1000",padding:"8px 16px",display:"flex",alignItems:"center",justifyContent:"center",gap:"12px",fontSize:"13px",fontFamily:S.font,fontWeight:"600",boxShadow:"0 2px 12px #00000044"}}>
+        <span>{lang==="en"?"New version available!":lang==="sv"?"Ny version tillgänglig!":"Uusi versio saatavilla!"}</span>
+        <button onClick={()=>window.location.reload()} style={{background:"#1a1000",color:"#ffcc00",border:"none",padding:"4px 14px",borderRadius:"6px",cursor:"pointer",fontFamily:S.font,fontWeight:"700",fontSize:"12px"}}>{lang==="en"?"UPDATE":lang==="sv"?"UPPDATERA":"PÄIVITÄ"}</button>
+        <button onClick={()=>setUpdateAvailable(false)} style={{background:"transparent",border:"none",color:"#1a100088",cursor:"pointer",fontSize:"18px",lineHeight:"1",padding:"0 4px"}}>×</button>
+      </div>}
 
       {/* Global hamburger — top-left, always visible */}
       {state!=="play"&&state!=="ending"&&state!=="scramble"&&(
