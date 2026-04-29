@@ -3923,8 +3923,8 @@ export default function Piilosana(){
       {/* Daily Challenge — date cards */}
       <div style={{marginBottom:"8px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:"6px",padding:"0 2px"}}>
-          <span style={{fontSize:"13px",fontWeight:"700",color:S.yellow||"#ffcc00"}}>{t.daily}</span>
-          <span style={{fontSize:"11px",color:S.textMuted}}>{t.dailyDesc}</span>
+          <span style={{fontFamily:S.font,fontSize:"13px",fontWeight:"700",color:S.yellow||"#ffcc00"}}>{t.daily}</span>
+          <span style={{fontFamily:S.font,fontSize:"11px",color:S.textMuted}}>{t.dailyDesc}</span>
         </div>
         <div style={{display:"flex",gap:"6px",width:"100%"}}>
           {/* Previous days — lighter yellow */}
