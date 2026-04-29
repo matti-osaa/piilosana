@@ -70,6 +70,24 @@ async function initDb() {
   // Add lang column to existing databases that don't have it
   try { db.run(`ALTER TABLE hall_of_fame ADD COLUMN lang TEXT NOT NULL DEFAULT 'fi'`); } catch(e) { /* column already exists */ }
 
+  // Daily scores — one entry per nickname per day_number (1–366), overwrites yearly
+  db.run(`
+    CREATE TABLE IF NOT EXISTS daily_scores (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      day_number INTEGER NOT NULL,
+      nickname TEXT NOT NULL COLLATE NOCASE,
+      score INTEGER NOT NULL,
+      words_found INTEGER NOT NULL,
+      words_total INTEGER NOT NULL,
+      percentage REAL NOT NULL,
+      lang TEXT NOT NULL DEFAULT 'fi',
+      year INTEGER NOT NULL,
+      date_str TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(day_number, nickname, lang)
+    )
+  `);
+
   // Users table for authentication
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -121,6 +139,40 @@ function submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTi
   );
   saveDb();
   return true;
+}
+
+// ---- Daily leaderboard functions ----
+function submitDailyScore({ nickname, score, wordsFound, wordsTotal, dateStr, lang }) {
+  if (!db || !nickname || score < 0 || !dateStr) return null;
+  const safeLang = LANGS[lang] ? lang : 'fi';
+  const d = new Date(dateStr + 'T00:00:00Z');
+  const dayNumber = Math.floor((d - new Date(d.getUTCFullYear(), 0, 0)) / 86400000);
+  const year = d.getUTCFullYear();
+  const percentage = wordsTotal > 0 ? Math.round((wordsFound / wordsTotal) * 100) : 0;
+  // UPSERT: replace if same day_number+nickname+lang (handles yearly overwrite + duplicate prevention)
+  db.run(
+    `INSERT OR REPLACE INTO daily_scores (day_number, nickname, score, words_found, words_total, percentage, lang, year, date_str)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [dayNumber, nickname, score, wordsFound, wordsTotal, percentage, safeLang, year, dateStr]
+  );
+  saveDb();
+  return true;
+}
+
+function getDailyLeaderboard(dateStr, lang) {
+  if (!db || !dateStr) return [];
+  const safeLang = lang || 'fi';
+  const d = new Date(dateStr + 'T00:00:00Z');
+  const dayNumber = Math.floor((d - new Date(d.getUTCFullYear(), 0, 0)) / 86400000);
+  const stmt = db.prepare(
+    `SELECT nickname, score, words_found, words_total, percentage, created_at
+     FROM daily_scores WHERE day_number = ? AND lang = ? ORDER BY score DESC LIMIT 20`
+  );
+  stmt.bind([dayNumber, safeLang]);
+  const results = [];
+  while (stmt.step()) results.push(stmt.getAsObject());
+  stmt.free();
+  return results;
 }
 
 function getHallOfFame(gameMode, gameTime, lang) {
@@ -1250,6 +1302,29 @@ app.get('/api/hall-of-fame/:gameMode/:gameTime', (req, res) => {
   const { gameMode, gameTime } = req.params;
   const lang = req.query.lang || 'fi';
   res.json(getHallOfFame(gameMode, Number(gameTime), lang));
+});
+
+// Daily leaderboard: get scores for a specific date
+app.get('/api/daily-scores/:dateStr', (req, res) => {
+  const { dateStr } = req.params;
+  const lang = req.query.lang || 'fi';
+  res.json(getDailyLeaderboard(dateStr, lang));
+});
+
+// Daily leaderboard: submit score
+app.post('/api/daily-scores', (req, res) => {
+  const { nickname, score, wordsFound, wordsTotal, dateStr, lang } = req.body;
+  if (!nickname || nickname.length > 12) {
+    return res.status(400).json({ error: 'Virheellinen nimimerkki' });
+  }
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return res.status(400).json({ error: 'Virheellinen päivämäärä' });
+  }
+  const safeLang = LANGS[lang] ? lang : 'fi';
+  const ok = submitDailyScore({ nickname, score, wordsFound, wordsTotal, dateStr, lang: safeLang });
+  if (!ok) return res.status(400).json({ error: 'Tulosta ei voitu tallentaa' });
+  const top = getDailyLeaderboard(dateStr, safeLang);
+  res.json({ ok: true, top });
 });
 
 // Public game status (supports ?lang=fi|en)

@@ -2114,6 +2114,62 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
 // ============================================
 // HALL OF FAME COMPONENT
 // ============================================
+function DailyPopup({dateStr,lang,t,S,myResult,onShare,dailyShareMsg,onClose}){
+  const[leaderboard,setLeaderboard]=useState(null);
+  const dl=dateLabel(dateStr,lang);
+  const myNick=(()=>{try{const a=JSON.parse(localStorage.getItem("piilosana_auth")||"null");if(a?.nickname)return a.nickname;}catch{}return localStorage.getItem('piilosana_nick')||localStorage.getItem('piilosana_nickname')||'';})();
+  useEffect(()=>{
+    fetch(`/api/daily-scores/${dateStr}?lang=${lang}`).then(r=>r.json()).then(data=>{setLeaderboard(data);}).catch(()=>setLeaderboard([]));
+  },[dateStr,lang]);
+  return(
+    <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px",animation:"fadeIn 0.2s ease"}} onClick={onClose}>
+      <div style={{background:S.dark,border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.panelRadius,width:"100%",maxWidth:"400px",padding:"20px",boxShadow:`0 0 30px ${S.yellow||"#ffcc00"}22`,maxHeight:"80vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
+        <div style={{textAlign:"center",marginBottom:"12px"}}>
+          <div style={{fontFamily:S.font,fontSize:"14px",color:S.yellow||"#ffcc00",fontWeight:"700",marginBottom:"4px",textTransform:"capitalize"}}>{t.daily} — {dl.full}</div>
+        </div>
+        {myResult&&(
+          <div style={{textAlign:"center",marginBottom:"16px",padding:"12px",background:`${S.yellow||"#ffcc00"}11`,borderRadius:"10px",border:`1px solid ${S.yellow||"#ffcc00"}33`}}>
+            <div style={{fontSize:"28px",fontWeight:"800",color:S.yellow}}>{myResult.score}<span style={{fontSize:"14px",fontWeight:"400",color:S.textMuted}}>p</span></div>
+            <div style={{fontSize:"13px",color:S.green,marginTop:"2px"}}>{myResult.wordsFound}/{myResult.totalWords} {t.dailyWords} ({myResult.totalWords>0?Math.round(myResult.wordsFound/myResult.totalWords*100):0}%)</div>
+          </div>
+        )}
+        {/* Leaderboard */}
+        <div style={{marginBottom:"12px"}}>
+          <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"700",color:S.yellow||"#ffcc00",marginBottom:"8px",textAlign:"center"}}>{lang==="en"?"Leaderboard":lang==="sv"?"Topplista":"Tuloslista"}</div>
+          {leaderboard===null?(
+            <div style={{textAlign:"center",color:S.textMuted,fontSize:"13px",padding:"12px"}}>...</div>
+          ):leaderboard.length===0?(
+            <div style={{textAlign:"center",color:S.textMuted,fontSize:"13px",padding:"12px"}}>{lang==="en"?"No scores yet":lang==="sv"?"Inga poäng än":"Ei tuloksia vielä"}</div>
+          ):(
+            <div style={{display:"flex",flexDirection:"column",gap:"2px"}}>
+              {leaderboard.map((s,i)=>{
+                const isMe=myNick&&s.nickname.toLowerCase()===myNick.toLowerCase();
+                const medals=["🥇","🥈","🥉"];
+                return(
+                  <div key={i} style={{display:"flex",alignItems:"center",padding:"6px 10px",borderRadius:"8px",
+                    background:isMe?`${S.yellow||"#ffcc00"}22`:"transparent",
+                    border:isMe?`1px solid ${S.yellow||"#ffcc00"}44`:"1px solid transparent"}}>
+                    <span style={{width:"28px",fontSize:"14px",fontWeight:"700",color:i<3?(S.yellow||"#ffcc00"):S.textMuted}}>{i<3?medals[i]:`${i+1}.`}</span>
+                    <span style={{flex:1,fontSize:"14px",fontWeight:isMe?"700":"400",color:isMe?(S.yellow||"#ffcc00"):"#ddd"}}>{s.nickname}</span>
+                    <span style={{fontSize:"16px",fontWeight:"700",color:S.green||"#44ddaa"}}>{s.score}<span style={{fontSize:"11px",fontWeight:"400",color:S.textMuted}}>p</span></span>
+                    <span style={{fontSize:"11px",color:S.textMuted,marginLeft:"8px",minWidth:"40px",textAlign:"right"}}>{s.words_found}/{s.words_total}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
+          {onShare&&<button onClick={e=>{e.stopPropagation();onShare();}} style={{fontFamily:S.font,fontSize:"13px",color:"#2a2000",background:`linear-gradient(135deg,${S.yellow||"#ffcc00"},#E6B800)`,border:"none",padding:"8px 20px",cursor:"pointer",borderRadius:"10px",fontWeight:"600"}}>
+            {dailyShareMsg||t.dailyShare}
+          </button>}
+          <button onClick={onClose} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:`1px solid ${S.border}`,padding:"8px 20px",cursor:"pointer",borderRadius:"10px"}}>{t.back}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
   const[scores,setScores]=useState(null);
   const[loading,setLoading]=useState(true);
@@ -2926,12 +2982,17 @@ export default function Piilosana(){
     return()=>clearInterval(t);
   },[state,mode]);
 
-  // Save daily result when game ends
+  // Save daily result when game ends — local + server
   useEffect(()=>{
     if(state==="end"&&dailyMode&&!getDailyResultForDate(dailyDate)){
       saveDailyResult(score,found.length,valid.size,dailyDate);
       if(dailyDate===todayStr())updateDailyStreak();
       setDailyResult(getDailyResult());
+      // Submit to server daily leaderboard
+      const nick=authUser?.nickname||(()=>{try{const a=JSON.parse(localStorage.getItem("piilosana_auth")||"null");if(a?.nickname)return a.nickname;}catch{}return localStorage.getItem('piilosana_nick')||'Anon';})();
+      fetch('/api/daily-scores',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({nickname:nick,score,wordsFound:found.length,wordsTotal:valid.size,dateStr:dailyDate,lang})
+      }).catch(()=>{});
     }
   },[state,dailyMode,score,found,valid,dailyDate]);
 
@@ -3946,7 +4007,7 @@ export default function Piilosana(){
           {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();return(
             <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,flex:2,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"3px",
               padding:"14px 8px",border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.btnRadius,cursor:"pointer",
-              background:res?`linear-gradient(135deg,#555,#666)`:`linear-gradient(135deg,${S.yellow||"#ffcc00"},#E6B800)`,color:res?"#fff":"#2a2000",position:"relative",minWidth:0}}>
+              background:res?`linear-gradient(135deg,${S.yellow||"#ffcc00"}55,${S.yellow||"#ffcc00"}44)`:`linear-gradient(135deg,${S.yellow||"#ffcc00"},#E6B800)`,color:res?"#fff":"#2a2000",position:"relative",minWidth:0}}>
               <span style={{fontSize:"12px",opacity:0.9,textTransform:"capitalize",letterSpacing:"0.5px"}}>{dl.weekday}</span>
               <span style={{fontSize:"18px",fontWeight:"700"}}>{dl.short}</span>
               {res?(
@@ -3970,28 +4031,13 @@ export default function Piilosana(){
         </div>
       </div>
 
-      {/* Daily history popup */}
+      {/* Daily history popup with leaderboard */}
       {showDailyHistory&&(
-        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px",animation:"fadeIn 0.2s ease"}} onClick={()=>setShowDailyHistory(null)}>
-          <div style={{background:S.dark,border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.panelRadius,width:"100%",maxWidth:"380px",padding:"20px",boxShadow:`0 0 30px ${S.yellow||"#ffcc00"}22`}} onClick={e=>e.stopPropagation()}>
-            {(()=>{const d=showDailyHistory;const dl=dateLabel(d,lang);const res=getDailyResultForDate(d)||(d===todayStr()?getDailyResult():null);
-              if(!res)return <div style={{textAlign:"center",color:S.textMuted}}>{t.dailyDone}</div>;
-              return(<>
-                <div style={{textAlign:"center",marginBottom:"16px"}}>
-                  <div style={{fontSize:"14px",color:S.yellow||"#ffcc00",fontWeight:"700",marginBottom:"4px",textTransform:"capitalize"}}>{t.daily} — {dl.full}</div>
-                  <div style={{fontSize:"32px",fontWeight:"800",color:S.yellow}}>{res.score}<span style={{fontSize:"16px",fontWeight:"400",color:S.textMuted}}>p</span></div>
-                  <div style={{fontSize:"14px",color:S.green,marginTop:"4px"}}>{res.wordsFound}/{res.totalWords} {t.dailyWords} ({res.totalWords>0?Math.round(res.wordsFound/res.totalWords*100):0}%)</div>
-                </div>
-                <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
-                  {d===todayStr()&&<button onClick={e=>{e.stopPropagation();shareDailyResult();}} style={{fontFamily:S.font,fontSize:"13px",color:"#2a2000",background:`linear-gradient(135deg,${S.yellow||"#ffcc00"},#E6B800)`,border:"none",padding:"8px 20px",cursor:"pointer",borderRadius:"10px",fontWeight:"600"}}>
-                    {dailyShareMsg||t.dailyShare}
-                  </button>}
-                  <button onClick={()=>setShowDailyHistory(null)} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:`1px solid ${S.border}`,padding:"8px 20px",cursor:"pointer",borderRadius:"10px"}}>{t.back}</button>
-                </div>
-              </>);
-            })()}
-          </div>
-        </div>
+        <DailyPopup dateStr={showDailyHistory} lang={lang} t={t} S={S}
+          myResult={getDailyResultForDate(showDailyHistory)||(showDailyHistory===todayStr()?getDailyResult():null)}
+          onShare={showDailyHistory===todayStr()?shareDailyResult:null}
+          dailyShareMsg={dailyShareMsg}
+          onClose={()=>setShowDailyHistory(null)} />
       )}
 
       {/* Three buttons side by side: Practice, Custom Game, Quick Guide */}
