@@ -73,6 +73,58 @@ const DAILY_EPOCH=new Date('2026-04-27').getTime();
 function dailyNumber(){return Math.floor((Date.now()-DAILY_EPOCH)/(1000*60*60*24))+1;}
 function todayStr(){return new Date().toISOString().slice(0,10);}
 function makeDailyGrid(lang='fi'){const rng=seededRng(dailySeed(todayStr()+lang));return makeGrid(7,lang,5,rng);}
+
+// ============================================
+// DAILY THEMES — themed word lists for daily challenge
+// ============================================
+const DAILY_THEMES={
+  fi:[
+    {id:"luonto",name:"Luonto",nameEn:"Nature",nameSv:"Natur",words:["metsä","puu","lehti","kukka","joki","järvi","vuori","kivi","sammal","sieni","oksa","juuri","pilvi","sade","tuuli","lumi","jää","ruoho","niitty","taivas","aurinko","kuu","tähti","maa","vesi"]},
+    {id:"eläimet",name:"Eläimet",nameEn:"Animals",nameSv:"Djur",words:["koira","kissa","lintu","kala","karhu","kettu","hirvi","jänis","orava","susi","kotka","pöllö","hevonen","lammas","lehmä","sika","ankka","kana","hiiri","käärme","sammakko","mehiläinen","perhonen"]},
+    {id:"ruoka",name:"Ruoka",nameEn:"Food",nameSv:"Mat",words:["leipä","juusto","kakku","keitto","liha","kala","peruna","porkkana","omena","marja","suola","sokeri","maito","voi","muna","riisi","pasta","salaatti","piirakka","lettu","puuro","mehu","kahvi"]},
+    {id:"koti",name:"Koti",nameEn:"Home",nameSv:"Hem",words:["tuoli","pöytä","sänky","ikkuna","ovi","lattia","katto","seinä","lamppu","matto","peili","kirja","kello","tyyny","peitto","lasi","kuppi","lusikka","haarukka","veitsi","astia","hylly"]},
+    {id:"urheilu",name:"Urheilu",nameEn:"Sports",nameSv:"Sport",words:["pallo","maali","juoksu","hyppy","uinti","hiihto","luistelu","pyörä","joukkue","peli","ottelu","kenttä","tuomari","voitto","häviö","piste","sarja","harjoitus","valmentaja"]},
+    {id:"meri",name:"Meri",nameEn:"Sea",nameSv:"Hav",words:["aalto","ranta","laiva","vene","saari","kala","lohi","rapu","simpukka","ankkuri","purje","satama","majakka","hiekka","tuuli","myrsky","valas","hylje","lokki","sumu"]},
+    {id:"musiikki",name:"Musiikki",nameEn:"Music",nameSv:"Musik",words:["laulu","soitto","kitara","piano","rumpu","huilu","viulu","nuotti","melodia","rytmi","basso","sävelmä","kuoro","säveltäjä","konsertti","levy","radio","ääni"]},
+    {id:"sää",name:"Sää",nameEn:"Weather",nameSv:"Väder",words:["aurinko","pilvi","sade","lumi","tuuli","myrsky","ukkonen","salama","sumu","halla","pakkanen","lämpö","jää","raekuuro","sateenkaari","kostea","kuiva"]},
+    {id:"kaupunki",name:"Kaupunki",nameEn:"City",nameSv:"Stad",words:["talo","katu","silta","puisto","kauppa","koulu","kirjasto","museo","teatteri","ravintola","hotelli","kirkko","torni","asema","bussi","auto","pyörä","valo","penkki"]},
+    {id:"avaruus",name:"Avaruus",nameEn:"Space",nameSv:"Rymd",words:["tähti","kuu","aurinko","planeetta","galaksi","raketti","astronautti","satelliitti","meteori","kometta","avaruus","musta","aukko","valo","pimeä","rata"]},
+    {id:"puutarha",name:"Puutarha",nameEn:"Garden",nameSv:"Trädgård",words:["kukka","ruusu","puu","pensas","nurmikko","siemen","multa","kastelukanne","kukkula","omena","marja","tomaatti","kurkku","salaatti","peruna","porkkana","herne","papu"]},
+    {id:"juhla",name:"Juhla",nameEn:"Party",nameSv:"Fest",words:["kakku","lahja","koriste","ilmapallo","valo","musiikki","tanssi","nauru","ystävä","perhe","juhla","kutsu","tarjoilu","juoma","konfetti","serpentiini","hattu"]},
+    {id:"värit",name:"Värit",nameEn:"Colors",nameSv:"Färger",words:["punainen","sininen","vihreä","keltainen","valkoinen","musta","oranssi","violetti","ruskea","harmaa","pinkki","turkoosi","kulta","hopea","vaaleanpunainen"]},
+    {id:"ammatti",name:"Ammatit",nameEn:"Professions",nameSv:"Yrken",words:["lääkäri","opettaja","kokki","poliisi","palomies","insinööri","taiteilija","muusikko","kirjailija","maanviljelijä","kauppias","sähköasentaja","putkimies"]},
+    {id:"talvi",name:"Talvi",nameEn:"Winter",nameSv:"Vinter",words:["lumi","jää","pakkanen","hanki","hiihto","luistelu","pulkka","latu","suksi","lumiukko","joulu","kynttilä","takka","viltti","kaakao","pipari"]},
+    {id:"kesä",name:"Kesä",nameEn:"Summer",nameSv:"Sommar",words:["aurinko","uiminen","ranta","loma","grilli","mökki","sauna","vene","kalastus","marjastus","pyöräily","jäätelö","lämmin","yötön","helle","uimaranta"]},
+  ],
+  en:[
+    {id:"nature",name:"Nature",words:["tree","leaf","river","lake","mountain","rock","moss","cloud","rain","wind","snow","ice","grass","sky","sun","moon","star","earth","water","flower","root","branch"]},
+    {id:"animals",name:"Animals",words:["dog","cat","bird","fish","bear","fox","deer","rabbit","wolf","eagle","owl","horse","sheep","cow","pig","duck","hen","mouse","snake","frog","bee"]},
+    {id:"food",name:"Food",words:["bread","cheese","cake","soup","meat","fish","potato","carrot","apple","berry","salt","sugar","milk","butter","egg","rice","pasta","salad","pie","juice","coffee"]},
+    {id:"home",name:"Home",words:["chair","table","bed","window","door","floor","roof","wall","lamp","rug","mirror","book","clock","pillow","glass","cup","spoon","fork","knife","shelf"]},
+    {id:"sea",name:"Sea",words:["wave","beach","ship","boat","island","fish","crab","shell","anchor","sail","port","sand","wind","storm","whale","seal","gull","fog","reef","tide"]},
+    {id:"city",name:"City",words:["house","street","bridge","park","shop","school","museum","hotel","church","tower","bus","car","bike","light","bench","road","train","sign","cafe"]},
+    {id:"space",name:"Space",words:["star","moon","sun","planet","galaxy","rocket","orbit","comet","meteor","light","dark","void","ring","dust","probe","mars","venus"]},
+    {id:"winter",name:"Winter",words:["snow","ice","frost","ski","sled","scarf","mitten","fire","candle","cocoa","cold","chill","storm","flake","icicle"]},
+    {id:"summer",name:"Summer",words:["sun","swim","beach","camp","grill","cabin","boat","fish","berry","bike","warm","heat","lake","shade","wave","sand"]},
+  ],
+  sv:[
+    {id:"natur",name:"Natur",words:["träd","löv","flod","sjö","berg","sten","moln","regn","vind","snö","is","gräs","himmel","sol","måne","stjärna","jord","vatten","blomma","rot"]},
+    {id:"djur",name:"Djur",words:["hund","katt","fågel","fisk","björn","räv","älg","hare","varg","örn","uggla","häst","får","ko","gris","anka","höna","mus","orm","groda","bi"]},
+    {id:"mat",name:"Mat",words:["bröd","ost","kaka","soppa","kött","fisk","potatis","morot","äpple","bär","salt","socker","mjölk","smör","ägg","ris","pasta","sallad","paj","juice","kaffe"]},
+  ]
+};
+
+function getDailyTheme(dateStr,lang){
+  const themes=DAILY_THEMES[lang]||DAILY_THEMES.fi;
+  const rng=seededRng(dailySeed(dateStr+"theme"));
+  return themes[Math.floor(rng()*themes.length)];
+}
+
+// Count how many theme words are findable in a hex grid
+function countThemeWords(foundWords,theme){
+  if(!theme||!theme.words)return 0;
+  return theme.words.filter(w=>foundWords.has(w)).length;
+}
 function getDailyResult(){try{const d=JSON.parse(localStorage.getItem('piilosana_daily')||'{}');if(d.date===todayStr())return d;return null;}catch{return null;}}
 function saveDailyResult(score,wordsFound,totalWords,forDate){
   const d=forDate||todayStr();
@@ -2304,7 +2356,14 @@ export default function Piilosana(){
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[soundTheme,setSoundTheme]=useState(()=>{const s=localStorage.getItem("piilosana_sound");return s==="modern"||s==="off"?s:"modern";});
   const[musicOn,setMusicOn]=useState(()=>localStorage.getItem("piilosana_music")!=="off");
-  const[musicTrack,setMusicTrack]=useState(()=>parseInt(localStorage.getItem("piilosana_music_track")||"0"));
+  const[musicTrack,setMusicTrack]=useState(()=>{
+    const saved=localStorage.getItem("piilosana_music_track");
+    if(saved!==null)return parseInt(saved);
+    // Random track on first visit
+    const r=Math.floor(Math.random()*MUSIC_TRACKS.length);
+    localStorage.setItem("piilosana_music_track",String(r));
+    return r;
+  });
   const[updateAvailable,setUpdateAvailable]=useState(false);
   const[wordsLoaded,setWordsLoaded]=useState(()=>({fi:LANG_CONFIG.fi.loaded,en:LANG_CONFIG.en.loaded,sv:LANG_CONFIG.sv.loaded}));
   useEffect(()=>{
@@ -2343,6 +2402,7 @@ export default function Piilosana(){
   const[showInflection,setShowInflection]=useState(false);
   const[showTutorial,setShowTutorial]=useState(false);
   const[dailyMode,setDailyMode]=useState(false);
+  const[dailyTheme,setDailyTheme]=useState(null);
   const[dailyResult,setDailyResult]=useState(()=>getDailyResult());
   const[dailyShareMsg,setDailyShareMsg]=useState(null);
   const[showDailyHistory,setShowDailyHistory]=useState(null); // date string or null
@@ -2865,10 +2925,22 @@ export default function Piilosana(){
     if(dayDiff<0)return; // can't play future
     if(!LANG_CONFIG[lang].loaded){await loadWords(lang);setWordsLoaded(p=>({...p,[lang]:true}));}
     sounds.init().catch(()=>{});
-    const rng=seededRng(dailySeed(playDate+lang));
-    let bg=null,bw=new Set();
-    for(let i=0;i<30;i++){const g=makeGrid(7,lang,5,rng);const w=findWordsHex(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=25)break;}
-    if(!bg){bg=makeGrid(7,lang,5,seededRng(dailySeed(playDate+lang)));bw=findWordsHex(bg,trie);}
+    // Pick today's theme deterministically
+    const theme=getDailyTheme(playDate,lang);
+    // Generate grids, prefer ones with more theme words (while still ensuring good total word count)
+    let bg=null,bw=new Set(),bestThemeCount=0;
+    for(let i=0;i<30;i++){
+      const rng=seededRng(dailySeed(playDate+lang+i));
+      const g=makeGrid(7,lang,5,rng);
+      const w=findWordsHex(g,trie);
+      const tc=countThemeWords(w,theme);
+      // Prefer grids with more theme words, but require decent total word count
+      if(w.size>=15&&(tc>bestThemeCount||(tc===bestThemeCount&&w.size>bw.size))){bg=g;bw=w;bestThemeCount=tc;}
+      else if(!bg&&w.size>bw.size){bg=g;bw=w;}
+      if(w.size>=25&&tc>=2)break;
+    }
+    if(!bg){const rng=seededRng(dailySeed(playDate+lang));bg=makeGrid(7,lang,5,rng);bw=findWordsHex(bg,trie);}
+    setDailyTheme(theme);
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(180);setScore(0);setMsg(null);
     setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);
     setEnding(null);setEndingProgress(0);setDropKey(0);
@@ -2887,10 +2959,11 @@ export default function Piilosana(){
     const dl=dateLabel(dr.date,lang);
     const pct=dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0;
     const streak=getDailyStreak();
-    const text=`Sain ${dl.full} päivän piilosanassa ${dr.score} pistettä (${dr.wordsFound}/${dr.totalWords} sanaa)! Pystytkö parempaan?${streak.streak>1?` 🔥 ${streak.streak} päivää putkeen!`:""}\n\nPelaa: https://piilosana.com`;
+    const themeStr=dailyTheme?` (${dailyTheme.name})`:"";
+    const text=`Sain ${dl.full} päivän piilosanassa${themeStr} ${dr.score} pistettä (${dr.wordsFound}/${dr.totalWords} sanaa)! Pystytkö parempaan?${streak.streak>1?` 🔥 ${streak.streak} päivää putkeen!`:""}\n\nPelaa: https://piilosana.com`;
     if(navigator.share){navigator.share({title:`Päivän Piilosana — ${dl.full}`,text}).catch(()=>{});}
     else{navigator.clipboard.writeText(text).then(()=>setDailyShareMsg(t.dailyCopied)).catch(()=>{});setTimeout(()=>setDailyShareMsg(null),2000);}
-  },[t,lang,dailyDate]);
+  },[t,lang,dailyDate,dailyTheme]);
 
   const start=useCallback(async()=>{
     if(mode==="solo"){
@@ -3076,7 +3149,7 @@ export default function Piilosana(){
     }
   },[state,dailyMode,score,found,valid,dailyDate]);
 
-  // Background music control — only after user interaction (browser autoplay policy)
+  // Background music control — starts from main menu on first interaction
   const prevTrackRef=useRef(musicTrack);
   useEffect(()=>{
     if(!audioStarted)return;
@@ -3091,7 +3164,7 @@ export default function Piilosana(){
       music.stop();
     }
     return()=>music.stop();
-  },[state,musicOn,music,audioStarted,musicTrack]);
+  },[musicOn,music,audioStarted,musicTrack]);
 
   // Bomb mode timer
   useEffect(()=>{
@@ -3961,6 +4034,7 @@ export default function Piilosana(){
     setPublicScores([]);
     setPublicRankings(null);
     setDailyMode(false);
+    setDailyTheme(null);
     setDailyResult(getDailyResult());
     setState("menu");
   },[socket,mode]);
@@ -4090,7 +4164,7 @@ export default function Piilosana(){
             );
           })}
           {/* Today — main card, darker/stronger yellow */}
-          {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();return(
+          {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();const todayTheme=getDailyTheme(d,lang);const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;return(
             <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,flex:2,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"3px",
               padding:"14px 8px",border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.btnRadius,cursor:"pointer",
               background:res?`linear-gradient(135deg,${S.yellow||"#ffcc00"}55,${S.yellow||"#ffcc00"}44)`:`linear-gradient(135deg,${S.yellow||"#ffcc00"},#E6B800)`,color:res?"#fff":"#2a2000",position:"relative",minWidth:0}}>
@@ -4100,7 +4174,8 @@ export default function Piilosana(){
                 <><span style={{fontSize:"22px",fontWeight:"800",color:S.yellow||"#ffcc00"}}>{res.score}p</span>
                 <span style={{fontSize:"13px",opacity:0.8,color:"#ccc"}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span></>
               ):(
-                <span style={{fontSize:"20px",marginTop:"2px"}}>▶</span>
+                <><span style={{fontSize:"20px",marginTop:"2px"}}>▶</span>
+                <span style={{fontSize:"11px",opacity:0.7,fontStyle:"italic"}}>{themeName}</span></>
               )}
             </button>
           );})()}
@@ -5181,6 +5256,7 @@ export default function Piilosana(){
             {mode==="solo"&&soloMode==="theme"&&activeTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44bb66",background:"#44bb6611",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>{activeTheme.emoji} {t.themeHint}: {activeTheme.name} — {themeFound.length}/{activeTheme.words.length}</div>}
             {mode==="solo"&&soloMode==="bomb"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff4444",background:"#ff444411",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>💣 {t.bombLabel} — {bombTimer}s</div>}
             {mode==="solo"&&soloMode==="mystery"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#aa66ff",background:"#aa66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>❓ {t.mysteryLabel}</div>}
+            {dailyMode&&dailyTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"12px",color:S.yellow||"#ffcc00",background:`${S.yellow||"#ffcc00"}11`,borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",fontStyle:"italic"}}>{lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}</div>}
             {mode==="solo"&&soloMode==="chess"&&state==="play"&&chessPiece&&(
               <div style={{textAlign:"center",padding:"8px",fontSize:"13px",color:"#ddaa33",background:"#ddaa3311",borderBottom:`1px solid ${S.border}`}}>
                 {chessPlacing?(
@@ -5565,7 +5641,8 @@ export default function Piilosana(){
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease",position:"relative"}}>
           {confettiOn&&<ConfettiCelebration isWinner={true}/>}
           <div style={{position:"relative",zIndex:1,border:`1px solid ${ending?.color||S.yellow}44`,padding:"24px",marginBottom:"16px",boxShadow:`0 4px 24px ${ending?.color||S.yellow}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
-            {dailyMode?<div style={{fontSize:"15px",color:S.yellow||"#ffcc00",marginBottom:"4px",fontWeight:"700"}}>{t.daily} {dateLabel(dailyDate,lang).short}</div>
+            {dailyMode?<><div style={{fontSize:"15px",color:S.yellow||"#ffcc00",marginBottom:"4px",fontWeight:"700"}}>{t.daily} {dateLabel(dailyDate,lang).short}</div>
+            {dailyTheme&&<div style={{fontSize:"12px",color:S.textMuted,marginBottom:"6px",fontStyle:"italic"}}>{lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}</div>}</>
             :<div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>}
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.score}</div>
             <div style={{fontSize:"36px",color:S.green,marginBottom:"4px",animation:"pop 0.3s ease",fontWeight:"700",letterSpacing:"2px"}}>{score}<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}>p</span>{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}> / {totalPossible}p</span>:null}</div>
