@@ -3866,7 +3866,7 @@ export default function Piilosana(){
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
       {/* Streak indicator — top left */}
       {(()=>{const s=getDailyStreak();return s.streak>0?(
-        <div style={{position:"absolute",top:"-18px",left:"2px",display:"flex",alignItems:"center",gap:"4px",fontSize:"11px",color:"#FF9500",fontWeight:"600",opacity:0.85}}>
+        <div style={{position:"absolute",top:"-18px",left:"2px",display:"flex",alignItems:"center",gap:"4px",fontSize:"11px",color:"#8CE600",fontWeight:"600",opacity:0.85}}>
           <span>{t.dailyStreak} {s.streak}</span>
           {s.best>s.streak&&<span style={{color:S.textMuted,fontWeight:"normal",fontSize:"10px"}}>({t.dailyBest}: {s.best})</span>}
         </div>
@@ -3930,7 +3930,7 @@ export default function Piilosana(){
       {/* Daily Challenge — date cards */}
       <div style={{marginBottom:"8px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:"6px",padding:"0 2px"}}>
-          <span style={{fontSize:"12px",fontWeight:"700",letterSpacing:"1px"}}>{(()=>{const tc=["#FF2D55","#FF6040","#A8FF00","#70E000","#00E5FF","#00C8E0","#BF5AF2","#A040D0","#FF2D55"];const txt=t.daily;return txt.split("").map((ch,i)=><span key={i} style={{color:tc[i%tc.length]}}>{ch}</span>);})()}</span>
+          <span style={{fontSize:"12px",fontWeight:"700",letterSpacing:"1px",color:"#8CE600"}}>{t.daily}</span>
           <span style={{fontSize:"10px",color:S.textMuted}}>{t.dailyDesc}</span>
         </div>
         <div style={{display:"flex",gap:"6px",width:"100%"}}>
@@ -3940,26 +3940,25 @@ export default function Piilosana(){
             if(num<1)return null;
             return(
               <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
-                padding:"10px 4px",border:`1px solid ${res?"#FF950044":"#FF950066"}`,borderRadius:S.btnRadius,cursor:"pointer",
-                background:res?"transparent":"linear-gradient(135deg,#FF950022,#FF6B0022)",color:"#fff",fontSize:"11px",minWidth:0}}>
+                padding:"10px 4px",border:`1px solid ${res?"#8CE60044":"#8CE60055"}`,borderRadius:S.btnRadius,cursor:"pointer",
+                background:res?"transparent":"linear-gradient(135deg,#8CE60015,#70E00015)",color:"#fff",fontSize:"11px",minWidth:0}}>
                 <span style={{fontSize:"10px",color:"#888",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
-                <span style={{fontSize:"13px",fontWeight:"600",color:res?"#888":"#FF9500"}}>{dl.short}</span>
-                {res?<span style={{fontSize:"14px",fontWeight:"700",color:S.green||"#44ddaa"}}>{res.score}p</span>
-                  :<span style={{fontSize:"12px",color:"#FF9500"}}>▶</span>}
+                <span style={{fontSize:"13px",fontWeight:"600",color:res?"#999":"#8CE600"}}>{dl.short}</span>
+                {res?<span style={{fontSize:"14px",fontWeight:"700",color:"#A8FF00"}}>{res.score}p</span>
+                  :<span style={{fontSize:"12px",color:"#8CE600"}}>▶</span>}
               </button>
             );
           })}
           {/* Today — main card */}
           {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();return(
             <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,flex:2,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"3px",
-              padding:"12px 8px",border:res?`2px solid #FF950044`:`2px solid #FF9500`,borderRadius:S.btnRadius,cursor:"pointer",
-              background:res?"linear-gradient(135deg,#555,#666)":"linear-gradient(135deg,#FF9500,#FF6B00)",color:"#fff",position:"relative",minWidth:0}}>
+              padding:"12px 8px",border:res?`2px solid #8CE60044`:`2px solid #8CE600`,borderRadius:S.btnRadius,cursor:"pointer",
+              background:res?"linear-gradient(135deg,#555,#666)":"linear-gradient(135deg,#8CE600,#6DB300)",color:res?"#fff":"#1a2800",position:"relative",minWidth:0}}>
               <span style={{fontSize:"10px",opacity:0.9,textTransform:"capitalize",letterSpacing:"0.5px"}}>{dl.weekday}</span>
               <span style={{fontSize:"16px",fontWeight:"700"}}>{dl.short}</span>
               {res?(
-                <><span style={{fontSize:"20px",fontWeight:"800"}}>{res.score}p</span>
-                <span style={{fontSize:"11px",opacity:0.8}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span>
-                <span onClick={e=>{e.stopPropagation();shareDailyResult();}} style={{position:"absolute",top:"6px",right:"6px",fontSize:"14px",opacity:0.7,cursor:"pointer",padding:"2px"}}>&#x2197;</span></>
+                <><span style={{fontSize:"20px",fontWeight:"800",color:"#A8FF00"}}>{res.score}p</span>
+                <span style={{fontSize:"11px",opacity:0.8,color:"#ccc"}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span></>
               ):(
                 <span style={{fontSize:"18px",marginTop:"2px"}}>▶</span>
               )}
@@ -3968,7 +3967,7 @@ export default function Piilosana(){
           {/* Tomorrow — locked */}
           {(()=>{const d=tomorrowStr();const dl=dateLabel(d,lang);return(
             <button disabled style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
-              padding:"10px 4px",border:`1px solid #44444488`,borderRadius:S.btnRadius,cursor:"default",
+              padding:"10px 4px",border:"1px dashed #55555588",borderRadius:S.btnRadius,cursor:"default",
               background:"transparent",color:"#555",fontSize:"11px",opacity:0.5,minWidth:0}}>
               <span style={{fontSize:"10px",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
               <span style={{fontSize:"13px",fontWeight:"600"}}>{dl.short}</span>
@@ -3981,17 +3980,17 @@ export default function Piilosana(){
       {/* Daily history popup */}
       {showDailyHistory&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px",animation:"fadeIn 0.2s ease"}} onClick={()=>setShowDailyHistory(null)}>
-          <div style={{background:S.dark,border:`2px solid #FF9500`,borderRadius:S.panelRadius,width:"100%",maxWidth:"380px",padding:"20px",boxShadow:`0 0 30px #FF950033`}} onClick={e=>e.stopPropagation()}>
+          <div style={{background:S.dark,border:`2px solid #8CE600`,borderRadius:S.panelRadius,width:"100%",maxWidth:"380px",padding:"20px",boxShadow:`0 0 30px #8CE60033`}} onClick={e=>e.stopPropagation()}>
             {(()=>{const d=showDailyHistory;const dl=dateLabel(d,lang);const res=getDailyResultForDate(d)||(d===todayStr()?getDailyResult():null);
               if(!res)return <div style={{textAlign:"center",color:S.textMuted}}>{t.dailyDone}</div>;
               return(<>
                 <div style={{textAlign:"center",marginBottom:"16px"}}>
-                  <div style={{fontSize:"14px",color:"#FF9500",fontWeight:"700",marginBottom:"4px",textTransform:"capitalize"}}>{t.daily} — {dl.full}</div>
+                  <div style={{fontSize:"14px",color:"#8CE600",fontWeight:"700",marginBottom:"4px",textTransform:"capitalize"}}>{t.daily} — {dl.full}</div>
                   <div style={{fontSize:"32px",fontWeight:"800",color:S.yellow}}>{res.score}<span style={{fontSize:"16px",fontWeight:"400",color:S.textMuted}}>p</span></div>
                   <div style={{fontSize:"14px",color:S.green,marginTop:"4px"}}>{res.wordsFound}/{res.totalWords} {t.dailyWords} ({res.totalWords>0?Math.round(res.wordsFound/res.totalWords*100):0}%)</div>
                 </div>
                 <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
-                  {d===todayStr()&&<button onClick={e=>{e.stopPropagation();shareDailyResult();}} style={{fontFamily:S.font,fontSize:"13px",color:"#fff",background:"linear-gradient(135deg,#FF9500,#FF6B00)",border:"none",padding:"8px 20px",cursor:"pointer",borderRadius:"10px",fontWeight:"600"}}>
+                  {d===todayStr()&&<button onClick={e=>{e.stopPropagation();shareDailyResult();}} style={{fontFamily:S.font,fontSize:"13px",color:"#1a2800",background:"linear-gradient(135deg,#A8FF00,#8CE600)",border:"none",padding:"8px 20px",cursor:"pointer",borderRadius:"10px",fontWeight:"600"}}>
                     {dailyShareMsg||t.dailyShare}
                   </button>}
                   <button onClick={()=>setShowDailyHistory(null)} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:`1px solid ${S.border}`,padding:"8px 20px",cursor:"pointer",borderRadius:"10px"}}>{t.back}</button>
@@ -5434,7 +5433,7 @@ export default function Piilosana(){
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease",position:"relative"}}>
           {confettiOn&&<ConfettiCelebration isWinner={true}/>}
           <div style={{position:"relative",zIndex:1,border:`1px solid ${ending?.color||S.yellow}44`,padding:"24px",marginBottom:"16px",boxShadow:`0 4px 24px ${ending?.color||S.yellow}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
-            {dailyMode?<div style={{fontSize:"15px",color:"#FF9500",marginBottom:"4px",fontWeight:"700"}}>{t.daily} {dateLabel(dailyDate,lang).short}</div>
+            {dailyMode?<div style={{fontSize:"15px",color:"#8CE600",marginBottom:"4px",fontWeight:"700"}}>{t.daily} {dateLabel(dailyDate,lang).short}</div>
             :<div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>}
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.score}</div>
             <div style={{fontSize:"36px",color:S.green,marginBottom:"4px",animation:"pop 0.3s ease",fontWeight:"700",letterSpacing:"2px"}}>{score}<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}>p</span>{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}> / {totalPossible}p</span>:null}</div>
@@ -5488,12 +5487,12 @@ export default function Piilosana(){
             </button>
 
             {dailyMode&&(()=>{const dr=dailyResult||getDailyResultForDate(dailyDate);const dl=dateLabel(dailyDate,lang);return dr?(
-              <div style={{margin:"12px 0",padding:"16px",background:"linear-gradient(135deg,#FF950022,#FF6B0022)",border:"2px solid #FF9500",borderRadius:"14px",textAlign:"center"}}>
-                <div style={{fontSize:"18px",fontWeight:"700",color:"#FF9500",marginBottom:"4px"}}>{t.daily} {dl.short}</div>
+              <div style={{margin:"12px 0",padding:"16px",background:"linear-gradient(135deg,#8CE60022,#6DB30022)",border:"2px solid #8CE600",borderRadius:"14px",textAlign:"center"}}>
+                <div style={{fontSize:"18px",fontWeight:"700",color:"#8CE600",marginBottom:"4px"}}>{t.daily} {dl.short}</div>
                 <div style={{fontSize:"24px",fontWeight:"800",color:S.yellow,marginBottom:"4px"}}>{dr.score}p</div>
                 <div style={{fontSize:"14px",color:S.green,marginBottom:"8px"}}>{dr.wordsFound}/{dr.totalWords} {t.dailyWords} ({dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0}%)</div>
-                {(()=>{const s=getDailyStreak();return s.streak>0?<div style={{fontSize:"14px",color:"#FF9500",marginBottom:"8px"}}>{t.dailyStreak}: {s.streak} · {t.dailyBest}: {s.best}</div>:null;})()}
-                <button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"15px",color:"#fff",background:"linear-gradient(135deg,#FF9500,#FF6B00)",border:"none",padding:"10px 24px",cursor:"pointer",borderRadius:"10px",fontWeight:"700",boxShadow:"0 4px 12px #FF950044"}}>
+                {(()=>{const s=getDailyStreak();return s.streak>0?<div style={{fontSize:"14px",color:"#8CE600",marginBottom:"8px"}}>{t.dailyStreak}: {s.streak} · {t.dailyBest}: {s.best}</div>:null;})()}
+                <button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"15px",color:"#1a2800",background:"linear-gradient(135deg,#A8FF00,#8CE600)",border:"none",padding:"10px 24px",cursor:"pointer",borderRadius:"10px",fontWeight:"700",boxShadow:"0 4px 12px #8CE60044"}}>
                   {dailyShareMsg||t.dailyShare}
                 </button>
               </div>
