@@ -4084,112 +4084,83 @@ export default function Piilosana(){
   const S=theme;
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
   const modeSelectJSX=(
-    <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
-      {/* ARENA CTA — player count inside button */}
-      <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#ffffff",background:"linear-gradient(135deg,#FF2D55 0%,#FF375F 50%,#E8254A 100%)",border:"none",padding:"28px 32px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #FF2D5544,${S.btnShadow}`:"4px 4px 0 #c41e3f,0 0 20px #FF2D5533",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"8px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
-        onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #FF2D5566":"6px 6px 0 #c41e3f,0 0 30px #FF2D5544"}}
-        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?`0 6px 24px #FF2D5544,${S.btnShadow}`:"4px 4px 0 #c41e3f,0 0 20px #FF2D5533"}}>
-        {t.arenaDesc&&<span style={{fontSize:"13px",letterSpacing:"3px",opacity:0.9}}>{t.arenaDesc}</span>}
-        <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%"}}><svg width="52" height="52" viewBox="0 0 100 85" style={{position:"absolute",left:"14px",top:"50%",transform:"translateY(-50%)"}}>
-          {/* Brain — smooth cartoon side view */}
-          <g transform="translate(95,2) scale(-0.95,0.95)">
-            {/* Stem */}
-            <path d="M60 58 C60 58 62 68 60 72 C59 75 55 75 54 72 C52 68 52 60 52 58" fill="#f4a0b0" stroke="#ffffff" strokeWidth="2.8" strokeLinejoin="round" strokeLinecap="round"/>
-            {/* Main brain outline */}
-            <path d="M50 56 C42 58 34 56 28 52 C20 48 14 42 10 34 C6 26 8 18 14 12 C18 8 24 10 28 8 C32 5 36 10 40 8 C44 4 48 2 54 4 C60 2 66 6 72 10 C78 14 84 20 86 28 C88 36 88 42 84 48 C80 52 76 52 72 48 C68 42 66 46 62 50 C58 56 56 58 54 58 Z" fill="#f4a0b0" stroke="#ffffff" strokeWidth="3" strokeLinejoin="round"/>
-            {/* Sylvian fissure */}
-            <path d="M16 38 C24 32 36 36 46 38 C56 40 64 34 80 36" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-            {/* Upper folds */}
-            <path d="M22 18 C28 22 36 20 42 16" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-            <path d="M52 10 C58 16 66 14 72 10" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-            <path d="M14 28 C22 24 32 26 40 24" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-            <path d="M50 20 C58 24 68 22 76 18" stroke="#ffffff" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-            {/* Lower folds */}
-            <path d="M62 44 C68 48 76 44 82 42" stroke="#ffffff" strokeWidth="2" fill="none" strokeLinecap="round"/>
-            <path d="M22 46 C28 42 36 44 42 46" stroke="#ffffff" strokeWidth="2" fill="none" strokeLinecap="round"/>
-          </g>
-          {/* Oil drops */}
-          <ellipse cx="50" cy="4" rx="3.5" ry="4.5" fill="#ffe066" stroke="#cca000" strokeWidth="0.8">
-            <animate attributeName="cy" values="0;14;0" dur="2s" repeatCount="indefinite"/>
-            <animate attributeName="ry" values="4.5;2.5;4.5" dur="2s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
-          </ellipse>
-          <ellipse cx="68" cy="2" rx="2.5" ry="3.5" fill="#ffcc00" stroke="#cca000" strokeWidth="0.8">
-            <animate attributeName="cy" values="-2;10;-2" dur="2.5s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.5s" repeatCount="indefinite"/>
-          </ellipse>
-          <ellipse cx="34" cy="6" rx="2.5" ry="3" fill="#ffe066" stroke="#cca000" strokeWidth="0.6">
-            <animate attributeName="cy" values="4;16;4" dur="1.7s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.7;0.1;0.7" dur="1.7s" repeatCount="indefinite"/>
-          </ellipse>
-          {/* Electric sparks */}
-          <g>
-            <path d="M8 18 L3 23 L10 21 L5 28" stroke="#ffee44" strokeWidth="2" fill="none" strokeLinecap="round">
-              <animate attributeName="opacity" values="0;1;0;0;1;0" dur="1.5s" repeatCount="indefinite"/>
-            </path>
-            <path d="M92 16 L97 21 L90 19 L95 26" stroke="#ffee44" strokeWidth="2" fill="none" strokeLinecap="round">
-              <animate attributeName="opacity" values="0;0;1;0;0;1" dur="1.8s" repeatCount="indefinite"/>
-            </path>
-            <path d="M4 46 L-1 50 L6 49 L1 55" stroke="#ffee44" strokeWidth="1.8" fill="none" strokeLinecap="round">
-              <animate attributeName="opacity" values="1;0;0;1;0;0" dur="1.3s" repeatCount="indefinite"/>
-            </path>
-            <path d="M94 42 L99 46 L92 45 L97 51" stroke="#ffee44" strokeWidth="1.8" fill="none" strokeLinecap="round">
-              <animate attributeName="opacity" values="0;1;0;1;0;0" dur="1.6s" repeatCount="indefinite"/>
-            </path>
-          </g>
-        </svg><span>{t.arenaCta}</span></span>
-        {publicOnlineCount>=3&&<span style={{fontSize:"12px",opacity:0.8,display:"flex",alignItems:"center",gap:"4px",marginTop:"2px"}}><span style={{fontSize:"14px",fontWeight:"700"}}>{publicOnlineCount}</span> {t.playersInArena}</span>}
-      </button>
+    <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
 
-      {/* Daily Challenge — grouped card */}
-      <div style={{marginBottom:"8px",padding:"14px 12px 12px",border:`1px solid ${S.yellow||"#ffcc00"}33`,borderRadius:S.panelRadius||"16px",background:`${S.yellow||"#ffcc00"}08`}}>
-        <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:"10px"}}>
-          <span style={{fontFamily:S.font,fontSize:"13px",fontWeight:"700",color:S.yellow||"#ffcc00"}}>{t.daily}</span>
-          <span style={{fontFamily:S.font,fontSize:"11px",color:S.textMuted}}>{t.dailyDesc}</span>
-        </div>
-        <div style={{display:"flex",gap:"6px",width:"100%"}}>
-          {/* Previous days — lighter yellow */}
-          {[3,2,1].map(daysAgo=>{
-            const d=daysAgoStr(daysAgo);const dl=dateLabel(d,lang);const res=getDailyResultForDate(d);const num=dailyNumberForDate(d);
-            if(num<1)return null;
-            return(
-              <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"3px",
-                padding:"12px 4px",border:`1px solid ${S.yellow||"#ffcc00"}44`,borderRadius:S.btnRadius,cursor:"pointer",
-                background:res?`${S.yellow||"#ffcc00"}22`:`${S.yellow||"#ffcc00"}18`,color:"#fff",fontSize:"11px",minWidth:0}}>
-                <span style={{fontSize:"12px",color:res?((S.yellow||"#ffcc00")+"aa"):"#999",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
-                <span style={{fontSize:"15px",fontWeight:"700",color:res?(S.yellow||"#ffcc00"):(S.yellow||"#ffcc00")}}>{dl.short}</span>
-                {res?<span style={{fontSize:"16px",fontWeight:"800",color:S.green||"#44ddaa"}}>{res.score}p</span>
-                  :<span style={{fontSize:"16px",color:S.yellow||"#ffcc00"}}>▶</span>}
-              </button>
-            );
-          })}
-          {/* Today — main card, darker/stronger yellow */}
-          {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();const todayTheme=getDailyTheme(d,lang);const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;return(
-            <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,flex:2,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"3px",
-              padding:"14px 8px",border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.btnRadius,cursor:"pointer",
-              background:res?`linear-gradient(135deg,${S.yellow||"#ffcc00"}55,${S.yellow||"#ffcc00"}44)`:`linear-gradient(135deg,${S.yellow||"#ffcc00"},#E6B800)`,color:res?"#fff":"#2a2000",position:"relative",minWidth:0}}>
-              <span style={{fontSize:"12px",opacity:0.9,textTransform:"capitalize",letterSpacing:"0.5px"}}>{dl.weekday}</span>
-              <span style={{fontSize:"18px",fontWeight:"700"}}>{dl.short}</span>
-              {res?(
-                <><span style={{fontSize:"22px",fontWeight:"800",color:S.yellow||"#ffcc00"}}>{res.score}p</span>
-                <span style={{fontSize:"13px",opacity:0.8,color:"#ccc"}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span></>
-              ):(
-                <><span style={{fontSize:"20px",marginTop:"2px"}}>▶</span>
-                <span style={{fontSize:"11px",opacity:0.7,fontStyle:"italic"}}>{themeName}</span></>
-              )}
+      {/* ===== DAILY CHALLENGE — HERO CARD ===== */}
+      {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();const todayTheme=getDailyTheme(d,lang);const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;const streak=getDailyStreak();return(
+        <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",
+          padding:"24px 16px 20px",border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.panelRadius||"16px",cursor:"pointer",
+          background:res?`linear-gradient(135deg,${S.yellow||"#ffcc00"}22,${S.yellow||"#ffcc00"}11)`:`linear-gradient(135deg,${S.yellow||"#ffcc00"}15,${S.yellow||"#ffcc00"}08)`,
+          marginBottom:"10px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 8px 32px ${S.yellow||"#ffcc00"}33`;}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+          <span style={{fontSize:"11px",color:S.yellow||"#ffcc00",letterSpacing:"3px",textTransform:"uppercase",fontWeight:"600"}}>{t.daily}</span>
+          <span style={{fontSize:"12px",color:S.textMuted,fontStyle:"italic"}}>{themeName}</span>
+          {res?(
+            <><span style={{fontSize:"32px",fontWeight:"800",color:S.yellow||"#ffcc00",lineHeight:1}}>{res.score}<span style={{fontSize:"16px",fontWeight:"400"}}>p</span></span>
+            <span style={{fontSize:"13px",color:S.textMuted}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span>
+            {streak.streak>1&&<span style={{fontSize:"12px",color:"#ff6644"}}>🔥 {streak.streak} {lang==="en"?"day streak":lang==="sv"?"dagar i rad":"päivää putkeen"}</span>}</>
+          ):(
+            <><span style={{fontSize:"28px",color:S.yellow||"#ffcc00",marginTop:"4px"}}>▶</span>
+            <span style={{fontSize:"12px",color:S.textMuted}}>{t.dailyDesc}</span></>
+          )}
+        </button>
+      );})()}
+
+      {/* Previous days row */}
+      <div style={{display:"flex",gap:"6px",width:"100%",marginBottom:"12px"}}>
+        {[3,2,1].map(daysAgo=>{
+          const d=daysAgoStr(daysAgo);const dl=dateLabel(d,lang);const res=getDailyResultForDate(d);const num=dailyNumberForDate(d);
+          if(num<1)return null;
+          return(
+            <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
+              padding:"8px 4px",border:`1px solid ${S.yellow||"#ffcc00"}33`,borderRadius:S.btnRadius,cursor:"pointer",
+              background:res?`${S.yellow||"#ffcc00"}15`:"transparent",color:"#fff",fontSize:"11px",minWidth:0,transition:"all 0.15s"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor=(S.yellow||"#ffcc00")+"88";}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor=(S.yellow||"#ffcc00")+"33";}}>
+              <span style={{fontSize:"11px",color:S.textMuted,textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
+              <span style={{fontSize:"13px",fontWeight:"600",color:S.yellow||"#ffcc00"}}>{dl.short}</span>
+              {res?<span style={{fontSize:"13px",fontWeight:"700",color:S.green||"#44ddaa"}}>{res.score}p</span>
+                :<span style={{fontSize:"13px",color:S.yellow||"#ffcc00"}}>▶</span>}
             </button>
-          );})()}
-          {/* Tomorrow — greyed out, dashed */}
-          {(()=>{const d=tomorrowStr();const dl=dateLabel(d,lang);return(
-            <button disabled style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"3px",
-              padding:"12px 4px",border:"1px dashed #44444466",borderRadius:S.btnRadius,cursor:"default",
-              background:"transparent",color:"#555",fontSize:"11px",minWidth:0}}>
-              <span style={{fontSize:"12px",textTransform:"capitalize",color:"#666"}}>{dl.weekday.slice(0,2)}</span>
-              <span style={{fontSize:"15px",fontWeight:"600",color:"#666"}}>{dl.short}</span>
-              <span style={{fontSize:"16px",color:"#555"}}>&#x1F512;</span>
-            </button>
-          );})()}
-        </div>
+          );
+        })}
+      </div>
+
+      {/* ===== AD SPACE ===== */}
+      <div style={{width:"100%",minHeight:"60px",border:`1px dashed ${S.border}`,borderRadius:S.btnRadius,marginBottom:"12px",display:"flex",alignItems:"center",justifyContent:"center",background:`${S.dark}88`}}>
+        <span style={{fontSize:"11px",color:S.textMuted+"88",letterSpacing:"1px"}}>AD</span>
+      </div>
+
+      {/* ===== ARENA + PRACTICE row ===== */}
+      <div style={{display:"flex",gap:"8px",marginBottom:"8px"}}>
+        <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"15px",color:"#ffffff",background:"linear-gradient(135deg,#FF2D55,#E8254A)",border:"none",padding:"16px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #c41e3f",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #FF2D5544":"5px 5px 0 #c41e3f";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #c41e3f";}}>
+          <span style={{fontWeight:"700"}}>{t.arenaCta}</span>
+          {publicOnlineCount>=3?<span style={{fontSize:"11px",opacity:0.85}}>{publicOnlineCount} {t.playersInArena}</span>
+            :<span style={{fontSize:"11px",opacity:0.7}}>{t.arenaDesc}</span>}
+        </button>
+        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"15px",color:"#1a3a00",background:"linear-gradient(180deg,#A8FF00,#8CE600)",border:"none",padding:"16px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",transition:"all 0.2s"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #6db300";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300";}}>
+          <span style={{fontWeight:"700"}}>{t.practice}</span>
+          <span style={{fontSize:"11px",opacity:0.7}}>{t.practiceDesc}</span>
+        </button>
+      </div>
+
+      {/* Custom game + Tutorial — smaller row */}
+      <div style={{display:"flex",gap:"8px",marginBottom:"0"}}>
+        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"13px",color:"#003040",background:"linear-gradient(180deg,#00E5FF,#00C8E0)",border:"none",padding:"12px 10px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"2px 2px 0 #009db8",borderRadius:S.btnRadius,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",transition:"all 0.2s"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
+          <span>{t.customGame}</span>
+        </button>
+        <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"13px",color:"#2a2040",background:"linear-gradient(180deg,#BF5AF2,#A040D0)",border:"none",padding:"12px 10px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"2px 2px 0 #8030a8",borderRadius:S.btnRadius,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",transition:"all 0.2s"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
+          <span>{t.tutorialBtn}</span>
+        </button>
       </div>
 
       {/* Daily history popup with leaderboard */}
@@ -4200,28 +4171,6 @@ export default function Piilosana(){
           dailyShareMsg={dailyShareMsg}
           onClose={()=>setShowDailyHistory(null)} />
       )}
-
-      {/* Three buttons side by side: Practice, Custom Game, Quick Guide */}
-      <div style={{display:"flex",gap:"8px"}}>
-        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"14px",color:"#1a3a00",background:"linear-gradient(180deg,#A8FF00 0%,#8CE600 100%)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #6db300"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300"}}>
-          <span>{t.practice}</span>
-          <span style={{fontSize:"12px",opacity:0.7}}>{t.practiceDesc}</span>
-        </button>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"14px",color:"#003040",background:"linear-gradient(180deg,#00E5FF 0%,#00C8E0 100%)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #009db8",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #009db8"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #009db8"}}>
-          <span>{t.customGame}</span>
-          <span style={{fontSize:"12px",opacity:0.7}}>{t.customDesc}</span>
-        </button>
-        <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"14px",color:"#2a2040",background:"linear-gradient(180deg,#BF5AF2 0%,#A040D0 100%)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #8030a8",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #8030a8"}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #8030a8"}}>
-          <span>{t.tutorialBtn}</span>
-          <span style={{fontSize:"12px",opacity:0.7}}>▶</span>
-        </button>
-      </div>
 
       {/* Solo options — fullscreen overlay so start button is always visible */}
       {showMenuOptions&&(
@@ -4258,45 +4207,43 @@ export default function Piilosana(){
         </div>
       )}
 
-      {/* Footer with buttons + info */}
-      <div style={{marginTop:"24px",width:"100%",maxWidth:"600px"}}>
-        {/* Flag language bubble — moved near bottom flags */}
+      {/* Footer */}
+      <div style={{marginTop:"20px",width:"100%",maxWidth:"600px"}}>
         {/* Action buttons row */}
-        <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap",marginBottom:"12px"}}>
+        <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap",marginBottom:"10px"}}>
           <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,
-            background:"transparent",border:`2px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",
-            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",position:"relative",minHeight:"36px",borderRadius:S.btnRadius}}>
+            background:"transparent",border:`1px solid ${S.border}`,padding:"5px 10px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",minHeight:"32px",borderRadius:S.btnRadius}}>
             <Icon icon="trophy" color={S.yellow} size={2} badge={true}/>
-            {Object.keys(achUnlocked).length>0&&<span style={{fontSize:"13px"}}>{Object.keys(achUnlocked).length}/{Object.keys(ACHIEVEMENTS).length}</span>}
+            {Object.keys(achUnlocked).length>0&&<span style={{fontSize:"12px"}}>{Object.keys(achUnlocked).length}/{Object.keys(ACHIEVEMENTS).length}</span>}
           </button>
-          <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"13px",color:authUser?S.green:S.yellow,
-            background:authUser?S.dark:"transparent",border:`2px solid ${authUser?S.green:S.border}`,padding:"6px 10px",cursor:"pointer",
-            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",
-            boxShadow:authUser?`0 0 8px ${S.green}44`:"none",minHeight:"36px",borderRadius:S.btnRadius}}>
-            <Icon icon="person" color={authUser?S.green:S.yellow} size={2}/>
-            {authUser&&authUser.nickname}
+          <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"13px",color:authUser?S.green:S.textMuted,
+            background:"transparent",border:`1px solid ${authUser?S.green+"66":S.border}`,padding:"5px 10px",cursor:"pointer",
+            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",minHeight:"32px",borderRadius:S.btnRadius}}>
+            <Icon icon="person" color={authUser?S.green:S.textMuted} size={2}/>
+            {authUser&&<span style={{fontSize:"12px"}}>{authUser.nickname}</span>}
           </button>
         </div>
-        {/* Info links */}
-        <div style={{fontSize:"14px",color:S.textMuted,marginBottom:"4px"}}>{currentLangLoaded?<>{lang==="fi"?<>{"~100 000 sanaa + "}{(WORDS_SET.size-100000).toLocaleString("fi-FI")}{" taivutusmuotoa "}<span onClick={()=>setShowInflection(true)} style={{color:S.green,cursor:"pointer",textDecoration:"underline dotted",textUnderlineOffset:"3px",fontSize:"12px"}}>(katso taivutusmuodot)</span></>:lang==="sv"?<>{WORDS_SET.size.toLocaleString("fi-FI")} ord och böjningsformer</>:<>{WORDS_SET.size.toLocaleString("fi-FI")} words &amp; inflections</>}</>:<span style={{color:S.textMuted,animation:"pulse 1.5s ease-in-out infinite"}}>{lang==="fi"?"Ladataan sanalistaa...":lang==="sv"?"Laddar ordlistan...":"Loading word list..."}</span>}</div>
-        <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
-          <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.howToPlay}</button>
-          <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:"transparent",border:"none",padding:"2px 6px",cursor:"pointer",textDecoration:"underline",opacity:0.7}}>{t.readMoreWords}</button>
+        {/* Info */}
+        <div style={{fontSize:"12px",color:S.textMuted,marginBottom:"4px"}}>{currentLangLoaded?<>{lang==="fi"?<>{"~100 000 sanaa + "}{(WORDS_SET.size-100000).toLocaleString("fi-FI")}{" taivutusmuotoa "}<span onClick={()=>setShowInflection(true)} style={{color:S.green,cursor:"pointer",textDecoration:"underline dotted",textUnderlineOffset:"3px",fontSize:"11px"}}>(katso taivutusmuodot)</span></>:lang==="sv"?<>{WORDS_SET.size.toLocaleString("fi-FI")} ord och böjningsformer</>:<>{WORDS_SET.size.toLocaleString("fi-FI")} words &amp; inflections</>}</>:<span style={{color:S.textMuted,animation:"pulse 1.5s ease-in-out infinite"}}>{lang==="fi"?"Ladataan sanalistaa...":lang==="sv"?"Laddar ordlistan...":"Loading word list..."}</span>}</div>
+        <div style={{display:"flex",gap:"10px",justifyContent:"center",marginBottom:"4px"}}>
+          <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"12px",color:S.green,background:"transparent",border:"none",padding:"2px 4px",cursor:"pointer",textDecoration:"underline",opacity:0.6}}>{t.howToPlay}</button>
+          <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"12px",color:S.green,background:"transparent",border:"none",padding:"2px 4px",cursor:"pointer",textDecoration:"underline",opacity:0.6}}>{t.readMoreWords}</button>
         </div>
-        <div style={{fontSize:"13px",color:S.textMuted,marginTop:"4px"}}>v{VERSION} · © Matti Kuokkanen 2026</div>
-        <div style={{fontSize:"13px",marginTop:"4px",display:"flex",gap:"10px",justifyContent:"center"}}>
-          <a href="mailto:info@piilosana.com" style={{color:S.textMuted,textDecoration:"none"}}>{lang==="en"?"Feedback":lang==="sv"?"Feedback":"Palaute"}</a>
-          <a href="/privacy" style={{color:S.textMuted,textDecoration:"none"}}>{lang==="en"?"Privacy":lang==="sv"?"Integritet":"Tietosuoja"}</a>
+        <div style={{fontSize:"11px",color:S.textMuted+"88",marginTop:"2px"}}>v{VERSION} · © Matti Kuokkanen 2026</div>
+        <div style={{fontSize:"12px",marginTop:"4px",display:"flex",gap:"10px",justifyContent:"center"}}>
+          <a href="mailto:info@piilosana.com" style={{color:S.textMuted+"88",textDecoration:"none"}}>{lang==="en"?"Feedback":lang==="sv"?"Feedback":"Palaute"}</a>
+          <a href="/privacy" style={{color:S.textMuted+"88",textDecoration:"none"}}>{lang==="en"?"Privacy":lang==="sv"?"Integritet":"Tietosuoja"}</a>
         </div>
-        {/* Language flags at bottom */}
-        <div style={{display:"flex",gap:"6px",justifyContent:"center",marginTop:"12px"}}>
+        {/* Language flags */}
+        <div style={{display:"flex",gap:"6px",justifyContent:"center",marginTop:"10px"}}>
           {Object.entries(LANG_CONFIG).map(([code,lc])=>(
             <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
               style={{fontFamily:S.font,fontSize:"13px",background:lang===code?S.dark:"transparent",
-                border:lang===code?`2px solid ${S.green}`:`2px solid ${S.border}`,
-                padding:"6px 10px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
-                boxShadow:lang===code?`0 0 8px ${S.green}44`:"none",
-                transition:"all 0.2s",display:"flex",alignItems:"center",gap:"5px",minHeight:"36px",borderRadius:S.btnRadius}}>
+                border:lang===code?`1px solid ${S.green}`:`1px solid ${S.border}`,
+                padding:"5px 8px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
+                boxShadow:lang===code?`0 0 6px ${S.green}33`:"none",
+                transition:"all 0.2s",display:"flex",alignItems:"center",gap:"4px",minHeight:"32px",borderRadius:S.btnRadius}}>
               <PixelFlag lang={code} size={2}/>
             </button>
           ))}
