@@ -3920,9 +3920,9 @@ export default function Piilosana(){
         {publicOnlineCount>=3&&<span style={{fontSize:"12px",opacity:0.8,display:"flex",alignItems:"center",gap:"4px",marginTop:"2px"}}><span style={{fontSize:"14px",fontWeight:"700"}}>{publicOnlineCount}</span> {t.playersInArena}</span>}
       </button>
 
-      {/* Daily Challenge — date cards */}
-      <div style={{marginBottom:"8px"}}>
-        <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:"6px",padding:"0 2px"}}>
+      {/* Daily Challenge — grouped card */}
+      <div style={{marginBottom:"8px",padding:"14px 12px 12px",border:`1px solid ${S.yellow||"#ffcc00"}33`,borderRadius:S.panelRadius||"16px",background:`${S.yellow||"#ffcc00"}08`}}>
+        <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:"10px"}}>
           <span style={{fontFamily:S.font,fontSize:"13px",fontWeight:"700",color:S.yellow||"#ffcc00"}}>{t.daily}</span>
           <span style={{fontFamily:S.font,fontSize:"11px",color:S.textMuted}}>{t.dailyDesc}</span>
         </div>
