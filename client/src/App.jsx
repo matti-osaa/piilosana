@@ -241,7 +241,7 @@ const T={
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
     shareLink:"JAA LINKKI",copied:"Kopioitu!",scanToJoin:"Skannaa liittyäksesi",inviteFriends:"Kutsu kavereita:",arenaLink:"Suora linkki moninpeliin:",invitePlayer:"KUTSU PELAAJA",shareGame:"Jaa linkki peliin",
     newCustom:"UUSI OMA NETTIPELI",menu:"VALIKKO",newPractice:"UUSI HARJOITUS",backToMenu:"PALAA ALKUVALIKKOON",joinMulti:"LIITY MONINPELIIN",
-    daily:"PÄIVÄN PIILOSANA",dailyDesc:"sama kaikille",dailyDone:"Jo pelattu tänään!",dailyShare:"JAA TULOS",dailyCopied:"Kopioitu leikepöydälle!",dailyStreak:"Putki",dailyBest:"Paras",dailyWords:"sanaa",dailyOf:"yhteensä",dailyChallenge:"Haaste",
+    daily:"PÄIVÄN PIILOSANA",dailyDesc:"sama kaikille · yksi yritys · 3 min",dailyDone:"Jo pelattu tänään!",dailyShare:"JAA TULOS",dailyCopied:"Kopioitu leikepöydälle!",dailyStreak:"Putki",dailyBest:"Paras",dailyWords:"sanaa",dailyOf:"yhteensä",dailyChallenge:"Haaste",
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
     notValid:"Ei kelpaa",alreadyFound:"Jo löydetty",
@@ -305,7 +305,7 @@ const T={
     joinGame:"JOIN GAME",roomCode:"ROOM CODE",noRooms:"No open rooms",orJoinRoom:"or join with code",
     shareLink:"SHARE LINK",copied:"Copied!",scanToJoin:"Scan to join",inviteFriends:"Invite friends:",arenaLink:"Direct link to multiplayer:",invitePlayer:"INVITE PLAYER",shareGame:"Share game link",
     newCustom:"NEW CUSTOM GAME",menu:"MENU",newPractice:"NEW PRACTICE",backToMenu:"BACK TO MENU",joinMulti:"JOIN MULTIPLAYER",
-    daily:"DAILY CHALLENGE",dailyDesc:"same for everyone",dailyDone:"Already played today!",dailyShare:"SHARE RESULT",dailyCopied:"Copied to clipboard!",dailyStreak:"Streak",dailyBest:"Best",dailyWords:"words",dailyOf:"total",dailyChallenge:"Challenge",
+    daily:"DAILY CHALLENGE",dailyDesc:"same for everyone · one attempt · 3 min",dailyDone:"Already played today!",dailyShare:"SHARE RESULT",dailyCopied:"Copied to clipboard!",dailyStreak:"Streak",dailyBest:"Best",dailyWords:"words",dailyOf:"total",dailyChallenge:"Challenge",
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
     notValid:"Not valid",alreadyFound:"Already found",
@@ -369,7 +369,7 @@ const T={
     joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
     shareLink:"DELA LÄNK",copied:"Kopierat!",scanToJoin:"Skanna för att gå med",inviteFriends:"Bjud in vänner:",arenaLink:"Direktlänk till flerspelare:",invitePlayer:"BJUD IN SPELARE",shareGame:"Dela spellänk",
     newCustom:"NYTT EGET SPEL",menu:"MENY",newPractice:"NY ÖVNING",backToMenu:"TILLBAKA TILL MENYN",joinMulti:"GÅ MED I FLERSPEL",
-    daily:"DAGENS UTMANING",dailyDesc:"samma för alla",dailyDone:"Redan spelat idag!",dailyShare:"DELA RESULTAT",dailyCopied:"Kopierat till urklipp!",dailyStreak:"Svit",dailyBest:"Bästa",dailyWords:"ord",dailyOf:"totalt",dailyChallenge:"Utmaning",
+    daily:"DAGENS UTMANING",dailyDesc:"samma för alla · ett försök · 3 min",dailyDone:"Redan spelat idag!",dailyShare:"DELA RESULTAT",dailyCopied:"Kopierat till urklipp!",dailyStreak:"Svit",dailyBest:"Bästa",dailyWords:"ord",dailyOf:"totalt",dailyChallenge:"Utmaning",
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
     notValid:"Ogiltigt",alreadyFound:"Redan hittat",
@@ -2209,6 +2209,7 @@ export default function Piilosana(){
   const[dailyMode,setDailyMode]=useState(false);
   const[dailyResult,setDailyResult]=useState(()=>getDailyResult());
   const[dailyShareMsg,setDailyShareMsg]=useState(null);
+  const[showDailyHistory,setShowDailyHistory]=useState(null); // date string or null
   const[showExitConfirm,setShowExitConfirm]=useState(false);
   const[showHamburger,setShowHamburger]=useState(false);
   const[muteEmojis,setMuteEmojis]=useState(()=>localStorage.getItem("piilosana_mute_emoji")==="on");
@@ -3928,18 +3929,18 @@ export default function Piilosana(){
 
       {/* Daily Challenge — date cards */}
       <div style={{marginBottom:"8px"}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"6px",padding:"0 2px"}}>
-          <span style={{fontSize:"12px",color:"#FF9500",fontWeight:"700",letterSpacing:"1px"}}>{t.daily}</span>
-          <span style={{fontSize:"11px",color:S.textMuted}}>{t.dailyDesc} — 3 min</span>
+        <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:"6px",padding:"0 2px"}}>
+          <span style={{fontSize:"12px",fontWeight:"700",letterSpacing:"1px"}}>{(()=>{const tc=["#FF2D55","#FF6040","#A8FF00","#70E000","#00E5FF","#00C8E0","#BF5AF2","#A040D0","#FF2D55"];const txt=t.daily;return txt.split("").map((ch,i)=><span key={i} style={{color:tc[i%tc.length]}}>{ch}</span>);})()}</span>
+          <span style={{fontSize:"10px",color:S.textMuted}}>{t.dailyDesc}</span>
         </div>
         <div style={{display:"flex",gap:"6px",width:"100%"}}>
-          {/* Previous days (scrollable) */}
+          {/* Previous days */}
           {[3,2,1].map(daysAgo=>{
             const d=daysAgoStr(daysAgo);const dl=dateLabel(d,lang);const res=getDailyResultForDate(d);const num=dailyNumberForDate(d);
             if(num<1)return null;
             return(
-              <button key={d} onClick={()=>{if(!res)startDaily(d);}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
-                padding:"10px 4px",border:`1px solid ${res?"#FF950044":"#FF950066"}`,borderRadius:S.btnRadius,cursor:res?"default":"pointer",
+              <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
+                padding:"10px 4px",border:`1px solid ${res?"#FF950044":"#FF950066"}`,borderRadius:S.btnRadius,cursor:"pointer",
                 background:res?"transparent":"linear-gradient(135deg,#FF950022,#FF6B0022)",color:"#fff",fontSize:"11px",minWidth:0}}>
                 <span style={{fontSize:"10px",color:"#888",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
                 <span style={{fontSize:"13px",fontWeight:"600",color:res?"#888":"#FF9500"}}>{dl.short}</span>
@@ -3949,15 +3950,16 @@ export default function Piilosana(){
             );
           })}
           {/* Today — main card */}
-          {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();const num=dailyNumber();return(
-            <button onClick={()=>{if(!res)startDaily();}} style={{fontFamily:S.font,flex:2,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"3px",
-              padding:"12px 8px",border:res?`2px solid #FF950044`:`2px solid #FF9500`,borderRadius:S.btnRadius,cursor:res?"default":"pointer",
+          {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();return(
+            <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,flex:2,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"3px",
+              padding:"12px 8px",border:res?`2px solid #FF950044`:`2px solid #FF9500`,borderRadius:S.btnRadius,cursor:"pointer",
               background:res?"linear-gradient(135deg,#555,#666)":"linear-gradient(135deg,#FF9500,#FF6B00)",color:"#fff",position:"relative",minWidth:0}}>
               <span style={{fontSize:"10px",opacity:0.9,textTransform:"capitalize",letterSpacing:"0.5px"}}>{dl.weekday}</span>
               <span style={{fontSize:"16px",fontWeight:"700"}}>{dl.short}</span>
               {res?(
                 <><span style={{fontSize:"20px",fontWeight:"800"}}>{res.score}p</span>
-                <span style={{fontSize:"11px",opacity:0.8}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span></>
+                <span style={{fontSize:"11px",opacity:0.8}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span>
+                <span onClick={e=>{e.stopPropagation();shareDailyResult();}} style={{position:"absolute",top:"6px",right:"6px",fontSize:"14px",opacity:0.7,cursor:"pointer",padding:"2px"}}>&#x2197;</span></>
               ):(
                 <span style={{fontSize:"18px",marginTop:"2px"}}>▶</span>
               )}
@@ -3970,17 +3972,35 @@ export default function Piilosana(){
               background:"transparent",color:"#555",fontSize:"11px",opacity:0.5,minWidth:0}}>
               <span style={{fontSize:"10px",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
               <span style={{fontSize:"13px",fontWeight:"600"}}>{dl.short}</span>
-              <span style={{fontSize:"14px"}}>🔒</span>
+              <span style={{fontSize:"11px",color:"#555"}}>&#x1F512;</span>
             </button>
           );})()}
         </div>
-        {/* Share button if today played */}
-        {dailyResult&&(
-          <button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"13px",color:"#FF9500",background:S.dark||"#1a1a2e",border:`1px solid #FF950044`,borderTop:"none",borderRadius:`0 0 ${S.btnRadius} ${S.btnRadius}`,width:"100%",padding:"8px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",marginTop:"-1px"}}>
-            {dailyShareMsg||`📤 ${t.dailyShare}`}
-          </button>
-        )}
       </div>
+
+      {/* Daily history popup */}
+      {showDailyHistory&&(
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px",animation:"fadeIn 0.2s ease"}} onClick={()=>setShowDailyHistory(null)}>
+          <div style={{background:S.dark,border:`2px solid #FF9500`,borderRadius:S.panelRadius,width:"100%",maxWidth:"380px",padding:"20px",boxShadow:`0 0 30px #FF950033`}} onClick={e=>e.stopPropagation()}>
+            {(()=>{const d=showDailyHistory;const dl=dateLabel(d,lang);const res=getDailyResultForDate(d)||(d===todayStr()?getDailyResult():null);
+              if(!res)return <div style={{textAlign:"center",color:S.textMuted}}>{t.dailyDone}</div>;
+              return(<>
+                <div style={{textAlign:"center",marginBottom:"16px"}}>
+                  <div style={{fontSize:"14px",color:"#FF9500",fontWeight:"700",marginBottom:"4px",textTransform:"capitalize"}}>{t.daily} — {dl.full}</div>
+                  <div style={{fontSize:"32px",fontWeight:"800",color:S.yellow}}>{res.score}<span style={{fontSize:"16px",fontWeight:"400",color:S.textMuted}}>p</span></div>
+                  <div style={{fontSize:"14px",color:S.green,marginTop:"4px"}}>{res.wordsFound}/{res.totalWords} {t.dailyWords} ({res.totalWords>0?Math.round(res.wordsFound/res.totalWords*100):0}%)</div>
+                </div>
+                <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
+                  {d===todayStr()&&<button onClick={e=>{e.stopPropagation();shareDailyResult();}} style={{fontFamily:S.font,fontSize:"13px",color:"#fff",background:"linear-gradient(135deg,#FF9500,#FF6B00)",border:"none",padding:"8px 20px",cursor:"pointer",borderRadius:"10px",fontWeight:"600"}}>
+                    {dailyShareMsg||t.dailyShare}
+                  </button>}
+                  <button onClick={()=>setShowDailyHistory(null)} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:`1px solid ${S.border}`,padding:"8px 20px",cursor:"pointer",borderRadius:"10px"}}>{t.back}</button>
+                </div>
+              </>);
+            })()}
+          </div>
+        </div>
+      )}
 
       {/* Three buttons side by side: Practice, Custom Game, Quick Guide */}
       <div style={{display:"flex",gap:"8px"}}>
@@ -4182,7 +4202,7 @@ export default function Piilosana(){
 
       {/* Global hamburger — top-left, always visible */}
       {state!=="play"&&state!=="ending"&&state!=="scramble"&&(
-        <button onClick={()=>setShowHamburger(true)} style={{position:"fixed",left:"10px",top:"14px",zIndex:100,background:`${S.dark}cc`,border:`1px solid ${S.border}`,padding:"4px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"10px",transition:"all 0.15s",fontSize:"20px",color:S.textMuted,lineHeight:1,backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}
+        <button onClick={()=>setShowHamburger(true)} style={{position:"fixed",left:"10px",top:"14px",zIndex:100,background:`${S.dark}cc`,border:`1px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"10px",transition:"all 0.15s",fontSize:"20px",color:S.textMuted,lineHeight:"1",height:"36px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}
           onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;e.currentTarget.style.background=S.green+"15";}}
           onMouseLeave={e=>{e.currentTarget.style.borderColor=S.border;e.currentTarget.style.color=S.textMuted;e.currentTarget.style.background=`${S.dark}cc`;}}>
           &#9776;
