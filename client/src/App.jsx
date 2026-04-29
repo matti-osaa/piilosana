@@ -241,7 +241,7 @@ const T={
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
     shareLink:"JAA LINKKI",copied:"Kopioitu!",scanToJoin:"Skannaa liittyäksesi",inviteFriends:"Kutsu kavereita:",arenaLink:"Suora linkki moninpeliin:",invitePlayer:"KUTSU PELAAJA",shareGame:"Jaa linkki peliin",
     newCustom:"UUSI OMA NETTIPELI",menu:"VALIKKO",newPractice:"UUSI HARJOITUS",backToMenu:"PALAA ALKUVALIKKOON",joinMulti:"LIITY MONINPELIIN",
-    daily:"PÄIVÄN PIILOSANA",dailyDesc:"sama kaikille",dailyDone:"Jo pelattu tänään!",dailyShare:"JAA TULOS",dailyCopied:"Kopioitu leikepöydälle!",dailyStreak:"Putkessa",dailyBest:"Paras putki",dailyWords:"sanaa",dailyOf:"yhteensä",dailyChallenge:"Haaste",
+    daily:"PÄIVÄN PIILOSANA",dailyDesc:"sama kaikille",dailyDone:"Jo pelattu tänään!",dailyShare:"JAA TULOS",dailyCopied:"Kopioitu leikepöydälle!",dailyStreak:"Putki",dailyBest:"Paras",dailyWords:"sanaa",dailyOf:"yhteensä",dailyChallenge:"Haaste",
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
     notValid:"Ei kelpaa",alreadyFound:"Jo löydetty",
@@ -305,7 +305,7 @@ const T={
     joinGame:"JOIN GAME",roomCode:"ROOM CODE",noRooms:"No open rooms",orJoinRoom:"or join with code",
     shareLink:"SHARE LINK",copied:"Copied!",scanToJoin:"Scan to join",inviteFriends:"Invite friends:",arenaLink:"Direct link to multiplayer:",invitePlayer:"INVITE PLAYER",shareGame:"Share game link",
     newCustom:"NEW CUSTOM GAME",menu:"MENU",newPractice:"NEW PRACTICE",backToMenu:"BACK TO MENU",joinMulti:"JOIN MULTIPLAYER",
-    daily:"DAILY CHALLENGE",dailyDesc:"same for everyone",dailyDone:"Already played today!",dailyShare:"SHARE RESULT",dailyCopied:"Copied to clipboard!",dailyStreak:"Streak",dailyBest:"Best streak",dailyWords:"words",dailyOf:"total",dailyChallenge:"Challenge",
+    daily:"DAILY CHALLENGE",dailyDesc:"same for everyone",dailyDone:"Already played today!",dailyShare:"SHARE RESULT",dailyCopied:"Copied to clipboard!",dailyStreak:"Streak",dailyBest:"Best",dailyWords:"words",dailyOf:"total",dailyChallenge:"Challenge",
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
     notValid:"Not valid",alreadyFound:"Already found",
@@ -369,7 +369,7 @@ const T={
     joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
     shareLink:"DELA LÄNK",copied:"Kopierat!",scanToJoin:"Skanna för att gå med",inviteFriends:"Bjud in vänner:",arenaLink:"Direktlänk till flerspelare:",invitePlayer:"BJUD IN SPELARE",shareGame:"Dela spellänk",
     newCustom:"NYTT EGET SPEL",menu:"MENY",newPractice:"NY ÖVNING",backToMenu:"TILLBAKA TILL MENYN",joinMulti:"GÅ MED I FLERSPEL",
-    daily:"DAGENS UTMANING",dailyDesc:"samma för alla",dailyDone:"Redan spelat idag!",dailyShare:"DELA RESULTAT",dailyCopied:"Kopierat till urklipp!",dailyStreak:"Svit",dailyBest:"Bästa svit",dailyWords:"ord",dailyOf:"totalt",dailyChallenge:"Utmaning",
+    daily:"DAGENS UTMANING",dailyDesc:"samma för alla",dailyDone:"Redan spelat idag!",dailyShare:"DELA RESULTAT",dailyCopied:"Kopierat till urklipp!",dailyStreak:"Svit",dailyBest:"Bästa",dailyWords:"ord",dailyOf:"totalt",dailyChallenge:"Utmaning",
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
     notValid:"Ogiltigt",alreadyFound:"Redan hittat",
@@ -3866,7 +3866,7 @@ export default function Piilosana(){
       {/* Streak indicator — top left */}
       {(()=>{const s=getDailyStreak();return s.streak>0?(
         <div style={{position:"absolute",top:"-18px",left:"2px",display:"flex",alignItems:"center",gap:"4px",fontSize:"11px",color:"#FF9500",fontWeight:"600",opacity:0.85}}>
-          <span>🔥 {s.streak}</span>
+          <span>{t.dailyStreak} {s.streak}</span>
           {s.best>s.streak&&<span style={{color:S.textMuted,fontWeight:"normal",fontSize:"10px"}}>({t.dailyBest}: {s.best})</span>}
         </div>
       ):null;})()}
@@ -3929,7 +3929,7 @@ export default function Piilosana(){
       {/* Daily Challenge — date cards */}
       <div style={{marginBottom:"8px"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"6px",padding:"0 2px"}}>
-          <span style={{fontSize:"12px",color:"#FF9500",fontWeight:"700",letterSpacing:"1px"}}>📅 {t.daily}</span>
+          <span style={{fontSize:"12px",color:"#FF9500",fontWeight:"700",letterSpacing:"1px"}}>{t.daily}</span>
           <span style={{fontSize:"11px",color:S.textMuted}}>{t.dailyDesc} — 3 min</span>
         </div>
         <div style={{display:"flex",gap:"6px",width:"100%"}}>
@@ -5414,7 +5414,7 @@ export default function Piilosana(){
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease",position:"relative"}}>
           {confettiOn&&<ConfettiCelebration isWinner={true}/>}
           <div style={{position:"relative",zIndex:1,border:`1px solid ${ending?.color||S.yellow}44`,padding:"24px",marginBottom:"16px",boxShadow:`0 4px 24px ${ending?.color||S.yellow}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
-            {dailyMode?<div style={{fontSize:"15px",color:"#FF9500",marginBottom:"4px",fontWeight:"700"}}>📅 {t.daily} {dateLabel(dailyDate,lang).short}</div>
+            {dailyMode?<div style={{fontSize:"15px",color:"#FF9500",marginBottom:"4px",fontWeight:"700"}}>{t.daily} {dateLabel(dailyDate,lang).short}</div>
             :<div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>}
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.score}</div>
             <div style={{fontSize:"36px",color:S.green,marginBottom:"4px",animation:"pop 0.3s ease",fontWeight:"700",letterSpacing:"2px"}}>{score}<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}>p</span>{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}> / {totalPossible}p</span>:null}</div>
@@ -5469,10 +5469,10 @@ export default function Piilosana(){
 
             {dailyMode&&(()=>{const dr=dailyResult||getDailyResultForDate(dailyDate);const dl=dateLabel(dailyDate,lang);return dr?(
               <div style={{margin:"12px 0",padding:"16px",background:"linear-gradient(135deg,#FF950022,#FF6B0022)",border:"2px solid #FF9500",borderRadius:"14px",textAlign:"center"}}>
-                <div style={{fontSize:"18px",fontWeight:"700",color:"#FF9500",marginBottom:"4px"}}>📅 {t.daily} {dl.short}</div>
+                <div style={{fontSize:"18px",fontWeight:"700",color:"#FF9500",marginBottom:"4px"}}>{t.daily} {dl.short}</div>
                 <div style={{fontSize:"24px",fontWeight:"800",color:S.yellow,marginBottom:"4px"}}>{dr.score}p</div>
                 <div style={{fontSize:"14px",color:S.green,marginBottom:"8px"}}>{dr.wordsFound}/{dr.totalWords} {t.dailyWords} ({dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0}%)</div>
-                {(()=>{const s=getDailyStreak();return s.streak>0?<div style={{fontSize:"14px",color:"#FF9500",marginBottom:"8px"}}>🔥 {t.dailyStreak}: {s.streak} · {t.dailyBest}: {s.best}</div>:null;})()}
+                {(()=>{const s=getDailyStreak();return s.streak>0?<div style={{fontSize:"14px",color:"#FF9500",marginBottom:"8px"}}>{t.dailyStreak}: {s.streak} · {t.dailyBest}: {s.best}</div>:null;})()}
                 <button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"15px",color:"#fff",background:"linear-gradient(135deg,#FF9500,#FF6B00)",border:"none",padding:"10px 24px",cursor:"pointer",borderRadius:"10px",fontWeight:"700",boxShadow:"0 4px 12px #FF950044"}}>
                   {dailyShareMsg||t.dailyShare}
                 </button>
