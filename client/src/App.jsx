@@ -3228,16 +3228,19 @@ export default function Piilosana(){
       const rect=el.getBoundingClientRect();
       const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
       const dx=Math.abs(x-cx),dy=Math.abs(y-cy);
-      const hw=rect.width/2;
-      if(dx>hw||dy>hw)continue;
-      const dist=Math.pow(dx,2/3)+Math.pow(dy,2/3);
-      const limit=Math.pow(hw,2/3);
-      if(dist<=limit){
-        const[row,col]=el.dataset.c.split(",").map(Number);
-        let score=dist;
-        if(lastCell&&(Math.abs(row-lastCell.r)>1||Math.abs(col-lastCell.c)>1))score+=limit*0.5;
-        if(score<bestDist){best={r:row,c:col};bestDist=score;}
-      }
+      const hw=rect.width/2,hh=rect.height/2;
+      if(dx>hw||dy>hh)continue;
+      // Hex hit-test for polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)
+      // From center: nx=dx/hw (0..1), ny=dy/hh (0..1)
+      // Flat sides at nx=1 (when ny≤0.5), diagonal edges when ny>0.5: nx ≤ 2*(1-ny)
+      const nx=dx/hw,ny=dy/hh;
+      const inHex=ny<=0.5?(nx<=1):(nx<=2*(1-ny));
+      if(!inHex)continue;
+      const dist=dx*dx+dy*dy;
+      const[row,col]=el.dataset.c.split(",").map(Number);
+      let score=dist;
+      if(lastCell&&(Math.abs(row-lastCell.r)>1||Math.abs(col-lastCell.c)>1))score+=hw*hw*2;
+      if(score<bestDist){best={r:row,c:col};bestDist=score;}
     }
     return best;
   },[]);
@@ -3859,7 +3862,14 @@ export default function Piilosana(){
   const S=theme;
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
   const modeSelectJSX=(
-    <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%"}}>
+    <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
+      {/* Streak indicator — top left */}
+      {(()=>{const s=getDailyStreak();return s.streak>0?(
+        <div style={{position:"absolute",top:"-18px",left:"2px",display:"flex",alignItems:"center",gap:"4px",fontSize:"11px",color:"#FF9500",fontWeight:"600",opacity:0.85}}>
+          <span>🔥 {s.streak}</span>
+          {s.best>s.streak&&<span style={{color:S.textMuted,fontWeight:"normal",fontSize:"10px"}}>({t.dailyBest}: {s.best})</span>}
+        </div>
+      ):null;})()}
       {/* ARENA CTA — player count inside button */}
       <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#ffffff",background:"linear-gradient(135deg,#FF2D55 0%,#FF375F 50%,#E8254A 100%)",border:"none",padding:"28px 32px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #FF2D5544,${S.btnShadow}`:"4px 4px 0 #c41e3f,0 0 20px #FF2D5533",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"8px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
         onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #FF2D5566":"6px 6px 0 #c41e3f,0 0 30px #FF2D5544"}}
@@ -3916,16 +3926,12 @@ export default function Piilosana(){
         {publicOnlineCount>=3&&<span style={{fontSize:"12px",opacity:0.8,display:"flex",alignItems:"center",gap:"4px",marginTop:"2px"}}><span style={{fontSize:"14px",fontWeight:"700"}}>{publicOnlineCount}</span> {t.playersInArena}</span>}
       </button>
 
-      {/* Streak bar */}
-      {(()=>{const s=getDailyStreak();return s.streak>0?(
-        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",padding:"6px 12px",marginBottom:"6px",fontSize:"13px",color:"#FF9500",fontWeight:"600"}}>
-          <span>🔥 {t.dailyStreak}: {s.streak}</span>
-          {s.best>s.streak&&<span style={{color:S.textMuted,fontWeight:"normal"}}>· {t.dailyBest}: {s.best}</span>}
-        </div>
-      ):null;})()}
-
       {/* Daily Challenge — date cards */}
       <div style={{marginBottom:"8px"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"6px",padding:"0 2px"}}>
+          <span style={{fontSize:"12px",color:"#FF9500",fontWeight:"700",letterSpacing:"1px"}}>📅 {t.daily}</span>
+          <span style={{fontSize:"11px",color:S.textMuted}}>{t.dailyDesc} — 3 min</span>
+        </div>
         <div style={{display:"flex",gap:"6px",width:"100%"}}>
           {/* Previous days (scrollable) */}
           {[3,2,1].map(daysAgo=>{
@@ -5184,6 +5190,7 @@ export default function Piilosana(){
                         style={{
                           width:"18.2%",aspectRatio:"0.866",
                           position:"relative",
+                          clipPath:hexClip,
                           cursor:state==="play"?"pointer":"default",
                           transition:"transform 0.12s ease-out",
                           transform:s?(last?"translateY(3px) scale(0.96)":"translateY(2px) scale(0.97)"):"none",
