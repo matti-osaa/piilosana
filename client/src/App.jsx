@@ -4143,20 +4143,20 @@ export default function Piilosana(){
         <span style={{fontSize:"11px",color:S.textMuted+"88",letterSpacing:"1px"}}>AD</span>
       </div>
 
-      {/* ===== ARENA + PRACTICE row ===== */}
+      {/* ===== PRACTICE (CTA1) + NONSTOP (CTA2) row ===== */}
       <div style={{display:"flex",gap:"8px",marginBottom:"8px"}}>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"15px",color:"#ffffff",background:"linear-gradient(135deg,#FF2D55,#E8254A)",border:"none",padding:"16px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #c41e3f",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
+        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"16px",color:"#1a3a00",background:"linear-gradient(180deg,#A8FF00,#8CE600)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",transition:"all 0.2s"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #6db300";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300";}}>
+          <span style={{fontWeight:"700"}}>{t.practice}</span>
+          <span style={{fontSize:"11px",opacity:0.7}}>{t.practiceDesc}</span>
+        </button>
+        <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"15px",color:"#ffffff",background:"linear-gradient(135deg,#FF2D55,#E8254A)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #c41e3f",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
           onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #FF2D5544":"5px 5px 0 #c41e3f";}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #c41e3f";}}>
           <span style={{fontWeight:"700"}}>{t.arenaCta}</span>
           {publicOnlineCount>=3?<span style={{fontSize:"11px",opacity:0.85}}>{publicOnlineCount} {t.playersInArena}</span>
             :<span style={{fontSize:"11px",opacity:0.7}}>{t.arenaDesc}</span>}
-        </button>
-        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"15px",color:"#1a3a00",background:"linear-gradient(180deg,#A8FF00,#8CE600)",border:"none",padding:"16px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",transition:"all 0.2s"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #6db300";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300";}}>
-          <span style={{fontWeight:"700"}}>{t.practice}</span>
-          <span style={{fontSize:"11px",opacity:0.7}}>{t.practiceDesc}</span>
         </button>
       </div>
 
