@@ -4088,33 +4088,34 @@ export default function Piilosana(){
 
       {/* ===== DAILY CHALLENGE — HERO CARD ===== */}
       {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();const todayTheme=getDailyTheme(d,lang);const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;const streak=getDailyStreak();return(
-        <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",
-          padding:"24px 16px 20px",border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.panelRadius||"16px",cursor:"pointer",
+        <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"5px",
+          padding:"22px 16px 18px",border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.panelRadius||"16px",cursor:"pointer",
           background:res?`linear-gradient(135deg,${S.yellow||"#ffcc00"}22,${S.yellow||"#ffcc00"}11)`:`linear-gradient(135deg,${S.yellow||"#ffcc00"}15,${S.yellow||"#ffcc00"}08)`,
           marginBottom:"10px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
           onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 8px 32px ${S.yellow||"#ffcc00"}33`;}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
           <span style={{fontSize:"11px",color:S.yellow||"#ffcc00",letterSpacing:"3px",textTransform:"uppercase",fontWeight:"600"}}>{t.daily}</span>
           <span style={{fontSize:"12px",color:S.textMuted,fontStyle:"italic"}}>{themeName}</span>
+          <span style={{fontSize:"13px",color:S.textMuted,textTransform:"capitalize"}}>{dl.weekday} {dl.short}</span>
           {res?(
             <><span style={{fontSize:"32px",fontWeight:"800",color:S.yellow||"#ffcc00",lineHeight:1}}>{res.score}<span style={{fontSize:"16px",fontWeight:"400"}}>p</span></span>
             <span style={{fontSize:"13px",color:S.textMuted}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span>
             {streak.streak>1&&<span style={{fontSize:"12px",color:"#ff6644"}}>🔥 {streak.streak} {lang==="en"?"day streak":lang==="sv"?"dagar i rad":"päivää putkeen"}</span>}</>
           ):(
-            <><span style={{fontSize:"28px",color:S.yellow||"#ffcc00",marginTop:"4px"}}>▶</span>
+            <><span style={{fontSize:"28px",color:S.yellow||"#ffcc00",marginTop:"2px"}}>▶</span>
             <span style={{fontSize:"12px",color:S.textMuted}}>{t.dailyDesc}</span></>
           )}
         </button>
       );})()}
 
-      {/* Previous days row */}
+      {/* Yesterday + Tomorrow row */}
       <div style={{display:"flex",gap:"6px",width:"100%",marginBottom:"12px"}}>
-        {[3,2,1].map(daysAgo=>{
-          const d=daysAgoStr(daysAgo);const dl=dateLabel(d,lang);const res=getDailyResultForDate(d);const num=dailyNumberForDate(d);
+        {/* Yesterday */}
+        {(()=>{const d=daysAgoStr(1);const dl=dateLabel(d,lang);const res=getDailyResultForDate(d);const num=dailyNumberForDate(d);
           if(num<1)return null;
           return(
             <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
-              padding:"8px 4px",border:`1px solid ${S.yellow||"#ffcc00"}33`,borderRadius:S.btnRadius,cursor:"pointer",
+              padding:"10px 4px",border:`1px solid ${S.yellow||"#ffcc00"}33`,borderRadius:S.btnRadius,cursor:"pointer",
               background:res?`${S.yellow||"#ffcc00"}15`:"transparent",color:"#fff",fontSize:"11px",minWidth:0,transition:"all 0.15s"}}
               onMouseEnter={e=>{e.currentTarget.style.borderColor=(S.yellow||"#ffcc00")+"88";}}
               onMouseLeave={e=>{e.currentTarget.style.borderColor=(S.yellow||"#ffcc00")+"33";}}>
@@ -4124,7 +4125,17 @@ export default function Piilosana(){
                 :<span style={{fontSize:"13px",color:S.yellow||"#ffcc00"}}>▶</span>}
             </button>
           );
-        })}
+        })()}
+        {/* Tomorrow — locked */}
+        {(()=>{const d=tomorrowStr();const dl=dateLabel(d,lang);return(
+          <button disabled style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
+            padding:"10px 4px",border:`1px dashed ${S.border}`,borderRadius:S.btnRadius,cursor:"default",
+            background:"transparent",color:"#555",fontSize:"11px",minWidth:0}}>
+            <span style={{fontSize:"11px",color:"#555",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
+            <span style={{fontSize:"13px",fontWeight:"600",color:"#555"}}>{dl.short}</span>
+            <span style={{fontSize:"13px",color:"#444"}}>🔒</span>
+          </button>
+        );})()}
       </div>
 
       {/* ===== AD SPACE ===== */}
