@@ -3864,13 +3864,6 @@ export default function Piilosana(){
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
-      {/* Streak indicator — top left */}
-      {(()=>{const s=getDailyStreak();return s.streak>0?(
-        <div style={{position:"absolute",top:"-18px",left:"2px",display:"flex",alignItems:"center",gap:"4px",fontSize:"11px",color:S.yellow||"#ffcc00",fontWeight:"600",opacity:0.85}}>
-          <span>{t.dailyStreak} {s.streak}</span>
-          {s.best>s.streak&&<span style={{color:S.textMuted,fontWeight:"normal",fontSize:"10px"}}>({t.dailyBest}: {s.best})</span>}
-        </div>
-      ):null;})()}
       {/* ARENA CTA — player count inside button */}
       <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"32px",color:"#ffffff",background:"linear-gradient(135deg,#FF2D55 0%,#FF375F 50%,#E8254A 100%)",border:"none",padding:"28px 32px 24px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?`0 6px 24px #FF2D5544,${S.btnShadow}`:"4px 4px 0 #c41e3f,0 0 20px #FF2D5533",borderRadius:S.btnRadius,width:"100%",minHeight:"90px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"8px",animation:"arenaPulse 3s ease-in-out infinite",position:"relative",overflow:"hidden"}}
         onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-3px) scale(1.01)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 8px 32px #FF2D5566":"6px 6px 0 #c41e3f,0 0 30px #FF2D5544"}}
@@ -5491,7 +5484,6 @@ export default function Piilosana(){
                 <div style={{fontSize:"18px",fontWeight:"700",color:S.yellow||"#ffcc00",marginBottom:"4px"}}>{t.daily} {dl.short}</div>
                 <div style={{fontSize:"24px",fontWeight:"800",color:S.yellow,marginBottom:"4px"}}>{dr.score}p</div>
                 <div style={{fontSize:"14px",color:S.green,marginBottom:"8px"}}>{dr.wordsFound}/{dr.totalWords} {t.dailyWords} ({dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0}%)</div>
-                {(()=>{const s=getDailyStreak();return s.streak>0?<div style={{fontSize:"14px",color:S.yellow||"#ffcc00",marginBottom:"8px"}}>{t.dailyStreak}: {s.streak} · {t.dailyBest}: {s.best}</div>:null;})()}
                 <button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"15px",color:"#2a2000",background:`linear-gradient(135deg,${S.yellow||"#ffcc00"},#E6B800)`,border:"none",padding:"10px 24px",cursor:"pointer",borderRadius:"10px",fontWeight:"700",boxShadow:`0 4px 12px ${S.yellow||"#ffcc00"}44`}}>
                   {dailyShareMsg||t.dailyShare}
                 </button>
