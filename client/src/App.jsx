@@ -71,7 +71,7 @@ function dailySeed(dateStr){let h=0;for(let i=0;i<dateStr.length;i++){h=Math.imu
 // Daily challenge number: days since 2026-04-27
 const DAILY_EPOCH=new Date('2026-04-27').getTime();
 function dailyNumber(){return Math.floor((Date.now()-DAILY_EPOCH)/(1000*60*60*24))+1;}
-function todayStr(){return new Date().toISOString().slice(0,10);}
+function todayStr(){return new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Helsinki'});}
 function makeDailyGrid(lang='fi'){const rng=seededRng(dailySeed(todayStr()+lang));return makeGrid(7,lang,5,rng);}
 
 // ============================================
@@ -149,7 +149,7 @@ function dateLabel(dateStr,lang='fi'){
   return{weekday:wd[d.getDay()],short:d.getDate()+"."+(d.getMonth()+1)+".",full:wd[d.getDay()]+" "+d.getDate()+"."+(d.getMonth()+1)+"."};
 }
 function dailyNumberForDate(dateStr){return Math.floor((new Date(dateStr+"T12:00:00").getTime()-DAILY_EPOCH)/(1000*60*60*24))+1;}
-function daysAgoStr(n){const d=new Date(Date.now()-n*86400000);return d.toISOString().slice(0,10);}
+function daysAgoStr(n){const d=new Date(Date.now()-n*86400000);return d.toLocaleDateString('sv-SE',{timeZone:'Europe/Helsinki'});}
 function tomorrowStr(){return daysAgoStr(-1);}
 
 // Client-side gravity: remove cells, drop letters down, fill new from top
