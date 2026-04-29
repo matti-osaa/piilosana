@@ -794,114 +794,180 @@ function useSounds(soundTheme){
 // BACKGROUND MUSIC - Two Dots / Monument Valley ambient
 // Soft piano + bell tones + light pad. C-pentatonic, lots of space.
 // ============================================
-function useMusic(){
+const MUSIC_TRACKS=[
+  {id:"neon-pulse",name:"Neon Pulse",nameFi:"Neonin syke"},
+  {id:"word-away",name:"Word Away",nameFi:"Sana pois"},
+  {id:"vapor-tail",name:"Vapor Tail",nameFi:"Höyryvanajälki"},
+  {id:"laser-silk",name:"Laser Silk",nameFi:"Lasersilkki"},
+];
+
+function startNeonPulse(rev,del){
+  Tone.Transport.bpm.value=120;
+  const seqF=new Tone.Filter({frequency:800,type:"lowpass",rolloff:-24,Q:4}).connect(rev);
+  const seq=new Tone.Synth({oscillator:{type:"sawtooth"},envelope:{attack:0.005,decay:0.12,sustain:0.08,release:0.1},volume:-12}).connect(seqF);
+  let filterPhase=0;
+  const leadF=new Tone.Filter({frequency:3000,type:"lowpass",rolloff:-12}).connect(del);
+  const lead=new Tone.Synth({oscillator:{type:"sawtooth"},envelope:{attack:0.08,decay:0.5,sustain:0.5,release:1.2},volume:-17}).connect(leadF);
+  const padF=new Tone.Filter({frequency:1500,type:"lowpass",rolloff:-12}).connect(rev);
+  const pad=new Tone.PolySynth(Tone.Synth,{oscillator:{type:"sawtooth"},envelope:{attack:1.0,decay:1.5,sustain:0.5,release:2.5},volume:-26}).connect(padF);
+  const kick=new Tone.MembraneSynth({volume:-10,pitchDecay:0.05,octaves:5,envelope:{attack:0.005,decay:0.3,sustain:0,release:0.2}}).toDestination();
+  const hihat=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.001,decay:0.03,sustain:0,release:0.02},volume:-22}).toDestination();
+  const snare=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.002,decay:0.15,sustain:0,release:0.1},volume:-16}).toDestination();
+  const seqPats=[
+    ["A1","A1","A2","A1","A1","A2","A1","A2","A1","A1","A2","A1","E2","A1","A2","A1"],
+    ["F1","F1","F2","F1","F1","F2","F1","F2","F1","F1","F2","F1","C2","F1","F2","F1"],
+    ["C2","C2","C3","C2","C2","C3","C2","C3","C2","C2","C3","C2","G2","C2","C3","C2"],
+    ["G1","G1","G2","G1","G1","G2","G1","G2","G1","G1","G2","G1","D2","G1","G2","G1"],
+  ];
+  const padCh=[["A3","C4","E4"],["F3","A3","C4"],["C3","E3","G3"],["G3","B3","D4"]];
+  const melA=["E5",null,null,"A5",null,"G5",null,"E5",null,"C5",null,"D5","E5",null,null,null,"G5",null,null,"E5",null,"D5",null,"C5",null,"B4",null,"C5","D5",null,null,null];
+  const melB=["A5",null,null,"C6",null,"B5",null,"A5",null,"G5",null,"A5","B5",null,null,null,"C6",null,"B5","A5",null,"G5",null,"E5",null,"D5",null,"E5",null,null,null,null];
+  let ss=0,sc=0,pc=0,ls=0,beat=0,useB=false;
+  const seqLoop=new Tone.Loop(t=>{const n=seqPats[sc%4][ss%16];seq.triggerAttackRelease(n,"32n",t);filterPhase+=0.015;seqF.frequency.setValueAtTime(800+Math.sin(filterPhase)*600,t);ss++;if(ss%16===0)sc++;},"16n");
+  const padLoop=new Tone.Loop(t=>{pad.triggerAttackRelease(padCh[pc%4],"1m",t);pc++;},"1m");
+  const leadLoop=new Tone.Loop(t=>{const m=useB?melB:melA;const n=m[ls%32];if(n)lead.triggerAttackRelease(n,"4n",t);ls++;if(ls%32===0)useB=!useB;},"4n");
+  const drumLoop=new Tone.Loop(t=>{const p=beat%16;if(p%4===0)kick.triggerAttackRelease("C1","8n",t);if(p===4||p===12)snare.triggerAttackRelease("16n",t);if(p%2===0)hihat.triggerAttackRelease("32n",t);beat++;},"16n");
+  seqLoop.start(0);drumLoop.start("4m");padLoop.start("4m");leadLoop.start("8m");
+  return{seq,seqF,lead,leadF,pad,padF,kick,hihat,snare,seqLoop,padLoop,leadLoop,drumLoop};
+}
+
+function startWordAway(rev,del){
+  Tone.Transport.bpm.value=100;
+  const chorus=new Tone.Chorus({frequency:0.5,delayTime:6,depth:0.5,wet:0.3}).connect(rev).start();
+  const arpF=new Tone.Filter({frequency:3500,type:"lowpass",rolloff:-12}).connect(del);
+  const arp=new Tone.Synth({oscillator:{type:"sawtooth"},envelope:{attack:0.005,decay:0.3,sustain:0.04,release:0.45},volume:-18}).connect(arpF);
+  const arpB=new Tone.Synth({oscillator:{type:"sine"},envelope:{attack:0.003,decay:0.35,sustain:0.02,release:0.4},volume:-25}).connect(del);
+  const strF=new Tone.Filter({frequency:2400,type:"lowpass",rolloff:-12}).connect(chorus);
+  const str=new Tone.PolySynth(Tone.Synth,{oscillator:{type:"sawtooth"},envelope:{attack:1.5,decay:2.0,sustain:0.6,release:3.0},volume:-21}).connect(strF);
+  const leadVib=new Tone.Vibrato({frequency:5,depth:0.1,wet:0.55}).connect(del);
+  const lead=new Tone.Synth({oscillator:{type:"sawtooth"},envelope:{attack:0.15,decay:0.8,sustain:0.5,release:2.0},volume:-17}).connect(leadVib);
+  const bassF=new Tone.Filter({frequency:300,type:"lowpass",rolloff:-24}).connect(rev);
+  const bass=new Tone.Synth({oscillator:{type:"sawtooth"},envelope:{attack:0.04,decay:0.5,sustain:0.35,release:0.6},volume:-14}).connect(bassF);
+  const kick=new Tone.MembraneSynth({volume:-12,pitchDecay:0.06,octaves:4,envelope:{attack:0.005,decay:0.35,sustain:0,release:0.25}}).toDestination();
+  const hihat=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.001,decay:0.035,sustain:0,release:0.025},volume:-25}).toDestination();
+  const snare=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.002,decay:0.16,sustain:0,release:0.1},volume:-18}).connect(rev);
+  const arpN={G:["G3","B3","D4","G4","D4","B3","G3","D4","B3","G4","D4","B3","G3","B3","D4","G4"],"D/F#":["F#3","A3","D4","F#4","D4","A3","F#3","D4","A3","F#4","D4","A3","F#3","A3","D4","F#4"],Em7:["E3","G3","B3","D4","B3","G3","E3","B3","G3","D4","B3","G3","E3","G3","B3","D4"],Am:["A2","C3","E3","A3","E3","C3","A2","E3","C3","A3","E3","C3","A2","C3","E3","A3"],D:["D3","F#3","A3","D4","A3","F#3","D3","A3","F#3","D4","A3","F#3","D3","F#3","A3","D4"],C:["C3","E3","G3","C4","G3","E3","C3","G3","E3","C4","G3","E3","C3","E3","G3","C4"]};
+  const strV={G:["G2","B2","D3"],"D/F#":["F#2","A2","D3"],Em7:["E2","G2","B2","D3"],Am:["A1","C2","E2"],D:["D2","F#2","A2"],C:["C2","E2","G2"]};
+  const bassN={G:"G1","D/F#":"F#1",Em7:"E1",Am:"A1",D:"D1",C:"C1"};
+  const song=["G","D/F#","Em7","D/F#","G","D/F#","Em7","D/F#","G","D/F#","Em7","D/F#","G","D/F#","Em7","D/F#","Am","Am","D","D","G","D/F#","C","D","G","D/F#","C","D","G","D/F#","C","D"];
+  const melV=["B4",null,null,"D5","A4",null,null,"F#4","G4",null,"B4",null,"A4",null,null,null,"B4",null,"D5",null,"E5",null,"D5",null,"B4",null,null,"A4",null,null,null,null,"C5",null,null,"E5","D5",null,"C5",null,"D5",null,null,null,"F#5",null,null,null,"G5",null,null,"F#5","E5",null,"D5",null,"C5",null,"D5",null,null,null,null,null];
+  const melC=["B5",null,"A5","G5","F#5",null,"E5",null,"E5",null,"D5",null,"D5","E5","F#5",null,"B5",null,"A5","G5","F#5",null,"E5","D5","E5",null,null,null,null,null,null,null];
+  let as2=0,ab=0,sb=0,bb=0,bh=0,ls2=0,lsb=0,beat=0,fp=0;
+  const arpLoop=new Tone.Loop(t=>{const ch=song[ab%song.length];const ns=arpN[ch]||arpN.G;arp.triggerAttackRelease(ns[as2%16],"32n",t);arpB.triggerAttackRelease(ns[as2%16],"32n",t);fp+=0.007;arpF.frequency.setValueAtTime(2800+Math.sin(fp)*1200,t);as2++;if(as2%16===0)ab++;},"16n");
+  const strLoop=new Tone.Loop(t=>{const ch=song[sb%song.length];str.triggerAttackRelease(strV[ch]||strV.G,"1m",t);sb++;},"1m");
+  const bassLoop=new Tone.Loop(t=>{const ch=song[bb%song.length];bass.triggerAttackRelease(bassN[ch]||"G1","4n",t);bh++;if(bh%2===0)bb++;},"2n");
+  const leadLoop=new Tone.Loop(t=>{const sb2=lsb%song.length;const isChorus=sb2>=24;const m=isChorus?melC:melV;const idx=isChorus?(ls2%32):(ls2%64);const n=m[idx];if(n)lead.triggerAttackRelease(n,"4n.",t);ls2++;if(ls2%(isChorus?32:64)===0)lsb++;},"4n");
+  const drumLoop=new Tone.Loop(t=>{const p=beat%16;if(p===0||p===8)kick.triggerAttackRelease("C1","8n",t);if(p===4||p===12)snare.triggerAttackRelease("16n",t);if(p%2===0)hihat.triggerAttackRelease("32n",t);beat++;},"16n");
+  arpLoop.start(0);strLoop.start("4m");bassLoop.start("4m");drumLoop.start("4m");leadLoop.start("8m");
+  return{arp,arpF,arpB,str,strF,lead,leadVib,bass,bassF,kick,hihat,snare,chorus,arpLoop,strLoop,bassLoop,leadLoop,drumLoop};
+}
+
+function startVaporTail(rev,del){
+  Tone.Transport.bpm.value=82;
+  const chorus=new Tone.Chorus({frequency:0.3,delayTime:8,depth:0.7,wet:0.4}).connect(rev).start();
+  const del2=new Tone.FeedbackDelay({delayTime:"2n",feedback:0.2,wet:0.18}).connect(rev);
+  const chF=new Tone.Filter({frequency:2000,type:"lowpass",rolloff:-12}).connect(chorus);
+  const chord=new Tone.PolySynth(Tone.Synth,{oscillator:{type:"sawtooth"},envelope:{attack:0.08,decay:1.2,sustain:0.3,release:2.5},volume:-18}).connect(chF);
+  const shimF=new Tone.Filter({frequency:4000,type:"lowpass",rolloff:-12}).connect(del);
+  const shim=new Tone.Synth({oscillator:{type:"sine"},envelope:{attack:0.004,decay:0.4,sustain:0.02,release:0.5},volume:-24}).connect(shimF);
+  const padF=new Tone.Filter({frequency:900,type:"lowpass",rolloff:-24,Q:2}).connect(chorus);
+  const pad=new Tone.PolySynth(Tone.Synth,{oscillator:{type:"sawtooth"},envelope:{attack:3.0,decay:3.0,sustain:0.7,release:5.0},volume:-25}).connect(padF);
+  const bassF2=new Tone.Filter({frequency:250,type:"lowpass",rolloff:-24}).connect(rev);
+  const bass=new Tone.Synth({oscillator:{type:"sawtooth"},envelope:{attack:0.1,decay:0.8,sustain:0.4,release:1.2},volume:-16}).connect(bassF2);
+  const leadVib=new Tone.Vibrato({frequency:4,depth:0.12,wet:0.6}).connect(del2);
+  const lead=new Tone.Synth({oscillator:{type:"sawtooth"},envelope:{attack:0.2,decay:1.0,sustain:0.45,release:2.5},volume:-19}).connect(leadVib);
+  const kick=new Tone.MembraneSynth({volume:-15,pitchDecay:0.07,octaves:3.5,envelope:{attack:0.008,decay:0.4,sustain:0,release:0.3}}).toDestination();
+  const rim=new Tone.NoiseSynth({noise:{type:"pink"},envelope:{attack:0.001,decay:0.04,sustain:0,release:0.025},volume:-24}).connect(rev);
+  const chV=[["F3","A3","C4","E4"],["A3","C4","E4","G4"],["D3","F3","A3","C4"],["Bb2","D3","F3","A3"]];
+  const padCh=[["F2","C3","E3"],["A2","E3","G3"],["D2","A2","C3"],["Bb1","F2","A2"]];
+  const bN=["F1","A1","D1","Bb0"];
+  const shimP=[["E5",null,null,"C5",null,null,"A4",null],["G5",null,null,"E5",null,null,"C5",null],["C5",null,null,"A4",null,null,"F4",null],["A4",null,null,"F4",null,null,"D4",null]];
+  const melA=["A5",null,null,null,"G5",null,null,null,"F5",null,null,"E5",null,null,null,null,null,null,"D5",null,null,"C5",null,null,null,null,null,null,null,null,null,null];
+  const melB=["C6",null,null,null,"Bb5",null,null,null,"A5",null,null,"G5",null,null,"F5",null,null,null,"E5",null,"F5",null,"G5",null,"A5",null,null,null,null,null,null,null];
+  let cc=0,pc2=0,bc=0,shs=0,shc=0,ls3=0,beat=0,useB=false,cfp=0;
+  let chBt=0;
+  const chLoop=new Tone.Loop(t=>{const p=chBt%8;if(p===0||p===3||p===6){chord.triggerAttackRelease(chV[cc%4],"4n",t);cfp+=0.15;chF.frequency.setValueAtTime(1200+Math.sin(cfp)*800,t);}chBt++;if(chBt%8===0)cc++;},"8n");
+  const padLoop=new Tone.Loop(t=>{pad.triggerAttackRelease(padCh[pc2%4],"2m",t);pc2++;},"2m");
+  const bassLoop=new Tone.Loop(t=>{bass.triggerAttackRelease(bN[bc%4],"1m",t);bc++;},"1m");
+  const shimLoop=new Tone.Loop(t=>{const n=shimP[shc%4][shs%8];if(n)shim.triggerAttackRelease(n,"8n",t);shs++;if(shs%8===0)shc++;},"8n");
+  const leadLoop=new Tone.Loop(t=>{const m=useB?melB:melA;const n=m[ls3%32];if(n)lead.triggerAttackRelease(n,"2n",t);ls3++;if(ls3%32===0)useB=!useB;},"4n");
+  const drumLoop=new Tone.Loop(t=>{const p=beat%32;if(p===0||p===16)kick.triggerAttackRelease("C1","4n",t);if(p%8===4)rim.triggerAttackRelease("32n",t);beat++;},"16n");
+  chLoop.start(0);padLoop.start("2m");shimLoop.start("4m");bassLoop.start("4m");drumLoop.start("6m");leadLoop.start("10m");
+  return{chord,chF,shim,shimF,pad,padF,bass,bassF:bassF2,lead,leadVib,kick,rim,chorus,del2,chLoop,padLoop,bassLoop,shimLoop,leadLoop,drumLoop};
+}
+
+function startLaserSilk(rev,del){
+  Tone.Transport.bpm.value=108;
+  const chorus=new Tone.Chorus({frequency:0.6,delayTime:5,depth:0.5,wet:0.25}).connect(rev).start();
+  const bassF=new Tone.Filter({frequency:600,type:"lowpass",rolloff:-24,Q:3}).connect(rev);
+  const bass=new Tone.Synth({oscillator:{type:"sawtooth"},envelope:{attack:0.006,decay:0.18,sustain:0.1,release:0.12},volume:-12}).connect(bassF);
+  const arpF=new Tone.Filter({frequency:3500,type:"lowpass",rolloff:-12}).connect(del);
+  const arp=new Tone.Synth({oscillator:{type:"sawtooth"},envelope:{attack:0.004,decay:0.22,sustain:0.03,release:0.3},volume:-22}).connect(arpF);
+  const padF=new Tone.Filter({frequency:1400,type:"lowpass",rolloff:-12}).connect(chorus);
+  const pad=new Tone.PolySynth(Tone.Synth,{oscillator:{type:"sawtooth"},envelope:{attack:1.5,decay:2.0,sustain:0.5,release:3.0},volume:-26}).connect(padF);
+  const leadF2=new Tone.Filter({frequency:3000,type:"lowpass",rolloff:-12}).connect(del);
+  const lead=new Tone.Synth({oscillator:{type:"sawtooth"},envelope:{attack:0.08,decay:0.5,sustain:0.45,release:1.2},volume:-17}).connect(leadF2);
+  const kick=new Tone.MembraneSynth({volume:-9,pitchDecay:0.05,octaves:4.5,envelope:{attack:0.004,decay:0.3,sustain:0,release:0.2}}).toDestination();
+  const snare=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.002,decay:0.12,sustain:0,release:0.08},volume:-17}).connect(rev);
+  const hihat=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.001,decay:0.028,sustain:0,release:0.018},volume:-23}).toDestination();
+  const bP=[["E1","E1","E2","E1","B1","E1","E2","B1"],["C1","C1","C2","C1","G1","C1","C2","G1"],["A0","A0","A1","A0","E1","A0","A1","E1"],["D1","D1","D2","D1","A1","D1","D2","A1"]];
+  const padCh=[["E2","G2","B2"],["C2","E2","G2","B2"],["A1","C2","E2","G2"],["D2","F#2","A2"]];
+  const arpP=[["E3","G3","B3","E4","B3","G3","E3","B3","G3","E4","B3","G3","E3","G3","B3","E4"],["C3","E3","G3","B3","G3","E3","C3","G3","E3","B3","G3","E3","C3","E3","G3","B3"],["A2","C3","E3","G3","E3","C3","A2","E3","C3","G3","E3","C3","A2","C3","E3","G3"],["D3","F#3","A3","D4","A3","F#3","D3","A3","F#3","D4","A3","F#3","D3","F#3","A3","D4"]];
+  const melA=["B4",null,"E5",null,"D5",null,"B4",null,null,"G4",null,"A4","B4",null,null,null,"C5",null,null,"E5",null,"D5",null,"C5",null,"B4",null,"A4",null,null,null,null];
+  const melB=["E5",null,"G5",null,"F#5",null,"E5",null,null,"D5",null,"C5","B4",null,null,null,"A4","B4","C5","D5","E5",null,"D5",null,"B4",null,null,null,null,null,null,null];
+  let bs2=0,bsc=0,as3=0,ac2=0,pc3=0,ls4=0,beat=0,useB=false,bfp=0,afp=0;
+  const bassLoop=new Tone.Loop(t=>{const n=bP[bsc%4][bs2%8];bass.triggerAttackRelease(n,"16n",t);bfp+=0.01;bassF.frequency.setValueAtTime(400+Math.sin(bfp)*250,t);bs2++;if(bs2%8===0)bsc++;},"8n");
+  const padLoop=new Tone.Loop(t=>{pad.triggerAttackRelease(padCh[pc3%4],"1m",t);pc3++;},"1m");
+  const arpLoop=new Tone.Loop(t=>{const n=arpP[ac2%4][as3%16];arp.triggerAttackRelease(n,"32n",t);afp+=0.008;arpF.frequency.setValueAtTime(2500+Math.sin(afp)*1500,t);as3++;if(as3%16===0)ac2++;},"16n");
+  const leadLoop=new Tone.Loop(t=>{const m=useB?melB:melA;const n=m[ls4%32];if(n)lead.triggerAttackRelease(n,"4n",t);ls4++;if(ls4%32===0)useB=!useB;},"4n");
+  const drumLoop=new Tone.Loop(t=>{const p=beat%16;if(p%4===0)kick.triggerAttackRelease("C1","8n",t);if(p===4||p===12)snare.triggerAttackRelease("16n",t);if(p%2===0)hihat.triggerAttackRelease("32n",t);beat++;},"16n");
+  bassLoop.start(0);drumLoop.start("2m");padLoop.start("4m");arpLoop.start("6m");leadLoop.start("10m");
+  return{bass,bassF,arp,arpF,pad,padF,lead,leadF:leadF2,kick,snare,hihat,chorus,bassLoop,padLoop,arpLoop,leadLoop,drumLoop};
+}
+
+function useMusic(trackId){
   const partsRef=useRef(null);
   const startedRef=useRef(false);
-
-  const start=useCallback(async()=>{
-    if(startedRef.current)return;
-    await Tone.start();
-    startedRef.current=true;
-
-    // --- Sunny Puzzle ---
-    // Lead — triangle, marimba-like
-    const lead=new Tone.Synth({
-      oscillator:{type:"triangle"},
-      envelope:{attack:0.005,decay:0.25,sustain:0.0,release:0.3},
-      volume:-16
-    }).toDestination();
-
-    // Bass — warm sine
-    const bass=new Tone.Synth({
-      oscillator:{type:"sine"},
-      envelope:{attack:0.01,decay:0.2,sustain:0.1,release:0.25},
-      volume:-21
-    }).toDestination();
-
-    // Chord stabs — triangle, soft
-    const chord=new Tone.PolySynth(Tone.Synth,{
-      oscillator:{type:"triangle"},
-      envelope:{attack:0.01,decay:0.4,sustain:0.05,release:0.5},
-      volume:-24
-    }).toDestination();
-
-    // Hi-hat — light texture
-    const hihat=new Tone.NoiseSynth({
-      noise:{type:"white"},
-      envelope:{attack:0.001,decay:0.05,sustain:0,release:0.02},
-      volume:-30
-    }).toDestination();
-
-    // Melody A — catchy, uplifting
-    const melodyA=[
-      {n:"E5",d:"8n"},{n:"G5",d:"8n"},{n:"A5",d:"4n"},{n:"G5",d:"8n"},{n:"E5",d:"8n"},{n:"D5",d:"4n"},
-      {n:"E5",d:"8n"},{n:"D5",d:"8n"},{n:"C5",d:"4n"},{n:"D5",d:"4n"},{n:"E5",d:"2n"},
-    ];
-    // Melody B — response phrase
-    const melodyB=[
-      {n:"C5",d:"8n"},{n:"D5",d:"8n"},{n:"E5",d:"4n"},{n:"G5",d:"8n"},{n:"A5",d:"8n"},{n:"G5",d:"4n"},
-      {n:"E5",d:"8n"},{n:"G5",d:"8n"},{n:"A5",d:"4n"},{n:"G5",d:"4n"},{n:"C6",d:"2n"},
-    ];
-
-    const prog=[
-      {b:"C3",ch:["C4","E4","G4"]},
-      {b:"A2",ch:["A3","C4","E4"]},
-      {b:"F2",ch:["F3","A3","C4"]},
-      {b:"G2",ch:["G3","B3","D4"]},
-    ];
-
-    let bar=0;
-    const melLoop=new Tone.Loop((time)=>{
-      const mel=bar%4<2?melodyA:melodyB;
-      let off=0;
-      mel.forEach(({n,d})=>{
-        lead.triggerAttackRelease(n,d,time+off);
-        off+=Tone.Time(d).toSeconds();
-      });
-      bar++;
-    },"2m");
-
-    let chordStep=0;
-    const chordLoop=new Tone.Loop((time)=>{
-      const p=prog[chordStep%4];
-      chord.triggerAttackRelease(p.ch,"2n",time);
-      bass.triggerAttackRelease(p.b,"4n",time);
-      bass.triggerAttackRelease(p.b,"4n",time+Tone.Time("2n").toSeconds());
-      chordStep++;
-    },"1m");
-
-    const hatLoop=new Tone.Loop((time)=>{
-      hihat.triggerAttackRelease("16n",time);
-    },"8n");
-
-    Tone.Transport.bpm.value=110;
-    chordLoop.start(0);hatLoop.start(0);melLoop.start("1m");
-    Tone.Transport.start();
-
-    partsRef.current={lead,bass,chord,hihat,melLoop,chordLoop,hatLoop};
-  },[]);
+  const trackRef=useRef(trackId);
+  trackRef.current=trackId;
 
   const stop=useCallback(()=>{
     if(!startedRef.current)return;
     startedRef.current=false;
     const p=partsRef.current;
     if(p){
-      p.melLoop.stop();p.chordLoop.stop();p.hatLoop.stop();
-      Tone.Transport.stop();
+      try{Tone.Transport.stop();Tone.Transport.cancel();}catch{}
       setTimeout(()=>{
-        try{p.lead.dispose();}catch{}
-        try{p.bass.dispose();}catch{}
-        try{p.chord.dispose();}catch{}
-        try{p.hihat.dispose();}catch{}
-        try{p.melLoop.dispose();}catch{}
-        try{p.chordLoop.dispose();}catch{}
-        try{p.hatLoop.dispose();}catch{}
+        Object.values(p).forEach(v=>{try{if(v.stop)v.stop();if(v.dispose)v.dispose();}catch{}});
       },500);
       partsRef.current=null;
     }
   },[]);
 
-  return useMemo(()=>({start,stop}),[start,stop]);
+  const start=useCallback(async()=>{
+    if(startedRef.current)return;
+    await Tone.start();
+    startedRef.current=true;
+    const rev=new Tone.Reverb({decay:3,wet:0.2}).toDestination();
+    const del=new Tone.FeedbackDelay({delayTime:"8n",feedback:0.18,wet:0.12}).connect(rev);
+    const tid=trackRef.current||0;
+    let trackParts;
+    if(tid===1)trackParts=startWordAway(rev,del);
+    else if(tid===2)trackParts=startVaporTail(rev,del);
+    else if(tid===3)trackParts=startLaserSilk(rev,del);
+    else trackParts=startNeonPulse(rev,del);
+    Tone.Transport.start();
+    partsRef.current={...trackParts,rev,del};
+  },[]);
+
+  const restart=useCallback(async()=>{
+    stop();
+    await new Promise(r=>setTimeout(r,600));
+    startedRef.current=false;
+    await start();
+  },[stop,start]);
+
+  return useMemo(()=>({start,stop,restart}),[start,stop,restart]);
 }
 
 // ============================================
@@ -2238,6 +2304,7 @@ export default function Piilosana(){
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[soundTheme,setSoundTheme]=useState(()=>{const s=localStorage.getItem("piilosana_sound");return s==="modern"||s==="off"?s:"modern";});
   const[musicOn,setMusicOn]=useState(()=>localStorage.getItem("piilosana_music")!=="off");
+  const[musicTrack,setMusicTrack]=useState(()=>parseInt(localStorage.getItem("piilosana_music_track")||"0"));
   const[wordsLoaded,setWordsLoaded]=useState(()=>({fi:LANG_CONFIG.fi.loaded,en:LANG_CONFIG.en.loaded,sv:LANG_CONFIG.sv.loaded}));
   useEffect(()=>{
     let mounted=true;
@@ -2502,7 +2569,7 @@ export default function Piilosana(){
   const trie=useMemo(()=>currentLangLoaded?langConf.trie:EMPTY_TRIE,[lang,currentLangLoaded]);
   const t=T[lang]||T.fi;
   const rawSounds=useSounds(soundTheme);
-  const music=useMusic();
+  const music=useMusic(musicTrack);
   // Wrap sounds with mute check
   const sounds=useMemo(()=>{
     if(soundTheme==="off")return{
@@ -2997,15 +3064,21 @@ export default function Piilosana(){
   },[state,dailyMode,score,found,valid,dailyDate]);
 
   // Background music control — only after user interaction (browser autoplay policy)
+  const prevTrackRef=useRef(musicTrack);
   useEffect(()=>{
     if(!audioStarted)return;
     if(musicOn){
-      music.start();
+      if(prevTrackRef.current!==musicTrack){
+        prevTrackRef.current=musicTrack;
+        music.restart();
+      }else{
+        music.start();
+      }
     }else{
       music.stop();
     }
     return()=>music.stop();
-  },[state,musicOn,music,audioStarted]);
+  },[state,musicOn,music,audioStarted,musicTrack]);
 
   // Bomb mode timer
   useEffect(()=>{
@@ -3995,9 +4068,9 @@ export default function Piilosana(){
             return(
               <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"3px",
                 padding:"12px 4px",border:`1px solid ${S.yellow||"#ffcc00"}44`,borderRadius:S.btnRadius,cursor:"pointer",
-                background:res?`${S.yellow||"#ffcc00"}11`:`${S.yellow||"#ffcc00"}18`,color:"#fff",fontSize:"11px",minWidth:0}}>
-                <span style={{fontSize:"12px",color:"#999",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
-                <span style={{fontSize:"15px",fontWeight:"700",color:res?"#bbb":(S.yellow||"#ffcc00")}}>{dl.short}</span>
+                background:res?`${S.yellow||"#ffcc00"}22`:`${S.yellow||"#ffcc00"}18`,color:"#fff",fontSize:"11px",minWidth:0}}>
+                <span style={{fontSize:"12px",color:res?((S.yellow||"#ffcc00")+"aa"):"#999",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
+                <span style={{fontSize:"15px",fontWeight:"700",color:res?(S.yellow||"#ffcc00"):(S.yellow||"#ffcc00")}}>{dl.short}</span>
                 {res?<span style={{fontSize:"16px",fontWeight:"800",color:S.green||"#44ddaa"}}>{res.score}p</span>
                   :<span style={{fontSize:"16px",color:S.yellow||"#ffcc00"}}>▶</span>}
               </button>
@@ -5607,6 +5680,19 @@ export default function Piilosana(){
                 {musicOn?(t.on||"ON"):(t.off||"OFF")}
               </span>
             </div>
+
+            {/* Music track selector */}
+            {musicOn&&<div style={{padding:"4px 8px 8px",display:"flex",gap:"6px",flexWrap:"wrap"}}>
+              {MUSIC_TRACKS.map((tr,i)=>(
+                <div key={tr.id} onClick={()=>{setMusicTrack(i);localStorage.setItem("piilosana_music_track",String(i));}}
+                  style={{fontSize:"10px",fontFamily:S.font,padding:"3px 8px",borderRadius:"6px",cursor:"pointer",
+                    background:musicTrack===i?(S.green+"33"):"transparent",
+                    border:`1px solid ${musicTrack===i?S.green+"66":S.border+"44"}`,
+                    color:musicTrack===i?S.green:(S.textMuted||"#888"),transition:"all 0.15s"}}>
+                  {lang==="fi"?tr.nameFi:tr.name}
+                </div>
+              ))}
+            </div>}
 
             {/* Theme picker */}
             <div style={{padding:"8px"}}>

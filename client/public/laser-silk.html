@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laser Silk — Piilosana</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#04080c;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.container{text-align:center;max-width:500px;width:100%}
+h1{color:#44ddcc;font-size:28px;margin-bottom:4px;letter-spacing:5px}
+.sub{color:#337766;font-size:14px;margin-bottom:6px}
+.style{color:#33aa99;font-size:12px;margin-bottom:32px;font-style:italic}
+.play-btn{
+  width:120px;height:120px;border-radius:50%;border:3px solid #44ddcc44;
+  background:radial-gradient(circle at 40% 35%,#0a1a18,#061210);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.3s;margin:0 auto 24px;
+  box-shadow:0 0 40px #44ddcc0a,inset 0 0 30px #ffffff05;
+}
+.play-btn:hover{border-color:#44ddcc;box-shadow:0 0 60px #44ddcc1a;transform:scale(1.05)}
+.play-btn.playing{border-color:#44ddcc;box-shadow:0 0 80px #44ddcc33;animation:pulse 2.5s ease-in-out infinite}
+.play-btn svg{width:40px;height:40px;fill:#44ddccaa;transition:fill 0.3s}
+.play-btn.playing svg{fill:#44ddcc}
+.info{color:#335544;font-size:12px;margin-top:8px}
+.visualizer{height:70px;display:flex;align-items:flex-end;justify-content:center;gap:2px;margin-bottom:24px;opacity:0;transition:opacity 0.6s}
+.visualizer.active{opacity:1}
+.bar{width:3px;border-radius:2px;height:3px}
+@keyframes pulse{0%,100%{box-shadow:0 0 40px #44ddcc12}50%{box-shadow:0 0 100px #44ddcc38}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.container{animation:fadeIn 0.8s ease}
+</style>
+</head><body>
+<div class="container">
+  <h1>LASER SILK</h1>
+  <div class="sub">lasersilkki</div>
+  <div class="style">smooth electro · gliding synth & pulse bass · 108 bpm</div>
+
+  <div class="visualizer" id="viz"></div>
+
+  <button class="play-btn" id="playBtn" onclick="togglePlay()">
+    <svg id="playIcon" viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+  </button>
+
+  <div class="info">Klikkaa kuunnellaksesi</div>
+</div>
+
+<script>
+const vizEl=document.getElementById('viz');
+for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bar';vizEl.appendChild(b);}
+const bars=document.querySelectorAll('.bar');
+let playing=false,parts=null,vizFrame=null;
+
+function animateViz(){
+  if(!playing)return;
+  const t=Date.now();
+  bars.forEach((b,i)=>{
+    const kick=Math.abs(Math.sin(t/278))*10;
+    const h=3+kick+Math.abs(Math.sin(t/450+i*0.48))*26+Math.random()*6;
+    b.style.height=h+'px';
+    const hue=170+Math.sin(t/1400+i*0.3)*20;
+    b.style.background=`hsl(${hue},55%,${35+Math.sin(t/900+i*0.45)*12}%)`;
+  });
+  vizFrame=requestAnimationFrame(animateViz);
+}
+
+async function togglePlay(){
+  if(playing){stopPlay();return;}
+  await Tone.start();playing=true;
+  document.getElementById('playBtn').classList.add('playing');
+  document.getElementById('playIcon').innerHTML='<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  vizEl.classList.add('active');animateViz();startLaser();
+}
+function stopPlay(){
+  playing=false;if(vizFrame)cancelAnimationFrame(vizFrame);
+  document.getElementById('playBtn').classList.remove('playing');
+  document.getElementById('playIcon').innerHTML='<polygon points="8,5 19,12 8,19"/>';
+  vizEl.classList.remove('active');bars.forEach(b=>{b.style.height='3px'});
+  if(parts){try{Tone.Transport.stop();Tone.Transport.cancel();}catch{}
+  Object.values(parts).forEach(p=>{try{if(p.stop)p.stop();if(p.dispose)p.dispose();}catch{}});parts=null;}
+}
+
+function startLaser(){
+  Tone.Transport.bpm.value=108;
+
+  // === EFFECTS ===
+  const rev=new Tone.Reverb({decay:3,wet:0.22}).toDestination();
+  const del=new Tone.FeedbackDelay({delayTime:"8n.",feedback:0.2,wet:0.15}).connect(rev);
+  const del2=new Tone.FeedbackDelay({delayTime:"4n",feedback:0.15,wet:0.1}).connect(rev);
+  const chorus=new Tone.Chorus({frequency:0.6,delayTime:5,depth:0.5,wet:0.25}).connect(rev).start();
+
+  // === PULSE BASS — tight, rhythmic, filtered ===
+  const bassF=new Tone.Filter({frequency:600,type:"lowpass",rolloff:-24,Q:3}).connect(rev);
+  const bass=new Tone.Synth({
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:0.006,decay:0.18,sustain:0.1,release:0.12},
+    volume:-10
+  }).connect(bassF);
+
+  const sub=new Tone.Synth({
+    oscillator:{type:"sine"},
+    envelope:{attack:0.008,decay:0.2,sustain:0.08,release:0.15},
+    volume:-14
+  }).toDestination();
+
+  // === GLIDING LEAD — smooth, silky, portamento-like ===
+  const leadF=new Tone.Filter({frequency:3000,type:"lowpass",rolloff:-12}).connect(del);
+  const lead=new Tone.Synth({
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:0.08,decay:0.5,sustain:0.45,release:1.2},
+    volume:-15
+  }).connect(leadF);
+
+  // Lead shimmer — octave up sine
+  const leadShim=new Tone.Synth({
+    oscillator:{type:"sine"},
+    envelope:{attack:0.1,decay:0.4,sustain:0.25,release:1.0},
+    volume:-24
+  }).connect(del2);
+
+  // === ARPEGGIO — silky smooth 16th notes ===
+  const arpF=new Tone.Filter({frequency:3500,type:"lowpass",rolloff:-12}).connect(del);
+  const arp=new Tone.Synth({
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:0.004,decay:0.22,sustain:0.03,release:0.3},
+    volume:-20
+  }).connect(arpF);
+
+  // === PAD — warm, flowing ===
+  const padF=new Tone.Filter({frequency:1400,type:"lowpass",rolloff:-12}).connect(chorus);
+  const pad=new Tone.PolySynth(Tone.Synth,{
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:1.5,decay:2.0,sustain:0.5,release:3.0},
+    volume:-24
+  }).connect(padF);
+
+  // === STABS — tight chord accents ===
+  const stabF=new Tone.Filter({frequency:2500,type:"lowpass",rolloff:-12}).connect(del2);
+  const stab=new Tone.PolySynth(Tone.Synth,{
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:0.008,decay:0.12,sustain:0.06,release:0.15},
+    volume:-19
+  }).connect(stabF);
+
+  // === DRUMS ===
+  const kick=new Tone.MembraneSynth({volume:-8,pitchDecay:0.05,octaves:4.5,envelope:{attack:0.004,decay:0.3,sustain:0,release:0.2}}).toDestination();
+  const snare=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.002,decay:0.12,sustain:0,release:0.08},volume:-16}).connect(rev);
+  const hihat=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.001,decay:0.028,sustain:0,release:0.018},volume:-22}).toDestination();
+  const openHat=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.001,decay:0.16,sustain:0.03,release:0.12},volume:-25}).connect(rev);
+  const clap=new Tone.NoiseSynth({noise:{type:"pink"},envelope:{attack:0.001,decay:0.08,sustain:0,release:0.06},volume:-17}).connect(rev);
+
+  // ============================================================
+  // COMPOSITION — Em — Cmaj7 — Am7 — D (smooth, gliding)
+  // ============================================================
+
+  // Pulse bass — 8th note patterns
+  const bassPats=[
+    ["E1","E1","E2","E1","B1","E1","E2","B1"],
+    ["C1","C1","C2","C1","G1","C1","C2","G1"],
+    ["A0","A0","A1","A0","E1","A0","A1","E1"],
+    ["D1","D1","D2","D1","A1","D1","D2","A1"],
+    ["E1","B1","E2","B1","E1","E2","B1","E2"],
+    ["C1","G1","C2","G1","C1","C2","E2","C1"],
+    ["A0","E1","A1","E1","A0","A1","C2","A0"],
+    ["D1","A1","D2","F#2","D1","D2","A1","D1"],
+  ];
+
+  const padChords=[
+    ["E2","G2","B2"],["C2","E2","G2","B2"],["A1","C2","E2","G2"],["D2","F#2","A2"],
+    ["E2","G2","B2"],["C2","E2","G2","B2"],["A1","C2","E2","G2"],["D2","F#2","A2"],
+  ];
+
+  const stabChords=[
+    ["E4","G4","B4"],["C4","E4","G4","B4"],["A3","C4","E4","G4"],["D4","F#4","A4"],
+    ["E4","G4","B4"],["C4","E4","G4","B4"],["A3","C4","E4","G4"],["D4","F#4","A4"],
+  ];
+
+  // Arpeggio patterns
+  const arpPats=[
+    ["E3","G3","B3","E4","B3","G3","E3","B3","G3","E4","B3","G3","E3","G3","B3","E4"],
+    ["C3","E3","G3","B3","G3","E3","C3","G3","E3","B3","G3","E3","C3","E3","G3","B3"],
+    ["A2","C3","E3","G3","E3","C3","A2","E3","C3","G3","E3","C3","A2","C3","E3","G3"],
+    ["D3","F#3","A3","D4","A3","F#3","D3","A3","F#3","D4","A3","F#3","D3","F#3","A3","D4"],
+    ["E3","B3","G3","E4","G3","B3","E3","G3","B3","E4","B3","G3","E3","B3","G3","E4"],
+    ["C3","G3","E3","B3","E3","G3","C3","E3","G3","B3","G3","E3","C3","G3","E3","B3"],
+    ["A2","E3","C3","G3","C3","E3","A2","C3","E3","G3","E3","C3","A2","E3","C3","G3"],
+    ["D3","A3","F#3","D4","F#3","A3","D3","F#3","A3","D4","A3","F#3","D3","A3","F#3","D4"],
+  ];
+
+  // Lead — smooth, gliding melody
+  const leadA=[
+    "B4",null,"E5",null,"D5",null,"B4",null,
+    null,"G4",null,"A4","B4",null,null,null,
+    "C5",null,null,"E5",null,"D5",null,"C5",
+    null,"B4",null,"A4",null,null,null,null,
+  ];
+  const leadB=[
+    "E5",null,"G5",null,"F#5",null,"E5",null,
+    null,"D5",null,"C5","B4",null,null,null,
+    "A4","B4","C5","D5","E5",null,"D5",null,
+    "B4",null,null,null,null,null,null,null,
+  ];
+  const leadC=[
+    "G5",null,"F#5","E5","D5",null,"E5",null,
+    null,"G5",null,null,"F#5",null,null,null,
+    "E5","D5","C5","B4","A4","B4","C5","D5",
+    "E5",null,null,null,null,null,null,null,
+  ];
+
+  let bss=0,bsc=0,pc2=0,as=0,ac=0,ls=0,beat=0;
+  let stabBeat=0,stabChord=0;
+  let leadPhase=0;
+  let bassFilterPhase=0,arpFilterPhase=0;
+
+  // Pulse bass
+  const bassLoop=new Tone.Loop(t=>{
+    const ci=bsc%8;
+    const note=bassPats[ci][bss%8];
+    bass.triggerAttackRelease(note,"16n",t);
+    sub.triggerAttackRelease(note,"16n",t);
+    bassFilterPhase+=0.01;
+    bassF.frequency.setValueAtTime(400+Math.sin(bassFilterPhase)*250,t);
+    bss++;
+    if(bss%8===0)bsc++;
+  },"8n");
+
+  // Pad
+  const padLoop=new Tone.Loop(t=>{
+    pad.triggerAttackRelease(padChords[pc2%8],"1m",t);pc2++;
+  },"1m");
+
+  // Stabs — syncopated
+  const stabLoop=new Tone.Loop(t=>{
+    const pos=stabBeat%8;
+    if(pos===1||pos===4||pos===6){
+      stab.triggerAttackRelease(stabChords[stabChord%8],"16n",t);
+    }
+    stabBeat++;
+    if(stabBeat%8===0)stabChord++;
+  },"8n");
+
+  // Arpeggio
+  const arpLoop=new Tone.Loop(t=>{
+    const ci=ac%8;
+    const note=arpPats[ci][as%16];
+    arp.triggerAttackRelease(note,"32n",t);
+    arpFilterPhase+=0.008;
+    arpF.frequency.setValueAtTime(2500+Math.sin(arpFilterPhase)*1500,t);
+    as++;
+    if(as%16===0)ac++;
+  },"16n");
+
+  // Lead
+  const leadLoop=new Tone.Loop(t=>{
+    const mels=[leadA,leadB,leadC];
+    const mel=mels[leadPhase%3];
+    const note=mel[ls%32];
+    if(note){
+      lead.triggerAttackRelease(note,"4n",t);
+      leadShim.triggerAttackRelease(Tone.Frequency(note).transpose(12).toNote(),"4n",t);
+    }
+    ls++;
+    if(ls%32===0)leadPhase++;
+  },"4n");
+
+  // Drums
+  const drumLoop=new Tone.Loop(t=>{
+    const p=beat%16;
+    if(p%4===0)kick.triggerAttackRelease("C1","8n",t);
+    if(p===4||p===12){snare.triggerAttackRelease("16n",t);clap.triggerAttackRelease("16n",t);}
+    if(p%2===0)hihat.triggerAttackRelease("32n",t);
+    if(p%4===2)openHat.triggerAttackRelease("16n",t);
+    beat++;
+  },"16n");
+
+  // === Build ===
+  bassLoop.start(0);
+  drumLoop.start("2m");
+  padLoop.start("4m");
+  arpLoop.start("6m");
+  stabLoop.start("8m");
+  leadLoop.start("12m");
+
+  Tone.Transport.start();
+  parts={bass,bassF,sub,lead,leadF,leadShim,arp,arpF,pad,padF,stab,stabF,
+    kick,snare,hihat,openHat,clap,rev,del,del2,chorus,
+    bassLoop,padLoop,arpLoop,stabLoop,leadLoop,drumLoop};
+}
+</script>
+</body></html>

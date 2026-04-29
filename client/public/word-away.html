@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Word Away — Piilosana</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#060810;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.container{text-align:center;max-width:500px;width:100%}
+h1{color:#6699cc;font-size:28px;margin-bottom:4px;letter-spacing:5px}
+.sub{color:#445566;font-size:14px;margin-bottom:6px}
+.style{color:#557799;font-size:12px;margin-bottom:32px;font-style:italic}
+.play-btn{
+  width:120px;height:120px;border-radius:50%;border:3px solid #6699cc44;
+  background:radial-gradient(circle at 40% 35%,#0e1620,#080e16);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.3s;margin:0 auto 24px;
+  box-shadow:0 0 40px #6699cc0a,inset 0 0 30px #ffffff05;
+}
+.play-btn:hover{border-color:#6699cc;box-shadow:0 0 60px #6699cc1a;transform:scale(1.05)}
+.play-btn.playing{border-color:#6699cc;box-shadow:0 0 80px #6699cc33;animation:pulse 3s ease-in-out infinite}
+.play-btn svg{width:40px;height:40px;fill:#6699ccaa;transition:fill 0.3s}
+.play-btn.playing svg{fill:#6699cc}
+.info{color:#334455;font-size:12px;margin-top:8px}
+.visualizer{height:70px;display:flex;align-items:flex-end;justify-content:center;gap:2px;margin-bottom:24px;opacity:0;transition:opacity 0.8s}
+.visualizer.active{opacity:1}
+.bar{width:3px;border-radius:2px;height:3px}
+@keyframes pulse{0%,100%{box-shadow:0 0 40px #6699cc10}50%{box-shadow:0 0 100px #6699cc33}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.container{animation:fadeIn 1s ease}
+</style>
+</head><body>
+<div class="container">
+  <h1>WORD AWAY</h1>
+  <div class="sub">sana pois</div>
+  <div class="style">Moroder cinematic synth · arpeggio & strings · 100 bpm</div>
+
+  <div class="visualizer" id="viz"></div>
+
+  <button class="play-btn" id="playBtn" onclick="togglePlay()">
+    <svg id="playIcon" viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+  </button>
+
+  <div class="info">Klikkaa kuunnellaksesi</div>
+</div>
+
+<script>
+const vizEl=document.getElementById('viz');
+for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bar';vizEl.appendChild(b);}
+const bars=document.querySelectorAll('.bar');
+let playing=false,parts=null,vizFrame=null;
+
+function animateViz(){
+  if(!playing)return;
+  const t=Date.now();
+  bars.forEach((b,i)=>{
+    const h=3+Math.abs(Math.sin(t/900+i*0.42))*28+Math.random()*5;
+    b.style.height=h+'px';
+    const hue=210+Math.sin(t/2200+i*0.3)*15;
+    b.style.background=`hsl(${hue},45%,${33+Math.sin(t/1400+i*0.5)*10}%)`;
+  });
+  vizFrame=requestAnimationFrame(animateViz);
+}
+
+async function togglePlay(){
+  if(playing){stopPlay();return;}
+  await Tone.start();playing=true;
+  document.getElementById('playBtn').classList.add('playing');
+  document.getElementById('playIcon').innerHTML='<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  vizEl.classList.add('active');animateViz();startBreathAway();
+}
+function stopPlay(){
+  playing=false;if(vizFrame)cancelAnimationFrame(vizFrame);
+  document.getElementById('playBtn').classList.remove('playing');
+  document.getElementById('playIcon').innerHTML='<polygon points="8,5 19,12 8,19"/>';
+  vizEl.classList.remove('active');bars.forEach(b=>{b.style.height='3px'});
+  if(parts){try{Tone.Transport.stop();Tone.Transport.cancel();}catch{}
+  Object.values(parts).forEach(p=>{try{if(p.stop)p.stop();if(p.dispose)p.dispose();}catch{}});parts=null;}
+}
+
+function startBreathAway(){
+  Tone.Transport.bpm.value=100;
+
+  // === EFFECTS ===
+  const rev=new Tone.Reverb({decay:5,wet:0.35}).toDestination();
+  const del=new Tone.FeedbackDelay({delayTime:"4n.",feedback:0.25,wet:0.18}).connect(rev);
+  const shortDel=new Tone.FeedbackDelay({delayTime:"8n",feedback:0.1,wet:0.08}).connect(rev);
+  const chorus=new Tone.Chorus({frequency:0.5,delayTime:6,depth:0.5,wet:0.3}).connect(rev).start();
+
+  // === ARPEGGIO — the signature flowing pattern ===
+  const arpF=new Tone.Filter({frequency:3500,type:"lowpass",rolloff:-12}).connect(del);
+  const arp=new Tone.Synth({
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:0.005,decay:0.3,sustain:0.04,release:0.45},
+    volume:-16
+  }).connect(arpF);
+
+  // Arp bell layer — sine shimmer
+  const arpBell=new Tone.Synth({
+    oscillator:{type:"sine"},
+    envelope:{attack:0.003,decay:0.35,sustain:0.02,release:0.4},
+    volume:-23
+  }).connect(del);
+
+  // === SYNTH STRINGS — lush, cinematic ===
+  const strF=new Tone.Filter({frequency:2400,type:"lowpass",rolloff:-12}).connect(chorus);
+  const str=new Tone.PolySynth(Tone.Synth,{
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:1.5,decay:2.0,sustain:0.6,release:3.0},
+    volume:-19
+  }).connect(strF);
+
+  // High strings
+  const hiStrF=new Tone.Filter({frequency:4000,type:"lowpass",rolloff:-12}).connect(chorus);
+  const hiStr=new Tone.PolySynth(Tone.Synth,{
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:2.0,decay:2.0,sustain:0.4,release:3.5},
+    volume:-25
+  }).connect(hiStrF);
+
+  // === LEAD — soaring, emotional, vibrato ===
+  const leadVib=new Tone.Vibrato({frequency:5,depth:0.1,wet:0.55}).connect(del);
+  const lead=new Tone.Synth({
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:0.15,decay:0.8,sustain:0.5,release:2.0},
+    volume:-15
+  }).connect(leadVib);
+
+  // Lead octave ghost
+  const leadGhost=new Tone.Synth({
+    oscillator:{type:"sine"},
+    envelope:{attack:0.2,decay:0.6,sustain:0.25,release:1.5},
+    volume:-26
+  }).connect(del);
+
+  // === BASS — warm, sustained ===
+  const bassF=new Tone.Filter({frequency:300,type:"lowpass",rolloff:-24}).connect(rev);
+  const bass=new Tone.Synth({
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:0.04,decay:0.5,sustain:0.35,release:0.6},
+    volume:-12
+  }).connect(bassF);
+
+  const sub=new Tone.Synth({
+    oscillator:{type:"sine"},
+    envelope:{attack:0.05,decay:0.6,sustain:0.3,release:0.7},
+    volume:-16
+  }).toDestination();
+
+  // === DRUMS — restrained, cinematic ===
+  const kick=new Tone.MembraneSynth({volume:-11,pitchDecay:0.06,octaves:4,envelope:{attack:0.005,decay:0.35,sustain:0,release:0.25}}).toDestination();
+  const snare=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.002,decay:0.16,sustain:0,release:0.1},volume:-17}).connect(rev);
+  const hihat=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.001,decay:0.035,sustain:0,release:0.025},volume:-24}).toDestination();
+  const openHat=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.001,decay:0.22,sustain:0.04,release:0.18},volume:-27}).connect(rev);
+  const clap=new Tone.NoiseSynth({noise:{type:"pink"},envelope:{attack:0.001,decay:0.1,sustain:0,release:0.07},volume:-18}).connect(rev);
+
+  // ============================================================
+  // COMPOSITION
+  // Actual progression: G — D/F# — Em7 — D/F# (verse)
+  //                     Am — Am7/G — D (bridge)
+  //                     G — D/F# — C — D (chorus)
+  // Capo 1 = Ab key in original, but we stay in G for synth
+  // ============================================================
+
+  // Full song structure as chord sequence indices
+  // 0=G, 1=D/F#, 2=Em7, 3=Am, 4=Am7/G, 5=D, 6=C
+
+  // Arpeggio notes per chord — flowing 16th note patterns
+  const arpNotes={
+    'G':    ["G3","B3","D4","G4","D4","B3","G3","D4","B3","G4","D4","B3","G3","B3","D4","G4"],
+    'D/F#': ["F#3","A3","D4","F#4","D4","A3","F#3","D4","A3","F#4","D4","A3","F#3","A3","D4","F#4"],
+    'Em7':  ["E3","G3","B3","D4","B3","G3","E3","B3","G3","D4","B3","G3","E3","G3","B3","D4"],
+    'Am':   ["A2","C3","E3","A3","E3","C3","A2","E3","C3","A3","E3","C3","A2","C3","E3","A3"],
+    'Am7/G':["G2","C3","E3","A3","E3","C3","G2","E3","C3","A3","E3","C3","G2","C3","E3","A3"],
+    'D':    ["D3","F#3","A3","D4","A3","F#3","D3","A3","F#3","D4","A3","F#3","D3","F#3","A3","D4"],
+    'C':    ["C3","E3","G3","C4","G3","E3","C3","G3","E3","C4","G3","E3","C3","E3","G3","C4"],
+  };
+
+  // String voicings
+  const strVoice={
+    'G':    ["G2","B2","D3"],
+    'D/F#': ["F#2","A2","D3"],
+    'Em7':  ["E2","G2","B2","D3"],
+    'Am':   ["A1","C2","E2"],
+    'Am7/G':["G1","C2","E2","A2"],
+    'D':    ["D2","F#2","A2"],
+    'C':    ["C2","E2","G2"],
+  };
+
+  // High string voicings
+  const hiStrVoice={
+    'G':    ["B3","D4","G4"],
+    'D/F#': ["A3","D4","F#4"],
+    'Em7':  ["G3","B3","D4"],
+    'Am':   ["C3","E3","A3"],
+    'Am7/G':["C3","E3","A3"],
+    'D':    ["F#3","A3","D4"],
+    'C':    ["E3","G3","C4"],
+  };
+
+  // Bass notes
+  const bassNote={
+    'G':"G1", 'D/F#':"F#1", 'Em7':"E1",
+    'Am':"A1", 'Am7/G':"G1", 'D':"D1", 'C':"C1"
+  };
+
+  // Song structure — each entry is one bar
+  // Intro: G — D/F# — Em7 — D/F# (x2)
+  // Verse: G — D/F# — Em7 — D/F# — G — D/F# — Em7 — D/F# — Am — Am7/G — D — D — G — D/F# — C — D
+  // Chorus: G — D/F# — C — D — G — D/F# — C — D
+  const songBars=[
+    // Intro (4 bars)
+    'G','D/F#','Em7','D/F#',
+    // Intro repeat (4 bars)
+    'G','D/F#','Em7','D/F#',
+    // Verse 1 (16 bars)
+    'G','D/F#','Em7','D/F#',
+    'G','D/F#','Em7','D/F#',
+    'Am','Am7/G','D','D',
+    'G','D/F#','C','D',
+    // Chorus 1 (8 bars)
+    'G','D/F#','C','D',
+    'G','D/F#','C','D',
+    // Verse 2 (16 bars)
+    'G','D/F#','Em7','D/F#',
+    'G','D/F#','Em7','D/F#',
+    'Am','Am7/G','D','D',
+    'G','D/F#','C','D',
+    // Chorus 2 (8 bars)
+    'G','D/F#','C','D',
+    'G','D/F#','C','D',
+    // Outro (4 bars)
+    'G','D/F#','Em7','G',
+  ];
+
+  const totalBars=songBars.length; // 60
+
+  // Lead melody — instrumental, own melody fitting the chords
+  // Verse melody (16 bars = 64 quarter notes)
+  const verseMel=[
+    // G — D/F# — Em7 — D/F# (bars 1-4)
+    "B4",null,null,"D5","A4",null,null,"F#4",
+    "G4",null,"B4",null,"A4",null,null,null,
+    // G — D/F# — Em7 — D/F# (bars 5-8)
+    "B4",null,"D5",null,"E5",null,"D5",null,
+    "B4",null,null,"A4",null,null,null,null,
+    // Am — Am7/G — D — D (bars 9-12)
+    "C5",null,null,"E5","D5",null,"C5",null,
+    "D5",null,null,null,"F#5",null,null,null,
+    // G — D/F# — C — D (bars 13-16)
+    "G5",null,null,"F#5","E5",null,"D5",null,
+    "C5",null,"D5",null,null,null,null,null,
+  ];
+
+  // Chorus melody (8 bars = 32 quarter notes) — soaring
+  const chorusMel=[
+    // G — D/F# — C — D
+    "B5",null,"A5","G5","F#5",null,"E5",null,
+    "E5",null,"D5",null,"D5","E5","F#5",null,
+    // G — D/F# — C — D
+    "B5",null,"A5","G5","F#5",null,"E5","D5",
+    "E5",null,null,null,null,null,null,null,
+  ];
+
+  let arpStep=0,currentBar=0,arpBar=0;
+  let melStep=0,section='intro';
+  let beat=0;
+  let filterPhase=0;
+
+  function getBarChord(barIndex){
+    return songBars[barIndex % totalBars];
+  }
+
+  // Arpeggio — 16th notes following chord changes
+  const arpLoop=new Tone.Loop(t=>{
+    const chord=getBarChord(arpBar);
+    const notes=arpNotes[chord];
+    const note=notes[arpStep%16];
+    arp.triggerAttackRelease(note,"32n",t);
+    arpBell.triggerAttackRelease(note,"32n",t);
+    // Gentle filter movement
+    filterPhase+=0.007;
+    arpF.frequency.setValueAtTime(2800+Math.sin(filterPhase)*1200,t);
+    arpStep++;
+    if(arpStep%16===0)arpBar++;
+  },"16n");
+
+  // Strings — one chord per bar
+  let strBar=0;
+  const strLoop=new Tone.Loop(t=>{
+    const chord=getBarChord(strBar);
+    str.triggerAttackRelease(strVoice[chord],"1m",t);
+    hiStr.triggerAttackRelease(hiStrVoice[chord],"1m",t);
+    strBar++;
+  },"1m");
+
+  // Bass — half notes
+  let bassBar=0,bassHalf=0;
+  const bassLoop=new Tone.Loop(t=>{
+    const chord=getBarChord(bassBar);
+    bass.triggerAttackRelease(bassNote[chord],"4n",t);
+    sub.triggerAttackRelease(bassNote[chord],"4n",t);
+    bassHalf++;
+    if(bassHalf%2===0)bassBar++;
+  },"2n");
+
+  // Lead melody — follows song structure
+  let leadBar=0,leadStep2=0,leadSongBar=0;
+  const leadLoop=new Tone.Loop(t=>{
+    // Figure out which section we're in
+    const sb=leadSongBar%totalBars;
+    let note=null;
+
+    if(sb>=8 && sb<24){
+      // Verse 1 (bars 8-23)
+      const vi=(leadStep2)%64;
+      note=verseMel[vi];
+    } else if(sb>=24 && sb<32){
+      // Chorus 1 (bars 24-31)
+      const ci=(leadStep2)%32;
+      note=chorusMel[ci];
+    } else if(sb>=32 && sb<48){
+      // Verse 2 (bars 32-47)
+      const vi=(leadStep2)%64;
+      note=verseMel[vi];
+    } else if(sb>=48 && sb<56){
+      // Chorus 2 (bars 48-55)
+      const ci=(leadStep2)%32;
+      note=chorusMel[ci];
+    }
+
+    if(note){
+      lead.triggerAttackRelease(note,"4n.",t);
+      leadGhost.triggerAttackRelease(Tone.Frequency(note).transpose(12).toNote(),"4n",t);
+    }
+    leadStep2++;
+    if(leadStep2%4===0)leadSongBar++;
+  },"4n");
+
+  // Drums
+  const drumLoop=new Tone.Loop(t=>{
+    const p=beat%16;
+    // Kick on 1 and 3
+    if(p===0||p===8)kick.triggerAttackRelease("C1","8n",t);
+    // Snare/clap on 2 and 4
+    if(p===4||p===12){snare.triggerAttackRelease("16n",t);clap.triggerAttackRelease("16n",t);}
+    // Hihat 8ths
+    if(p%2===0)hihat.triggerAttackRelease("32n",t);
+    // Open hat upbeats
+    if(p===6||p===14)openHat.triggerAttackRelease("16n",t);
+    beat++;
+  },"16n");
+
+  // === Build — cinematic intro ===
+  arpLoop.start(0);           // Arpeggio alone
+  strLoop.start("4m");        // Strings swell in after intro
+  bassLoop.start("8m");       // Bass enters at verse
+  drumLoop.start("8m");       // Drums at verse
+  leadLoop.start("8m");       // Lead melody at verse
+
+  Tone.Transport.start();
+  parts={arp,arpF,arpBell,lead,leadVib,leadGhost,
+    str,strF,hiStr,hiStrF,bass,bassF,sub,
+    kick,snare,hihat,openHat,clap,
+    rev,del,shortDel,chorus,
+    arpLoop,strLoop,bassLoop,leadLoop,drumLoop};
+}
+</script>
+</body></html>

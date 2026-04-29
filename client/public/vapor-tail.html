@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vapor Tail — Piilosana</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080612;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.container{text-align:center;max-width:500px;width:100%}
+h1{color:#ee77aa;font-size:28px;margin-bottom:4px;letter-spacing:5px}
+.sub{color:#885577;font-size:14px;margin-bottom:6px}
+.style{color:#aa5588;font-size:12px;margin-bottom:32px;font-style:italic}
+.play-btn{
+  width:120px;height:120px;border-radius:50%;border:3px solid #ee77aa44;
+  background:radial-gradient(circle at 40% 35%,#1a0e18,#100814);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.3s;margin:0 auto 24px;
+  box-shadow:0 0 40px #ee77aa0a,inset 0 0 30px #ffffff05;
+}
+.play-btn:hover{border-color:#ee77aa;box-shadow:0 0 60px #ee77aa1a;transform:scale(1.05)}
+.play-btn.playing{border-color:#ee77aa;box-shadow:0 0 80px #ee77aa33;animation:pulse 3s ease-in-out infinite}
+.play-btn svg{width:40px;height:40px;fill:#ee77aaaa;transition:fill 0.3s}
+.play-btn.playing svg{fill:#ee77aa}
+.info{color:#553344;font-size:12px;margin-top:8px}
+.visualizer{height:70px;display:flex;align-items:flex-end;justify-content:center;gap:2px;margin-bottom:24px;opacity:0;transition:opacity 0.8s}
+.visualizer.active{opacity:1}
+.bar{width:3px;border-radius:2px;height:3px}
+@keyframes pulse{0%,100%{box-shadow:0 0 40px #ee77aa12}50%{box-shadow:0 0 100px #ee77aa33}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.container{animation:fadeIn 1s ease}
+</style>
+</head><body>
+<div class="container">
+  <h1>VAPOR TAIL</h1>
+  <div class="sub">höyryvanajälki</div>
+  <div class="style">dreamy vaporwave · slowed chords & shimmer · 82 bpm</div>
+
+  <div class="visualizer" id="viz"></div>
+
+  <button class="play-btn" id="playBtn" onclick="togglePlay()">
+    <svg id="playIcon" viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+  </button>
+
+  <div class="info">Klikkaa kuunnellaksesi</div>
+</div>
+
+<script>
+const vizEl=document.getElementById('viz');
+for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bar';vizEl.appendChild(b);}
+const bars=document.querySelectorAll('.bar');
+let playing=false,parts=null,vizFrame=null;
+
+function animateViz(){
+  if(!playing)return;
+  const t=Date.now();
+  bars.forEach((b,i)=>{
+    const h=3+Math.abs(Math.sin(t/1100+i*0.4))*28+Math.random()*5;
+    b.style.height=h+'px';
+    const hue=320+Math.sin(t/2000+i*0.3)*25;
+    b.style.background=`hsl(${hue},55%,${38+Math.sin(t/1600+i*0.5)*12}%)`;
+  });
+  vizFrame=requestAnimationFrame(animateViz);
+}
+
+async function togglePlay(){
+  if(playing){stopPlay();return;}
+  await Tone.start();playing=true;
+  document.getElementById('playBtn').classList.add('playing');
+  document.getElementById('playIcon').innerHTML='<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  vizEl.classList.add('active');animateViz();startVapor();
+}
+function stopPlay(){
+  playing=false;if(vizFrame)cancelAnimationFrame(vizFrame);
+  document.getElementById('playBtn').classList.remove('playing');
+  document.getElementById('playIcon').innerHTML='<polygon points="8,5 19,12 8,19"/>';
+  vizEl.classList.remove('active');bars.forEach(b=>{b.style.height='3px'});
+  if(parts){try{Tone.Transport.stop();Tone.Transport.cancel();}catch{}
+  Object.values(parts).forEach(p=>{try{if(p.stop)p.stop();if(p.dispose)p.dispose();}catch{}});parts=null;}
+}
+
+function startVapor(){
+  Tone.Transport.bpm.value=82;
+
+  // === EFFECTS — dreamy, washy ===
+  const rev=new Tone.Reverb({decay:7,wet:0.5}).toDestination();
+  const del=new Tone.FeedbackDelay({delayTime:"4n.",feedback:0.3,wet:0.25}).connect(rev);
+  const del2=new Tone.FeedbackDelay({delayTime:"2n",feedback:0.2,wet:0.18}).connect(rev);
+  const chorus=new Tone.Chorus({frequency:0.3,delayTime:8,depth:0.7,wet:0.4}).connect(rev).start();
+
+  // === SLOWED CHORD STABS — the vaporwave signature ===
+  const chordF=new Tone.Filter({frequency:2000,type:"lowpass",rolloff:-12}).connect(chorus);
+  const chord=new Tone.PolySynth(Tone.Synth,{
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:0.08,decay:1.2,sustain:0.3,release:2.5},
+    volume:-16
+  }).connect(chordF);
+
+  // === SHIMMER ARPEGGIO — high, glittering ===
+  const shimF=new Tone.Filter({frequency:4000,type:"lowpass",rolloff:-12}).connect(del);
+  const shim=new Tone.Synth({
+    oscillator:{type:"sine"},
+    envelope:{attack:0.004,decay:0.4,sustain:0.02,release:0.5},
+    volume:-22
+  }).connect(shimF);
+
+  // === PAD — warm, enveloping ===
+  const padF=new Tone.Filter({frequency:900,type:"lowpass",rolloff:-24,Q:2}).connect(chorus);
+  const pad=new Tone.PolySynth(Tone.Synth,{
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:3.0,decay:3.0,sustain:0.7,release:5.0},
+    volume:-23
+  }).connect(padF);
+
+  // === BASS — deep, slow, round ===
+  const bassF=new Tone.Filter({frequency:250,type:"lowpass",rolloff:-24}).connect(rev);
+  const bass=new Tone.Synth({
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:0.1,decay:0.8,sustain:0.4,release:1.2},
+    volume:-14
+  }).connect(bassF);
+
+  const sub=new Tone.Synth({
+    oscillator:{type:"sine"},
+    envelope:{attack:0.12,decay:0.8,sustain:0.35,release:1.0},
+    volume:-18
+  }).toDestination();
+
+  // === LEAD — dreamy, vibrato, floaty ===
+  const leadVib=new Tone.Vibrato({frequency:4,depth:0.12,wet:0.6}).connect(del2);
+  const lead=new Tone.Synth({
+    oscillator:{type:"sawtooth"},
+    envelope:{attack:0.2,decay:1.0,sustain:0.45,release:2.5},
+    volume:-17
+  }).connect(leadVib);
+
+  // === DRUMS — minimal, lo-fi feel ===
+  const kick=new Tone.MembraneSynth({volume:-14,pitchDecay:0.07,octaves:3.5,envelope:{attack:0.008,decay:0.4,sustain:0,release:0.3}}).toDestination();
+  const rim=new Tone.NoiseSynth({noise:{type:"pink"},envelope:{attack:0.001,decay:0.04,sustain:0,release:0.025},volume:-22}).connect(rev);
+  const openHat=new Tone.NoiseSynth({noise:{type:"white"},envelope:{attack:0.001,decay:0.25,sustain:0.03,release:0.2},volume:-28}).connect(rev);
+
+  // ============================================================
+  // COMPOSITION — Fmaj7 — Am7 — Dm7 — Bbmaj7 (dreamy vapor loop)
+  // ============================================================
+
+  const chordVoicings=[
+    ["F3","A3","C4","E4"],     // Fmaj7
+    ["A3","C4","E4","G4"],     // Am7
+    ["D3","F3","A3","C4"],     // Dm7
+    ["Bb2","D3","F3","A3"],    // Bbmaj7
+    ["F3","A3","C4","E4"],     // Fmaj7
+    ["G3","Bb3","D4","F4"],    // Gm7
+    ["Dm3","F3","A3","C4"],    // Dm7
+    ["C3","E3","G3","Bb3"],    // C7
+  ];
+
+  const padChords=[
+    ["F2","C3","E3"],["A2","E3","G3"],["D2","A2","C3"],["Bb1","F2","A2"],
+    ["F2","C3","E3"],["G2","D3","F3"],["D2","A2","C3"],["C2","G2","Bb2"],
+  ];
+
+  const bassNotes=["F1","A1","D1","Bb0","F1","G1","D1","C1"];
+
+  // Shimmer patterns — sparse, high, glittering
+  const shimPats=[
+    ["E5",null,null,"C5",null,null,"A4",null,"C5",null,null,null,null,null,null,null],
+    ["G5",null,null,"E5",null,null,"C5",null,"E5",null,null,null,null,null,null,null],
+    ["C5",null,null,"A4",null,null,"F4",null,"A4",null,null,null,null,null,null,null],
+    ["A4",null,null,"F4",null,null,"D4",null,"F4",null,null,null,null,null,null,null],
+    ["E5",null,null,"C5",null,null,"A4",null,"E5",null,null,null,null,null,null,null],
+    ["F5",null,null,"D5",null,null,"Bb4",null,"D5",null,null,null,null,null,null,null],
+    ["C5",null,null,"A4",null,null,"F4",null,"C5",null,null,null,null,null,null,null],
+    ["Bb4",null,null,"G4",null,null,"E4",null,"G4",null,null,null,null,null,null,null],
+  ];
+
+  // Lead melody — dreamy, slow, floating
+  const leadA=[
+    "A5",null,null,null,"G5",null,null,null,
+    "F5",null,null,"E5",null,null,null,null,
+    null,null,"D5",null,null,"C5",null,null,
+    null,null,null,null,null,null,null,null,
+  ];
+  const leadB=[
+    "C6",null,null,null,"Bb5",null,null,null,
+    "A5",null,null,"G5",null,null,"F5",null,
+    null,null,"E5",null,"F5",null,"G5",null,
+    "A5",null,null,null,null,null,null,null,
+  ];
+
+  let cc=0,pc2=0,bc=0,ss=0,sc=0,ls=0,beat=0;
+  let useB=false;
+  let chordFilterPhase=0;
+
+  // Chord stabs — syncopated, slowed
+  let chBeat=0;
+  const chordLoop=new Tone.Loop(t=>{
+    const pos=chBeat%8;
+    if(pos===0||pos===3||pos===6){
+      chord.triggerAttackRelease(chordVoicings[cc%8],"4n",t);
+      chordFilterPhase+=0.15;
+      chordF.frequency.setValueAtTime(1200+Math.sin(chordFilterPhase)*800,t);
+    }
+    chBeat++;
+    if(chBeat%8===0)cc++;
+  },"8n");
+
+  // Pad
+  const padLoop=new Tone.Loop(t=>{
+    pad.triggerAttackRelease(padChords[pc2%8],"2m",t);
+    padF.frequency.rampTo(600+Math.sin(pc2*0.4)*400,4);
+    pc2++;
+  },"2m");
+
+  // Bass — whole notes
+  const bassLoop=new Tone.Loop(t=>{
+    bass.triggerAttackRelease(bassNotes[bc%8],"1m",t);
+    sub.triggerAttackRelease(bassNotes[bc%8],"1m",t);
+    bc++;
+  },"1m");
+
+  // Shimmer
+  const shimLoop=new Tone.Loop(t=>{
+    const ci=sc%8;
+    const note=shimPats[ci][ss%16];
+    if(note)shim.triggerAttackRelease(note,"8n",t);
+    ss++;
+    if(ss%16===0)sc++;
+  },"8n");
+
+  // Lead
+  const leadLoop=new Tone.Loop(t=>{
+    const mel=useB?leadB:leadA;
+    const note=mel[ls%32];
+    if(note)lead.triggerAttackRelease(note,"2n",t);
+    ls++;
+    if(ls%32===0)useB=!useB;
+  },"4n");
+
+  // Drums — minimal
+  const drumLoop=new Tone.Loop(t=>{
+    const p=beat%32;
+    if(p===0||p===16)kick.triggerAttackRelease("C1","4n",t);
+    if(p%8===4)rim.triggerAttackRelease("32n",t);
+    if(p===12||p===28)openHat.triggerAttackRelease("8n",t);
+    beat++;
+  },"16n");
+
+  // === Build ===
+  chordLoop.start(0);
+  padLoop.start("2m");
+  shimLoop.start("4m");
+  bassLoop.start("6m");
+  drumLoop.start("8m");
+  leadLoop.start("12m");
+
+  Tone.Transport.start();
+  parts={chord,chordF,shim,shimF,pad,padF,bass,bassF,sub,lead,leadVib,
+    kick,rim,openHat,rev,del,del2,chorus,
+    chordLoop,padLoop,shimLoop,bassLoop,drumLoop,leadLoop};
+}
+</script>
+</body></html>
