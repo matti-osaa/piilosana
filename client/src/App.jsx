@@ -6,6 +6,15 @@ import DEFS_FI from "./defs_fi.js";
 import { menuColors } from "./menuColors.js";
 import { MultiplayerHero } from "./components/MultiplayerHero.jsx";
 import { DailyHeroCard } from "./components/DailyHeroCard.jsx";
+import { DayBoxRow } from "./components/DayBoxRow.jsx";
+import { MenuFooter } from "./components/MenuFooter.jsx";
+import { PracticeOptionsModal } from "./components/PracticeOptionsModal.jsx";
+import { MenuButton } from "./components/MenuButton.jsx";
+import { ResultsScreen as ResultsScreenView } from "./components/ResultsScreen.jsx";
+import { HelpModal } from "./components/HelpModal.jsx";
+import { InflectionModal } from "./components/InflectionModal.jsx";
+import { WordInfoModal } from "./components/WordInfoModal.jsx";
+import { AchievementsModal } from "./components/AchievementsModal.jsx";
 
 // ============================================
 // PIILOSANA - Finnish Word Hunt Game
@@ -4115,35 +4124,26 @@ export default function Piilosana(){
         );
       })()}
 
-      {/* Yesterday + Tomorrow row */}
-      <div style={{display:"flex",gap:"6px",width:"100%",marginBottom:"12px"}}>
-        {/* Yesterday */}
-        {(()=>{const d=daysAgoStr(1);const dl=dateLabel(d,lang);const res=getDailyResultForDate(d,lang);const num=dailyNumberForDate(d);
-          if(num<1)return null;
-          return(
-            <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",
-              padding:"16px 6px",border:`2px solid ${menuColors.pastBorder}`,borderRadius:S.btnRadius,cursor:"pointer",
-              background:menuColors.pastBg,color:menuColors.pastText,fontSize:"14px",minWidth:0,transition:"all 0.15s"}}
-              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow=menuColors.softShadow;}}
-              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
-              <span style={{fontSize:"15px",color:menuColors.pastText,textTransform:"capitalize",fontWeight:"700",opacity:0.75}}>{dl.weekday.slice(0,2)}</span>
-              <span style={{fontSize:"22px",fontWeight:"800",color:menuColors.pastText}}>{dl.short}</span>
-              {res?<span style={{fontSize:"18px",fontWeight:"800",color:"#49634d"}}>{res.score}p</span>
-                :<span style={{fontSize:"22px",color:"#49634d"}}>▶</span>}
-            </button>
-          );
-        })()}
-        {/* Tomorrow — locked */}
-        {(()=>{const d=tomorrowStr();const dl=dateLabel(d,lang);return(
-          <button disabled style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",
-            padding:"16px 6px",border:`2px dashed ${menuColors.futureBorder}`,borderRadius:S.btnRadius,cursor:"default",
-            background:menuColors.futureBg,color:menuColors.futureText,fontSize:"14px",minWidth:0}}>
-            <span style={{fontSize:"15px",color:menuColors.futureText,textTransform:"capitalize",fontWeight:"700",opacity:0.75}}>{dl.weekday.slice(0,2)}</span>
-            <span style={{fontSize:"22px",fontWeight:"800",color:menuColors.futureText}}>{dl.short}</span>
-            <span style={{fontSize:"20px",color:menuColors.futureText,opacity:0.65}}>🔒</span>
-          </button>
-        );})()}
-      </div>
+      {/* ===== Eilinen + Huominen -rivi ===== */}
+      {(()=>{
+        const pastD=daysAgoStr(1);
+        const pastDl=dateLabel(pastD,lang);
+        const pastRes=getDailyResultForDate(pastD,lang);
+        const pastNum=dailyNumberForDate(pastD);
+        const futureD=tomorrowStr();
+        const futureDl=dateLabel(futureD,lang);
+        return(
+          <DayBoxRow
+            S={S}
+            past={pastNum>=1?{
+              dateLabel:pastDl,
+              result:pastRes,
+              onClick:()=>{if(pastRes){setShowDailyHistory(pastD);}else{startDaily(pastD);}}
+            }:null}
+            future={{dateLabel:futureDl}}
+          />
+        );
+      })()}
 
       {/* ===== MONINPELI HERO ===== */}
       <MultiplayerHero
@@ -4159,28 +4159,40 @@ export default function Piilosana(){
 
       {/* ===== HARJOITTELU + OMA MONINPELI -rivi ===== */}
       <div style={{display:"flex",gap:"8px",marginBottom:"8px"}}>
-        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"16px",color:menuColors.practiceText,background:menuColors.practiceBg,border:"1px solid rgba(255,255,255,0.35)",padding:"18px 12px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",transition:"all 0.2s"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 14px 30px rgba(57,45,28,0.25)";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}>
-          <span style={{fontWeight:"700"}}>{t.practice}</span>
-          <span style={{fontSize:"11px",opacity:0.8}}>{t.practiceDesc}</span>
-        </button>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"16px",color:menuColors.customText,background:menuColors.customBg,border:"1px solid rgba(255,255,255,0.35)",padding:"18px 12px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",transition:"all 0.2s"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 14px 30px rgba(57,45,28,0.25)";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}>
-          <span style={{fontWeight:"700"}}>{t.customGame}</span>
-          <span style={{fontSize:"11px",opacity:0.8}}>{lang==="fi"?"kutsu kavereita":lang==="sv"?"bjud in vänner":"invite friends"}</span>
-        </button>
+        <MenuButton
+          S={S}
+          bg={menuColors.practiceBg}
+          text={menuColors.practiceText}
+          label={t.practice}
+          subLabel={t.practiceDesc}
+          onClick={()=>setShowMenuOptions(true)}
+        />
+        <MenuButton
+          S={S}
+          bg={menuColors.customBg}
+          text={menuColors.customText}
+          label={t.customGame}
+          subLabel={lang==="fi"?"kutsu kavereita":lang==="sv"?"bjud in vänner":"invite friends"}
+          onClick={()=>{
+            sounds.init().catch(()=>{});
+            setMode("multi");
+            if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}
+            else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}
+          }}
+        />
       </div>
 
       {/* ===== PIKAOHJE — kompakti, koko leveys ===== */}
       <div style={{marginBottom:"12px"}}>
-        <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"12px",color:menuColors.tutorialText,background:menuColors.tutorialBg,border:"1px solid rgba(255,255,255,0.35)",padding:"8px 12px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",transition:"all 0.2s",opacity:0.92}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.opacity="1";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.opacity="0.92";}}>
-          <span style={{fontSize:"14px",lineHeight:1}}>?</span>
-          <span>{t.tutorialBtn}</span>
-        </button>
+        <MenuButton
+          S={S}
+          bg={menuColors.tutorialBg}
+          text={menuColors.tutorialText}
+          label={t.tutorialBtn}
+          icon="?"
+          compact
+          onClick={()=>setShowTutorial(true)}
+        />
       </div>
 
       {/* ===== AD SPACE ===== */}
@@ -4197,173 +4209,70 @@ export default function Piilosana(){
           onClose={()=>setShowDailyHistory(null)} />
       )}
 
-      {/* Solo options — fullscreen overlay so start button is always visible */}
+      {/* ===== Harjoittelun asetukset — overlay ===== */}
       {showMenuOptions&&(
-        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:150,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px",animation:"fadeIn 0.2s ease"}} onClick={()=>setShowMenuOptions(false)}>
-          <div style={{background:S.dark,border:`2px solid ${S.green}`,borderRadius:S.panelRadius,width:"100%",maxWidth:"440px",maxHeight:"85vh",display:"flex",flexDirection:"column",boxShadow:S.panelShadow}} onClick={e=>e.stopPropagation()}>
-            {/* Header */}
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 16px 10px",borderBottom:`1px solid ${S.green}33`,flexShrink:0}}>
-              <div style={{fontSize:"14px",color:S.green,fontFamily:S.font,fontWeight:"700"}}>{t.practice}</div>
-              <button onClick={()=>setShowMenuOptions(false)} style={{fontFamily:S.font,fontSize:"16px",color:S.textMuted,background:"transparent",border:"none",cursor:"pointer",padding:"2px 6px"}}>✕</button>
-            </div>
-            {/* Scrollable content */}
-            <div style={{padding:"12px 16px",overflowY:"auto",flex:1}}>
-              <div style={{marginBottom:"12px"}}>
-                <div style={{fontSize:"13px",color:S.green,marginBottom:"6px"}}>{t.time}</div>
-                <div style={{display:"flex",gap:"6px",justifyContent:"center"}}>
-                  <button onClick={()=>setGameTime(120)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===120?S.bg:S.green,background:gameTime===120?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer"}}>2 MIN</button>
-                  <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"6px 14px",cursor:"pointer"}}>{lang==="en"?"6.7":"6,7"} MIN</button>
-                  <button onClick={()=>setGameTime(0)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===0?S.bg:"#44ddff",background:gameTime===0?"#44ddff":"transparent",border:"2px solid #44ddff",padding:"6px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:"4px"}}><Icon icon="infinity" color={gameTime===0?S.bg:"#44ddff"} size={1.5}/>{t.unlimited}</button>
-                </div>
-              </div>
-              <div>
-                <button onClick={()=>setLetterMult(v=>!v)} style={{fontFamily:S.font,fontSize:"13px",color:letterMult?S.bg:S.yellow,background:letterMult?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"6px 14px",cursor:"pointer"}}>
-                  {letterMult?"✓ ":""}{t.letterMultBtn}
-                </button>
-              </div>
-            </div>
-            {/* Fixed start button at bottom */}
-            <div style={{padding:"12px 16px 16px",borderTop:`1px solid ${S.green}33`,flexShrink:0}}>
-              <button onClick={()=>{startSolo();setShowMenuOptions(false);}} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"14px 32px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844",borderRadius:S.btnRadius,width:"100%",letterSpacing:"2px"}}
-                onMouseEnter={e=>{e.currentTarget.style.transform=S.btnShadow!=="none"?"translateY(-2px)":"translate(-2px,-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #008844"}}
-                onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #008844"}}>▶ {t.startGame||"ALOITA"}</button>
-            </div>
-          </div>
-        </div>
+        <PracticeOptionsModal
+          S={S}
+          t={t}
+          lang={lang}
+          Icon={Icon}
+          gameTime={gameTime}
+          letterMult={letterMult}
+          onGameTimeChange={setGameTime}
+          onLetterMultToggle={()=>setLetterMult(v=>!v)}
+          onStart={()=>{startSolo();setShowMenuOptions(false);}}
+          onClose={()=>setShowMenuOptions(false)}
+        />
       )}
 
-      {/* Footer */}
-      <div style={{marginTop:"20px",width:"100%",maxWidth:"600px"}}>
-        {/* Action buttons row */}
-        <div style={{display:"flex",gap:"6px",justifyContent:"center",flexWrap:"wrap",marginBottom:"10px"}}>
-          <button onClick={()=>setShowAchievements(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,
-            background:"transparent",border:`1px solid ${S.border}`,padding:"5px 10px",cursor:"pointer",
-            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",minHeight:"32px",borderRadius:S.btnRadius}}>
-            <Icon icon="trophy" color={S.yellow} size={2} badge={true}/>
-            {Object.keys(achUnlocked).length>0&&<span style={{fontSize:"12px"}}>{Object.keys(achUnlocked).length}/{Object.keys(ACHIEVEMENTS).length}</span>}
-          </button>
-          <button onClick={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}} style={{fontFamily:S.font,fontSize:"13px",color:authUser?S.green:S.textMuted,
-            background:"transparent",border:`1px solid ${authUser?S.green+"66":S.border}`,padding:"5px 10px",cursor:"pointer",
-            display:"flex",alignItems:"center",gap:"5px",transition:"all 0.2s",minHeight:"32px",borderRadius:S.btnRadius}}>
-            <Icon icon="person" color={authUser?S.green:S.textMuted} size={2}/>
-            {authUser&&<span style={{fontSize:"12px"}}>{authUser.nickname}</span>}
-          </button>
-        </div>
-        {/* Info */}
-        <div style={{fontSize:"12px",color:S.textMuted,marginBottom:"4px"}}>{currentLangLoaded?<>{lang==="fi"?<>{"~100 000 sanaa + "}{(WORDS_SET.size-100000).toLocaleString("fi-FI")}{" taivutusmuotoa "}<span onClick={()=>setShowInflection(true)} style={{color:S.green,cursor:"pointer",textDecoration:"underline dotted",textUnderlineOffset:"3px",fontSize:"11px"}}>(katso taivutusmuodot)</span></>:lang==="sv"?<>{WORDS_SET.size.toLocaleString("fi-FI")} ord och böjningsformer</>:<>{WORDS_SET.size.toLocaleString("fi-FI")} words &amp; inflections</>}</>:<span style={{color:S.textMuted,animation:"pulse 1.5s ease-in-out infinite"}}>{lang==="fi"?"Ladataan sanalistaa...":lang==="sv"?"Laddar ordlistan...":"Loading word list..."}</span>}</div>
-        <div style={{display:"flex",gap:"10px",justifyContent:"center",marginBottom:"4px"}}>
-          <button onClick={()=>setShowHelp(true)} style={{fontFamily:S.font,fontSize:"12px",color:S.green,background:"transparent",border:"none",padding:"2px 4px",cursor:"pointer",textDecoration:"underline",opacity:0.6}}>{t.howToPlay}</button>
-          <button onClick={()=>setShowWordInfo(true)} style={{fontFamily:S.font,fontSize:"12px",color:S.green,background:"transparent",border:"none",padding:"2px 4px",cursor:"pointer",textDecoration:"underline",opacity:0.6}}>{t.readMoreWords}</button>
-        </div>
-        <div style={{fontSize:"11px",color:S.textMuted+"88",marginTop:"2px"}}>v{VERSION} · © Matti Kuokkanen 2026</div>
-        <div style={{fontSize:"12px",marginTop:"4px",display:"flex",gap:"10px",justifyContent:"center"}}>
-          <a href="mailto:info@piilosana.com" style={{color:S.textMuted+"88",textDecoration:"none"}}>{lang==="en"?"Feedback":lang==="sv"?"Feedback":"Palaute"}</a>
-          <a href="/privacy" style={{color:S.textMuted+"88",textDecoration:"none"}}>{lang==="en"?"Privacy":lang==="sv"?"Integritet":"Tietosuoja"}</a>
-        </div>
-        {/* Language flags */}
-        <div style={{display:"flex",gap:"6px",justifyContent:"center",marginTop:"10px"}}>
-          {Object.entries(LANG_CONFIG).map(([code,lc])=>(
-            <button key={code} onClick={()=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
-              style={{fontFamily:S.font,fontSize:"13px",background:lang===code?S.dark:"transparent",
-                border:lang===code?`1px solid ${S.green}`:`1px solid ${S.border}`,
-                padding:"5px 8px",cursor:"pointer",color:lang===code?S.green:S.textMuted,
-                boxShadow:lang===code?`0 0 6px ${S.green}33`:"none",
-                transition:"all 0.2s",display:"flex",alignItems:"center",gap:"4px",minHeight:"32px",borderRadius:S.btnRadius}}>
-              <PixelFlag lang={code} size={2}/>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* ===== Footer ===== */}
+      <MenuFooter
+        S={S}
+        lang={lang}
+        t={t}
+        Icon={Icon}
+        PixelFlag={PixelFlag}
+        version={VERSION}
+        langConfig={LANG_CONFIG}
+        authUser={authUser}
+        achUnlockedCount={Object.keys(achUnlocked).length}
+        achTotalCount={Object.keys(ACHIEVEMENTS).length}
+        wordCount={WORDS_SET.size}
+        wordsLoaded={currentLangLoaded}
+        onShowAchievements={()=>setShowAchievements(true)}
+        onShowAuth={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}}
+        onShowInflection={()=>setShowInflection(true)}
+        onShowHelp={()=>setShowHelp(true)}
+        onShowWordInfo={()=>setShowWordInfo(true)}
+        onLangChange={(code)=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
+      />
     </div>
   );
   
   const isWinner=multiRankings&&multiRankings.length>0&&multiRankings[0].playerId===playerId;
   const myRank=multiRankings?multiRankings.findIndex(p=>p.playerId===playerId):0;
   const ResultsScreen=()=>(
-    <div style={{textAlign:"center",marginTop:"20px",animation:"fadeIn 1s ease",position:"relative"}}>
-      <ConfettiCelebration isWinner={isWinner}/>
-      <div style={{position:"relative",zIndex:1,border:`1px solid ${isWinner?S.yellow:S.green}44`,padding:"24px",boxShadow:`0 4px 24px ${isWinner?S.yellow:S.green}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,maxWidth:"600px",borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
-        {myRank===0&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🏆</div>}
-        {myRank===1&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🥈</div>}
-        {myRank===2&&<div style={{fontSize:"36px",marginBottom:"8px",animation:"pop 0.6s ease"}}>🥉</div>}
-        <div style={{fontSize:"16px",color:isWinner?S.yellow:myRank<=2?S.yellow:S.green,marginBottom:"4px",animation:myRank<=2?"pop 0.6s ease":"none"}}>{isWinner?t.youWon:myRank===1?"2.":myRank===2?"3.":t.gameOver}</div>
-        <p style={{fontSize:"13px",color:S.green,marginBottom:"12px"}}>{t.results}</p>
-        {multiRankings&&multiRankings.slice(0,5).map((p,i)=>{
-          const medals=["🥇","🥈","🥉"];
-          const isMe=p.playerId===playerId;
-          return(
-            <div key={i} style={{fontSize:i===0?"15px":"13px",color:isMe?S.yellow:i===0?S.yellow:i<3?S.yellow:S.green,padding:i===0?"10px 12px":"8px 12px",borderBottom:`1px solid ${S.border}33`,display:"flex",justifyContent:"space-between",alignItems:"center",background:i===0?`${S.yellow}15`:isMe?`${S.yellow}10`:"transparent",animation:isMe||i===0?"pop 0.4s ease":"none",borderRadius:"8px",marginBottom:"2px",fontWeight:i<3?"600":"normal"}}>
-              <span>{medals[i]||`${i+1}.`} {p.nickname}</span>
-              <span style={{fontWeight:"bold"}}>{p.score}p <span style={{fontWeight:"normal",fontSize:"12px",opacity:0.7}}>({p.wordsFound} {t.words})</span></span>
-            </div>
-          );
-        })}
-        {gameMode==="classic"&&multiValidWords.length>0&&(
-          <div style={{fontSize:"13px",color:S.textSoft||"#88ccaa",marginTop:"8px"}}>{(() => {const allF=new Set();Object.values(multiAllFoundWords).forEach(ws=>ws.forEach(w=>allF.add(w)));return `${allF.size} / ${multiValidWords.length} ${t.words} (${Math.round(allF.size/multiValidWords.length*100)}%)`;})()}</div>
-        )}
-        {/* Word summary for multiplayer - separate boxes */}
-        {gameMode==="battle"&&multiRankings&&(()=>{
-          // Battle mode: show all found words per player, no missed words
-          const allFound=new Set();
-          Object.values(multiAllFoundWords).forEach(ws=>ws.forEach(w=>allFound.add(w)));
-          const foundWords=[...allFound].sort((a,b)=>b.length-a.length||a.localeCompare(b));
-          const nickMap={};
-          if(multiRankings)multiRankings.forEach(p=>{nickMap[p.playerId]=p.nickname;});
-          return foundWords.length>0&&(
-            <div style={{marginTop:"16px",padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,textAlign:"left",animation:"fadeIn 0.8s ease",borderRadius:"12px"}}>
-              <div style={{fontSize:"14px",color:S.purple,marginBottom:"8px",display:"flex",alignItems:"center",gap:"6px",fontWeight:"600"}}><Icon icon="swords" color={S.purple} size={2}/>LÖYDETYT ({foundWords.length})</div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
-                {foundWords.map((w,i)=>{
-                  const finders=Object.entries(multiAllFoundWords).filter(([,ws])=>ws.includes(w)).map(([pid])=>nickMap[pid]||"?");
-                  return(
-                    <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}} title={finders.join(", ")}>{w.toUpperCase()}</span>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })()}
-        {gameMode!=="battle"&&multiValidWords.length>0&&(()=>{
-          const allFound=new Set();
-          Object.values(multiAllFoundWords).forEach(ws=>ws.forEach(w=>allFound.add(w)));
-          const foundWords=[...allFound].sort((a,b)=>b.length-a.length||a.localeCompare(b));
-          const missedWords=[...multiValidWords].filter(w=>!allFound.has(w)).sort((a,b)=>b.length-a.length||a.localeCompare(b));
-          const nickMap={};
-          if(multiRankings)multiRankings.forEach(p=>{nickMap[p.playerId]=p.nickname;});
-          return(<>
-            {foundWords.length>0&&(
-              <div style={{marginTop:"16px",padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,textAlign:"left",animation:"fadeIn 0.8s ease",borderRadius:"12px"}}>
-                <div style={{fontSize:"14px",color:S.green,marginBottom:"8px",fontWeight:"600"}}>LÖYDETYT ({foundWords.length})</div>
-                <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
-                  {foundWords.map((w,i)=>{
-                    const finders=Object.entries(multiAllFoundWords).filter(([,ws])=>ws.includes(w)).map(([pid])=>nickMap[pid]||"?");
-                    return(
-                      <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}} title={finders.join(", ")}>{w.toUpperCase()}</span>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-            {missedWords.length>0&&(
-              <div style={{marginTop:"10px",padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease",borderRadius:"12px"}}>
-                <div style={{fontSize:"14px",color:"#ff6666",marginBottom:"8px",fontWeight:"600"}}>JÄIVÄT LÖYTÄMÄTTÄ ({missedWords.length})</div>
-                <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
-                  {missedWords.map((w,i)=>(
-                    <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
-                  ))}
-                </div>
-                {(room?.lang||"fi")==="fi"&&<div style={{fontSize:"12px",color:S.textMuted,marginTop:"8px",fontStyle:"italic"}}>{t.missedLong||"Laudalta löytyi myös pidempiä sanoja"}</div>}
-              </div>
-            )}
-          </>);
-        })()}
-        <div style={{marginTop:"16px",display:"flex",flexDirection:"column",gap:"8px",alignItems:"center"}}>
-          {isHost&&<button onClick={playAgain} style={{fontFamily:S.font,fontSize:"15px",color:S.bg,background:S.green,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.green}33`,fontWeight:"600"}}>{t.newCustom}</button>}
-          <button onClick={switchToSolo} style={{fontFamily:S.font,fontSize:"15px",color:S.bg,background:S.yellow,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.yellow}33`,fontWeight:"600"}}>{t.practice}</button>
-          <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`1px solid ${S.green}44`,background:"transparent",padding:"10px 20px",cursor:"pointer",width:"280px",borderRadius:"10px"}}>{t.menu}</button>
-        </div>
-      </div>
-    </div>
+    <ResultsScreenView
+      S={S}
+      t={t}
+      isWinner={isWinner}
+      myRank={myRank}
+      isHost={isHost}
+      gameMode={gameMode}
+      multiRankings={multiRankings}
+      multiAllFoundWords={multiAllFoundWords}
+      multiValidWords={multiValidWords}
+      playerId={playerId}
+      wordColor={wordColor}
+      DEFS={DEFS}
+      showDef={showDef}
+      roomLang={room?.lang||"fi"}
+      Icon={Icon}
+      ConfettiCelebration={ConfettiCelebration}
+      onPlayAgain={playAgain}
+      onSwitchToSolo={switchToSolo}
+      onReturnToMenu={returnToModeSelect}
+    />
   );
 
 
@@ -4402,106 +4311,17 @@ export default function Piilosana(){
       {/* Top bar removed — buttons moved to footer */}
       {/* Word info modal */}
       {showWordInfo&&(
-        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}} onClick={()=>setShowWordInfo(false)}>
-          <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"500px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative",borderRadius:S.panelRadius,boxShadow:S.panelShadow}} onClick={e=>e.stopPropagation()}>
-            <button onClick={()=>setShowWordInfo(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius}}>✕</button>
-            <div style={{fontSize:"14px",color:S.green,marginBottom:"16px"}}>{t.wordInfoTitle}</div>
-            <div style={{fontSize:"13px",color:S.green,lineHeight:"1.8",marginBottom:"12px"}}>{t.wordInfoBody1}</div>
-            <div style={{fontSize:"13px",color:S.green,lineHeight:"1.8",marginBottom:"12px"}}>{t.wordInfoBody2}</div>
-            <div style={{fontSize:"13px",color:S.green,lineHeight:"1.8",marginBottom:"16px"}}>{t.wordInfoBody3}</div>
-            <div style={{fontSize:"13px",color:S.green,marginBottom:"8px",borderTop:`1px solid ${S.border}`,paddingTop:"12px"}}>
-              <div style={{marginBottom:"8px",color:S.yellow}}>{t.wordInfoSources}:</div>
-              <div style={{display:"flex",flexDirection:"column",gap:"6px"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}>
-                  <span>🇫🇮</span>
-                  <span style={{flex:1,marginLeft:"8px"}}>{t.wordInfoSourceFi}</span>
-                  <span style={{color:S.textMuted,marginLeft:"8px"}}>{LANG_CONFIG.fi.words.size.toLocaleString()}</span>
-                </div>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}>
-                  <span>🇬🇧</span>
-                  <span style={{flex:1,marginLeft:"8px"}}>{t.wordInfoSourceEn}</span>
-                  <span style={{color:S.textMuted,marginLeft:"8px"}}>{LANG_CONFIG.en.words.size.toLocaleString()}</span>
-                </div>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}>
-                  <span>🇸🇪</span>
-                  <span style={{flex:1,marginLeft:"8px"}}>{t.wordInfoSourceSv}</span>
-                  <span style={{color:S.textMuted,marginLeft:"8px"}}>{LANG_CONFIG.sv.words.size.toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <WordInfoModal S={S} t={t} langConfig={LANG_CONFIG} onClose={()=>setShowWordInfo(false)} />
       )}
       {/* Help / How to play modal */}
       {showTutorial&&<QuickTutorial lang={lang} theme={S} onClose={()=>setShowTutorial(false)}/>}
       {showHelp&&(
-        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px"}} onClick={()=>setShowHelp(false)}>
-          <div style={{background:S.bg,border:`3px solid ${S.green}`,padding:"20px",maxWidth:"440px",width:"100%",maxHeight:"80vh",overflowY:"auto",fontFamily:S.font,position:"relative",borderRadius:S.panelRadius,boxShadow:S.panelShadow}} onClick={e=>e.stopPropagation()}>
-            <button onClick={()=>setShowHelp(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius}}>✕</button>
-            <div style={{fontSize:"14px",color:S.green,marginBottom:"16px"}}>{t.howToPlay?.toUpperCase()}</div>
-            <div style={{display:"flex",flexDirection:"column",gap:"14px",fontSize:"13px",color:S.green,lineHeight:"1.8"}}>
-              <div><span style={{color:S.yellow}}>☝</span> {t.helpDrag}</div>
-              <div><span style={{color:S.yellow}}>⏱</span> {t.helpTime}</div>
-              <div><span style={{color:S.yellow}}>⭐</span> {t.helpScoring}</div>
-              <div><span style={{color:S.yellow}}>🔥</span> {t.helpCombo}</div>
-              <div><span style={{color:S.yellow}}>✦</span> {t.helpMultiplier}</div>
-              <div><span style={{color:S.yellow}}>🌐</span> {t.helpLang}</div>
-              <div><span style={{color:S.yellow}}>🔤</span> {t.helpInflection}</div>
-              {t.helpDefs&&<div><span style={{color:S.yellow}}>💬</span> {t.helpDefs}</div>}
-            </div>
-          </div>
-        </div>
+        <HelpModal S={S} t={t} onClose={()=>setShowHelp(false)} />
       )}
 
       {/* Inflection table modal */}
       {showInflection&&(
-        <div onClick={()=>setShowInflection(false)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"#000000cc",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"20px",animation:"fadeIn 0.3s ease"}}>
-          <div onClick={e=>e.stopPropagation()} style={{background:S.bg,border:`3px solid ${S.green}`,padding:"24px",maxWidth:"520px",width:"100%",maxHeight:"85vh",overflowY:"auto",position:"relative"}}>
-            <button onClick={()=>setShowInflection(false)} style={{position:"absolute",top:"8px",right:"8px",fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"32px",height:"32px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius}}>✕</button>
-            <div style={{fontSize:"14px",color:S.green,marginBottom:"4px",fontWeight:"bold"}}>{lang==="fi"?"TAIVUTUSMUODOT":lang==="sv"?"BÖJNINGSFORMER":"INFLECTION FORMS"}</div>
-            <div style={{fontSize:"12px",color:S.textMuted,marginBottom:"16px"}}>{lang==="fi"?"Esimerkki: sametti (substantiivi, tyyppi 5-C)":lang==="sv"?"Exempel: sametti (substantiv, typ 5-C)":"Example: sametti (noun, type 5-C)"}</div>
-            <table style={{width:"100%",borderCollapse:"collapse",fontSize:"13px"}}>
-              <thead>
-                <tr style={{borderBottom:`2px solid ${S.border}`}}>
-                  <th style={{textAlign:"left",padding:"6px 8px",color:S.textSoft,fontWeight:"bold"}}>{lang==="fi"?"Sijamuoto":lang==="sv"?"Kasus":"Case"}</th>
-                  <th style={{textAlign:"left",padding:"6px 8px",color:S.textSoft,fontWeight:"bold"}}>{lang==="fi"?"Yksikkö":lang==="sv"?"Singular":"Singular"}</th>
-                  <th style={{textAlign:"left",padding:"6px 8px",color:S.textSoft,fontWeight:"bold"}}>{lang==="fi"?"Monikko":lang==="sv"?"Plural":"Plural"}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  ["Nominatiivi","sametti","sametit"],
-                  ["Genetiivi","sametin","samettien"],
-                  ["Partitiivi","samettia","sametteja"],
-                  ["Akkusatiivi","sametti / sametin","sametit"],
-                  ["Inessiivi","sametissa","sameteissa"],
-                  ["Elatiivi","sametista","sameteista"],
-                  ["Illatiivi","samettiin","sametteihin"],
-                  ["Adessiivi","sametilla","sameteilla"],
-                  ["Ablatiivi","sametilta","sameteilta"],
-                  ["Allatiivi","sametille","sameteille"],
-                  ["Essiivi","samettina","sametteina"],
-                  ["Translatiivi","sametiksi","sameteiksi"],
-                  ["Abessiivi","sametitta","sameteitta"],
-                  ["Instruktiivi","—","samettein"],
-                  ["Komitatiivi","—","sametteine-"],
-                ].map(([c,s,p],i)=>(
-                  <tr key={i} style={{borderBottom:`1px solid ${S.border}`,background:i%2===0?"transparent":S.dark}}>
-                    <td style={{padding:"5px 8px",color:S.yellow,fontSize:"12px",whiteSpace:"nowrap"}}>{c}</td>
-                    <td style={{padding:"5px 8px",color:S.green}}>{s}</td>
-                    <td style={{padding:"5px 8px",color:S.green}}>{p}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div style={{marginTop:"12px",fontSize:"12px",color:S.textMuted,lineHeight:"1.6"}}>
-              {lang==="fi"?"Lisäksi jokaiseen muotoon voi liittyä possessiivisuffiksi (-ni, -si, -nsa, -mme, -nne) → yhteensä yli 100 muotoa per sana. Kaikki hyväksytään pelissä!":lang==="sv"?"Dessutom kan varje form ha possessivsuffix (-ni, -si, -nsa, -mme, -nne) → totalt över 100 former per ord. Alla godkänns i spelet!":"Each form can also have possessive suffixes (-ni, -si, -nsa, -mme, -nne) → over 100 forms per word. All are accepted in the game!"}
-            </div>
-            <div style={{marginTop:"8px",fontSize:"11px",color:S.textMuted}}>
-              {lang==="fi"?"Lähde: Wikisanakirja":lang==="sv"?"Källa: Wiktionary":"Source: Wiktionary"} — <span onClick={()=>window.open("https://fi.wiktionary.org/wiki/sametti","_blank")} style={{color:S.green,cursor:"pointer",textDecoration:"underline"}}>fi.wiktionary.org/wiki/sametti</span>
-            </div>
-          </div>
-        </div>
+        <InflectionModal S={S} lang={lang} onClose={()=>setShowInflection(false)} />
       )}
 
       {/* Share popup — game link + QR */}
@@ -4640,61 +4460,16 @@ export default function Piilosana(){
 
       {/* Achievements view */}
       {showAchievements&&(
-        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:150,
-          display:"flex",justifyContent:"center",alignItems:"flex-start",padding:"40px 16px",overflowY:"auto"}}
-          onClick={(e)=>{if(e.target===e.currentTarget)setShowAchievements(false);}}>
-          <div style={{width:"100%",maxWidth:"600px",background:S.dark,border:`2px solid #ffcc00`,
-            boxShadow:S.panelShadow!=="none"?S.panelShadow:"0 0 30px #ffcc0033",borderRadius:S.panelRadius,padding:"24px",animation:"fadeIn 0.3s ease"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"20px"}}>
-              <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
-                <Icon icon="trophy" color="#ffcc00" size={4} badge={true}/>
-                <span style={{fontFamily:S.font,fontSize:"20px",fontWeight:"700",color:"#ffcc00"}}>{t.achievements}</span>
-              </div>
-              <span style={{fontSize:"15px",color:S.textSoft||"#88ccaa",fontWeight:"600"}}>{Object.keys(achUnlocked).length} / {Object.keys(ACHIEVEMENTS).length}</span>
-              <button onClick={()=>setShowAchievements(false)} style={{fontFamily:S.font,fontSize:"18px",color:S.green,
-                background:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer",borderRadius:"8px"}}>X</button>
-            </div>
-            {/* Progress bar */}
-            <div style={{width:"100%",height:"8px",background:S.border,marginBottom:"20px",borderRadius:"4px"}}>
-              <div style={{width:`${Object.keys(achUnlocked).length/Object.keys(ACHIEVEMENTS).length*100}%`,height:"100%",
-                background:"linear-gradient(90deg, #ffcc00, #ff6644)",transition:"width 0.5s ease",borderRadius:"4px"}}/>
-            </div>
-            {/* Achievement grid */}
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(160px, 1fr))",gap:"10px"}}>
-              {Object.entries(ACHIEVEMENTS).map(([id,ach])=>{
-                const unlocked=!!achUnlocked[id];
-                return(
-                  <div key={id} style={{border:`2px solid ${unlocked?ach.color+"88":S.border}`,
-                    padding:"14px",textAlign:"center",background:unlocked?"#ffffff08":"#00000044",
-                    opacity:unlocked?1:0.5,transition:"all 0.3s",borderRadius:"10px"}}>
-                    <div style={{display:"flex",justifyContent:"center",marginBottom:"8px"}}>
-                      <Icon icon={ach.icon} color={unlocked?ach.color:"#444"} size={4} badge={true}/>
-                    </div>
-                    <div style={{fontSize:"15px",fontWeight:"700",color:unlocked?ach.color:S.textMuted,marginBottom:"4px",lineHeight:"1.4"}}>
-                      {ach[lang]||ach.fi}
-                    </div>
-                    <div style={{fontSize:"13px",color:unlocked?(S.textSoft||"#88ccaa"):S.textMuted,lineHeight:"1.4"}}>
-                      {ach[lang+"_d"]||ach.fi_d}
-                    </div>
-                    {unlocked&&<div style={{fontSize:"13px",color:S.textMuted,marginTop:"4px"}}>
-                      {new Date(achUnlocked[id]).toLocaleDateString()}
-                    </div>}
-                  </div>
-                );
-              })}
-            </div>
-            {/* Stats summary */}
-            <div style={{marginTop:"20px",padding:"14px",border:`1px solid ${S.border}`,fontSize:"14px",color:S.textSoft||"#88ccaa",
-              display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",borderRadius:"8px"}}>
-              <div>{lang==="en"?"Words found":lang==="sv"?"Ord hittade":"Sanoja löydetty"}: <strong>{achStats.totalWords}</strong></div>
-              <div>{lang==="en"?"Games played":lang==="sv"?"Spel spelade":"Pelejä pelattu"}: <strong>{achStats.gamesPlayed}</strong></div>
-              <div>{lang==="en"?"Best score":lang==="sv"?"Bästa poäng":"Paras tulos"}: <strong>{achStats.bestScore}</strong></div>
-              <div>{lang==="en"?"Best combo":lang==="sv"?"Bästa kombo":"Paras kombo"}: <strong>{achStats.bestCombo}</strong></div>
-              <div>{lang==="en"?"Longest word":lang==="sv"?"Längsta ord":"Pisin sana"}: <strong>{achStats.longestWord}</strong> {lang==="en"?"letters":lang==="sv"?"bokstäver":"kirjainta"}</div>
-              <div>{lang==="en"?"Multiplayer wins":lang==="sv"?"Flerspelarvinster":"Moninpelivoitot"}: <strong>{achStats.arenaWins}</strong></div>
-            </div>
-          </div>
-        </div>
+        <AchievementsModal
+          S={S}
+          lang={lang}
+          t={t}
+          Icon={Icon}
+          achievements={ACHIEVEMENTS}
+          achUnlocked={achUnlocked}
+          achStats={achStats}
+          onClose={()=>setShowAchievements(false)}
+        />
       )}
 
 
