@@ -92,7 +92,10 @@ export function HamburgerMenu({
           top: 0,
           left: 0,
           bottom: 0,
-          width: "260px",
+          // Skaalautuu viewport-leveyden mukaan: kapeilla mobiileilla menu on
+          // suhteessa kapeampi, leveämmillä se kasvaa, mutta maxissa 320px
+          // ettei se levitä koko leveydeltä isolla näytöllä.
+          width: "min(85vw, 320px)",
           background: `${S.dark}f8`,
           borderRight: `1px solid ${S.border}`,
           padding: "16px",
