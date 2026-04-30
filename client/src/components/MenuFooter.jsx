@@ -1,10 +1,10 @@
-// MenuFooter — alkuvalikon footer-blokki.
+// MenuFooter – alkuvalikon footer-blokki.
 //
 // Sisältää: saavutus- ja käyttäjänappi (yläpalkki), sanamäärä-info,
 // "Näin pelaat" + "Lue lisää sanoista" -linkit, versio, palaute/tietosuoja
 // -linkit, ja kielilippuvalitsin.
 //
-// Tämä on koottu visuaalinen komponentti — App.jsx antaa propseina
+// Tämä on koottu visuaalinen komponentti – App.jsx antaa propseina
 // kaikki tarvittavat tiedot ja callbackit, eikä komponentti tunne
 // sounds/socket/storage-yksityiskohtia.
 //
@@ -25,7 +25,7 @@
 //   onShowInflection
 //   onShowHelp
 //   onShowWordInfo
-//   onLangChange(code)  — vaihtaa kielen ja persistoi
+//   onLangChange(code)  – vaihtaa kielen ja persistoi
 
 const TEXTS = {
   fi: {

@@ -1,4 +1,4 @@
-// words.js — kielikohtaiset sanavarastot, triet ja täyssanaston binäärihaku.
+// words.js – kielikohtaiset sanavarastot, triet ja täyssanaston binäärihaku.
 //
 // Pitää sisäisen LANGS-objektin: jokaiselle kielelle sana-Set + trie +
 // kirjaintaajuudet. Tarjoaa myös FULL_WORDS_BUF-puskurin pidempien

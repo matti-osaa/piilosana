@@ -12,7 +12,7 @@
 //   - Insertoi kaikki rivit hall_of_fame, daily_scores, users -tauluista
 //   - Tarkistaa rivimäärät onnistumisen merkiksi
 //
-// Skripti on idempotent — jos ajat sen kahdesti, daily_scores käyttää
+// Skripti on idempotent – jos ajat sen kahdesti, daily_scores käyttää
 // ON CONFLICT DO NOTHING:ia, joten rivit eivät duplikoidu.
 // hall_of_fame ja users ovat kuitenkin INSERT -only, joten varo: jos
 // ajat sen kahdesti, hall_of_fame -taulu duplikoituu. Tyhjennä se

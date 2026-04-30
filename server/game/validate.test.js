@@ -21,7 +21,7 @@ describe("findWords (square)", () => {
       ["a", "a", "a"],
       ["a", "a", "a"],
     ];
-    // Sana "aaaaaaaaaa" tarvitsisi 10 a:ta — gridissä on vain 9
+    // Sana "aaaaaaaaaa" tarvitsisi 10 a:ta – gridissä on vain 9
     const trie = buildTrie(["aaaaaaaaaa"]);
     const found = findWords(grid, trie);
     expect(found.has("aaaaaaaaaa")).toBe(false);

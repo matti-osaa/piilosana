@@ -3,11 +3,11 @@
 // alivalikkokomponenteissa (DailyHero, MultiplayerHero, jne).
 //
 // Värit on valittu niin että ne pysyvät yhtenäisinä eri teemoista riippumatta
-// — tämä paletti EI muutu kun käyttäjä vaihtaa pelin värimaailmaa, koska
+// – tämä paletti EI muutu kun käyttäjä vaihtaa pelin värimaailmaa, koska
 // alkuvalikon pitää olla visuaalisesti vakaa.
 
 export const menuColors = {
-  // Päivän Piilosana — hero
+  // Päivän Piilosana – hero
   dailyBg: "linear-gradient(135deg,#49634d,#3f5744)",
   dailyBorder: "#7f8a4b",
   dailyText: "#fff8ec",

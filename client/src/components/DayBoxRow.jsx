@@ -1,4 +1,4 @@
-// DayBoxRow — alkuvalikon "Eilinen + Huominen" -rivi.
+// DayBoxRow – alkuvalikon "Eilinen + Huominen" -rivi.
 //
 // Visuaalinen komponentti, joka renderöi rinnakkain kaksi pientä päivä-
 // laatikkoa: pelattavissa oleva eilinen (vihreä) ja lukittu huominen (beige).
@@ -13,8 +13,8 @@
 //             - result: { score, ... } tai null jos ei pelattu
 //             - onClick: klikkauskäsittelijä (avaa historia tai aloittaa)
 //             - JOS past on null, eilinen-laatikkoa ei renderöidä
-//               (käytä silloin kun arena ei ulotu eiliseen — esim. päivä 0 tai 1)
-//   future  { dateLabel } — pakollinen, näytetään aina lukittuna
+//               (käytä silloin kun arena ei ulotu eiliseen – esim. päivä 0 tai 1)
+//   future  { dateLabel } – pakollinen, näytetään aina lukittuna
 //
 // Käyttäytymissäännöt:
 //   - Eilinen-laatikko on klikattava: aloita peli tai avaa tulokset
@@ -32,10 +32,10 @@ export function DayBoxRow({ S, past, future }) {
         marginBottom: "12px",
       }}
     >
-      {/* Eilinen — pelattavissa, jos olemassa */}
+      {/* Eilinen – pelattavissa, jos olemassa */}
       {past && <PastBox S={S} {...past} />}
 
-      {/* Huominen — aina lukittu */}
+      {/* Huominen – aina lukittu */}
       <FutureBox S={S} dateLabel={future.dateLabel} />
     </div>
   );

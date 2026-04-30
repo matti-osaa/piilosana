@@ -1,4 +1,4 @@
-// Pisteytys — kuinka paljon pisteitä sana antaa pituutensa perusteella.
+// Pisteytys – kuinka paljon pisteitä sana antaa pituutensa perusteella.
 //
 // Kaava on yksinkertainen: 3 kirjainta = 1 p, 4 = 2 p, 5 = 4 p, 6 = 6 p,
 // 7 = 10 p, 8+ = 14 p. Pisteet kasvavat eksponentiaalisesti, jotta

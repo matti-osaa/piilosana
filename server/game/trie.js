@@ -1,4 +1,4 @@
-// Trie — sanaston nopea hakurakenne pelilogiikkaa varten.
+// Trie – sanaston nopea hakurakenne pelilogiikkaa varten.
 //
 // Pieni TrieNode + buildTrie. Käytetään ruudukon sanan etsintään
 // (findWords/Hex), missä DFS kävelee solmuja ja katkaisee aikaisin

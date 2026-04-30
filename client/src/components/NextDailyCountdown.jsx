@@ -1,6 +1,6 @@
-// NextDailyCountdown — pieni laskuri alkuvalikon Daily-kortin alla.
+// NextDailyCountdown – pieni laskuri alkuvalikon Daily-kortin alla.
 //
-// Näkyy vain kun pelaaja on jo pelannut tämän päivän haasteen — ei ole
+// Näkyy vain kun pelaaja on jo pelannut tämän päivän haasteen – ei ole
 // järkevää näyttää "seuraava haaste 14 t" jos pelaaja ei ole vielä
 // pelannut tätäkään.
 //
@@ -8,7 +8,7 @@
 //
 // Props:
 //   S, lang   konteksti
-//   isPlayed  boolean — onko Päivän Piilosana jo pelattu
+//   isPlayed  boolean – onko Päivän Piilosana jo pelattu
 
 import { useEffect, useState } from "react";
 

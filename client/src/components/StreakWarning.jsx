@@ -1,11 +1,11 @@
-// StreakWarning — pieni lämmin "putki vaarassa" -muistutus alkuvalikossa.
+// StreakWarning – pieni lämmin "putki vaarassa" -muistutus alkuvalikossa.
 //
 // Näkyy vain kun pelaajalla on aktiivinen streak (>= 1) ja hän ei ole
 // vielä pelannut tämän päivän haastetta. Tarkoitus: motivoida palaamaan
 // ja säilyttämään putki, ilman aggressiivista painostusta.
 //
 // Sijainti: Daily-kortin yläpuolella, joten pelaaja näkee sen heti
-// avatessaan sivun. Klikkaaminen ei tee mitään — käyttäjä klikkaa
+// avatessaan sivun. Klikkaaminen ei tee mitään – käyttäjä klikkaa
 // itse Daily-korttia.
 //
 // Props:
@@ -15,8 +15,8 @@
 
 const TEXTS = {
   fi: {
-    label: (n) => `${n} päivän putki — pelaa tänään säilyttääksesi sen`,
-    starting: "Aloita putki — pelaa tänään",
+    label: (n) => `${n} päivän putki – pelaa tänään säilyttääksesi sen`,
+    starting: "Aloita putki – pelaa tänään",
   },
   sv: {
     label: (n) => `${n} dagars svit — spela idag för att behålla den`,

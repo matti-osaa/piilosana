@@ -1,4 +1,4 @@
-// DailyHeroCard — alkuvalikon "Päivän Piilosana" -hero.
+// DailyHeroCard – alkuvalikon "Päivän Piilosana" -hero.
 //
 // Pelin jälkeen näytetään pisteet + percentile-tieri (väri + lyhyt teksti).
 // Tier-määrittelyt ja käännökset tulevat hooks/useDailyPercentile-moduulista,

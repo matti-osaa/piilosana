@@ -1,4 +1,4 @@
-// MenuButton — yleinen alkuvalikon CTA-nappi.
+// MenuButton – yleinen alkuvalikon CTA-nappi.
 //
 // Käytetään HARJOITTELU-, OMA MONINPELI- ja PIKAOHJE-napeissa. Kaikilla
 // on sama hover- ja varjokäyttäytyminen, vain värit, koko ja sisältö
@@ -17,7 +17,7 @@
 //   label      pääteksti (lihava)
 //   subLabel   valinnainen pienempi teksti label-rivin alla (vain isossa)
 //   icon       valinnainen merkki/ikoni vasemmalla (vain kompaktissa)
-//   compact    boolean — käytetäänkö pientä versiota
+//   compact    boolean – käytetäänkö pientä versiota
 //   onClick    klikkauskäsittelijä
 
 import { menuColors } from "../menuColors.js";

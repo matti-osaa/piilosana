@@ -1,4 +1,4 @@
-// socketHandlers.js — Socket.IO connection-handler ja kaikkien tapahtumien
+// socketHandlers.js – Socket.IO connection-handler ja kaikkien tapahtumien
 // rekisteröinti. Logiikka itse asuu publicArena.js:ssä ja rooms.js:ssä;
 // tämä tiedosto vain bindaa eventit ja delegoi.
 //

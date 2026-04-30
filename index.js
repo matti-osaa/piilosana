@@ -29,7 +29,7 @@ function makeGrid(lang = 'fi', rows = GRID_SIZE, cols) {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// App version — changes on every deploy (server restart)
+// App version – changes on every deploy (server restart)
 const APP_VERSION = Date.now().toString(36);
 console.log(`App version: ${APP_VERSION}`);
 
@@ -107,7 +107,7 @@ function generateGoodGrid(lang = 'fi', hex = false) {
 }
 
 // ============================================================================
-// REALTIME — public arena + private rooms + socket handlers (moduulit)
+// REALTIME – public arena + private rooms + socket handlers (moduulit)
 // ============================================================================
 
 const arena = createPublicArenaManager({ io, generateGoodGrid });
@@ -122,24 +122,24 @@ attachSocketHandlers(io, {
 
 
 // ============================================================================
-// HTTP ROUTES — staattiset/perus reitit ovat moduulissa server/routes/static.js
+// HTTP ROUTES – staattiset/perus reitit ovat moduulissa server/routes/static.js
 // ============================================================================
 
-// isShuttingDown — graceful shutdown asettaa tämän true:ksi, /ready palauttaa 503
+// isShuttingDown – graceful shutdown asettaa tämän true:ksi, /ready palauttaa 503
 let isShuttingDown = false;
 
 
 
 // ============================================================================
-// AUTH / ACCOUNT — alustetaan integrointiriippuvuudet, reitit ovat moduuleissa
+// AUTH / ACCOUNT – alustetaan integrointiriippuvuudet, reitit ovat moduuleissa
 // (server/routes/auth.js ja server/routes/account.js).
 // ============================================================================
 
-// Resend (sähköposti) — RESEND_API_KEY env-muuttujasta. Jos puuttuu, jätetään null
+// Resend (sähköposti) – RESEND_API_KEY env-muuttujasta. Jos puuttuu, jätetään null
 // ja salasanan nollaus & tervetuloa-meilit menevät hiljaisesti pois käytöstä.
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-// Google OAuth — GOOGLE_CLIENT_ID env-muuttujasta
+// Google OAuth – GOOGLE_CLIENT_ID env-muuttujasta
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
 
@@ -164,7 +164,7 @@ attachAuthRoutes(app, {
   googleClientId: GOOGLE_CLIENT_ID,
 });
 attachAccountRoutes(app);
-// SPA catch-all — TÄYTYY olla viimeisenä kaikkien muiden reittien jälkeen
+// SPA catch-all – TÄYTYY olla viimeisenä kaikkien muiden reittien jälkeen
 attachSpaCatchAll(app, join(__dirname, 'dist'));
 
 
@@ -198,7 +198,7 @@ function gracefulShutdown(signal) {
     console.error('Failed to emit server_draining:', e);
   }
 
-  // Pakotettu timeout — jos kaikki ei ehtinyt, lopetetaan kuitenkin
+  // Pakotettu timeout – jos kaikki ei ehtinyt, lopetetaan kuitenkin
   const forceTimer = setTimeout(() => {
     console.log('Graceful shutdown timed out, forcing exit');
     process.exit(1);

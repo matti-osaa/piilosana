@@ -1,4 +1,4 @@
-// HamburgerMenu — vasemmalta liukuva sivumenu, joka avautuu hampurilais-
+// HamburgerMenu – vasemmalta liukuva sivumenu, joka avautuu hampurilais-
 // painikkeesta peliruudussa.
 //
 // Sisältää: Sound on/off, Music on/off + musiikkivalitsin, teemavalinta,
@@ -11,13 +11,13 @@
 //
 // Props (data):
 //   S, t, lang, Icon              konteksti
-//   sound                          boolean — ääni päällä
-//   music                          boolean — musiikki päällä
-//   musicTrack                     number — valitun raidan indeksi
+//   sound                          boolean – ääni päällä
+//   music                          boolean – musiikki päällä
+//   musicTrack                     number – valitun raidan indeksi
 //   musicTracks                    [{ id, name, nameFi }]
-//   theme                          string — valitun teeman id
+//   theme                          string – valitun teeman id
 //   themes                         { id: { bg, border, green, cell, name, nameEn, nameSv } }
-//   size                           string — "normal" | "large"
+//   size                           string – "normal" | "large"
 //   confetti                       boolean
 //   muteEmojis                     boolean
 //
@@ -281,7 +281,7 @@ export function HamburgerMenu({
           onClick={onConfettiToggle}
         />
 
-        {/* Share — multi/public only */}
+        {/* Share – multi/public only */}
         {inMultiplayer && (
           <ActionRow
             S={S}
@@ -291,7 +291,7 @@ export function HamburgerMenu({
           />
         )}
 
-        {/* Mute emojis — multi only */}
+        {/* Mute emojis – multi only */}
         {inMultiplayer && (
           <ToggleRow
             S={S}
@@ -306,7 +306,7 @@ export function HamburgerMenu({
 
         <Divider color={S.border} margin="4px 0" />
 
-        {/* Exit — only when in a mode */}
+        {/* Exit – only when in a mode */}
         {hasMode && (
           <div
             onClick={onExit}

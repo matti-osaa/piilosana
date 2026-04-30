@@ -1,4 +1,4 @@
-// FirstTimeWelcome — tervetulobanneri ensikertalaisille.
+// FirstTimeWelcome – tervetulobanneri ensikertalaisille.
 //
 // Näkyy alkuvalikossa kun pelaaja ei ole vielä pelannut yhtään peliä
 // loppuun (achStats.gamesPlayed === 0). Selittää pelin idean yhdellä
@@ -12,7 +12,7 @@
 //
 // Props:
 //   S, lang
-//   isFirstTime    boolean — onko pelaaja ensikertalainen
+//   isFirstTime    boolean – onko pelaaja ensikertalainen
 //   onTryPractice  klikkauskäsittelijä (avaa harjoittelun asetukset)
 
 const TEXTS = {
@@ -20,7 +20,7 @@ const TEXTS = {
     title: "Tervetuloa Piilosanaan!",
     body: "Vedä sormi kirjainten yli ja etsi sanoja. Mitä pidempi sana, sitä enemmän pisteitä.",
     cta: "Aloita harjoittelulla",
-    hint: "Päivän haaste on alla — se on yksi yritys per päivä, joten kokeile peliä ensin tästä.",
+    hint: "Päivän haaste on alla – se on yksi yritys per päivä, joten kokeile peliä ensin tästä.",
   },
   sv: {
     title: "Välkommen till Piilosana!",

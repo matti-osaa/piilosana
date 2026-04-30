@@ -1,14 +1,14 @@
-// DailyEndResult — pelin päättymisen jälkeen näkyvä tulosbanneri kun
+// DailyEndResult – pelin päättymisen jälkeen näkyvä tulosbanneri kun
 // pelaaja juuri lopetti päivän haasteen.
 //
 // Pieni keltainen banneri jossa näkyy päivä, pisteet, percentile-leima
 // ja jaa-nappi. Tämä on emotionaalisesti merkittävin paikka näyttää
-// tier-leima — pelaaja juuri sai tuloksensa ja näkee heti missä meni.
+// tier-leima – pelaaja juuri sai tuloksensa ja näkee heti missä meni.
 //
 // Props:
 //   S, t, lang
 //   dateStr        "YYYY-MM-DD" (käytetään percentile-haussa)
-//   dateLabel      { weekday, short, ... } — vanhemman dateLabel-tulos
+//   dateLabel      { weekday, short, ... } – vanhemman dateLabel-tulos
 //   result         { score, wordsFound, totalWords }
 //   onShare        klikkaus jaa-napille
 //   shareMsg       "Kopioitu!"-tyyppinen status tai tyhjä → näyttää default

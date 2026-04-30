@@ -1,4 +1,4 @@
-// Grid — ruudukon generointi annetuilla kirjaintaajuuksilla.
+// Grid – ruudukon generointi annetuilla kirjaintaajuuksilla.
 //
 // Vakiot pelitiloille (square 5×5, hex 7×5).
 // randLetter ja makeGrid ottavat valinnaisen rng-argumentin, jotta testit

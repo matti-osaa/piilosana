@@ -1,4 +1,4 @@
-// Auth-reitit — rekisteröinti, kirjautuminen, salasanan nollaus & vaihto,
+// Auth-reitit – rekisteröinti, kirjautuminen, salasanan nollaus & vaihto,
 // Google Sign-In. Riippuu user-helpeistä db.js:stä jotta tukee sekä sql.js:ää
 // että Postgresia ilman raakoja kyselyitä.
 //
@@ -44,7 +44,7 @@ export function attachAuthRoutes(app, ctx = {}) {
   const { resend = null, googleClient = null, googleClientId = null } = ctx;
   const fromAddr = ctx.resendFrom || process.env.RESEND_FROM || DEFAULT_FROM;
 
-  // Rate limiter — sama 20 pyyntöä / 15 min / IP kuin ennen
+  // Rate limiter – sama 20 pyyntöä / 15 min / IP kuin ennen
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 20,
@@ -87,7 +87,7 @@ export function attachAuthRoutes(app, ctx = {}) {
           await resend.emails.send({
             from: fromAddr,
             to: safeEmail,
-            subject: "Piilosana — tunnuksesi",
+            subject: "Piilosana – tunnuksesi",
             html: `
               <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
                 <h2 style="color:#ffcc00;">Tervetuloa Piilosanaan!</h2>
@@ -130,7 +130,7 @@ export function attachAuthRoutes(app, ctx = {}) {
     }
   });
 
-  // Salasanan unohtaminen — generoi uusi ja lähetä sähköpostiin
+  // Salasanan unohtaminen – generoi uusi ja lähetä sähköpostiin
   app.post("/api/forgot-password", async (req, res) => {
     try {
       const { email } = req.body;
@@ -157,7 +157,7 @@ export function attachAuthRoutes(app, ctx = {}) {
       await resend.emails.send({
         from: fromAddr,
         to: user.email,
-        subject: "Piilosana — uusi salasana",
+        subject: "Piilosana – uusi salasana",
         html: `
           <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
             <h2 style="color:#ffcc00;">Uusi salasana</h2>
@@ -198,7 +198,7 @@ export function attachAuthRoutes(app, ctx = {}) {
           await resend.emails.send({
             from: fromAddr,
             to: user.email,
-            subject: "Piilosana — salasana vaihdettu",
+            subject: "Piilosana – salasana vaihdettu",
             html: `
               <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
                 <h2 style="color:#ffcc00;">Salasana vaihdettu</h2>

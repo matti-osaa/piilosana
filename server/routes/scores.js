@@ -1,4 +1,4 @@
-// Scores-reitit — Hall of Fame ja päivän tuloslista (REST).
+// Scores-reitit – Hall of Fame ja päivän tuloslista (REST).
 //
 // Riippuu vain db.js:n queryista ja words.js:n LANGS-tiedosta.
 // Wire up index.js:ssä:  attachScoresRoutes(app);

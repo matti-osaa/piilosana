@@ -1,4 +1,4 @@
-// Static-reitit — palvelimen perusinfra: root, health, ready, privacy ja
+// Static-reitit – palvelimen perusinfra: root, health, ready, privacy ja
 // SPA-catch-all. Health/ready ovat erillisiä:
 //   /health  = liveness (vastaa aina kun prosessi pyörii)
 //   /ready   = readiness (503 kun draining-tilassa)
@@ -19,17 +19,17 @@ import { join } from "node:path";
 export function attachStaticRoutes(app, ctx) {
   const { getRoomsCount, isShuttingDown } = ctx;
 
-  // Root — sanity-check että API on pystyssä
+  // Root – sanity-check että API on pystyssä
   app.get("/", (req, res) => {
     res.json({ status: "ok", message: "Piilosana multiplayer server" });
   });
 
-  // Liveness — Railway erottaa tämän avulla kuolleen prosessin
+  // Liveness – Railway erottaa tämän avulla kuolleen prosessin
   app.get("/health", (req, res) => {
     res.json({ status: "ok", rooms: getRoomsCount() });
   });
 
-  // Readiness — 503 kun palvelin on sammumassa (load balancer ohjaa muualle)
+  // Readiness – 503 kun palvelin on sammumassa (load balancer ohjaa muualle)
   app.get("/ready", (req, res) => {
     if (isShuttingDown()) {
       res.status(503).json({ status: "draining" });
@@ -38,7 +38,7 @@ export function attachStaticRoutes(app, ctx) {
     }
   });
 
-  // Tietosuojaseloste — staattinen HTML
+  // Tietosuojaseloste – staattinen HTML
   app.get("/privacy", (req, res) => {
     res.send(privacyHtml());
   });
@@ -58,7 +58,7 @@ function privacyHtml() {
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Piilosana — Tietosuojaseloste / Privacy Policy</title>
+<title>Piilosana – Tietosuojaseloste / Privacy Policy</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:#0a0a1a;color:#88ccaa;font-family:'Courier New',monospace;padding:24px;max-width:700px;margin:0 auto;line-height:1.8;}
@@ -70,7 +70,7 @@ a{color:#00ff88;}
 </style>
 </head>
 <body>
-<h1>Piilosana — Tietosuojaseloste</h1>
+<h1>Piilosana – Tietosuojaseloste</h1>
 <span class="lang"><a href="#fi">Suomeksi</a> | <a href="#en">In English</a></span>
 
 <div id="fi">

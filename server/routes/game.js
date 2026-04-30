@@ -1,4 +1,4 @@
-// Game-aiheiset reitit — version, public-game, arena-count, sananvalidointi.
+// Game-aiheiset reitit – version, public-game, arena-count, sananvalidointi.
 //
 // Osa toimivuudesta riippuu in-process tilasta (publicGames Map) joka on
 // edelleen index.js:n hallussa. Annetaan se ctx-objektin kautta että
@@ -18,7 +18,7 @@ import { FULL_WORDS_BUF, hasWordInBuf, getLang } from "../words.js";
 export function attachGameRoutes(app, ctx) {
   const { appVersion, googleClientId, getPublicGame, publicGames, findLongWordsOnGrid } = ctx;
 
-  // Etsi pitkät sanat (11+ kirjainta) annetulta hex-gridiltä — solo modea varten
+  // Etsi pitkät sanat (11+ kirjainta) annetulta hex-gridiltä – solo modea varten
   app.post("/api/find-long-words", (req, res) => {
     const { grid, hex } = req.body;
     if (!grid || !Array.isArray(grid) || !FULL_WORDS_BUF) {
@@ -46,7 +46,7 @@ export function attachGameRoutes(app, ctx) {
     return res.json({ valid: hasWordInBuf(FULL_WORDS_BUF, w) });
   });
 
-  // App-versio — clientit pollaavat tätä havaitakseen deployt
+  // App-versio – clientit pollaavat tätä havaitakseen deployt
   app.get("/api/version", (req, res) => {
     res.json({ version: appVersion });
   });

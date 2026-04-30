@@ -1,8 +1,8 @@
-// rooms.js — Yksityiset moninpelihuoneet (4-merkkinen koodi).
+// rooms.js – Yksityiset moninpelihuoneet (4-merkkinen koodi).
 //
 // Manageri pitää huolta huoneista (Map: roomCode -> room) ja siitä missä
 // huoneessa kukin socket on (Map: socketId -> roomCode). Ei sisällä socket.on-
-// kuuntelijoita — ne elävät socketHandlers.js:ssä.
+// kuuntelijoita – ne elävät socketHandlers.js:ssä.
 //
 // Käyttö:
 //   const roomMgr = createRoomManager({ io, getLang });
@@ -451,7 +451,7 @@ export function createRoomManager({ io, getLang = defaultGetLang }) {
     socket.leave(roomCode);
   }
 
-  // Apuri emoji-reactionia varten — palauttaa { roomCode, nickname } tai null
+  // Apuri emoji-reactionia varten – palauttaa { roomCode, nickname } tai null
   function getPlayerForEmoji(socketId) {
     const roomCode = playerRooms.get(socketId);
     if (!roomCode || !rooms.has(roomCode)) return null;

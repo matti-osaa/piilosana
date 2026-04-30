@@ -1,4 +1,4 @@
-// ResultsScreen — moninpelin tulosnäkymä pelin jälkeen.
+// ResultsScreen – moninpelin tulosnäkymä pelin jälkeen.
 //
 // Näyttää: voitto/häviö-banneri, ranking (top 5), löydetyt sanat (battle vs.
 // classic eri tavalla), missatut sanat (vain classic), ja toiminta-
@@ -9,13 +9,13 @@
 //
 // Props (data):
 //   S, t                           teema + käännökset
-//   isWinner                       boolean — päihitin kaikki
+//   isWinner                       boolean – päihitin kaikki
 //   myRank                         oma sija (0 = 1.)
 //   isHost                         saanko aloittaa uuden pelin
 //   gameMode                       "classic" | "battle" | ...
 //   multiRankings                  [{ playerId, nickname, score, wordsFound }]
 //   multiAllFoundWords             { [playerId]: ["kissa", ...] }
-//   multiValidWords                [...] — kaikki sanat ruudukosta (classic)
+//   multiValidWords                [...] – kaikki sanat ruudukosta (classic)
 //   playerId                       oma id (rankingin korostus)
 //   wordColor(length)              funktio joka palauttaa värin pituuden mukaan
 //   DEFS                           sanaston mahdolliset määritelmät
@@ -101,7 +101,7 @@ export function ResultsScreen({
           {t.results}
         </p>
 
-        {/* Ranking — top 5 */}
+        {/* Ranking – top 5 */}
         {multiRankings &&
           multiRankings.slice(0, 5).map((p, i) => {
             const medals = ["🥇", "🥈", "🥉"];

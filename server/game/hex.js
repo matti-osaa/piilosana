@@ -1,4 +1,4 @@
-// Hex-ruudukon naapuruus — pelin pidemmissä tiloissa käytettävä geometria.
+// Hex-ruudukon naapuruus – pelin pidemmissä tiloissa käytettävä geometria.
 //
 // Käytetään odd-r offset -kaavaa: parilliset rivit siirtyvät hieman
 // vasemmalle, parittomat oikealle. Jokainen solu kuuluu kuusikulmioon

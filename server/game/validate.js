@@ -1,4 +1,4 @@
-// Validate — sanan etsintä ja polun tarkistus ruudukolta.
+// Validate – sanan etsintä ja polun tarkistus ruudukolta.
 //
 // findWords/Hex käyvät trie:n kanssa kaikki polut ja keräävät kaikki
 // sanat jotka voi muodostaa naapurussolujen ketjuilla.

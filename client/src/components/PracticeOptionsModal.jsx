@@ -1,4 +1,4 @@
-// PracticeOptionsModal — kokoruudun overlay, jossa valitaan harjoittelun
+// PracticeOptionsModal – kokoruudun overlay, jossa valitaan harjoittelun
 // peliaika ja kirjainkertoimet ennen kuin yksinpeli alkaa.
 //
 // Vanhempi (App.jsx) hoitaa avaamisen/sulkemisen tilan ja peliasetukset
@@ -8,16 +8,16 @@
 // Props (data):
 //   S         aktiivinen teema
 //   t         käännösten kantaobjekti
-//   lang      "fi" | "sv" | "en" — kirjoitusasun fix (6,7 vs 6.7)
+//   lang      "fi" | "sv" | "en" – kirjoitusasun fix (6,7 vs 6.7)
 //   Icon      teeman mukainen ikoni-komponentti
 //   gameTime  120 | 402 | 0  (sekuntia; 0 = rajaton)
-//   letterMult boolean — onko kirjainkertoimet päällä
+//   letterMult boolean – onko kirjainkertoimet päällä
 //
 // Props (callbacks):
 //   onGameTimeChange(seconds)
 //   onLetterMultToggle()
-//   onStart()   — käynnistää pelin (App.jsx hoitaa start + sulje)
-//   onClose()   — sulje overlay
+//   onStart()   – käynnistää pelin (App.jsx hoitaa start + sulje)
+//   onClose()   – sulje overlay
 
 export function PracticeOptionsModal({
   S,

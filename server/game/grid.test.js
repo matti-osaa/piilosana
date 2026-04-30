@@ -22,7 +22,7 @@ describe("randLetter", () => {
     expect(randLetter(FAKE_WEIGHTS, () => 0.99)).toBe("c");
   });
 
-  it("respektoi painoja — isompi paino tulee useammin", () => {
+  it("respektoi painoja – isompi paino tulee useammin", () => {
     const heavy = { a: 99, b: 1 };
     let aCount = 0;
     const rng = seq([0.1, 0.3, 0.5, 0.7, 0.9, 0.99]);

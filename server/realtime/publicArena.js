@@ -1,4 +1,4 @@
-// publicArena.js — Public arenan tilakone (per-kieli) ja siihen liittyvät
+// publicArena.js – Public arenan tilakone (per-kieli) ja siihen liittyvät
 // socket-emit-helpperit. Yksi instanssi per kieli (fi/en/sv), aina käynnissä,
 // oma 2 min kierros + 30 s tauko silmukassa.
 //
@@ -8,8 +8,8 @@
 //   const pg = arena.get('fi');
 //
 // Riippuvuudet:
-//   - io                 — Socket.IO server (broadcastia varten)
-//   - generateGoodGrid   — (lang, hex) => { grid, validWords }; injektoitu
+//   - io                 – Socket.IO server (broadcastia varten)
+//   - generateGoodGrid   – (lang, hex) => { grid, validWords }; injektoitu
 //                          jotta arenan testaus ei vaadi hex-grid-koodia
 //
 // Socket-handlerit (join_public, public_word_found, leave_public)
@@ -297,7 +297,7 @@ export function createPublicArenaManager({ io, generateGoodGrid }) {
     return lang;
   }
 
-  // Apuri emoji-reactionia varten — palauttaa { lang, nickname } tai null
+  // Apuri emoji-reactionia varten – palauttaa { lang, nickname } tai null
   function getPlayerForEmoji(socketId) {
     const lang = playerLang.get(socketId);
     if (!lang) return null;

@@ -1,4 +1,4 @@
-// Account-reitit — kirjautuneen käyttäjän omat tiedot ja tallennetut data.
+// Account-reitit – kirjautuneen käyttäjän omat tiedot ja tallennetut data.
 //
 // Kaikki reitit autentikoivat pyynnön nimimerkillä + salasanalla
 // (clientillä on ne sessiossa). Käyttävät user-helppejä db.js:stä,

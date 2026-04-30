@@ -141,7 +141,7 @@ function getDailyTheme(dateStr,lang){
 }
 
 // Count how many theme words (or their inflections) are findable in a hex grid.
-// Käyttää prefiksi-matchausta — jos teemasana on "kissa", taivutukset
+// Käyttää prefiksi-matchausta – jos teemasana on "kissa", taivutukset
 // "kissan", "kissoja", "kissalla" lasketaan myös. Stem-pituus = 4 tai
 // sanan koko pituus jos lyhyempi (esim. "puu" → "puu", löytää "puuta").
 function countThemeWords(foundWords,theme){
@@ -298,7 +298,7 @@ function scrambleArea(grid,centerR,centerC,radius,lang){
 // UI translations
 const T={
   fi:{
-    selectMode:"VALITSE PELIMUOTO",arena:"MONINPELI",arenaDesc:"24/7 nonstop-moninpeli",arenaCta:"ETSI SANOJA",arenaWelcome:"Tervetuloa — liity peliin!",customGame:"OMA MONINPELI",customDesc:"kutsu kavereita",practice:"HARJOITTELU",practiceDesc:"yksinpeli",
+    selectMode:"VALITSE PELIMUOTO",arena:"MONINPELI",arenaDesc:"24/7 nonstop-moninpeli",arenaCta:"ETSI SANOJA",arenaWelcome:"Tervetuloa – liity peliin!",customGame:"OMA MONINPELI",customDesc:"kutsu kavereita",practice:"HARJOITTELU",practiceDesc:"yksinpeli",
     findWords:"Etsi sanoja ruudukosta!",dragHint:"VEDÄ kirjaimien yli kaikkiin suuntiin. Aikaa 2 min.",comboHint:"Löydä sanoja nopeasti putkeen = kombo ja lisäpisteet!",
     scoring:"PISTEYTYS: 3kir=1p · 4=2p · 5=4p · 6=6p · 7=10p",comboScoring:"KOMBO x2 (3+) · KOMBO x3 (5+)",words:"sanaa",
     nickname:"NIMIMERKKI",join:"LIITY",back:"TAKAISIN",exit:"POISTU",play:"PELAA",
@@ -312,12 +312,12 @@ const T={
     letterMult:"PISTEYTYS",letterMultBtn:"KIRJAINARVOT",letterMultDesc:"Harvinaiset kirjaimet = enemmän pisteitä! (D,Ö=7 V,J,H,Y,P,U=4 ...)",
     otherOptions:"MUUT VALINNAT",nickForHof:"NIMIMERKKI (ennätystauluun)",optional:"VAPAAEHTOINEN",scoresSaved:"Pisteesi tallennetaan nimellä",
     modeNormal:"NORMAALI",modeTetris:"PUDOTUS",tetrisDesc:"Löydetyt kirjaimet katoavat ja uudet tippuvat ylhäältä!",
-    modeRotate:"PYÖRITYS",rotateDesc:"Raahaa reunoilta pyörittääksesi rivejä ja sarakkeita — kuin kuutiota! Löydä uusia sanoja.",rotateStarts:"PYÖRITYS ALKAA",rotateLabel:"PYÖRITYS",
+    modeRotate:"PYÖRITYS",rotateDesc:"Raahaa reunoilta pyörittääksesi rivejä ja sarakkeita – kuin kuutiota! Löydä uusia sanoja.",rotateStarts:"PYÖRITYS ALKAA",rotateLabel:"PYÖRITYS",
     modeTheme:"TEEMAT",themeDesc:"Löydä teemaan kuuluvia sanoja bonuspisteillä!",themeStarts:"TEEMAT ALKAA",themeLabel:"TEEMAT",themeBonus:"TEEMABONUS",themeHint:"Teema",
     modeBomb:"POMMI",bombDesc:"Käytä tikittävä kirjain sanassa ennen kuin se räjähtää!",bombStarts:"POMMI ALKAA",bombLabel:"POMMI",bombExploded:"POMMI RÄJÄHTI!",
     modeMystery:"MYSTEERI",mysteryDesc:"Piilotettu kirjain paljastuu kun löydät sanan sen kautta!",mysteryStarts:"MYSTEERI ALKAA",mysteryLabel:"MYSTEERI",mysteryRevealed:"PALJASTETTU!",
     modeChess:"SHAKKI",chessDesc:"Liikuta shakkinappulaa ja muodosta sanoja sen liikkeen mukaan!",chessLabel:"SHAKKI",chessSubmit:"VAHVISTA",chessSkip:"OHITA",chessNewPiece:"Uusi nappula:",chessInvalidMove:"Ei mahdollinen!",
-    modeHex:"HEKSA",hexDesc:"Kuusikulmaiset ruudut — 6 naapuria jokaisella! Uusia polkuja sanoille.",hexStarts:"HEKSA ALKAA",hexLabel:"HEKSA",
+    modeHex:"HEKSA",hexDesc:"Kuusikulmaiset ruudut – 6 naapuria jokaisella! Uusia polkuja sanoille.",hexStarts:"HEKSA ALKAA",hexLabel:"HEKSA",
     waiting:"ODOTETAAN PELAAJIA",playersCount:"PELAAJAT",youTag:"SINÄ",createGame:"LUO PELI",connecting:"YHDISTETÄÄN...",
     startGame:"ALOITA PELI",waitForPlayers:"Odota, että joku liittyy peliisi...",waitForHost:"Odota, että isäntä aloittaa pelin...",
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
@@ -335,24 +335,24 @@ const T={
     openGames:"AVOIMET PELIT",roomFull:"Huone on täynnä",gameInProgress:"Peli on jo käynnissä",roomNotFound:"Huonetta ei löydy",
     someoneBeatYou:"Joku ehti ensin!",tooShort:"Liian lyhyt",notInGrid:"Ei löydy ruudukosta",wrongMode:"Väärä moodi",gameNotRunning:"Peli ei käynnissä",
     achievements:"SAAVUTUKSET",achievementUnlocked:"Uusi saavutus!",locked:"Lukittu",
-    share:"JAA TULOS",shareCopied:"Kopioitu!",shareText:"Piilosana — löysin {words} sanaa ja sain {score} pistettä! Pääsetkö parempaan?",
+    share:"JAA TULOS",shareCopied:"Kopioitu!",shareText:"Piilosana – löysin {words} sanaa ja sain {score} pistettä! Pääsetkö parempaan?",
     options:"ASETUKSET",quickPlay:"PELAA",or:"tai",advancedOptions:"Lisävalinnat",
     readMoreWords:"Lue lisää sanoista",
     wordInfoTitle:"SANALISTASTA",
-    wordInfoBody1:"Sanalistassa on perusmuotoja, taivutuksia ja yhdyssanoja — yhteensä noin 138 000 sanaa.",
+    wordInfoBody1:"Sanalistassa on perusmuotoja, taivutuksia ja yhdyssanoja – yhteensä noin 138 000 sanaa.",
     wordInfoBody2:"Suomen kielelle sanoja on paljon, koska suomen rikas taivutusjärjestelmä tuottaa saman sanan monessa muodossa (esim. talo → taloa, talossa, talojen, taloihin...).",
     wordInfoBody3:"Sanalista perustuu Wiktionary-sanakirjaan (kaikki.org). Sanat ovat 3–7 kirjainta pitkiä.",
     wordInfoSources:"Lähteet",
-    wordInfoSourceFi:"Wiktionary (kaikki.org) — perusmuodot ja taivutukset, ~138 000 sanaa",
-    wordInfoSourceEn:"ENABLE — Enhanced North American Benchmark Lexicon (public domain)",
-    wordInfoSourceSv:"Wiktionary (kaikki.org) — grundformer och böjningar (CC-BY-SA)",
+    wordInfoSourceFi:"Wiktionary (kaikki.org) – perusmuodot ja taivutukset, ~138 000 sanaa",
+    wordInfoSourceEn:"ENABLE – Enhanced North American Benchmark Lexicon (public domain)",
+    wordInfoSourceSv:"Wiktionary (kaikki.org) – grundformer och böjningar (CC-BY-SA)",
     howToPlay:"Näin pelaat",
     helpDrag:"Vedä sormella tai hiirellä kirjainten yli muodostaaksesi sanoja. Voit liikkua kaikkiin suuntiin, myös vinottain.",
     helpTime:"Sinulla on 2 minuuttia aikaa löytää mahdollisimman monta sanaa.",
     helpScoring:"Pisteytys: 3 kirjainta = 1p · 4 = 2p · 5 = 4p · 6 = 6p · 7 = 10p · 8+ = 14p",
     helpCombo:"Löydä sanoja nopeasti peräkkäin → combo! 3+ peräkkäin = x2, 5+ = x3 pisteet.",
     helpMultiplier:"Kultaiset kirjaimet antavat 2× tai 3× pistekertoimen sanaan.",
-    helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto — suomeksi yli 90 000 sanaa ja niiden taivutusmuotoja, yhteensä yli 6 miljoonaa muotoa (3–15 kirjainta). Englanniksi ja ruotsiksi omat sanalistansa.",
+    helpLang:"Voit vaihtaa kieltä päävalikossa. Jokaisella kielellä on oma sanavarasto – suomeksi yli 90 000 sanaa ja niiden taivutusmuotoja, yhteensä yli 6 miljoonaa muotoa (3–15 kirjainta). Englanniksi ja ruotsiksi omat sanalistansa.",
     helpInflection:"Taivutusmuodot kelpaavat! Esim. sametti → sametin, samettia, samettiin, sametilla, sametteja, samettien… Kaikki suomen sijamuodot toimivat, joten kokeile rohkeasti eri päätteitä.",
     helpInflectionLink:"Katso kaikki taivutusmuodot →",
     helpDefs:"Klikkaa lyhyitä sanoja tulosnäkymässä nähdäksesi niiden merkityksen. Selitteet löytyvät 3-kirjaimisille sanoille.",
@@ -1215,7 +1215,7 @@ function WordPopup({text,color,x,y,font}){
 // ============================================
 const TUTORIAL_GRIDS={
   fi:{
-    // 4 rows × 5 cols — letters placed so paths spell real words
+    // 4 rows × 5 cols – letters placed so paths spell real words
     // sauna: (2,0)s → (1,0)a → (0,0)u → (0,1)n → (1,1)a
     // suo:   (3,2)s → (3,1)u → (2,1)o
     grid:[
@@ -2273,7 +2273,7 @@ function DailyPopup({dateStr,lang,t,S,myResult,onShare,dailyShareMsg,onClose}){
     <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"#000000cc",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"16px",animation:"fadeIn 0.2s ease"}} onClick={onClose}>
       <div style={{background:S.dark,border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.panelRadius,width:"100%",maxWidth:"400px",padding:"20px",boxShadow:`0 0 30px ${S.yellow||"#ffcc00"}22`,maxHeight:"80vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
         <div style={{textAlign:"center",marginBottom:"12px"}}>
-          <div style={{fontFamily:S.font,fontSize:"14px",color:S.yellow||"#ffcc00",fontWeight:"700",marginBottom:"4px",textTransform:"capitalize"}}>{t.daily} — {dl.full}</div>
+          <div style={{fontFamily:S.font,fontSize:"14px",color:S.yellow||"#ffcc00",fontWeight:"700",marginBottom:"4px",textTransform:"capitalize"}}>{t.daily} – {dl.full}</div>
         </div>
         {myResult&&(
           <div style={{textAlign:"center",marginBottom:"16px",padding:"12px",background:`${S.yellow||"#ffcc00"}11`,borderRadius:"10px",border:`1px solid ${S.yellow||"#ffcc00"}33`}}>
@@ -2996,7 +2996,7 @@ export default function Piilosana(){
     const streak=getDailyStreak(lang);
     const themeStr=dailyTheme?` (${dailyTheme.name})`:"";
     const text=`Sain ${dl.full} päivän piilosanassa${themeStr} ${dr.score} pistettä (${dr.wordsFound}/${dr.totalWords} sanaa)! Pystytkö parempaan?${streak.streak>1?` 🔥 ${streak.streak} päivää putkeen!`:""}\n\nPelaa: https://piilosana.com`;
-    if(navigator.share){navigator.share({title:`Päivän Piilosana — ${dl.full}`,text}).catch(()=>{});}
+    if(navigator.share){navigator.share({title:`Päivän Piilosana – ${dl.full}`,text}).catch(()=>{});}
     else{navigator.clipboard.writeText(text).then(()=>setDailyShareMsg(t.dailyCopied)).catch(()=>{});setTimeout(()=>setDailyShareMsg(null),2000);}
   },[t,lang,dailyDate,dailyTheme]);
 
@@ -3744,7 +3744,7 @@ export default function Piilosana(){
         }
         return prev;
       });
-      // Jos pelin aikana yhteys katkeaa, ilmoita ja palaa valikkoon — pelitila
+      // Jos pelin aikana yhteys katkeaa, ilmoita ja palaa valikkoon – pelitila
       // ei voi enää jatkua koska palvelin ei tunne meitä uudessa yhteydessä.
       const inPublicGame=mode==="public"&&(publicState==="playing"||publicState==="countdown");
       const inMultiGame=mode==="multi"&&(state==="play"||state==="countdown"||state==="ending");
@@ -3763,7 +3763,7 @@ export default function Piilosana(){
       const inGame=(mode==="public"&&publicState==="playing")||(mode==="multi"&&state==="play");
       if(inGame){
         setTimeout(()=>{
-          alert(lang==="en"?"Server is updating. The game will end — please try again in a moment.":lang==="sv"?"Servern uppdateras. Spelet avslutas — försök igen om en stund.":"Päivitys käynnissä — peli päättyy. Yritä hetken päästä uudelleen.");
+          alert(lang==="en"?"Server is updating. The game will end – please try again in a moment.":lang==="sv"?"Servern uppdateras. Spelet avslutas – försök igen om en stund.":"Päivitys käynnissä – peli päättyy. Yritä hetken päästä uudelleen.");
           returnToModeSelect();
         },100);
       }
@@ -4144,7 +4144,7 @@ export default function Piilosana(){
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
 
-      {/* Tervetulo­banneri — näkyy vain ensikertalaisille */}
+      {/* Tervetulo­banneri – näkyy vain ensikertalaisille */}
       <FirstTimeWelcome
         S={S}
         lang={lang}
@@ -4152,7 +4152,7 @@ export default function Piilosana(){
         onTryPractice={()=>setShowMenuOptions(true)}
       />
 
-      {/* Streak-varoitus — näkyy ennen Daily-korttia jos putki vaarassa */}
+      {/* Streak-varoitus – näkyy ennen Daily-korttia jos putki vaarassa */}
       <StreakWarning
         S={S}
         lang={lang}
@@ -4183,7 +4183,7 @@ export default function Piilosana(){
         );
       })()}
 
-      {/* Laskuri seuraavaan Dailyyn — näkyy vain kun pelattu */}
+      {/* Laskuri seuraavaan Dailyyn – näkyy vain kun pelattu */}
       <NextDailyCountdown
         S={S}
         lang={lang}
@@ -4275,7 +4275,7 @@ export default function Piilosana(){
           onClose={()=>setShowDailyHistory(null)} />
       )}
 
-      {/* ===== Harjoittelun asetukset — overlay ===== */}
+      {/* ===== Harjoittelun asetukset – overlay ===== */}
       {showMenuOptions&&(
         <PracticeOptionsModal
           S={S}
@@ -4572,7 +4572,7 @@ export default function Piilosana(){
             {lang==="en"?"Save your nickname?":lang==="sv"?"Spara ditt smeknamn?":"Tallenna nimimerkkisi?"}
           </div>
           <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
-            {lang==="en"?"Create an account to save your progress":lang==="sv"?"Skapa ett konto för att spara dina framsteg":"Luo tunnus — nimimerkkisi ja saavutuksesi tallentuvat"}
+            {lang==="en"?"Create an account to save your progress":lang==="sv"?"Skapa ett konto för att spara dina framsteg":"Luo tunnus – nimimerkkisi ja saavutuksesi tallentuvat"}
           </div>
           <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
             <button onClick={()=>{setShowAuth(true);setAuthMode("register");setShowFirstTimeAuth(false);}}

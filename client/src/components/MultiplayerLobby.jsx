@@ -1,15 +1,15 @@
-// MultiplayerLobby — moninpelin lobby-näkymät.
+// MultiplayerLobby – moninpelin lobby-näkymät.
 //
 // Sisältää kolme komponenttia, jotka edustavat lobbyn eri vaiheita:
-//   LobbyEnterName  — nimimerkin syöttö ennen lobbyä
-//   LobbyChoose     — huoneluettelo + "luo huone" + "liity koodilla"
-//   LobbyWaiting    — odottava lobby (host valitsee gamemoden, jakaa linkin
+//   LobbyEnterName  – nimimerkin syöttö ennen lobbyä
+//   LobbyChoose     – huoneluettelo + "luo huone" + "liity koodilla"
+//   LobbyWaiting    – odottava lobby (host valitsee gamemoden, jakaa linkin
 //                     ja painaa start-nappia kun pelaajia on tarpeeksi)
 //
 // Loading-tila ("LUODAAN HUONETTA…" / "LIITYTÄÄN HUONEESEEN…") jätetään
 // App.jsx:ään, koska se on triviaali eikä hyödy omasta komponentista.
 //
-// Komponentit ovat puhtaita renderöijiä — kaikki state ja behavior tulee
+// Komponentit ovat puhtaita renderöijiä – kaikki state ja behavior tulee
 // propseina/callbackeina vanhemmalta.
 
 import { QRCodeSVG } from "qrcode.react";
@@ -430,7 +430,7 @@ export function LobbyChoose({
 // LobbyWaiting
 // =====================================================================
 //
-// Odottava lobby — peli ei ole vielä alkanut. Host näkee gamemoden,
+// Odottava lobby – peli ei ole vielä alkanut. Host näkee gamemoden,
 // jakaa linkin/QR-koodin, ja painaa "ALOITA" kun pelaajia on >= 2.
 // Vieraat näkevät pelaajalistan ja "Odotetaan hostia" -tekstin.
 //
@@ -439,11 +439,11 @@ export function LobbyChoose({
 //   players               [{ playerId, nickname }]
 //   playerId              oma id (oman rivin korostamiseksi)
 //   roomCode              huoneen koodi (jaa linkki/qr)
-//   linkCopied            boolean — näytä "Kopioitu!" jos äsken kopioitu
+//   linkCopied            boolean – näytä "Kopioitu!" jos äsken kopioitu
 //   isHost                voinko muuttaa asetuksia ja aloittaa pelin
 //   gameMode              "classic" | "battle"
 //   gameTime              120 | 402
-//   letterMult            boolean — kirjainkertoimet (vain classic-mode)
+//   letterMult            boolean – kirjainkertoimet (vain classic-mode)
 //
 // Props (callbacks):
 //   onCopyLink

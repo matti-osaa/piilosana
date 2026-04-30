@@ -1,4 +1,4 @@
-// MultiplayerHero — alkuvalikon iso "MONINPELI" -kortti.
+// MultiplayerHero – alkuvalikon iso "MONINPELI" -kortti.
 //
 // Visuaalinen komponentti: ei tunne sounds-/socket-/setMode-logiikkaa.
 // Vanhempi (App.jsx) antaa onClick-callbackin, joka hoitaa siirtymisen
@@ -8,7 +8,7 @@
 //   lang              "fi" | "sv" | "en"
 //   S                 aktiivinen teema-objekti (käytetään S.font, S.panelRadius)
 //   publicOnlineCount Online-pelaajien lukumäärä arenassa
-//   onClick           Klikkauskäsittelijä — hoitaa siirtymän
+//   onClick           Klikkauskäsittelijä – hoitaa siirtymän
 //
 // Käyttäytymissäännöt:
 //   - LIVE-merkki ja "X pelaajaa nyt" näkyvät vain kun count > 1
@@ -21,7 +21,7 @@ const TEXTS = {
   fi: {
     aria: "Liity moninpeliin",
     title: "MONINPELI",
-    desc: "Nopea sanahaaste — pelaa muita vastaan",
+    desc: "Nopea sanahaaste – pelaa muita vastaan",
     players: "pelaajaa nyt",
     ctaJoin: "LIITY PELIIN ⚡",
     ctaStart: "ALOITA PELI ⚡",
@@ -90,7 +90,7 @@ export function MultiplayerHero({ lang, S, publicOnlineCount, onClick }) {
         }}
       />
 
-      {/* Minimalistinen geometrinen koriste — sisäkkäiset ympyrät oikeassa alanurkassa */}
+      {/* Minimalistinen geometrinen koriste – sisäkkäiset ympyrät oikeassa alanurkassa */}
       <div
         aria-hidden="true"
         style={{
@@ -132,7 +132,7 @@ export function MultiplayerHero({ lang, S, publicOnlineCount, onClick }) {
       />
 
       <div style={{ position: "relative", zIndex: 1 }}>
-        {/* LIVE-badge — vain kun pelaajia oikeasti on */}
+        {/* LIVE-badge – vain kun pelaajia oikeasti on */}
         {hasPlayers && (
           <div
             style={{
@@ -189,7 +189,7 @@ export function MultiplayerHero({ lang, S, publicOnlineCount, onClick }) {
           {txt.desc}
         </div>
 
-        {/* Pelaajamäärä-badge — vain jos pelaajia on */}
+        {/* Pelaajamäärä-badge – vain jos pelaajia on */}
         {hasPlayers && (
           <div style={{ marginBottom: "10px" }}>
             <span

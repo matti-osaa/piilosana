@@ -1,4 +1,4 @@
-// AchievementsModal — saavutuskansion overlay.
+// AchievementsModal – saavutuskansion overlay.
 //
 // Näyttää: edistymispalkki, kaikki saavutukset gridissä (lukitut ja avatut),
 // ja statistiikkayhteenveto pohjalla.
@@ -11,7 +11,7 @@
 //   S, lang, t                  konteksti
 //   Icon                         teeman ikoni-komponentti
 //   achievements                 ACHIEVEMENTS-objekti { id: { icon, color, fi, en, sv, fi_d, ... } }
-//   achUnlocked                  { id: timestamp } — milloin avattu
+//   achUnlocked                  { id: timestamp } – milloin avattu
 //   achStats                     { totalWords, gamesPlayed, bestScore, bestCombo,
 //                                  longestWord, arenaWins }
 //

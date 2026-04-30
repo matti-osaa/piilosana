@@ -1,4 +1,4 @@
-// useDailyPercentile — percentile-laskennan moduuli päivän haasteelle.
+// useDailyPercentile – percentile-laskennan moduuli päivän haasteelle.
 //
 // Sisältää:
 //   - useDailyPercentile(score, dateStr, lang): hookki joka hakee API:sta
@@ -14,7 +14,7 @@
 
 import { useEffect, useState } from "react";
 
-// ===== Pure laskenta — käytettävissä myös ilman hookkia =====
+// ===== Pure laskenta – käytettävissä myös ilman hookkia =====
 
 export function computePercentile(score, leaderboard) {
   if (score == null || !Array.isArray(leaderboard)) return null;
@@ -26,7 +26,7 @@ export function computePercentile(score, leaderboard) {
   );
 }
 
-// ===== Hookki — komponentin käyttöön kun leaderboardia ei vielä ole =====
+// ===== Hookki – komponentin käyttöön kun leaderboardia ei vielä ole =====
 
 export function useDailyPercentile(score, dateStr, lang) {
   const [percentile, setPercentile] = useState(null);
@@ -54,7 +54,7 @@ export function useDailyPercentile(score, dateStr, lang) {
   return percentile;
 }
 
-// ===== Tier-määrittely — väri ja teksti per prosenttipaikka =====
+// ===== Tier-määrittely – väri ja teksti per prosenttipaikka =====
 
 export const PERCENTILE_TIERS = [
   { min: 90, color: "#fff4b8", textKey: "top10", sparkle: true },

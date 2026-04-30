@@ -1,9 +1,9 @@
-// HelpModal — "Näin pelaat" -overlay.
+// HelpModal – "Näin pelaat" -overlay.
 //
 // Yksinkertainen modal joka listaa pelin perusasiat: vetäminen, aika,
 // pisteytys, kombo, kerroin, kieli, taivutusmuodot, määritelmät.
 //
-// Kaikki tekstit tulevat t-objektista. Komponentti on puhdas — ei tunne
+// Kaikki tekstit tulevat t-objektista. Komponentti on puhdas – ei tunne
 // state-managementia, vain render + onClose-callback.
 //
 // Props:

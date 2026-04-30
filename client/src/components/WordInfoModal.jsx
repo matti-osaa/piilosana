@@ -1,4 +1,4 @@
-// WordInfoModal — "Lue lisää sanoista" -overlay.
+// WordInfoModal – "Lue lisää sanoista" -overlay.
 //
 // Selittää mistä pelin sanavarasto tulee ja mitä lähteitä on käytetty
 // kullekin kielelle. Käännökset tulevat t-objektista, lähdemäärät

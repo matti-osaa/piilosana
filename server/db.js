@@ -1,4 +1,4 @@
-// db.js — DB-elinkaari ja yhteiset query-helpers.
+// db.js – DB-elinkaari ja yhteiset query-helpers.
 //
 // Tukee KAHTA driveria saman julkisen rajapinnan takana:
 //
@@ -52,7 +52,7 @@ export async function initDb() {
 }
 
 export function saveDb() {
-  // pg-versio kirjoittaa heti — saveDb on no-op
+  // pg-versio kirjoittaa heti – saveDb on no-op
   if (USE_PG) return;
   if (!sqliteDb) return;
   const data = sqliteDb.export();
@@ -343,7 +343,7 @@ export async function getDailyLeaderboard(dateStr, lang) {
 }
 
 // ============================================================================
-// USER CRUD — kirjautuminen, rekisteröinti, asetukset, saavutukset
+// USER CRUD – kirjautuminen, rekisteröinti, asetukset, saavutukset
 // ============================================================================
 
 // Kaikki funktiot palauttavat täyden user-objektin tai null. Caller poimii

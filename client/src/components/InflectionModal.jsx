@@ -1,4 +1,4 @@
-// InflectionModal — Suomen taivutusmuototaulukko-overlay.
+// InflectionModal – Suomen taivutusmuototaulukko-overlay.
 //
 // Näyttää 15 sijamuotoa (Nominatiivi-Komitatiivi) yksikön ja monikon
 // muodoissa esimerkkisanalla "sametti". Auttaa pelaajaa ymmärtämään,
@@ -58,8 +58,8 @@ const FORMS = [
   ["Essiivi", "samettina", "sametteina"],
   ["Translatiivi", "sametiksi", "sameteiksi"],
   ["Abessiivi", "sametitta", "sameteitta"],
-  ["Instruktiivi", "—", "samettein"],
-  ["Komitatiivi", "—", "sametteine-"],
+  ["Instruktiivi", "–", "samettein"],
+  ["Komitatiivi", "–", "sametteine-"],
 ];
 
 export function InflectionModal({ S, lang, onClose }) {
@@ -181,7 +181,7 @@ export function InflectionModal({ S, lang, onClose }) {
         </div>
 
         <div style={{ marginTop: "8px", fontSize: "11px", color: S.textMuted }}>
-          {txt.source} —{" "}
+          {txt.source} –{" "}
           <span
             onClick={() =>
               window.open("https://fi.wiktionary.org/wiki/sametti", "_blank")

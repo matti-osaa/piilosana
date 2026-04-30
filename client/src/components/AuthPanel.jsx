@@ -1,4 +1,4 @@
-// AuthPanel — kirjautumis- ja tunnusten hallinnan paneeli.
+// AuthPanel – kirjautumis- ja tunnusten hallinnan paneeli.
 //
 // Renderöi yhden seuraavista näkymistä riippuen authUser- ja authMode-
 // tilasta:
