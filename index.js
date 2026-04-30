@@ -11,6 +11,7 @@ import bcrypt from 'bcryptjs';
 import { Resend } from 'resend';
 import rateLimit from 'express-rate-limit';
 import { OAuth2Client } from 'google-auth-library';
+import { getScoreForWord, getScoreForWordLength } from "./server/game/score.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -442,16 +443,6 @@ function generateGoodGrid(lang = 'fi', hex = false) {
   return { grid: bestGrid, validWords: bestWords };
 }
 
-function getScoreForWord(word) {
-  const len = word.length;
-  if (len === 3) return 1;
-  if (len === 4) return 2;
-  if (len === 5) return 4;
-  if (len === 6) return 6;
-  if (len === 7) return 10;
-  return 14;
-}
-
 // ============================================================================
 // ALWAYS-ON PUBLIC GAME
 // ============================================================================
@@ -696,15 +687,6 @@ function generateRoomCode() {
     code += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return code;
-}
-
-function getScoreForWordLength(length) {
-  if (length === 3) return 1;
-  if (length === 4) return 2;
-  if (length === 5) return 4;
-  if (length === 6) return 6;
-  if (length === 7) return 10;
-  return 14;
 }
 
 function formatPlayers(room) {
