@@ -4086,6 +4086,35 @@ export default function Piilosana(){
 
   // Render multiplayer screens
   const S=theme;
+  const menuColors={
+    dailyBg:"linear-gradient(135deg,#49634d,#3f5744)",
+    dailyBorder:"#7f8a4b",
+    dailyText:"#fff8ec",
+    dailyMuted:"#e8dfcf",
+    dailyAccent:"#f4e7b2",
+
+    pastBg:"linear-gradient(135deg,#dfe7d8,#d2dccb)",
+    pastBorder:"#aeb99b",
+    pastText:"#314733",
+
+    futureBg:"linear-gradient(135deg,#f7f1e7,#efe7d8)",
+    futureBorder:"#c9b99d",
+    futureText:"#8b7a5c",
+
+    practiceBg:"linear-gradient(135deg,#6f9d8d,#558779)",
+    practiceText:"#fff8ec",
+
+    arenaBg:"linear-gradient(135deg,#d98261,#c86e51)",
+    arenaText:"#fff8ec",
+
+    customBg:"linear-gradient(135deg,#7fa4b0,#658d9a)",
+    customText:"#fff8ec",
+
+    tutorialBg:"linear-gradient(135deg,#9a829d,#816b86)",
+    tutorialText:"#fff8ec",
+
+    softShadow:"0 10px 26px rgba(57,45,28,0.18)"
+  };
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
@@ -4093,21 +4122,21 @@ export default function Piilosana(){
       {/* ===== DAILY CHALLENGE — HERO CARD ===== */}
       {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult(lang);const todayTheme=getDailyTheme(d,lang);const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;const streak=getDailyStreak(lang);return(
         <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"7px",
-          padding:"26px 16px 22px",border:`3px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.panelRadius||"16px",cursor:"pointer",
-          background:res?`linear-gradient(135deg,${S.yellow||"#ffcc00"}88,${S.yellow||"#ffcc00"}55)`:`linear-gradient(135deg,${S.yellow||"#ffcc00"}77,${S.yellow||"#ffcc00"}44)`,
+          padding:"26px 16px 22px",border:`2px solid ${menuColors.dailyBorder}`,borderRadius:S.panelRadius||"16px",cursor:"pointer",
+          background:menuColors.dailyBg,boxShadow:menuColors.softShadow,
           marginBottom:"10px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 8px 32px ${S.yellow||"#ffcc00"}55`;}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
-          <span style={{fontSize:"20px",color:S.yellow||"#ffcc00",letterSpacing:"3px",textTransform:"uppercase",fontWeight:"800",textShadow:"0 1px 2px #00000044"}}>{t.daily}</span>
-          <span style={{fontSize:"15px",color:S.text||S.textMuted,fontStyle:"italic",fontWeight:"600"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {themeName}</span>
-          <span style={{fontSize:"19px",color:S.text||S.textMuted,textTransform:"capitalize",fontWeight:"700"}}>{dl.weekday} {dl.short}</span>
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 14px 36px rgba(57,45,28,0.28)";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}>
+          <span style={{fontSize:"20px",color:menuColors.dailyAccent,letterSpacing:"3px",textTransform:"uppercase",fontWeight:"800",textShadow:"0 1px 2px #00000044"}}>{t.daily}</span>
+          <span style={{fontSize:"15px",color:menuColors.dailyMuted,fontStyle:"italic",fontWeight:"600"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {themeName}</span>
+          <span style={{fontSize:"19px",color:menuColors.dailyText,textTransform:"capitalize",fontWeight:"700"}}>{dl.weekday} {dl.short}</span>
           {res?(
-            <><span style={{fontSize:"42px",fontWeight:"800",color:S.yellow||"#ffcc00",lineHeight:1,textShadow:"0 1px 2px #00000044"}}>{res.score}<span style={{fontSize:"20px",fontWeight:"400"}}>p</span></span>
-            <span style={{fontSize:"15px",color:S.text||S.textMuted,fontWeight:"600"}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span>
+            <><span style={{fontSize:"42px",fontWeight:"800",color:menuColors.dailyAccent,lineHeight:1,textShadow:"0 1px 2px #00000044"}}>{res.score}<span style={{fontSize:"20px",fontWeight:"400"}}>p</span></span>
+            <span style={{fontSize:"15px",color:menuColors.dailyMuted,fontWeight:"600"}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span>
             {streak.streak>1&&<span style={{fontSize:"14px",color:"#ff6644",fontWeight:"700"}}>🔥 {streak.streak} {lang==="en"?"day streak":lang==="sv"?"dagar i rad":"päivää putkeen"}</span>}</>
           ):(
-            <><span style={{fontSize:"40px",color:S.yellow||"#ffcc00",marginTop:"2px",textShadow:"0 2px 4px #00000044"}}>▶</span>
-            <span style={{fontSize:"14px",color:S.text||S.textMuted,fontWeight:"600"}}>{t.dailyDesc}</span></>
+            <><span style={{fontSize:"40px",color:menuColors.dailyAccent,marginTop:"2px",textShadow:"0 2px 4px #00000044"}}>▶</span>
+            <span style={{fontSize:"14px",color:menuColors.dailyMuted,fontWeight:"600"}}>{t.dailyDesc}</span></>
           )}
         </button>
       );})()}
@@ -4119,25 +4148,25 @@ export default function Piilosana(){
           if(num<1)return null;
           return(
             <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",
-              padding:"16px 6px",border:`2px solid ${S.yellow||"#ffcc00"}88`,borderRadius:S.btnRadius,cursor:"pointer",
-              background:res?`${S.yellow||"#ffcc00"}66`:`${S.yellow||"#ffcc00"}44`,color:"#fff",fontSize:"14px",minWidth:0,transition:"all 0.15s"}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor=(S.yellow||"#ffcc00");e.currentTarget.style.transform="translateY(-1px)";}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor=(S.yellow||"#ffcc00")+"88";e.currentTarget.style.transform="none";}}>
-              <span style={{fontSize:"15px",color:S.text||S.textMuted,textTransform:"capitalize",fontWeight:"700"}}>{dl.weekday.slice(0,2)}</span>
-              <span style={{fontSize:"22px",fontWeight:"800",color:S.yellow||"#ffcc00",textShadow:"0 1px 2px #00000044"}}>{dl.short}</span>
-              {res?<span style={{fontSize:"18px",fontWeight:"800",color:S.green||"#44ddaa"}}>{res.score}p</span>
-                :<span style={{fontSize:"22px",color:S.yellow||"#ffcc00",textShadow:"0 1px 2px #00000044"}}>▶</span>}
+              padding:"16px 6px",border:`2px solid ${menuColors.pastBorder}`,borderRadius:S.btnRadius,cursor:"pointer",
+              background:menuColors.pastBg,color:menuColors.pastText,fontSize:"14px",minWidth:0,transition:"all 0.15s"}}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow=menuColors.softShadow;}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+              <span style={{fontSize:"15px",color:menuColors.pastText,textTransform:"capitalize",fontWeight:"700",opacity:0.75}}>{dl.weekday.slice(0,2)}</span>
+              <span style={{fontSize:"22px",fontWeight:"800",color:menuColors.pastText}}>{dl.short}</span>
+              {res?<span style={{fontSize:"18px",fontWeight:"800",color:"#49634d"}}>{res.score}p</span>
+                :<span style={{fontSize:"22px",color:"#49634d"}}>▶</span>}
             </button>
           );
         })()}
         {/* Tomorrow — locked */}
         {(()=>{const d=tomorrowStr();const dl=dateLabel(d,lang);return(
           <button disabled style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",
-            padding:"16px 6px",border:`2px dashed ${S.yellow||"#ffcc00"}55`,borderRadius:S.btnRadius,cursor:"default",
-            background:`${S.yellow||"#ffcc00"}11`,color:"#555",fontSize:"14px",minWidth:0}}>
-            <span style={{fontSize:"15px",color:S.textMuted,textTransform:"capitalize",fontWeight:"700"}}>{dl.weekday.slice(0,2)}</span>
-            <span style={{fontSize:"22px",fontWeight:"800",color:(S.yellow||"#ffcc00")+"99"}}>{dl.short}</span>
-            <span style={{fontSize:"20px",color:(S.yellow||"#ffcc00")+"77"}}>🔒</span>
+            padding:"16px 6px",border:`2px dashed ${menuColors.futureBorder}`,borderRadius:S.btnRadius,cursor:"default",
+            background:menuColors.futureBg,color:menuColors.futureText,fontSize:"14px",minWidth:0}}>
+            <span style={{fontSize:"15px",color:menuColors.futureText,textTransform:"capitalize",fontWeight:"700",opacity:0.75}}>{dl.weekday.slice(0,2)}</span>
+            <span style={{fontSize:"22px",fontWeight:"800",color:menuColors.futureText}}>{dl.short}</span>
+            <span style={{fontSize:"20px",color:menuColors.futureText,opacity:0.65}}>🔒</span>
           </button>
         );})()}
       </div>
@@ -4147,29 +4176,29 @@ export default function Piilosana(){
 
       {/* ===== PRACTICE (CTA1) + NONSTOP (CTA2) row ===== */}
       <div style={{display:"flex",gap:"8px",marginBottom:"8px"}}>
-        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"16px",color:"#1a3a00",background:"linear-gradient(180deg,#A8FF00,#8CE600)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",transition:"all 0.2s"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #00000044":"5px 5px 0 #6db300";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #6db300";}}>
+        <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"16px",color:menuColors.practiceText,background:menuColors.practiceBg,border:"1px solid rgba(255,255,255,0.35)",padding:"18px 12px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",transition:"all 0.2s"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 14px 30px rgba(57,45,28,0.25)";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}>
           <span style={{fontWeight:"700"}}>{t.practice}</span>
-          <span style={{fontSize:"11px",opacity:0.7}}>{t.practiceDesc}</span>
+          <span style={{fontSize:"11px",opacity:0.8}}>{t.practiceDesc}</span>
         </button>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"15px",color:"#ffffff",background:"linear-gradient(135deg,#FF2D55,#E8254A)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:`0 0 16px #FF2D5533, 0 0 4px #FF2D5522${S.btnShadow!=="none"?", "+S.btnShadow:", 3px 3px 0 #c41e3f"}`,borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",position:"relative",overflow:"hidden",transition:"all 0.2s",animation:"arenaPulse 3s ease-in-out infinite"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 0 24px #FF2D5555, 0 6px 20px #FF2D5544";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=`0 0 16px #FF2D5533, 0 0 4px #FF2D5522${S.btnShadow!=="none"?", "+S.btnShadow:", 3px 3px 0 #c41e3f"}`;}}>
+        <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"15px",color:menuColors.arenaText,background:menuColors.arenaBg,border:"1px solid rgba(255,255,255,0.35)",padding:"18px 12px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 14px 30px rgba(57,45,28,0.25)";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}>
           <span style={{fontWeight:"700"}}>{t.arenaCta}</span>
           {publicOnlineCount>=3?<span style={{fontSize:"11px",opacity:0.85}}>{publicOnlineCount} {t.playersInArena}</span>
-            :<span style={{fontSize:"11px",opacity:0.7}}>{t.arenaDesc}</span>}
+            :<span style={{fontSize:"11px",opacity:0.8}}>{t.arenaDesc}</span>}
         </button>
       </div>
 
       {/* Custom game + Tutorial — smaller row */}
       <div style={{display:"flex",gap:"8px",marginBottom:"0"}}>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"13px",color:"#003040",background:"linear-gradient(180deg,#00E5FF,#00C8E0)",border:"none",padding:"12px 10px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"2px 2px 0 #009db8",borderRadius:S.btnRadius,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",transition:"all 0.2s"}}
+        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"13px",color:menuColors.customText,background:menuColors.customBg,border:"1px solid rgba(255,255,255,0.35)",padding:"12px 10px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",transition:"all 0.2s"}}
           onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
           <span>{t.customGame}</span>
         </button>
-        <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"13px",color:"#2a2040",background:"linear-gradient(180deg,#BF5AF2,#A040D0)",border:"none",padding:"12px 10px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"2px 2px 0 #8030a8",borderRadius:S.btnRadius,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",transition:"all 0.2s"}}
+        <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"13px",color:menuColors.tutorialText,background:menuColors.tutorialBg,border:"1px solid rgba(255,255,255,0.35)",padding:"12px 10px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",transition:"all 0.2s"}}
           onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
           <span>{t.tutorialBtn}</span>
