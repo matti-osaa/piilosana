@@ -4092,22 +4092,22 @@ export default function Piilosana(){
 
       {/* ===== DAILY CHALLENGE — HERO CARD ===== */}
       {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult(lang);const todayTheme=getDailyTheme(d,lang);const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;const streak=getDailyStreak(lang);return(
-        <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"5px",
-          padding:"22px 16px 18px",border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.panelRadius||"16px",cursor:"pointer",
-          background:res?`linear-gradient(135deg,${S.yellow||"#ffcc00"}22,${S.yellow||"#ffcc00"}11)`:`linear-gradient(135deg,${S.yellow||"#ffcc00"}15,${S.yellow||"#ffcc00"}08)`,
+        <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"7px",
+          padding:"26px 16px 22px",border:`3px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.panelRadius||"16px",cursor:"pointer",
+          background:res?`linear-gradient(135deg,${S.yellow||"#ffcc00"}88,${S.yellow||"#ffcc00"}55)`:`linear-gradient(135deg,${S.yellow||"#ffcc00"}77,${S.yellow||"#ffcc00"}44)`,
           marginBottom:"10px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 8px 32px ${S.yellow||"#ffcc00"}33`;}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 8px 32px ${S.yellow||"#ffcc00"}55`;}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
-          <span style={{fontSize:"11px",color:S.yellow||"#ffcc00",letterSpacing:"3px",textTransform:"uppercase",fontWeight:"600"}}>{t.daily}</span>
-          <span style={{fontSize:"12px",color:S.textMuted,fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {themeName}</span>
-          <span style={{fontSize:"13px",color:S.textMuted,textTransform:"capitalize"}}>{dl.weekday} {dl.short}</span>
+          <span style={{fontSize:"20px",color:S.yellow||"#ffcc00",letterSpacing:"3px",textTransform:"uppercase",fontWeight:"800",textShadow:"0 1px 2px #00000044"}}>{t.daily}</span>
+          <span style={{fontSize:"15px",color:S.text||S.textMuted,fontStyle:"italic",fontWeight:"600"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {themeName}</span>
+          <span style={{fontSize:"19px",color:S.text||S.textMuted,textTransform:"capitalize",fontWeight:"700"}}>{dl.weekday} {dl.short}</span>
           {res?(
-            <><span style={{fontSize:"32px",fontWeight:"800",color:S.yellow||"#ffcc00",lineHeight:1}}>{res.score}<span style={{fontSize:"16px",fontWeight:"400"}}>p</span></span>
-            <span style={{fontSize:"13px",color:S.textMuted}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span>
-            {streak.streak>1&&<span style={{fontSize:"12px",color:"#ff6644"}}>🔥 {streak.streak} {lang==="en"?"day streak":lang==="sv"?"dagar i rad":"päivää putkeen"}</span>}</>
+            <><span style={{fontSize:"42px",fontWeight:"800",color:S.yellow||"#ffcc00",lineHeight:1,textShadow:"0 1px 2px #00000044"}}>{res.score}<span style={{fontSize:"20px",fontWeight:"400"}}>p</span></span>
+            <span style={{fontSize:"15px",color:S.text||S.textMuted,fontWeight:"600"}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span>
+            {streak.streak>1&&<span style={{fontSize:"14px",color:"#ff6644",fontWeight:"700"}}>🔥 {streak.streak} {lang==="en"?"day streak":lang==="sv"?"dagar i rad":"päivää putkeen"}</span>}</>
           ):(
-            <><span style={{fontSize:"28px",color:S.yellow||"#ffcc00",marginTop:"2px"}}>▶</span>
-            <span style={{fontSize:"12px",color:S.textMuted}}>{t.dailyDesc}</span></>
+            <><span style={{fontSize:"40px",color:S.yellow||"#ffcc00",marginTop:"2px",textShadow:"0 2px 4px #00000044"}}>▶</span>
+            <span style={{fontSize:"14px",color:S.text||S.textMuted,fontWeight:"600"}}>{t.dailyDesc}</span></>
           )}
         </button>
       );})()}
@@ -4118,26 +4118,26 @@ export default function Piilosana(){
         {(()=>{const d=daysAgoStr(1);const dl=dateLabel(d,lang);const res=getDailyResultForDate(d,lang);const num=dailyNumberForDate(d);
           if(num<1)return null;
           return(
-            <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
-              padding:"10px 4px",border:`1px solid ${S.yellow||"#ffcc00"}33`,borderRadius:S.btnRadius,cursor:"pointer",
-              background:res?`${S.yellow||"#ffcc00"}15`:"transparent",color:"#fff",fontSize:"11px",minWidth:0,transition:"all 0.15s"}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor=(S.yellow||"#ffcc00")+"88";}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor=(S.yellow||"#ffcc00")+"33";}}>
-              <span style={{fontSize:"11px",color:S.textMuted,textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
-              <span style={{fontSize:"13px",fontWeight:"600",color:S.yellow||"#ffcc00"}}>{dl.short}</span>
-              {res?<span style={{fontSize:"13px",fontWeight:"700",color:S.green||"#44ddaa"}}>{res.score}p</span>
-                :<span style={{fontSize:"13px",color:S.yellow||"#ffcc00"}}>▶</span>}
+            <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",
+              padding:"16px 6px",border:`2px solid ${S.yellow||"#ffcc00"}88`,borderRadius:S.btnRadius,cursor:"pointer",
+              background:res?`${S.yellow||"#ffcc00"}66`:`${S.yellow||"#ffcc00"}44`,color:"#fff",fontSize:"14px",minWidth:0,transition:"all 0.15s"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor=(S.yellow||"#ffcc00");e.currentTarget.style.transform="translateY(-1px)";}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor=(S.yellow||"#ffcc00")+"88";e.currentTarget.style.transform="none";}}>
+              <span style={{fontSize:"15px",color:S.text||S.textMuted,textTransform:"capitalize",fontWeight:"700"}}>{dl.weekday.slice(0,2)}</span>
+              <span style={{fontSize:"22px",fontWeight:"800",color:S.yellow||"#ffcc00",textShadow:"0 1px 2px #00000044"}}>{dl.short}</span>
+              {res?<span style={{fontSize:"18px",fontWeight:"800",color:S.green||"#44ddaa"}}>{res.score}p</span>
+                :<span style={{fontSize:"22px",color:S.yellow||"#ffcc00",textShadow:"0 1px 2px #00000044"}}>▶</span>}
             </button>
           );
         })()}
         {/* Tomorrow — locked */}
         {(()=>{const d=tomorrowStr();const dl=dateLabel(d,lang);return(
-          <button disabled style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
-            padding:"10px 4px",border:`1px dashed ${S.yellow||"#ffcc00"}22`,borderRadius:S.btnRadius,cursor:"default",
-            background:"transparent",color:"#555",fontSize:"11px",minWidth:0}}>
-            <span style={{fontSize:"11px",color:S.textMuted,textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
-            <span style={{fontSize:"13px",fontWeight:"600",color:(S.yellow||"#ffcc00")+"66"}}>{dl.short}</span>
-            <span style={{fontSize:"13px",color:(S.yellow||"#ffcc00")+"44"}}>🔒</span>
+          <button disabled style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",
+            padding:"16px 6px",border:`2px dashed ${S.yellow||"#ffcc00"}55`,borderRadius:S.btnRadius,cursor:"default",
+            background:`${S.yellow||"#ffcc00"}11`,color:"#555",fontSize:"14px",minWidth:0}}>
+            <span style={{fontSize:"15px",color:S.textMuted,textTransform:"capitalize",fontWeight:"700"}}>{dl.weekday.slice(0,2)}</span>
+            <span style={{fontSize:"22px",fontWeight:"800",color:(S.yellow||"#ffcc00")+"99"}}>{dl.short}</span>
+            <span style={{fontSize:"20px",color:(S.yellow||"#ffcc00")+"77"}}>🔒</span>
           </button>
         );})()}
       </div>
