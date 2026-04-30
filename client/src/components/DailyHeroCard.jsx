@@ -1,37 +1,62 @@
 // DailyHeroCard — alkuvalikon "Päivän Piilosana" -hero.
 //
-// Visuaalinen komponentti: ei tunne todayStr-/getDailyResult-funktioita,
-// vaan saa kaiken laskettuna propseina. Vanhempi (App.jsx) hoitaa IIFE:ssä
-// päivämäärän, teeman ja tuloksen laskennan, ja pelkkä onClick-callback
-// ratkaisee mitä tapahtuu klikkauksesta.
-//
-// Props:
-//   lang        "fi" | "sv" | "en"
-//   t           käännösten kantaobjekti (käytetään t.daily, t.dailyDesc, t.dailyWords)
-//   S           aktiivinen teema-objekti (käytetään S.font, S.panelRadius)
-//   dateLabel   { weekday, short, ... } — vanhemman dateLabel(d,lang)-tulos
-//   themeName   tämän päivän teeman nimi käännettynä
-//   result      { score, wordsFound, totalWords } tai null/undefined jos ei pelattu
-//   streak      { streak, best, ... } — alle 2:n streakia ei näytetä
-//   onClick     klikkauskäsittelijä (esim. avaa historia jos pelattu, muutoin aloita)
-//
-// Käyttäytymissäännöt:
-//   - Pelatun jälkeen näkyy tulos (score + sanat + mahdollinen streak)
-//   - Pelaamattomana näkyy play-nuoli + kuvaus
-//   - Streak näkyy vain kun > 1 (1 päivä = ei vielä putki)
+// Pelin jälkeen näytetään pisteet + percentile-tieri (väri + lyhyt teksti).
+// Ei näytetä pelaajamääriä, vain jakaumaan suhteutettu palaute.
 
 import { menuColors } from "../menuColors.js";
+import { useDailyPercentile } from "../hooks/useDailyPercentile.js";
 
 const TEXTS = {
-  fi: { theme: "Teema", streak: "päivää putkeen" },
-  sv: { theme: "Tema",  streak: "dagar i rad" },
-  en: { theme: "Theme", streak: "day streak" },
+  fi: {
+    theme: "Teema",
+    streak: "päivää putkeen",
+    top10: "Top 10 %",
+    top25: "Top 25 %",
+    aboveAvg: "Yli keskiarvon",
+    nearAvg: "Lähellä keskiarvoa",
+    belowAvg: "Aloituspisteet",
+  },
+  sv: {
+    theme: "Tema",
+    streak: "dagar i rad",
+    top10: "Top 10 %",
+    top25: "Top 25 %",
+    aboveAvg: "Över genomsnittet",
+    nearAvg: "Nära genomsnittet",
+    belowAvg: "Startpoäng",
+  },
+  en: {
+    theme: "Theme",
+    streak: "day streak",
+    top10: "Top 10%",
+    top25: "Top 25%",
+    aboveAvg: "Above average",
+    nearAvg: "Near average",
+    belowAvg: "Starting score",
+  },
 };
+
+const PERCENTILE_TIERS = [
+  { min: 90, color: "#fff4b8", textKey: "top10", sparkle: true },
+  { min: 75, color: "#d8e8a8", textKey: "top25" },
+  { min: 50, color: menuColors.dailyAccent, textKey: "aboveAvg" },
+  { min: 25, color: "#d9c98c", textKey: "nearAvg" },
+  { min: 0, color: "#e6b48a", textKey: "belowAvg" },
+];
+
+function tierForPercentile(pct) {
+  if (pct == null) return null;
+  for (const tier of PERCENTILE_TIERS) {
+    if (pct >= tier.min) return tier;
+  }
+  return null;
+}
 
 export function DailyHeroCard({
   lang,
   t,
   S,
+  dateStr,
   dateLabel,
   themeName,
   result,
@@ -41,6 +66,13 @@ export function DailyHeroCard({
   const txt = TEXTS[lang] || TEXTS.fi;
   const isPlayed = result != null;
   const showStreak = streak?.streak > 1;
+  const percentile = useDailyPercentile(
+    isPlayed ? result.score : null,
+    dateStr,
+    lang
+  );
+  const tier = tierForPercentile(percentile);
+  const scoreColor = tier ? tier.color : menuColors.dailyAccent;
 
   return (
     <button
@@ -73,106 +105,49 @@ export function DailyHeroCard({
         e.currentTarget.style.boxShadow = menuColors.softShadow;
       }}
     >
-      {/* Otsikko: PÄIVÄN PIILOSANA */}
-      <span
-        style={{
-          fontSize: "20px",
-          color: menuColors.dailyAccent,
-          letterSpacing: "3px",
-          textTransform: "uppercase",
-          fontWeight: "800",
-          textShadow: "0 1px 2px #00000044",
-        }}
-      >
+      <span style={{ fontSize: "20px", color: menuColors.dailyAccent, letterSpacing: "3px", textTransform: "uppercase", fontWeight: "800", textShadow: "0 1px 2px #00000044" }}>
         {t.daily}
       </span>
 
-      {/* Teema */}
-      <span
-        style={{
-          fontSize: "15px",
-          color: menuColors.dailyMuted,
-          fontStyle: "italic",
-          fontWeight: "600",
-        }}
-      >
+      <span style={{ fontSize: "15px", color: menuColors.dailyMuted, fontStyle: "italic", fontWeight: "600" }}>
         {txt.theme}: {themeName}
       </span>
 
-      {/* Päivämäärä */}
-      <span
-        style={{
-          fontSize: "19px",
-          color: menuColors.dailyText,
-          textTransform: "capitalize",
-          fontWeight: "700",
-        }}
-      >
+      <span style={{ fontSize: "19px", color: menuColors.dailyText, textTransform: "capitalize", fontWeight: "700" }}>
         {dateLabel.weekday} {dateLabel.short}
       </span>
 
       {isPlayed ? (
         <>
-          {/* Pisteet */}
-          <span
-            style={{
-              fontSize: "42px",
-              fontWeight: "800",
-              color: menuColors.dailyAccent,
-              lineHeight: 1,
-              textShadow: "0 1px 2px #00000044",
-            }}
-          >
+          <span style={{ fontSize: "42px", fontWeight: "800", color: scoreColor, lineHeight: 1, textShadow: "0 1px 2px #00000044", transition: "color 0.3s ease" }}>
             {result.score}
             <span style={{ fontSize: "20px", fontWeight: "400" }}>p</span>
           </span>
 
-          {/* Sanat / kokonaismäärä */}
-          <span
-            style={{
-              fontSize: "15px",
-              color: menuColors.dailyMuted,
-              fontWeight: "600",
-            }}
-          >
+          {tier && (
+            <span style={{ fontSize: "13px", color: tier.color, fontWeight: "700", letterSpacing: "0.5px", animation: tier.sparkle ? "pulse 2s ease-in-out infinite" : "none" }}>
+              {tier.sparkle ? "✨ " : ""}
+              {txt[tier.textKey]}
+              {tier.sparkle ? " ✨" : ""}
+            </span>
+          )}
+
+          <span style={{ fontSize: "15px", color: menuColors.dailyMuted, fontWeight: "600" }}>
             {result.wordsFound}/{result.totalWords} {t.dailyWords}
           </span>
 
-          {/* Putki — vain jos > 1 päivä */}
           {showStreak && (
-            <span
-              style={{
-                fontSize: "14px",
-                color: "#ff6644",
-                fontWeight: "700",
-              }}
-            >
+            <span style={{ fontSize: "14px", color: "#ff6644", fontWeight: "700" }}>
               🔥 {streak.streak} {txt.streak}
             </span>
           )}
         </>
       ) : (
         <>
-          {/* Play-nuoli */}
-          <span
-            style={{
-              fontSize: "40px",
-              color: menuColors.dailyAccent,
-              marginTop: "2px",
-              textShadow: "0 2px 4px #00000044",
-            }}
-          >
+          <span style={{ fontSize: "40px", color: menuColors.dailyAccent, marginTop: "2px", textShadow: "0 2px 4px #00000044" }}>
             ▶
           </span>
-
-          {/* Kuvaus: "sama kaikille · yksi yritys · 3 min" */}
-          <span
-            style={{
-              fontSize: "14px",
-              color: menuColors.dailyMuted,
-              fontWeight: "600",
-            }}
-          >
+          <span style={{ fontSize: "14px", color: menuColors.dailyMuted, fontWeight: "600" }}>
             {t.dailyDesc}
           </span>
         </>

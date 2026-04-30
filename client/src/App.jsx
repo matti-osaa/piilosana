@@ -4118,6 +4118,7 @@ export default function Piilosana(){
             lang={lang}
             t={t}
             S={S}
+            dateStr={d}
             dateLabel={dl}
             themeName={themeName}
             result={res}
