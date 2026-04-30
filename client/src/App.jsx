@@ -140,10 +140,20 @@ function getDailyTheme(dateStr,lang){
   return themes[Math.floor(rng()*themes.length)];
 }
 
-// Count how many theme words are findable in a hex grid
+// Count how many theme words (or their inflections) are findable in a hex grid.
+// Käyttää prefiksi-matchausta — jos teemasana on "kissa", taivutukset
+// "kissan", "kissoja", "kissalla" lasketaan myös. Stem-pituus = 4 tai
+// sanan koko pituus jos lyhyempi (esim. "puu" → "puu", löytää "puuta").
 function countThemeWords(foundWords,theme){
   if(!theme||!theme.words)return 0;
-  return theme.words.filter(w=>foundWords.has(w)).length;
+  const stems=theme.words.map(w=>w.slice(0,Math.min(4,w.length)));
+  const seen=new Set();
+  for(const w of foundWords){
+    for(const stem of stems){
+      if(w.startsWith(stem)&&!seen.has(stem)){seen.add(stem);break;}
+    }
+  }
+  return seen.size;
 }
 function getDailyResult(lang='fi'){try{const d=JSON.parse(localStorage.getItem(`piilosana_daily_${lang}`)||'{}');if(d.date===todayStr())return d;return null;}catch{return null;}}
 function saveDailyResult(score,wordsFound,totalWords,forDate,lang='fi'){
@@ -2899,7 +2909,7 @@ export default function Piilosana(){
     const gt=overrideTime!==undefined?overrideTime:gameTime;
     const sm=overrideMode!==undefined?overrideMode:soloMode;
     let bg=null,bw=new Set();
-    for(let i=0;i<30;i++){const g=sm==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=(sm==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(sm==="hex"?25:15))break;}
+    for(let i=0;i<50;i++){const g=sm==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=(sm==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(sm==="hex"?25:15))break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(gt);setScore(0);setMsg(null);
     // Fetch long words (11-15 chars) from server in background
     if(lang==="fi"&&bg){fetch(`${SERVER_URL}/api/find-long-words`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({grid:bg,hex:sm==="hex"})}).then(r=>r.json()).then(({words})=>{if(words&&words.length>0)setValid(prev=>{const n=new Set(prev);words.forEach(w=>n.add(w));return n;});}).catch(()=>{});}
@@ -2954,7 +2964,7 @@ export default function Piilosana(){
     const theme=getDailyTheme(playDate,lang);
     // Generate grids, prefer ones with more theme words (while still ensuring good total word count)
     let bg=null,bw=new Set(),bestThemeCount=0;
-    for(let i=0;i<30;i++){
+    for(let i=0;i<50;i++){
       const rng=seededRng(dailySeed(playDate+lang+i));
       const g=makeGrid(7,lang,5,rng);
       const w=findWordsHex(g,trie);
@@ -2962,7 +2972,7 @@ export default function Piilosana(){
       // Prefer grids with more theme words, but require decent total word count
       if(w.size>=15&&(tc>bestThemeCount||(tc===bestThemeCount&&w.size>bw.size))){bg=g;bw=w;bestThemeCount=tc;}
       else if(!bg&&w.size>bw.size){bg=g;bw=w;}
-      if(w.size>=25&&tc>=2)break;
+      if(w.size>=25&&tc>=5)break;
     }
     if(!bg){const rng=seededRng(dailySeed(playDate+lang));bg=makeGrid(7,lang,5,rng);bw=findWordsHex(bg,trie);}
     setDailyTheme(theme);
@@ -3999,7 +4009,7 @@ export default function Piilosana(){
   const refreshGrid=useCallback(()=>{
     if(state!=="play"||gameTime!==0)return;
     let bg=null,bw=new Set();
-    for(let i=0;i<30;i++){const g=soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(soloMode==="hex"?25:15))break;}
+    for(let i=0;i<50;i++){const g=soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(soloMode==="hex"?25:15))break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setMsg(null);
     setDropKey(0);
   },[state,gameTime,trie,lang,soloMode]);
@@ -4017,7 +4027,7 @@ export default function Piilosana(){
     if(!socket||!isHost||players.length<2)return;
     const gm=selectedMode||gameMode;
     let bg=null,bw=new Set();
-    for(let i=0;i<30;i++){const g=makeGrid(SZ,lang),w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
+    for(let i=0;i<50;i++){const g=makeGrid(SZ,lang),w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
     setCurrentMultiGrid(bg);
     setGameMode(gm);
     socket.emit("start_game",{grid:bg,validWords:Array.from(bw),gameMode:gm,gameTime});
