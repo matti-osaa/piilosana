@@ -183,7 +183,7 @@ function startPublicRound(lang = 'fi') {
   }, 5000);
 }
 
-function endPublicRound(lang = 'fi') {
+async function endPublicRound(lang = 'fi') {
   const pg = getPublicGame(lang);
   const room = publicRoomName(lang);
   pg.state = 'waiting';
@@ -205,7 +205,7 @@ function endPublicRound(lang = 'fi') {
 
   for (const r of rankings) {
     if (r.score > 0) {
-      submitScore({
+      await submitScore({
         nickname: r.nickname,
         score: r.score,
         wordsFound: r.wordsFound,
@@ -643,7 +643,7 @@ io.on('connection', (socket) => {
     // 5s countdown before timer starts
     room.countdownTimer = setTimeout(() => {
       room.countdownTimer = null;
-      room.timer = setInterval(() => {
+      room.timer = setInterval(async () => {
         room.timeLeft--;
         io.to(roomCode).emit('timer_tick', { remaining: room.timeLeft });
 
@@ -661,7 +661,7 @@ io.on('connection', (socket) => {
           for (const [pid, s] of room.scores.entries()) {
             const p = room.players.get(pid);
             if (p && s.score > 0) {
-              submitScore({
+              await submitScore({
                 nickname: p.nickname,
                 score: s.score,
                 wordsFound: s.wordsFound.size,
@@ -936,16 +936,16 @@ app.post('/api/validate-word', (req, res) => {
 });
 
 // Hall of Fame: get all categories
-app.get('/api/hall-of-fame', (req, res) => {
+app.get('/api/hall-of-fame', async (req, res) => {
   const lang = req.query.lang || 'fi';
-  res.json(getAllHallOfFame(lang));
+  res.json(await getAllHallOfFame(lang));
 });
 
 // Hall of Fame: get specific category
-app.get('/api/hall-of-fame/:gameMode/:gameTime', (req, res) => {
+app.get('/api/hall-of-fame/:gameMode/:gameTime', async (req, res) => {
   const { gameMode, gameTime } = req.params;
   const lang = req.query.lang || 'fi';
-  res.json(getHallOfFame(gameMode, Number(gameTime), lang));
+  res.json(await getHallOfFame(gameMode, Number(gameTime), lang));
 });
 
 // App version endpoint — clients poll this to detect deploys
@@ -954,14 +954,14 @@ app.get('/api/version', (req, res) => {
 });
 
 // Daily leaderboard: get scores for a specific date
-app.get('/api/daily-scores/:dateStr', (req, res) => {
+app.get('/api/daily-scores/:dateStr', async (req, res) => {
   const { dateStr } = req.params;
   const lang = req.query.lang || 'fi';
-  res.json(getDailyLeaderboard(dateStr, lang));
+  res.json(await getDailyLeaderboard(dateStr, lang));
 });
 
 // Daily leaderboard: submit score
-app.post('/api/daily-scores', (req, res) => {
+app.post('/api/daily-scores', async (req, res) => {
   const { nickname, score, wordsFound, wordsTotal, dateStr, lang } = req.body;
   if (!nickname || nickname.length > 12) {
     return res.status(400).json({ error: 'Virheellinen nimimerkki' });
@@ -970,9 +970,9 @@ app.post('/api/daily-scores', (req, res) => {
     return res.status(400).json({ error: 'Virheellinen päivämäärä' });
   }
   const safeLang = LANGS[lang] ? lang : 'fi';
-  const ok = submitDailyScore({ nickname, score, wordsFound, wordsTotal, dateStr, lang: safeLang });
+  const ok = await submitDailyScore({ nickname, score, wordsFound, wordsTotal, dateStr, lang: safeLang });
   if (!ok) return res.status(400).json({ error: 'Tulosta ei voitu tallentaa' });
-  const top = getDailyLeaderboard(dateStr, safeLang);
+  const top = await getDailyLeaderboard(dateStr, safeLang);
   res.json({ ok: true, top });
 });
 
@@ -989,16 +989,16 @@ app.get('/api/public-game', (req, res) => {
 });
 
 // Hall of Fame: submit score (for solo games)
-app.post('/api/hall-of-fame', (req, res) => {
+app.post('/api/hall-of-fame', async (req, res) => {
   const { nickname, score, wordsFound, wordsTotal, gameMode, gameTime, lang } = req.body;
   if (!nickname || nickname.length > 12) {
     return res.status(400).json({ error: 'Virheellinen nimimerkki' });
   }
   const safeLang = LANGS[lang] ? lang : 'fi';
-  const id = submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti: false, lang: safeLang });
+  const id = await submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti: false, lang: safeLang });
   if (!id) return res.status(400).json({ error: 'Tulosta ei voitu tallentaa' });
   // Return updated top 10 for this category
-  const top = getHallOfFame(gameMode, gameTime, safeLang);
+  const top = await getHallOfFame(gameMode, gameTime, safeLang);
   res.json({ id, top });
 });
 

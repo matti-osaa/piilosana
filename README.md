@@ -91,12 +91,31 @@ Pushaa `main`-haaraan. Railway havaitsee muutoksen ja deployaa
 automaattisesti. Build-skripti `npm run build` ajetaan ennen
 `npm start`:ia.
 
-**Huomio nykyisestä deploysta**: palvelin tallentaa peli- ja
-käyttäjä­datan in-process SQLiten kautta `/data/piilosana.db`-tiedostoon
-(Railwayn persistent volume). Käynnissä olevat arena-pelit ja Socket.IO-huoneet
-katkeavat aina kun palvelin käynnistyy uudelleen. Nollakatkodeplyt
-vaativat siirtymisen Postgresiin + Redikseen — katso suunnitelma
-arkkitehtuuriarviosta.
+## Tietokanta
+
+Sovellus tukee kahta tietokanta-ajuria:
+
+- **sql.js (oletus)**: in-process SQLite, koko DB muistissa, levylle
+  serialisoituna `/data/piilosana.db`-tiedostoon. Toimii kun
+  `DATABASE_URL` on tyhjä. Häviää usein restartissa jos volume puuttuu.
+
+- **Postgres**: kun `DATABASE_URL` on asetettu, käyttää `pg`-poolia.
+  Kestää restartit ja mahdollistaa nollakatkodeplyt rinnakkaisten
+  prosessien kanssa.
+
+### Migraatio sql.js → Postgres
+
+1. Lisää Railwayssa Postgres add-on, kopioi sen `DATABASE_URL`
+2. Aseta sama URL paikallisesti (`export DATABASE_URL=...`)
+3. Aja kerran: `npm run migrate:postgres` — siirtää nykyisen
+   `piilosana.db`:n tiedot Postgresiin
+4. Aseta `DATABASE_URL` Railwayn Variables-välilehdelle, redeploy
+5. Sovellus käyttää nyt Postgresiä; sql.js fallback jää käyttöön
+   jos URL poistuu
+
+Migraatioskripti on idempotent `daily_scores`:n osalta (käyttää
+`ON CONFLICT DO NOTHING`), mutta `hall_of_fame` ja `users` voivat
+duplikoitua jos ajat kahdesti. Tyhjennä kohdetaulu tarvittaessa.
 
 ## Lisenssi
 
