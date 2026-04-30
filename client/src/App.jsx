@@ -5,6 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import DEFS_FI from "./defs_fi.js";
 import { menuColors } from "./menuColors.js";
 import { MultiplayerHero } from "./components/MultiplayerHero.jsx";
+import { DailyHeroCard } from "./components/DailyHeroCard.jsx";
 
 // ============================================
 // PIILOSANA - Finnish Word Hunt Game
@@ -4093,26 +4094,26 @@ export default function Piilosana(){
     <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
 
       {/* ===== DAILY CHALLENGE — HERO CARD ===== */}
-      {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult(lang);const todayTheme=getDailyTheme(d,lang);const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;const streak=getDailyStreak(lang);return(
-        <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"7px",
-          padding:"26px 16px 22px",border:`2px solid ${menuColors.dailyBorder}`,borderRadius:S.panelRadius||"16px",cursor:"pointer",
-          background:menuColors.dailyBg,boxShadow:menuColors.softShadow,
-          marginBottom:"10px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 14px 36px rgba(57,45,28,0.28)";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}>
-          <span style={{fontSize:"20px",color:menuColors.dailyAccent,letterSpacing:"3px",textTransform:"uppercase",fontWeight:"800",textShadow:"0 1px 2px #00000044"}}>{t.daily}</span>
-          <span style={{fontSize:"15px",color:menuColors.dailyMuted,fontStyle:"italic",fontWeight:"600"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {themeName}</span>
-          <span style={{fontSize:"19px",color:menuColors.dailyText,textTransform:"capitalize",fontWeight:"700"}}>{dl.weekday} {dl.short}</span>
-          {res?(
-            <><span style={{fontSize:"42px",fontWeight:"800",color:menuColors.dailyAccent,lineHeight:1,textShadow:"0 1px 2px #00000044"}}>{res.score}<span style={{fontSize:"20px",fontWeight:"400"}}>p</span></span>
-            <span style={{fontSize:"15px",color:menuColors.dailyMuted,fontWeight:"600"}}>{res.wordsFound}/{res.totalWords} {t.dailyWords}</span>
-            {streak.streak>1&&<span style={{fontSize:"14px",color:"#ff6644",fontWeight:"700"}}>🔥 {streak.streak} {lang==="en"?"day streak":lang==="sv"?"dagar i rad":"päivää putkeen"}</span>}</>
-          ):(
-            <><span style={{fontSize:"40px",color:menuColors.dailyAccent,marginTop:"2px",textShadow:"0 2px 4px #00000044"}}>▶</span>
-            <span style={{fontSize:"14px",color:menuColors.dailyMuted,fontWeight:"600"}}>{t.dailyDesc}</span></>
-          )}
-        </button>
-      );})()}
+      {(()=>{
+        const d=todayStr();
+        const dl=dateLabel(d,lang);
+        const res=getDailyResult(lang);
+        const todayTheme=getDailyTheme(d,lang);
+        const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;
+        const streak=getDailyStreak(lang);
+        return(
+          <DailyHeroCard
+            lang={lang}
+            t={t}
+            S={S}
+            dateLabel={dl}
+            themeName={themeName}
+            result={res}
+            streak={streak}
+            onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}}
+          />
+        );
+      })()}
 
       {/* Yesterday + Tomorrow row */}
       <div style={{display:"flex",gap:"6px",width:"100%",marginBottom:"12px"}}>
