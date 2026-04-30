@@ -12,6 +12,21 @@ import { Resend } from 'resend';
 import rateLimit from 'express-rate-limit';
 import { OAuth2Client } from 'google-auth-library';
 import { getScoreForWord, getScoreForWordLength } from "./server/game/score.js";
+import { TrieNode, buildTrie } from "./server/game/trie.js";
+import { hexNeighbors } from "./server/game/hex.js";
+import { GRID_SIZE, HEX_ROWS, HEX_COLS, randLetter as randLetterPure, makeGrid as makeGridPure } from "./server/game/grid.js";
+import { findWords, findWordsHex, canTraceWord } from "./server/game/validate.js";
+
+// Adapters: pure modules ottavat letterWeights-objektin, mutta index.js:n
+// sisäiset kutsut käyttävät lang-koodia. getLang() ei vielä ole määritelty
+// tässä kohtaa, joten käärimme adapterit funktioiksi jotka käyttävät sitä
+// ajonaikaisesti.
+function randLetter(lang = 'fi') {
+  return randLetterPure(getLang(lang).letterWeights);
+}
+function makeGrid(lang = 'fi', rows = GRID_SIZE, cols) {
+  return makeGridPure(getLang(lang).letterWeights, rows, cols);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -214,17 +229,6 @@ import WORDS_RAW_FI from './words.js';
 import WORDS_RAW_EN from './words_en.js';
 import WORDS_RAW_SV from './words_sv.js';
 
-class TrieNode { constructor() { this.c = {}; this.w = false; } }
-function buildTrie(words) {
-  const root = new TrieNode();
-  for (const word of words) {
-    let n = root;
-    for (const ch of word) { if (!n.c[ch]) n.c[ch] = new TrieNode(); n = n.c[ch]; }
-    n.w = true;
-  }
-  return root;
-}
-
 // Per-language word sets and tries
 const LANGS = {
   fi: {
@@ -299,91 +303,9 @@ function hasWordInBuf(buf, word) {
   return false;
 }
 
-const GRID_SIZE = 5;
-const HEX_ROWS = 7;
-const HEX_COLS = 5;
-
-function makeGrid(lang = 'fi', rows = GRID_SIZE, cols) {
-  const c = cols || rows;
-  return Array.from({ length: rows }, () =>
-    Array.from({ length: c }, () => randLetter(lang))
-  );
-}
-
-function findWords(grid, trie) {
-  const sz = grid.length, found = new Set();
-  const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
-  function dfs(r, c, node, path, vis) {
-    const ch = grid[r][c], nx = node.c[ch];
-    if (!nx) return;
-    const np = path + ch;
-    if (nx.w && np.length >= 3) found.add(np);
-    vis.add(r * sz + c);
-    for (const [dr, dc] of dirs) {
-      const nr = r + dr, nc = c + dc;
-      if (nr >= 0 && nr < sz && nc >= 0 && nc < sz && !vis.has(nr * sz + nc))
-        dfs(nr, nc, nx, np, vis);
-    }
-    vis.delete(r * sz + c);
-  }
-  for (let r = 0; r < sz; r++)
-    for (let c = 0; c < sz; c++)
-      dfs(r, c, trie, '', new Set());
-  return found;
-}
 
 // Hex grid neighbors (odd-r offset)
-const HEX_DIRS_EVEN = [[-1,-1],[-1,0],[0,-1],[0,1],[1,-1],[1,0]];
-const HEX_DIRS_ODD  = [[-1,0],[-1,1],[0,-1],[0,1],[1,0],[1,1]];
-function hexNeighbors(r, c, rows, cols) {
-  const dirs = r % 2 === 0 ? HEX_DIRS_EVEN : HEX_DIRS_ODD;
-  return dirs.map(([dr,dc]) => ({r: r+dr, c: c+dc}))
-    .filter(n => n.r >= 0 && n.r < rows && n.c >= 0 && n.c < cols);
-}
-
-function findWordsHex(grid, trie) {
-  const rows = grid.length, cols = grid[0].length, found = new Set();
-  function dfs(r, c, node, path, vis) {
-    const ch = grid[r][c], nx = node.c[ch];
-    if (!nx) return;
-    const np = path + ch;
-    if (nx.w && np.length >= 3) found.add(np);
-    vis.add(r * cols + c);
-    for (const n of hexNeighbors(r, c, rows, cols)) {
-      if (!vis.has(n.r * cols + n.c)) dfs(n.r, n.c, nx, np, vis);
-    }
-    vis.delete(r * cols + c);
-  }
-  for (let r = 0; r < rows; r++)
-    for (let c = 0; c < cols; c++)
-      dfs(r, c, trie, '', new Set());
-  return found;
-}
-
 // Check if a specific word can be traced on the grid (for long word validation)
-function canTraceWord(grid, word, hex) {
-  const rows = grid.length, cols = grid[0].length;
-  function neighbors(r, c) {
-    if (hex) return hexNeighbors(r, c, rows, cols);
-    const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
-    return dirs.map(([dr,dc]) => ({r:r+dr,c:c+dc})).filter(n => n.r>=0 && n.r<rows && n.c>=0 && n.c<cols);
-  }
-  function dfs(idx, r, c, vis) {
-    if (grid[r][c] !== word[idx]) return false;
-    if (idx === word.length - 1) return true;
-    vis.add(r * cols + c);
-    for (const n of neighbors(r, c)) {
-      if (!vis.has(n.r * cols + n.c) && dfs(idx + 1, n.r, n.c, vis)) return true;
-    }
-    vis.delete(r * cols + c);
-    return false;
-  }
-  for (let r = 0; r < rows; r++)
-    for (let c = 0; c < cols; c++)
-      if (grid[r][c] === word[0] && dfs(0, r, c, new Set())) return true;
-  return false;
-}
-
 // Find long words (11-15 chars) on a hex grid using Buffer binary search (no trie needed)
 function bufHasPrefix(buf, prefix) {
   if (!buf) return false;
@@ -593,18 +515,6 @@ const playerRooms = new Map(); // socketId -> roomCode
 // ============================================================================
 // LETTER GENERATION (for battle mode)
 // ============================================================================
-
-function randLetter(lang = 'fi') {
-  const lw = getLang(lang).letterWeights;
-  const ls = Object.keys(lw);
-  const tot = Object.values(lw).reduce((a, b) => a + b, 0);
-  let r = Math.random() * tot;
-  for (let i = 0; i < ls.length; i++) {
-    r -= lw[ls[i]];
-    if (r <= 0) return ls[i];
-  }
-  return ls[ls.length - 1];
-}
 
 // ============================================================================
 // BATTLE MODE: Grid path validation
