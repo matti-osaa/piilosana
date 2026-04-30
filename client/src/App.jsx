@@ -17,6 +17,7 @@ import { WordInfoModal } from "./components/WordInfoModal.jsx";
 import { AchievementsModal } from "./components/AchievementsModal.jsx";
 import { HamburgerMenu } from "./components/HamburgerMenu.jsx";
 import { AuthPanel } from "./components/AuthPanel.jsx";
+import { LobbyEnterName, LobbyChoose, LobbyWaiting } from "./components/MultiplayerLobby.jsx";
 
 // ============================================
 // PIILOSANA - Finnish Word Hunt Game
@@ -4531,19 +4532,16 @@ export default function Piilosana(){
       
       {/* MULTIPLAYER SCREENS - inline to prevent focus loss */}
       {mode==="multi"&&lobbyState==="enter_name"&&(
-        <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{border:`3px solid ${S.green}`,padding:"24px",boxShadow:`0 0 20px ${S.green}44`,maxWidth:"600px"}}>
-            <p style={{fontSize:"14px",lineHeight:"2",marginBottom:"16px",color:S.green}}>{t.nickname}</p>
-            <input ref={el=>{nicknameRef.current=el;if(el)el.focus();}} type="text" inputMode="text" maxLength="12" value={nickname} onChange={e=>setNickname(e.target.value.toUpperCase())}
-              autoFocus placeholder={t.nickname} onKeyDown={e=>{if(e.key==="Enter"&&nickname)setLobbyState("choose");}}
-              style={{fontFamily:S.font,fontSize:"18px",padding:"8px 12px",width:"100%",maxWidth:"500px",background:S.dark,color:S.green,border:`2px solid ${S.green}`,boxSizing:"border-box",marginBottom:"16px"}}/>
-            <br/>
-            <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
-              <button onClick={()=>nickname&&setLobbyState("choose")} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:nickname?S.green:S.border,border:"none",padding:"12px 28px",cursor:nickname?"pointer":"default",boxShadow:"4px 4px 0 #008844"}}>{lang==="en"?"CONTINUE":"JATKA"}</button>
-              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer"}}>{t.back}</button>
-            </div>
-          </div>
-        </div>
+        <LobbyEnterName
+          S={S}
+          t={t}
+          lang={lang}
+          nickname={nickname}
+          nicknameRef={nicknameRef}
+          onNicknameChange={setNickname}
+          onContinue={()=>setLobbyState("choose")}
+          onBack={returnToModeSelect}
+        />
       )}
       {mode==="multi"&&(lobbyState==="creating"||lobbyState==="joining")&&(
         <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
@@ -4555,102 +4553,49 @@ export default function Piilosana(){
         </div>
       )}
       {mode==="multi"&&lobbyState==="choose"&&(
-        <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{border:`3px solid ${S.green}`,padding:"24px",boxShadow:`0 0 20px ${S.green}44`,maxWidth:"600px",borderRadius:"16px"}}>
-            {lobbyError&&<p style={{fontSize:"13px",color:S.red,marginBottom:"8px"}}>{lobbyError}</p>}
-            {!socketConnected&&<p style={{fontSize:"13px",color:S.yellow,marginBottom:"12px",animation:"pulse 1s infinite"}}>{t.connecting}</p>}
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
-              <p style={{fontSize:"13px",lineHeight:"2",color:S.green,margin:0}}>{t.openGames}</p>
-              <button onClick={refreshRooms} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.green,border:`1px solid ${S.green}`,background:"transparent",padding:"4px 10px",cursor:"pointer",display:"flex",alignItems:"center",borderRadius:"8px"}}><Icon icon="refresh" color={S.green} size={2}/></button>
-            </div>
-            <div style={{background:S.dark,padding:"8px",border:`1px solid ${S.border}`,marginBottom:"16px",minHeight:"80px",maxHeight:"200px",overflowY:"auto",borderRadius:"10px"}}>
-              {publicRooms.length===0&&(
-                <p style={{fontSize:"18px",color:S.textMuted,padding:"16px 0"}}>{t.noRooms}</p>
-              )}
-              {publicRooms.map((r,i)=>(
-                <div key={r.roomCode} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px",borderBottom:i<publicRooms.length-1?`1px solid ${S.border}`:"none"}}>
-                  <div>
-                    <span style={{marginRight:"6px",display:"inline-flex",verticalAlign:"middle"}}><PixelFlag lang={r.lang||"fi"} size={2}/></span>
-                    <span style={{fontSize:"13px",color:S.yellow}}>{r.hostNickname}</span>
-                    <span style={{fontSize:"18px",color:"#888",marginLeft:"8px"}}>{r.playerCount}/{r.maxPlayers}</span>
-                  </div>
-                  <button onClick={()=>joinRoom(r.roomCode)} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:S.yellow,border:"none",padding:"6px 14px",cursor:"pointer",boxShadow:"2px 2px 0 #cc8800",borderRadius:"8px"}}>{t.join}</button>
-                </div>
-              ))}
-            </div>
-            {/* Join with room code */}
-            <div style={{marginBottom:"12px"}}>
-              <p style={{fontSize:"13px",color:S.textMuted,marginBottom:"6px"}}>{t.orJoinRoom}</p>
-              <div style={{display:"flex",gap:"6px",justifyContent:"center",alignItems:"center"}}>
-                <input type="text" maxLength="6" value={roomCode} onChange={e=>setRoomCode(e.target.value.toUpperCase())} placeholder={t.roomCode}
-                  style={{fontFamily:S.font,fontSize:"14px",color:S.green,background:S.dark,border:`2px solid ${S.border}`,padding:"8px",width:"140px",textAlign:"center",outline:"none",letterSpacing:"2px",borderRadius:"8px"}}
-                  onKeyDown={e=>{if(e.key==="Enter"&&roomCode.trim())joinRoom(roomCode.trim());}}/>
-                <button onClick={()=>{if(roomCode.trim())joinRoom(roomCode.trim());}} disabled={!socketConnected||!roomCode.trim()} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:roomCode.trim()&&socketConnected?S.yellow:S.border,border:"none",padding:"8px 14px",cursor:roomCode.trim()&&socketConnected?"pointer":"default",borderRadius:"8px"}}>{t.joinGame}</button>
-              </div>
-            </div>
-            <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
-              <button onClick={createRoom} disabled={!socketConnected} style={{fontFamily:S.font,fontSize:"18px",color:S.bg,background:socketConnected?S.green:S.border,border:"none",padding:"12px 20px",cursor:socketConnected?"pointer":"default",boxShadow:socketConnected?"3px 3px 0 #008844":"none",borderRadius:"10px"}}>{socketConnected?t.createGame:t.connecting}</button>
-              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"18px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"10px 20px",cursor:"pointer",borderRadius:"10px"}}>{t.back}</button>
-            </div>
-          </div>
-        </div>
+        <LobbyChoose
+          S={S}
+          t={t}
+          Icon={Icon}
+          PixelFlag={PixelFlag}
+          socketConnected={socketConnected}
+          lobbyError={lobbyError}
+          publicRooms={publicRooms}
+          roomCode={roomCode}
+          onRoomCodeChange={setRoomCode}
+          onJoinRoom={joinRoom}
+          onCreateRoom={createRoom}
+          onRefreshRooms={refreshRooms}
+          onBack={returnToModeSelect}
+        />
       )}
       {mode==="multi"&&lobbyState==="waiting"&&(
-        <div style={{textAlign:"center",marginTop:"30px",animation:"fadeIn 0.5s ease"}}>
-          <div style={{border:`1px solid ${S.yellow}44`,padding:"24px",boxShadow:`0 4px 24px ${S.yellow}22, 0 8px 32px #00000022`,maxWidth:"600px",borderRadius:"16px",background:`${S.dark}f0`,backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
-            <p style={{fontSize:"18px",lineHeight:"2",marginBottom:"12px",color:S.yellow}}>{t.waiting}</p>
-            <p style={{fontSize:"13px",lineHeight:"2",color:S.green,marginBottom:"12px"}}>{t.playersCount} ({players.length})</p>
-            <div style={{background:`${S.dark}cc`,padding:"10px",border:`1px solid ${S.border}`,marginBottom:"16px",minHeight:"60px",borderRadius:"10px"}}>
-              {players.map((p,i)=><div key={i} style={{fontSize:"13px",color:p.playerId===playerId?S.yellow:S.green,padding:"4px"}}>{i+1}. {p.nickname}{p.playerId===playerId?` (${t.youTag})`:""}</div>)}
-            </div>
-            {/* Share link & QR code */}
-            {roomCode&&(()=>{
-              const shareUrl=`${window.location.origin}?room=${roomCode}`;
-              const copyLink=()=>{navigator.clipboard.writeText(shareUrl).then(()=>{setLinkCopied(true);setTimeout(()=>setLinkCopied(false),2000);}).catch(()=>{});};
-              return(
-              <div style={{marginBottom:"16px",padding:"14px",background:`${S.gridBg||S.dark}cc`,border:`1px solid ${S.border}`,borderRadius:"12px"}}>
-                <p style={{fontSize:"13px",color:S.textSoft,marginBottom:"8px"}}>{t.inviteFriends}</p>
-                <div style={{display:"flex",gap:"8px",alignItems:"center",justifyContent:"center",marginBottom:"10px"}}>
-                  <input readOnly value={shareUrl} style={{fontFamily:S.font,fontSize:"12px",color:S.textSoft,background:S.dark,border:`1px solid ${S.border}`,padding:"6px 8px",flex:1,maxWidth:"280px",outline:"none"}} onClick={e=>e.target.select()}/>
-                  <button onClick={copyLink} style={{fontFamily:S.font,fontSize:"12px",color:linkCopied?S.bg:S.green,background:linkCopied?S.green:"transparent",border:`2px solid ${S.green}`,padding:"6px 12px",cursor:"pointer",minWidth:"80px",transition:"all 0.2s"}}>{linkCopied?t.copied:t.shareLink}</button>
-                </div>
-                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"4px"}}>
-                  <QRCodeSVG value={shareUrl} size={120} bgColor="transparent" fgColor={S.textSoft} level="L"/>
-                  <p style={{fontSize:"11px",color:S.textMuted}}>{t.scanToJoin}</p>
-                </div>
-              </div>);
-            })()}
-            {isHost&&(
-              <div style={{marginBottom:"12px"}}>
-                <p style={{fontSize:"13px",color:S.green,marginBottom:"8px"}}>{t.gameMode}</p>
-                <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
-                  <button onClick={()=>setGameMode("classic")} style={{fontFamily:S.font,fontSize:"13px",color:gameMode==="classic"?S.bg:S.green,background:gameMode==="classic"?S.green:"transparent",border:`1px solid ${gameMode==="classic"?S.green:S.green+"66"}`,padding:"8px 16px",cursor:"pointer",borderRadius:"10px",transition:"all 0.15s"}}>{t.classic}</button>
-                  <button onClick={()=>setGameMode("battle")} style={{fontFamily:S.font,fontSize:"13px",color:gameMode==="battle"?S.bg:S.purple,background:gameMode==="battle"?S.purple:"transparent",border:`1px solid ${gameMode==="battle"?S.purple:S.purple+"66"}`,padding:"8px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px",borderRadius:"10px",transition:"all 0.15s"}}><Icon icon="swords" color={gameMode==="battle"?S.bg:S.purple} size={2}/>{t.battle}</button>
-                </div>
-                {gameMode==="battle"&&<p style={{fontSize:"13px",color:S.purple,marginTop:"8px",lineHeight:"1.8"}}>{t.battleDesc}</p>}
-                <div style={{marginTop:"12px"}}>
-                  <p style={{fontSize:"13px",color:S.green,marginBottom:"8px"}}>{t.time}</p>
-                  <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
-                    <button onClick={()=>setGameTime(120)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===120?S.bg:S.green,background:gameTime===120?S.green:"transparent",border:`1px solid ${gameTime===120?S.green:S.green+"66"}`,padding:"8px 16px",cursor:"pointer",borderRadius:"10px",transition:"all 0.15s"}}>2 MIN</button>
-                    <button onClick={()=>setGameTime(402)} style={{fontFamily:S.font,fontSize:"13px",color:gameTime===402?S.bg:S.yellow,background:gameTime===402?S.yellow:"transparent",border:`1px solid ${gameTime===402?S.yellow:S.yellow+"66"}`,padding:"8px 16px",cursor:"pointer",borderRadius:"10px",transition:"all 0.15s"}}>{lang==="en"?"6.7":"6,7"} MIN</button>
-                  </div>
-                </div>
-                {gameMode!=="battle"&&(
-                  <div style={{marginTop:"12px"}}>
-                    <p style={{fontSize:"13px",color:S.green,marginBottom:"8px"}}>{t.letterMult}</p>
-                    <button onClick={()=>setLetterMult(v=>!v)} style={{fontFamily:S.font,fontSize:"13px",color:letterMult?S.bg:S.yellow,background:letterMult?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"8px 16px",cursor:"pointer"}}>
-                      {letterMult?"✓ ":""}{t.letterMultBtn}
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-            {isHost&&<button onClick={()=>startGame(gameMode)} disabled={players.length<2} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:players.length>=2?S.green:S.border,border:"none",padding:"14px 28px",cursor:players.length>=2?"pointer":"default",borderRadius:"12px",boxShadow:players.length>=2?`0 4px 12px ${S.green}33`:"none",fontWeight:"600",transition:"all 0.15s"}}>{t.startGame}</button>}
-            {isHost&&players.length<2&&<p style={{fontSize:"18px",color:"#666",marginTop:"8px"}}>{t.waitForPlayers}</p>}
-            {!isHost&&<p style={{fontSize:"18px",color:"#666"}}>{t.waitForHost}</p>}
-            <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`1px solid ${S.green}44`,background:"transparent",padding:"10px 20px",cursor:"pointer",marginTop:"12px",borderRadius:"10px"}}>{t.exit}</button>
-          </div>
-        </div>
+        <LobbyWaiting
+          S={S}
+          t={t}
+          lang={lang}
+          Icon={Icon}
+          players={players}
+          playerId={playerId}
+          roomCode={roomCode}
+          linkCopied={linkCopied}
+          isHost={isHost}
+          gameMode={gameMode}
+          gameTime={gameTime}
+          letterMult={letterMult}
+          onCopyLink={()=>{
+            const shareUrl=`${window.location.origin}?room=${roomCode}`;
+            navigator.clipboard.writeText(shareUrl).then(()=>{
+              setLinkCopied(true);
+              setTimeout(()=>setLinkCopied(false),2000);
+            }).catch(()=>{});
+          }}
+          onGameModeChange={setGameMode}
+          onGameTimeChange={setGameTime}
+          onLetterMultToggle={()=>setLetterMult(v=>!v)}
+          onStartGame={startGame}
+          onExit={returnToModeSelect}
+        />
       )}
       {mode==="multi"&&state==="end"&&lobbyState==="results"&&<ResultsScreen/>}
 
