@@ -125,20 +125,20 @@ function countThemeWords(foundWords,theme){
   if(!theme||!theme.words)return 0;
   return theme.words.filter(w=>foundWords.has(w)).length;
 }
-function getDailyResult(){try{const d=JSON.parse(localStorage.getItem('piilosana_daily')||'{}');if(d.date===todayStr())return d;return null;}catch{return null;}}
-function saveDailyResult(score,wordsFound,totalWords,forDate){
+function getDailyResult(lang='fi'){try{const d=JSON.parse(localStorage.getItem(`piilosana_daily_${lang}`)||'{}');if(d.date===todayStr())return d;return null;}catch{return null;}}
+function saveDailyResult(score,wordsFound,totalWords,forDate,lang='fi'){
   const d=forDate||todayStr();
-  const result={date:d,num:dailyNumberForDate(d),score,wordsFound,totalWords,lang:'fi'};
-  if(d===todayStr())localStorage.setItem('piilosana_daily',JSON.stringify(result));
+  const result={date:d,num:dailyNumberForDate(d),score,wordsFound,totalWords,lang};
+  if(d===todayStr())localStorage.setItem(`piilosana_daily_${lang}`,JSON.stringify(result));
   // Save to history (last 14 days, no duplicates)
-  try{let hist=JSON.parse(localStorage.getItem('piilosana_daily_history')||'[]');
+  try{let hist=JSON.parse(localStorage.getItem(`piilosana_daily_history_${lang}`)||'[]');
   hist=hist.filter(h=>h.date!==d);hist.unshift(result);
-  localStorage.setItem('piilosana_daily_history',JSON.stringify(hist.slice(0,14)));}catch{}
+  localStorage.setItem(`piilosana_daily_history_${lang}`,JSON.stringify(hist.slice(0,14)));}catch{}
 }
-function getDailyHistory(){try{return JSON.parse(localStorage.getItem('piilosana_daily_history')||'[]');}catch{return [];}}
-function getDailyResultForDate(dateStr){const hist=getDailyHistory();return hist.find(h=>h.date===dateStr)||null;}
-function getDailyStreak(){try{const s=JSON.parse(localStorage.getItem('piilosana_streak')||'{}');return s;}catch{return{};}}
-function updateDailyStreak(){const s=getDailyStreak();const today=todayStr();const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);if(s.lastDate===today)return s;const streak=(s.lastDate===yesterday)?(s.streak||0)+1:1;const best=Math.max(streak,s.best||0);const result={streak,best,lastDate:today};localStorage.setItem('piilosana_streak',JSON.stringify(result));return result;}
+function getDailyHistory(lang='fi'){try{return JSON.parse(localStorage.getItem(`piilosana_daily_history_${lang}`)||'[]');}catch{return [];}}
+function getDailyResultForDate(dateStr,lang='fi'){const hist=getDailyHistory(lang);return hist.find(h=>h.date===dateStr)||null;}
+function getDailyStreak(lang='fi'){try{const s=JSON.parse(localStorage.getItem(`piilosana_streak_${lang}`)||'{}');return s;}catch{return{};}}
+function updateDailyStreak(lang='fi'){const s=getDailyStreak(lang);const today=todayStr();const yesterday=daysAgoStr(1);if(s.lastDate===today)return s;const streak=(s.lastDate===yesterday)?(s.streak||0)+1:1;const best=Math.max(streak,s.best||0);const result={streak,best,lastDate:today};localStorage.setItem(`piilosana_streak_${lang}`,JSON.stringify(result));return result;}
 // Date helpers for daily challenge UI
 const WEEKDAYS_FI=["sunnuntai","maanantai","tiistai","keskiviikko","torstai","perjantai","lauantai"];
 const WEEKDAYS_EN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -2403,7 +2403,9 @@ export default function Piilosana(){
   const[showTutorial,setShowTutorial]=useState(false);
   const[dailyMode,setDailyMode]=useState(false);
   const[dailyTheme,setDailyTheme]=useState(null);
-  const[dailyResult,setDailyResult]=useState(()=>getDailyResult());
+  const[dailyResult,setDailyResult]=useState(()=>getDailyResult(lang));
+  // Refresh daily result when language changes
+  useEffect(()=>{setDailyResult(getDailyResult(lang));},[lang]);
   const[dailyShareMsg,setDailyShareMsg]=useState(null);
   const[showDailyHistory,setShowDailyHistory]=useState(null); // date string or null
   const[showExitConfirm,setShowExitConfirm]=useState(false);
@@ -2919,7 +2921,7 @@ export default function Piilosana(){
   const[dailyDate,setDailyDate]=useState(todayStr()); // which date's daily we're playing
   const startDaily=useCallback(async(forDate)=>{
     const playDate=forDate||todayStr();
-    if(getDailyResultForDate(playDate))return; // already played this date
+    if(getDailyResultForDate(playDate,lang))return; // already played this date
     // Only allow today and past 6 days (compare in Finnish timezone)
     const today=todayStr();
     const dayDiff=Math.floor((new Date(today+"T12:00:00Z").getTime()-new Date(playDate+"T12:00:00Z").getTime())/(86400000));
@@ -2957,10 +2959,10 @@ export default function Piilosana(){
   },[trie,sounds,lang]);
 
   const shareDailyResult=useCallback(()=>{
-    const dr=getDailyResult()||getDailyResultForDate(dailyDate);if(!dr)return;
+    const dr=getDailyResult(lang)||getDailyResultForDate(dailyDate,lang);if(!dr)return;
     const dl=dateLabel(dr.date,lang);
     const pct=dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0;
-    const streak=getDailyStreak();
+    const streak=getDailyStreak(lang);
     const themeStr=dailyTheme?` (${dailyTheme.name})`:"";
     const text=`Sain ${dl.full} päivän piilosanassa${themeStr} ${dr.score} pistettä (${dr.wordsFound}/${dr.totalWords} sanaa)! Pystytkö parempaan?${streak.streak>1?` 🔥 ${streak.streak} päivää putkeen!`:""}\n\nPelaa: https://piilosana.com`;
     if(navigator.share){navigator.share({title:`Päivän Piilosana — ${dl.full}`,text}).catch(()=>{});}
@@ -3139,10 +3141,10 @@ export default function Piilosana(){
 
   // Save daily result when game ends — local + server
   useEffect(()=>{
-    if(state==="end"&&dailyMode&&!getDailyResultForDate(dailyDate)){
-      saveDailyResult(score,found.length,valid.size,dailyDate);
-      if(dailyDate===todayStr())updateDailyStreak();
-      setDailyResult(getDailyResult());
+    if(state==="end"&&dailyMode&&!getDailyResultForDate(dailyDate,lang)){
+      saveDailyResult(score,found.length,valid.size,dailyDate,lang);
+      if(dailyDate===todayStr())updateDailyStreak(lang);
+      setDailyResult(getDailyResult(lang));
       // Submit to server daily leaderboard
       const nick=authUser?.nickname||(()=>{try{const a=JSON.parse(localStorage.getItem("piilosana_auth")||"null");if(a?.nickname)return a.nickname;}catch{}return localStorage.getItem('piilosana_nick')||'Anon';})();
       fetch('/api/daily-scores',{method:'POST',headers:{'Content-Type':'application/json'},
@@ -4037,9 +4039,9 @@ export default function Piilosana(){
     setPublicRankings(null);
     setDailyMode(false);
     setDailyTheme(null);
-    setDailyResult(getDailyResult());
+    setDailyResult(getDailyResult(lang));
     setState("menu");
-  },[socket,mode]);
+  },[socket,mode,lang]);
   
   const refreshRooms=useCallback(()=>{
     if(socket&&socket.connected)socket.emit("list_rooms");
@@ -4089,7 +4091,7 @@ export default function Piilosana(){
     <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
 
       {/* ===== DAILY CHALLENGE — HERO CARD ===== */}
-      {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult();const todayTheme=getDailyTheme(d,lang);const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;const streak=getDailyStreak();return(
+      {(()=>{const d=todayStr();const dl=dateLabel(d,lang);const res=getDailyResult(lang);const todayTheme=getDailyTheme(d,lang);const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;const streak=getDailyStreak(lang);return(
         <button onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}} style={{fontFamily:S.font,width:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"5px",
           padding:"22px 16px 18px",border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:S.panelRadius||"16px",cursor:"pointer",
           background:res?`linear-gradient(135deg,${S.yellow||"#ffcc00"}22,${S.yellow||"#ffcc00"}11)`:`linear-gradient(135deg,${S.yellow||"#ffcc00"}15,${S.yellow||"#ffcc00"}08)`,
@@ -4097,7 +4099,7 @@ export default function Piilosana(){
           onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 8px 32px ${S.yellow||"#ffcc00"}33`;}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
           <span style={{fontSize:"11px",color:S.yellow||"#ffcc00",letterSpacing:"3px",textTransform:"uppercase",fontWeight:"600"}}>{t.daily}</span>
-          <span style={{fontSize:"12px",color:S.textMuted,fontStyle:"italic"}}>{themeName}</span>
+          <span style={{fontSize:"12px",color:S.textMuted,fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {themeName}</span>
           <span style={{fontSize:"13px",color:S.textMuted,textTransform:"capitalize"}}>{dl.weekday} {dl.short}</span>
           {res?(
             <><span style={{fontSize:"32px",fontWeight:"800",color:S.yellow||"#ffcc00",lineHeight:1}}>{res.score}<span style={{fontSize:"16px",fontWeight:"400"}}>p</span></span>
@@ -4113,7 +4115,7 @@ export default function Piilosana(){
       {/* Yesterday + Tomorrow row */}
       <div style={{display:"flex",gap:"6px",width:"100%",marginBottom:"12px"}}>
         {/* Yesterday */}
-        {(()=>{const d=daysAgoStr(1);const dl=dateLabel(d,lang);const res=getDailyResultForDate(d);const num=dailyNumberForDate(d);
+        {(()=>{const d=daysAgoStr(1);const dl=dateLabel(d,lang);const res=getDailyResultForDate(d,lang);const num=dailyNumberForDate(d);
           if(num<1)return null;
           return(
             <button key={d} onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily(d);}}} style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
@@ -4141,9 +4143,7 @@ export default function Piilosana(){
       </div>
 
       {/* ===== AD SPACE ===== */}
-      <div style={{width:"100%",minHeight:"60px",border:`1px dashed ${S.border}`,borderRadius:S.btnRadius,marginBottom:"12px",display:"flex",alignItems:"center",justifyContent:"center",background:`${S.dark}88`}}>
-        <span style={{fontSize:"11px",color:S.textMuted+"88",letterSpacing:"1px"}}>AD</span>
-      </div>
+      <div style={{width:"100%",minHeight:"60px",borderRadius:S.btnRadius,marginBottom:"12px"}}></div>
 
       {/* ===== PRACTICE (CTA1) + NONSTOP (CTA2) row ===== */}
       <div style={{display:"flex",gap:"8px",marginBottom:"8px"}}>
@@ -4153,9 +4153,9 @@ export default function Piilosana(){
           <span style={{fontWeight:"700"}}>{t.practice}</span>
           <span style={{fontSize:"11px",opacity:0.7}}>{t.practiceDesc}</span>
         </button>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"15px",color:"#ffffff",background:"linear-gradient(135deg,#FF2D55,#E8254A)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #c41e3f",borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?"0 6px 20px #FF2D5544":"5px 5px 0 #c41e3f";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=S.btnShadow!=="none"?S.btnShadow:"3px 3px 0 #c41e3f";}}>
+        <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"15px",color:"#ffffff",background:"linear-gradient(135deg,#FF2D55,#E8254A)",border:"none",padding:"18px 12px",cursor:"pointer",boxShadow:`0 0 16px #FF2D5533, 0 0 4px #FF2D5522${S.btnShadow!=="none"?", "+S.btnShadow:", 3px 3px 0 #c41e3f"}`,borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",position:"relative",overflow:"hidden",transition:"all 0.2s",animation:"arenaPulse 3s ease-in-out infinite"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 0 24px #FF2D5555, 0 6px 20px #FF2D5544";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=`0 0 16px #FF2D5533, 0 0 4px #FF2D5522${S.btnShadow!=="none"?", "+S.btnShadow:", 3px 3px 0 #c41e3f"}`;}}>
           <span style={{fontWeight:"700"}}>{t.arenaCta}</span>
           {publicOnlineCount>=3?<span style={{fontSize:"11px",opacity:0.85}}>{publicOnlineCount} {t.playersInArena}</span>
             :<span style={{fontSize:"11px",opacity:0.7}}>{t.arenaDesc}</span>}
@@ -4179,7 +4179,7 @@ export default function Piilosana(){
       {/* Daily history popup with leaderboard */}
       {showDailyHistory&&(
         <DailyPopup dateStr={showDailyHistory} lang={lang} t={t} S={S}
-          myResult={getDailyResultForDate(showDailyHistory)||(showDailyHistory===todayStr()?getDailyResult():null)}
+          myResult={getDailyResultForDate(showDailyHistory,lang)||(showDailyHistory===todayStr()?getDailyResult(lang):null)}
           onShare={showDailyHistory===todayStr()?shareDailyResult:null}
           dailyShareMsg={dailyShareMsg}
           onClose={()=>setShowDailyHistory(null)} />
@@ -5216,7 +5216,7 @@ export default function Piilosana(){
             {mode==="solo"&&soloMode==="theme"&&activeTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44bb66",background:"#44bb6611",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>{activeTheme.emoji} {t.themeHint}: {activeTheme.name} — {themeFound.length}/{activeTheme.words.length}</div>}
             {mode==="solo"&&soloMode==="bomb"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff4444",background:"#ff444411",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>💣 {t.bombLabel} — {bombTimer}s</div>}
             {mode==="solo"&&soloMode==="mystery"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#aa66ff",background:"#aa66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>❓ {t.mysteryLabel}</div>}
-            {dailyMode&&dailyTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"12px",color:S.yellow||"#ffcc00",background:`${S.yellow||"#ffcc00"}11`,borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",fontStyle:"italic"}}>{lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}</div>}
+            {dailyMode&&dailyTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"12px",color:S.yellow||"#ffcc00",background:`${S.yellow||"#ffcc00"}11`,borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}</div>}
             {mode==="solo"&&soloMode==="chess"&&state==="play"&&chessPiece&&(
               <div style={{textAlign:"center",padding:"8px",fontSize:"13px",color:"#ddaa33",background:"#ddaa3311",borderBottom:`1px solid ${S.border}`}}>
                 {chessPlacing?(
@@ -5602,7 +5602,7 @@ export default function Piilosana(){
           {confettiOn&&<ConfettiCelebration isWinner={true}/>}
           <div style={{position:"relative",zIndex:1,border:`1px solid ${ending?.color||S.yellow}44`,padding:"24px",marginBottom:"16px",boxShadow:`0 4px 24px ${ending?.color||S.yellow}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
             {dailyMode?<><div style={{fontSize:"15px",color:S.yellow||"#ffcc00",marginBottom:"4px",fontWeight:"700"}}>{t.daily} {dateLabel(dailyDate,lang).short}</div>
-            {dailyTheme&&<div style={{fontSize:"12px",color:S.textMuted,marginBottom:"6px",fontStyle:"italic"}}>{lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}</div>}</>
+            {dailyTheme&&<div style={{fontSize:"12px",color:S.textMuted,marginBottom:"6px",fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}</div>}</>
             :<div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>}
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.score}</div>
             <div style={{fontSize:"36px",color:S.green,marginBottom:"4px",animation:"pop 0.3s ease",fontWeight:"700",letterSpacing:"2px"}}>{score}<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}>p</span>{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}> / {totalPossible}p</span>:null}</div>
@@ -5655,7 +5655,7 @@ export default function Piilosana(){
               {t.share}
             </button>
 
-            {dailyMode&&(()=>{const dr=dailyResult||getDailyResultForDate(dailyDate);const dl=dateLabel(dailyDate,lang);return dr?(
+            {dailyMode&&(()=>{const dr=dailyResult||getDailyResultForDate(dailyDate,lang);const dl=dateLabel(dailyDate,lang);return dr?(
               <div style={{margin:"12px 0",padding:"16px",background:`linear-gradient(135deg,${S.yellow||"#ffcc00"}22,${S.yellow||"#ffcc00"}11)`,border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:"14px",textAlign:"center"}}>
                 <div style={{fontSize:"18px",fontWeight:"700",color:S.yellow||"#ffcc00",marginBottom:"4px"}}>{t.daily} {dl.short}</div>
                 <div style={{fontSize:"24px",fontWeight:"800",color:S.yellow,marginBottom:"4px"}}>{dr.score}p</div>
