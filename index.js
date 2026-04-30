@@ -19,6 +19,7 @@ import { findWords, findWordsHex, canTraceWord } from "./server/game/validate.js
 import { initDb, saveDb, getDb, submitScore, submitDailyScore, getHallOfFame, getAllHallOfFame, getDailyLeaderboard, HOF_CATEGORIES } from "./server/db.js";
 import { LANGS, getLang, isLangValid, FULL_WORDS_BUF, hasWordInBuf, bufHasPrefix } from "./server/words.js";
 import { attachScoresRoutes } from "./server/routes/scores.js";
+import { attachGameRoutes } from "./server/routes/game.js";
 
 // Adapters: pure modules ottavat letterWeights-objektin, mutta index.js:n
 // sisäiset kutsut käyttävät lang-koodia. getLang() ei vielä ole määritelty
@@ -920,53 +921,6 @@ app.get('/ready', (req, res) => {
   }
 });
 
-// Validate long words (11+ chars) using the full Finnish word list
-// Find long words (11-15 chars) on a given grid - for solo mode
-app.post('/api/find-long-words', (req, res) => {
-  const { grid, hex } = req.body;
-  if (!grid || !Array.isArray(grid) || !FULL_WORDS_BUF) {
-    return res.json({ words: [] });
-  }
-  try {
-    const longWords = findLongWordsOnGrid(grid, FULL_WORDS_BUF, !!hex);
-    return res.json({ words: [...longWords] });
-  } catch (e) {
-    return res.json({ words: [] });
-  }
-});
-
-app.post('/api/validate-word', (req, res) => {
-  const { word } = req.body;
-  if (!word || typeof word !== 'string' || word.length < 3 || word.length > 30) {
-    return res.json({ valid: false });
-  }
-  const w = word.toLowerCase().trim();
-  // Short words: check trie/set
-  if (w.length <= 10) {
-    const lang = getLang('fi');
-    return res.json({ valid: lang.words.has(w) });
-  }
-  // Long words: binary search in full word buffer
-  return res.json({ valid: hasWordInBuf(FULL_WORDS_BUF, w) });
-});
-
-
-// App version endpoint — clients poll this to detect deploys
-app.get('/api/version', (req, res) => {
-  res.json({ version: APP_VERSION });
-});
-
-// Public game status (supports ?lang=fi|en)
-app.get('/api/public-game', (req, res) => {
-  const lang = req.query.lang === 'en' ? 'en' : 'fi';
-  const pg = getPublicGame(lang);
-  res.json({
-    state: pg.state,
-    playerCount: pg.players.size,
-    timeLeft: pg.timeLeft,
-    roundNumber: pg.roundNumber,
-  });
-});
 
 // ============================================================================
 // AUTH ROUTES
@@ -1244,11 +1198,6 @@ app.post('/api/google-login', async (req, res) => {
   }
 });
 
-// Endpoint to provide Google Client ID to frontend
-app.get('/api/google-client-id', (req, res) => {
-  res.json({ clientId: GOOGLE_CLIENT_ID || null });
-});
-
 // Save user settings
 app.post('/api/settings', async (req, res) => {
   try {
@@ -1288,15 +1237,6 @@ app.post('/api/me', (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Virhe' });
   }
-});
-
-// Get arena player count (for main menu display)
-app.get('/api/arena-count', (req, res) => {
-  let total = 0;
-  for (const lang of Object.keys(publicGames)) {
-    total += publicGames[lang].players.size;
-  }
-  res.json({ count: total });
 });
 
 // Save achievements
@@ -1404,6 +1344,13 @@ a{color:#00ff88;}
 
 // Reittimoduulit (siirretty server/routes/-hakemistoon)
 attachScoresRoutes(app);
+attachGameRoutes(app, {
+  appVersion: APP_VERSION,
+  googleClientId: GOOGLE_CLIENT_ID,
+  getPublicGame,
+  publicGames,
+  findLongWordsOnGrid,
+});
 
 // SPA catch-all: serve index.html for any non-API route
 app.get('*', (req, res) => {
