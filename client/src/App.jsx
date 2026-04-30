@@ -3744,6 +3744,29 @@ export default function Piilosana(){
         }
         return prev;
       });
+      // Jos pelin aikana yhteys katkeaa, ilmoita ja palaa valikkoon — pelitila
+      // ei voi enää jatkua koska palvelin ei tunne meitä uudessa yhteydessä.
+      const inPublicGame=mode==="public"&&(publicState==="playing"||publicState==="countdown");
+      const inMultiGame=mode==="multi"&&(state==="play"||state==="countdown"||state==="ending");
+      if(inPublicGame||inMultiGame){
+        setTimeout(()=>{
+          alert(lang==="en"?"Connection lost. Returning to menu.":lang==="sv"?"Anslutningen bröts. Återgår till menyn.":"Yhteys katkesi. Palataan valikkoon.");
+          returnToModeSelect();
+        },100);
+      }
+    });
+
+    // Server lähettää tämän kun se on lähdössä alas (uuden version deploy).
+    // Annetaan käyttäjälle selvä palaute, ei hiljaista bug-kokemusta.
+    newSocket.on("server_draining",()=>{
+      console.log("Server draining — version update");
+      const inGame=(mode==="public"&&publicState==="playing")||(mode==="multi"&&state==="play");
+      if(inGame){
+        setTimeout(()=>{
+          alert(lang==="en"?"Server is updating. The game will end — please try again in a moment.":lang==="sv"?"Servern uppdateras. Spelet avslutas — försök igen om en stund.":"Päivitys käynnissä — peli päättyy. Yritä hetken päästä uudelleen.");
+          returnToModeSelect();
+        },100);
+      }
     });
 
     newSocket.on("connect_error",(err)=>{
@@ -5498,4 +5521,4 @@ export default function Piilosana(){
       )}
     </div>
   );
-}
+}
