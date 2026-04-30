@@ -5339,11 +5339,7 @@ export default function Piilosana(){
             </div>
           )}
 
-          {combo>=2&&state==="play"&&(
-            <div style={{textAlign:"center",fontSize:"13px",color:combo>=5?S.purple:combo>=3?S.yellow:S.green,marginBottom:"4px",animation:combo>=3?"epicPulse 0.5s infinite":"none"}}>
-              {combo>=5?`${t.megaCombo} x${combo}!`:combo>=3?`${t.combo} x${combo}! (x2)`:`${combo} ${t.comboStreak}`}
-            </div>
-          )}
+          {/* Combo banner poistettu – combo-info näkyy inline sanapalkissa (rivi ~5287) */}
 
           {/* Exit confirmation overlay */}
           {showExitConfirm&&(
