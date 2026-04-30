@@ -6,6 +6,7 @@ import DEFS_FI from "./defs_fi.js";
 import { menuColors } from "./menuColors.js";
 import { MultiplayerHero } from "./components/MultiplayerHero.jsx";
 import { DailyHeroCard } from "./components/DailyHeroCard.jsx";
+import { DailyEndResult } from "./components/DailyEndResult.jsx";
 import { computePercentile, tierForPercentile, PERCENTILE_TEXTS } from "./hooks/useDailyPercentile.js";
 import { DayBoxRow } from "./components/DayBoxRow.jsx";
 import { MenuFooter } from "./components/MenuFooter.jsx";
@@ -2339,7 +2340,7 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
               <span style={{fontSize:"13px",color:i===0?S.yellow:isHighlight?S.green:i<3?"#cccccc":S.textSoft,fontWeight:i<3||isHighlight?"600":"normal"}}>{s.nickname}</span>
             </div>
             <div style={{display:"flex",gap:"12px",alignItems:"center"}}>
-              <span style={{fontSize:i===0?"14px":"13px",color:S.yellow,fontWeight:i<3?"bold":"normal"}}>{s.score}p</span>
+              <span style={{fontSize:i===0?"14px":"13px",color:(tierForPercentile(computePercentile(s.score,scores))?.color)||S.yellow,fontWeight:i<3?"bold":"normal",transition:"color 0.3s ease"}}>{s.score}p</span>
               <span style={{fontSize:"13px",color:S.textSoft||"#88ccaa"}}>{s.percentage}%</span>
             </div>
           </div>;
@@ -5277,16 +5278,23 @@ export default function Piilosana(){
               {t.share}
             </button>
 
-            {dailyMode&&(()=>{const dr=dailyResult||getDailyResultForDate(dailyDate,lang);const dl=dateLabel(dailyDate,lang);return dr?(
-              <div style={{margin:"12px 0",padding:"16px",background:`linear-gradient(135deg,${S.yellow||"#ffcc00"}22,${S.yellow||"#ffcc00"}11)`,border:`2px solid ${S.yellow||"#ffcc00"}`,borderRadius:"14px",textAlign:"center"}}>
-                <div style={{fontSize:"18px",fontWeight:"700",color:S.yellow||"#ffcc00",marginBottom:"4px"}}>{t.daily} {dl.short}</div>
-                <div style={{fontSize:"24px",fontWeight:"800",color:S.yellow,marginBottom:"4px"}}>{dr.score}p</div>
-                <div style={{fontSize:"14px",color:S.green,marginBottom:"8px"}}>{dr.wordsFound}/{dr.totalWords} {t.dailyWords} ({dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0}%)</div>
-                <button onClick={shareDailyResult} style={{fontFamily:S.font,fontSize:"15px",color:"#2a2000",background:`linear-gradient(135deg,${S.yellow||"#ffcc00"},#E6B800)`,border:"none",padding:"10px 24px",cursor:"pointer",borderRadius:"10px",fontWeight:"700",boxShadow:`0 4px 12px ${S.yellow||"#ffcc00"}44`}}>
-                  {dailyShareMsg||t.dailyShare}
-                </button>
-              </div>
-            ):null;})()}
+            {dailyMode&&(()=>{
+              const dr=dailyResult||getDailyResultForDate(dailyDate,lang);
+              const dl=dateLabel(dailyDate,lang);
+              if(!dr)return null;
+              return(
+                <DailyEndResult
+                  S={S}
+                  t={t}
+                  lang={lang}
+                  dateStr={dailyDate}
+                  dateLabel={dl}
+                  result={dr}
+                  onShare={shareDailyResult}
+                  shareMsg={dailyShareMsg}
+                />
+              );
+            })()}
 
             <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center",marginTop:"10px"}}>
               <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.green}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.backToMenu}</button>
