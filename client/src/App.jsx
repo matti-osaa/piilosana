@@ -7,6 +7,8 @@ import { menuColors } from "./menuColors.js";
 import { MultiplayerHero } from "./components/MultiplayerHero.jsx";
 import { DailyHeroCard } from "./components/DailyHeroCard.jsx";
 import { NextDailyCountdown } from "./components/NextDailyCountdown.jsx";
+import { StreakWarning } from "./components/StreakWarning.jsx";
+import { FirstTimeWelcome } from "./components/FirstTimeWelcome.jsx";
 import { DailyEndResult } from "./components/DailyEndResult.jsx";
 import { computePercentile, tierForPercentile, PERCENTILE_TEXTS } from "./hooks/useDailyPercentile.js";
 import { DayBoxRow } from "./components/DayBoxRow.jsx";
@@ -4108,6 +4110,22 @@ export default function Piilosana(){
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
+
+      {/* Tervetulo­banneri — näkyy vain ensikertalaisille */}
+      <FirstTimeWelcome
+        S={S}
+        lang={lang}
+        isFirstTime={achStats.gamesPlayed===0}
+        onTryPractice={()=>setShowMenuOptions(true)}
+      />
+
+      {/* Streak-varoitus — näkyy ennen Daily-korttia jos putki vaarassa */}
+      <StreakWarning
+        S={S}
+        lang={lang}
+        streak={getDailyStreak(lang)}
+        isPlayed={!!getDailyResult(lang)}
+      />
 
       {/* ===== DAILY CHALLENGE — HERO CARD ===== */}
       {(()=>{
