@@ -29,7 +29,7 @@ const TEXTS = {
   sv: {
     aria: "Gå med i flerspelare",
     title: "FLERSPEL",
-    desc: "Snabb ordutmaning — spela mot andra",
+    desc: "Snabb ordutmaning – spela mot andra",
     players: "spelare nu",
     ctaJoin: "GÅ MED ⚡",
     ctaStart: "STARTA SPEL ⚡",

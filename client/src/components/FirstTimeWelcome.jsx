@@ -26,7 +26,7 @@ const TEXTS = {
     title: "Välkommen till Piilosana!",
     body: "Dra med fingret över bokstäverna och hitta ord. Ju längre ord desto mer poäng.",
     cta: "Starta med övning",
-    hint: "Dagens utmaning är nedanför — den är ett försök per dag, så prova spelet här först.",
+    hint: "Dagens utmaning är nedanför – den är ett försök per dag, så prova spelet här först.",
   },
   en: {
     title: "Welcome to Piilosana!",

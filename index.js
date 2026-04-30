@@ -19,6 +19,7 @@ import { attachStaticRoutes, attachSpaCatchAll } from "./server/routes/static.js
 import { createPublicArenaManager } from "./server/realtime/publicArena.js";
 import { createRoomManager } from "./server/realtime/rooms.js";
 import { attachSocketHandlers } from "./server/realtime/socketHandlers.js";
+import { requestId, accessLog, errorHandler } from "./server/middleware.js";
 
 // Adapter: pure makeGrid ottaa letterWeights-objektin, mutta index.js:n
 // generateGoodGrid käyttää lang-koodia. Kääritään se siksi tähän adapteriin.
@@ -44,6 +45,8 @@ const io = new Server(httpServer, {
 
 app.use(cors());
 app.use(express.json());
+app.use(requestId);
+app.use(accessLog);
 
 // Serve static frontend (built by Vite into /dist)
 app.use(express.static(join(__dirname, 'dist')));
@@ -166,6 +169,8 @@ attachAuthRoutes(app, {
 attachAccountRoutes(app);
 // SPA catch-all – TÄYTYY olla viimeisenä kaikkien muiden reittien jälkeen
 attachSpaCatchAll(app, join(__dirname, 'dist'));
+// Virhe-handler – kaikkien reittien jälkeen, nappaa heitetyt poikkeukset
+app.use(errorHandler);
 
 
 // ============================================================================

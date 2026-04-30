@@ -19,8 +19,8 @@ const TEXTS = {
     starting: "Aloita putki – pelaa tänään",
   },
   sv: {
-    label: (n) => `${n} dagars svit — spela idag för att behålla den`,
-    starting: "Starta en svit — spela idag",
+    label: (n) => `${n} dagars svit – spela idag för att behålla den`,
+    starting: "Starta en svit – spela idag",
   },
   en: {
     label: (n) => `${n}-day streak — play today to keep it`,
