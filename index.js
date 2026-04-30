@@ -901,8 +901,22 @@ app.get('/', (req, res) => {
   res.json({ status: 'ok', message: 'Piilosana multiplayer server' });
 });
 
+// Liveness — vastaa aina kun prosessi pyörii (Railway käyttää tätä erottaakseen kuolleen prosessin)
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', rooms: rooms.size });
+});
+
+// Readiness — vastaa 200 vain kun palvelu ottaa vastaan uutta liikennettä.
+// Palauttaa 503 kun palvelin on draining-tilassa (SIGTERM saatu, valmistellaan sammumista).
+// Railway:n health check kannattaa osoittaa tähän, jotta deploy-vaiheessa load balancer
+// ohjaa uudet pyynnöt suoraan uuteen replikaan.
+let isShuttingDown = false;
+app.get('/ready', (req, res) => {
+  if (isShuttingDown) {
+    res.status(503).json({ status: 'draining' });
+  } else {
+    res.json({ status: 'ready' });
+  }
 });
 
 // Validate long words (11+ chars) using the full Finnish word list
@@ -1444,6 +1458,52 @@ app.get('*', (req, res) => {
 // ============================================================================
 // SERVER START
 // ============================================================================
+
+
+// ============================================================================
+// GRACEFUL SHUTDOWN
+// ============================================================================
+//
+// Kun Railway tai Docker lähettää SIGTERM-signaalin (esim. uusi deploy):
+// 1. Asetetaan isShuttingDown=true → /ready palauttaa 503 → load balancer
+//    ohjaa uudet pyynnöt muualle (jos on muita replikoita)
+// 2. Lähetetään socket-clienteille "server_draining" -event että he osaavat
+//    odottaa tai uudelleenyhdistää
+// 3. Suljetaan HTTP-palvelin (lopettaa ottamasta uusia yhteyksiä, mutta
+//    sallii nykyisten päättyä siististi)
+// 4. Maksimi 25 sek odotus, sitten pakotetaan sammuminen (Railway tappaa
+//    prosessin 30 sek jälkeen joka tapauksessa)
+
+function gracefulShutdown(signal) {
+  console.log(`Received ${signal}, starting graceful shutdown...`);
+  isShuttingDown = true;
+
+  // Kerro client-puolelle että server on lähdössä
+  try {
+    io.emit('server_draining', { reason: signal });
+  } catch (e) {
+    console.error('Failed to emit server_draining:', e);
+  }
+
+  // Pakotettu timeout — jos kaikki ei ehtinyt, lopetetaan kuitenkin
+  const forceTimer = setTimeout(() => {
+    console.log('Graceful shutdown timed out, forcing exit');
+    process.exit(1);
+  }, 25_000);
+
+  // Sulje socket.io ja HTTP-palvelin siististi
+  io.close(() => {
+    console.log('Socket.IO closed');
+    httpServer.close(() => {
+      console.log('HTTP server closed');
+      clearTimeout(forceTimer);
+      process.exit(0);
+    });
+  });
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 initDb().then(() => {
   httpServer.listen(PORT, () => {
