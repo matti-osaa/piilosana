@@ -341,3 +341,170 @@ export async function getDailyLeaderboard(dateStr, lang) {
   stmt.free();
   return results;
 }
+
+// ============================================================================
+// USER CRUD — kirjautuminen, rekisteröinti, asetukset, saavutukset
+// ============================================================================
+
+// Kaikki funktiot palauttavat täyden user-objektin tai null. Caller poimii
+// mitä tarvitsee. Tukee sekä sql.js:ää että Postgresia.
+
+function rowToUser(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    nickname: row.nickname,
+    password_hash: row.password_hash,
+    email: row.email,
+    settings: row.settings,
+    achievements: row.achievements,
+    google_id: row.google_id,
+    created_at: row.created_at,
+  };
+}
+
+export async function getUserByNickname(nickname) {
+  if (!nickname) return null;
+  if (USE_PG) {
+    const r = await pgPool.query(
+      "SELECT * FROM users WHERE lower(nickname) = lower($1) LIMIT 1",
+      [nickname]
+    );
+    return rowToUser(r.rows[0]);
+  }
+  if (!sqliteDb) return null;
+  const stmt = sqliteDb.prepare(
+    "SELECT * FROM users WHERE nickname = ? COLLATE NOCASE LIMIT 1"
+  );
+  stmt.bind([nickname]);
+  const row = stmt.step() ? stmt.getAsObject() : null;
+  stmt.free();
+  return rowToUser(row);
+}
+
+export async function getUserByEmail(email) {
+  if (!email) return null;
+  if (USE_PG) {
+    const r = await pgPool.query(
+      "SELECT * FROM users WHERE lower(email) = lower($1) LIMIT 1",
+      [email]
+    );
+    return rowToUser(r.rows[0]);
+  }
+  if (!sqliteDb) return null;
+  const stmt = sqliteDb.prepare(
+    "SELECT * FROM users WHERE lower(email) = lower(?) LIMIT 1"
+  );
+  stmt.bind([email]);
+  const row = stmt.step() ? stmt.getAsObject() : null;
+  stmt.free();
+  return rowToUser(row);
+}
+
+export async function getUserById(id) {
+  if (id == null) return null;
+  if (USE_PG) {
+    const r = await pgPool.query("SELECT * FROM users WHERE id = $1", [id]);
+    return rowToUser(r.rows[0]);
+  }
+  if (!sqliteDb) return null;
+  const stmt = sqliteDb.prepare("SELECT * FROM users WHERE id = ?");
+  stmt.bind([id]);
+  const row = stmt.step() ? stmt.getAsObject() : null;
+  stmt.free();
+  return rowToUser(row);
+}
+
+export async function getUserByGoogleId(googleId) {
+  if (!googleId) return null;
+  if (USE_PG) {
+    const r = await pgPool.query(
+      "SELECT * FROM users WHERE google_id = $1 LIMIT 1",
+      [googleId]
+    );
+    return rowToUser(r.rows[0]);
+  }
+  if (!sqliteDb) return null;
+  const stmt = sqliteDb.prepare(
+    "SELECT * FROM users WHERE google_id = ? LIMIT 1"
+  );
+  stmt.bind([googleId]);
+  const row = stmt.step() ? stmt.getAsObject() : null;
+  stmt.free();
+  return rowToUser(row);
+}
+
+export async function createUser({ nickname, password_hash, email, google_id }) {
+  if (!nickname || !password_hash) return null;
+  if (USE_PG) {
+    const r = await pgPool.query(
+      `INSERT INTO users (nickname, password_hash, email, google_id)
+       VALUES ($1, $2, $3, $4) RETURNING id`,
+      [nickname, password_hash, email || null, google_id || null]
+    );
+    return r.rows[0].id;
+  }
+  if (!sqliteDb) return null;
+  sqliteDb.run(
+    `INSERT INTO users (nickname, password_hash, email, google_id) VALUES (?, ?, ?, ?)`,
+    [nickname, password_hash, email || null, google_id || null]
+  );
+  // Hae juuri lisätty id
+  const stmt = sqliteDb.prepare("SELECT last_insert_rowid() AS id");
+  stmt.step();
+  const row = stmt.getAsObject();
+  stmt.free();
+  saveDb();
+  return row.id;
+}
+
+export async function updateUserPassword(id, password_hash) {
+  if (id == null || !password_hash) return false;
+  if (USE_PG) {
+    await pgPool.query("UPDATE users SET password_hash = $1 WHERE id = $2", [password_hash, id]);
+    return true;
+  }
+  if (!sqliteDb) return false;
+  sqliteDb.run("UPDATE users SET password_hash = ? WHERE id = ?", [password_hash, id]);
+  saveDb();
+  return true;
+}
+
+export async function updateUserSettings(id, settings) {
+  if (id == null) return false;
+  const json = JSON.stringify(settings || {});
+  if (USE_PG) {
+    await pgPool.query("UPDATE users SET settings = $1 WHERE id = $2", [json, id]);
+    return true;
+  }
+  if (!sqliteDb) return false;
+  sqliteDb.run("UPDATE users SET settings = ? WHERE id = ?", [json, id]);
+  saveDb();
+  return true;
+}
+
+export async function updateUserAchievements(id, achievements) {
+  if (id == null) return false;
+  const json = JSON.stringify(achievements || {});
+  if (USE_PG) {
+    await pgPool.query("UPDATE users SET achievements = $1 WHERE id = $2", [json, id]);
+    return true;
+  }
+  if (!sqliteDb) return false;
+  sqliteDb.run("UPDATE users SET achievements = ? WHERE id = ?", [json, id]);
+  saveDb();
+  return true;
+}
+
+export async function linkGoogleId(id, googleId) {
+  if (id == null || !googleId) return false;
+  if (USE_PG) {
+    await pgPool.query("UPDATE users SET google_id = $1 WHERE id = $2", [googleId, id]);
+    return true;
+  }
+  if (!sqliteDb) return false;
+  sqliteDb.run("UPDATE users SET google_id = ? WHERE id = ?", [googleId, id]);
+  saveDb();
+  return true;
+}
+

@@ -7,9 +7,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { gunzipSync } from 'zlib';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import bcrypt from 'bcryptjs';
 import { Resend } from 'resend';
-import rateLimit from 'express-rate-limit';
 import { OAuth2Client } from 'google-auth-library';
 import { getScoreForWord, getScoreForWordLength } from "./server/game/score.js";
 import { TrieNode, buildTrie } from "./server/game/trie.js";
@@ -20,6 +18,8 @@ import { initDb, saveDb, getDb, submitScore, submitDailyScore, getHallOfFame, ge
 import { LANGS, getLang, isLangValid, FULL_WORDS_BUF, hasWordInBuf, bufHasPrefix } from "./server/words.js";
 import { attachScoresRoutes } from "./server/routes/scores.js";
 import { attachGameRoutes } from "./server/routes/game.js";
+import { attachAuthRoutes } from "./server/routes/auth.js";
+import { attachAccountRoutes } from "./server/routes/account.js";
 
 // Adapters: pure modules ottavat letterWeights-objektin, mutta index.js:n
 // sisäiset kutsut käyttävät lang-koodia. getLang() ei vielä ole määritelty
@@ -923,345 +923,18 @@ app.get('/ready', (req, res) => {
 
 
 // ============================================================================
-// AUTH ROUTES
+// AUTH / ACCOUNT — alustetaan integrointiriippuvuudet, reitit ovat moduuleissa
+// (server/routes/auth.js ja server/routes/account.js).
 // ============================================================================
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 min
-  max: 20, // max 20 requests per 15 min per IP
-  message: { error: 'Liian monta yritystä. Odota hetki.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Resend (sähköposti) — RESEND_API_KEY env-muuttujasta. Jos puuttuu, jätetään null
+// ja salasanan nollaus & tervetuloa-meilit menevät hiljaisesti pois käytöstä.
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-app.use('/api/login', authLimiter);
-app.use('/api/register', authLimiter);
-app.use('/api/forgot-password', authLimiter);
-
-// Register new user
-app.post('/api/register', async (req, res) => {
-  try {
-    const { nickname, password, email } = req.body;
-    if (!nickname || !password) return res.status(400).json({ error: 'Nimimerkki ja salasana vaaditaan' });
-    if (nickname.length > 12) return res.status(400).json({ error: 'Nimimerkki max 12 merkkiä' });
-    if (password.length < 4) return res.status(400).json({ error: 'Salasana min 4 merkkiä' });
-    if (email && email.length > 0) {
-      // Validate both emails match (client sends email, email2)
-      const { email2 } = req.body;
-      if (email !== email2) return res.status(400).json({ error: 'Sähköpostit eivät täsmää' });
-    }
-
-    // Check if nickname exists
-    const existing = db.exec(`SELECT id FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
-    if (existing.length > 0 && existing[0].values.length > 0) {
-      return res.status(409).json({ error: 'Nimimerkki on jo käytössä' });
-    }
-
-    const password_hash = await bcrypt.hash(password, 10);
-    const safeEmail = email && email.trim().length > 0 ? email.trim().toLowerCase() : null;
-
-    db.run(
-      `INSERT INTO users (nickname, password_hash, email) VALUES (?, ?, ?)`,
-      [nickname.toUpperCase(), password_hash, safeEmail]
-    );
-    saveDb();
-
-    const userRows = db.exec(`SELECT id FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
-    const userId = userRows[0].values[0][0];
-
-    // Send password to email if provided and Resend is configured
-    if (safeEmail && resend) {
-      try {
-        await resend.emails.send({
-          from: process.env.RESEND_FROM || 'Piilosana <onboarding@resend.dev>',
-          to: safeEmail,
-          subject: 'Piilosana — tunnuksesi',
-          html: `
-            <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
-              <h2 style="color:#ffcc00;">Tervetuloa Piilosanaan!</h2>
-              <p>Nimimerkkisi: <strong>${nickname.toUpperCase()}</strong></p>
-              <p>Tilisi on luotu onnistuneesti. Pelaa osoitteessa piilosana.up.railway.app</p>
-              <p style="color:#556;margin-top:20px;font-size:12px;">Jos unohdat salasanasi, voit nollata sen pelin kirjautumissivulta.</p>
-            </div>
-          `
-        });
-        console.log(`Welcome email sent to ${safeEmail} for user ${nickname}`);
-      } catch (emailErr) {
-        console.error('Failed to send email:', emailErr);
-        // Don't fail registration if email fails
-      }
-    }
-
-    res.json({ ok: true, user: { id: userId, nickname: nickname.toUpperCase(), email: safeEmail } });
-  } catch (err) {
-    console.error('Registration error:', err);
-    res.status(500).json({ error: 'Rekisteröinti epäonnistui' });
-  }
-});
-
-// Login
-app.post('/api/login', async (req, res) => {
-  try {
-    const { nickname, password } = req.body;
-    if (!nickname || !password) return res.status(400).json({ error: 'Nimimerkki ja salasana vaaditaan' });
-
-    const rows = db.exec(`SELECT id, nickname, password_hash, email, settings, achievements FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
-    if (rows.length === 0 || rows[0].values.length === 0) {
-      return res.status(401).json({ error: 'Väärä nimimerkki tai salasana' });
-    }
-
-    const [id, dbNickname, password_hash, email, settingsJson, achievementsJson] = rows[0].values[0];
-    const match = await bcrypt.compare(password, password_hash);
-    if (!match) {
-      return res.status(401).json({ error: 'Väärä nimimerkki tai salasana' });
-    }
-
-    let settings = null;
-    try { settings = settingsJson ? JSON.parse(settingsJson) : null; } catch(e) {}
-    let achievements = null;
-    try { achievements = achievementsJson ? JSON.parse(achievementsJson) : null; } catch(e) {}
-
-    res.json({ ok: true, user: { id, nickname: dbNickname, email, settings, achievements } });
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ error: 'Kirjautuminen epäonnistui' });
-  }
-});
-
-// Forgot password — generate new password and send to email
-app.post('/api/forgot-password', async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ error: 'Sähköposti vaaditaan' });
-
-    const rows = db.exec(`SELECT id, nickname, email FROM users WHERE email = ?`, [email.trim().toLowerCase()]);
-    if (rows.length === 0 || rows[0].values.length === 0) {
-      // Don't reveal if email exists
-      return res.json({ ok: true, message: 'Jos sähköposti löytyy, uusi salasana lähetetään.' });
-    }
-
-    const [id, dbNickname, dbEmail] = rows[0].values[0];
-
-    if (!resend) {
-      return res.status(500).json({ error: 'Sähköpostipalvelu ei ole käytössä' });
-    }
-
-    // Generate random password (8 chars)
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-    let newPassword = '';
-    for (let i = 0; i < 8; i++) newPassword += chars[Math.floor(Math.random() * chars.length)];
-
-    const password_hash = await bcrypt.hash(newPassword, 10);
-    db.run(`UPDATE users SET password_hash = ? WHERE id = ?`, [password_hash, id]);
-    saveDb();
-
-    await resend.emails.send({
-      from: process.env.RESEND_FROM || 'Piilosana <onboarding@resend.dev>',
-      to: dbEmail,
-      subject: 'Piilosana — uusi salasana',
-      html: `
-        <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
-          <h2 style="color:#ffcc00;">Uusi salasana</h2>
-          <p>Nimimerkkisi: <strong>${dbNickname}</strong></p>
-          <p>Uusi salasanasi: <strong>${newPassword}</strong></p>
-          <p style="color:#556;margin-top:20px;font-size:12px;">Kirjaudu osoitteessa piilosana.app</p>
-        </div>
-      `
-    });
-
-    console.log(`Password reset email sent to ${dbEmail} for user ${dbNickname}`);
-    res.json({ ok: true, message: 'Uusi salasana lähetetty sähköpostiin!' });
-  } catch (err) {
-    console.error('Forgot password error:', err);
-    res.status(500).json({ error: 'Salasanan nollaus epäonnistui' });
-  }
-});
-
-// Change password (requires current password)
-app.post('/api/change-password', async (req, res) => {
-  try {
-    const { nickname, currentPassword, newPassword } = req.body;
-    if (!nickname || !currentPassword || !newPassword) return res.status(400).json({ error: 'Kaikki kentät vaaditaan' });
-    if (newPassword.length < 4) return res.status(400).json({ error: 'Uusi salasana min 4 merkkiä' });
-
-    const rows = db.exec(`SELECT id, password_hash, email FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
-    if (rows.length === 0 || rows[0].values.length === 0) {
-      return res.status(401).json({ error: 'Käyttäjää ei löydy' });
-    }
-
-    const [id, password_hash, email] = rows[0].values[0];
-    const match = await bcrypt.compare(currentPassword, password_hash);
-    if (!match) {
-      return res.status(401).json({ error: 'Nykyinen salasana on väärin' });
-    }
-
-    const newHash = await bcrypt.hash(newPassword, 10);
-    db.run(`UPDATE users SET password_hash = ? WHERE id = ?`, [newHash, id]);
-    saveDb();
-
-    // Send new password to email if available
-    if (email && resend) {
-      try {
-        await resend.emails.send({
-          from: process.env.RESEND_FROM || 'Piilosana <onboarding@resend.dev>',
-          to: email,
-          subject: 'Piilosana — salasana vaihdettu',
-          html: `
-            <div style="font-family:monospace;background:#0a0a1a;color:#00ff88;padding:30px;border-radius:8px;">
-              <h2 style="color:#ffcc00;">Salasana vaihdettu</h2>
-              <p>Nimimerkkisi: <strong>${nickname.toUpperCase()}</strong></p>
-              <p>Salasanasi on vaihdettu onnistuneesti.</p>
-              <p style="color:#ff4444;margin-top:10px;font-size:12px;">Jos et vaihtanut salasanaasi, ota yhteyttä ylläpitoon.</p>
-            </div>
-          `
-        });
-      } catch (emailErr) {
-        console.error('Failed to send password change email:', emailErr);
-      }
-    }
-
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Change password error:', err);
-    res.status(500).json({ error: 'Salasanan vaihto epäonnistui' });
-  }
-});
-
-// Google Sign-In
+// Google OAuth — GOOGLE_CLIENT_ID env-muuttujasta
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
 
-app.post('/api/google-login', async (req, res) => {
-  try {
-    if (!googleClient) return res.status(500).json({ error: 'Google-kirjautuminen ei ole käytössä' });
-    const { credential } = req.body;
-    if (!credential) return res.status(400).json({ error: 'Token puuttuu' });
-
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    const googleId = payload.sub;
-    const email = payload.email;
-    const name = payload.name || payload.email.split('@')[0];
-
-    // Check if user exists with this google_id
-    let rows = db.exec(`SELECT id, nickname, email, settings, achievements FROM users WHERE google_id = ?`, [googleId]);
-    if (rows.length > 0 && rows[0].values.length > 0) {
-      const [id, nickname, dbEmail, settingsJson, achievementsJson] = rows[0].values[0];
-      let settings = null, achievements = null;
-      try { settings = settingsJson ? JSON.parse(settingsJson) : null; } catch(e) {}
-      try { achievements = achievementsJson ? JSON.parse(achievementsJson) : null; } catch(e) {}
-      return res.json({ ok: true, user: { id, nickname, email: dbEmail, settings, achievements }, isNew: false });
-    }
-
-    // Check if user exists with same email — link accounts
-    rows = db.exec(`SELECT id, nickname, email FROM users WHERE email = ?`, [email?.toLowerCase()]);
-    if (rows.length > 0 && rows[0].values.length > 0) {
-      const [id, nickname] = rows[0].values[0];
-      db.run(`UPDATE users SET google_id = ? WHERE id = ?`, [googleId, id]);
-      saveDb();
-      const updated = db.exec(`SELECT id, nickname, email, settings, achievements FROM users WHERE id = ?`, [id]);
-      const [uid, uNick, uEmail, sJson, aJson] = updated[0].values[0];
-      let settings = null, achievements = null;
-      try { settings = sJson ? JSON.parse(sJson) : null; } catch(e) {}
-      try { achievements = aJson ? JSON.parse(aJson) : null; } catch(e) {}
-      return res.json({ ok: true, user: { id: uid, nickname: uNick, email: uEmail, settings, achievements }, isNew: false });
-    }
-
-    // Create new user with Google
-    const nickname = name.toUpperCase().replace(/[^A-ZÄÖÅ0-9]/g, '').slice(0, 12) || 'PELAAJA';
-    // Ensure unique nickname
-    let finalNick = nickname;
-    let counter = 1;
-    while (true) {
-      const check = db.exec(`SELECT id FROM users WHERE nickname = ? COLLATE NOCASE`, [finalNick]);
-      if (check.length === 0 || check[0].values.length === 0) break;
-      finalNick = nickname.slice(0, 9) + counter;
-      counter++;
-    }
-
-    // Random password hash (user won't use it — they use Google)
-    const dummyHash = await bcrypt.hash(Math.random().toString(36), 10);
-    db.run(`INSERT INTO users (nickname, password_hash, email, google_id) VALUES (?, ?, ?, ?)`,
-      [finalNick, dummyHash, email?.toLowerCase() || null, googleId]);
-    saveDb();
-
-    const newRows = db.exec(`SELECT id FROM users WHERE google_id = ?`, [googleId]);
-    const newId = newRows[0].values[0][0];
-
-    res.json({ ok: true, user: { id: newId, nickname: finalNick, email: email?.toLowerCase() }, isNew: true });
-  } catch (err) {
-    console.error('Google login error:', err);
-    res.status(500).json({ error: 'Google-kirjautuminen epäonnistui' });
-  }
-});
-
-// Save user settings
-app.post('/api/settings', async (req, res) => {
-  try {
-    const { nickname, password, settings } = req.body;
-    if (!nickname || !password) return res.status(401).json({ error: 'Ei kirjautunut' });
-
-    const rows = db.exec(`SELECT id, password_hash FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
-    if (rows.length === 0 || rows[0].values.length === 0) return res.status(401).json({ error: 'Ei kirjautunut' });
-
-    const [id, password_hash] = rows[0].values[0];
-    const match = await bcrypt.compare(password, password_hash);
-    if (!match) return res.status(401).json({ error: 'Ei kirjautunut' });
-
-    const settingsJson = JSON.stringify(settings || {});
-    db.run(`UPDATE users SET settings = ? WHERE id = ?`, [settingsJson, id]);
-    saveDb();
-
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Settings save error:', err);
-    res.status(500).json({ error: 'Asetusten tallennus epäonnistui' });
-  }
-});
-
-// Get user info (check if logged in)
-app.post('/api/me', (req, res) => {
-  try {
-    const { nickname, password } = req.body;
-    if (!nickname || !password) return res.status(401).json({ error: 'Ei kirjautunut' });
-
-    const rows = db.exec(`SELECT id, nickname, email FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
-    if (rows.length === 0 || rows[0].values.length === 0) {
-      return res.status(401).json({ error: 'Ei kirjautunut' });
-    }
-    const [id, dbNickname, email] = rows[0].values[0];
-    res.json({ ok: true, user: { id, nickname: dbNickname, email } });
-  } catch (err) {
-    res.status(500).json({ error: 'Virhe' });
-  }
-});
-
-// Save achievements
-app.post('/api/achievements', async (req, res) => {
-  try {
-    const { nickname, password, achievements } = req.body;
-    if (!nickname || !password) return res.status(401).json({ error: 'Ei kirjautunut' });
-
-    const rows = db.exec(`SELECT id, password_hash FROM users WHERE nickname = ? COLLATE NOCASE`, [nickname.toUpperCase()]);
-    if (rows.length === 0 || rows[0].values.length === 0) return res.status(401).json({ error: 'Ei kirjautunut' });
-
-    const [id, password_hash] = rows[0].values[0];
-    const match = await bcrypt.compare(password, password_hash);
-    if (!match) return res.status(401).json({ error: 'Ei kirjautunut' });
-
-    const achievementsJson = JSON.stringify(achievements || {});
-    db.run(`UPDATE users SET achievements = ? WHERE id = ?`, [achievementsJson, id]);
-    saveDb();
-
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Achievements save error:', err);
-    res.status(500).json({ error: 'Saavutusten tallennus epäonnistui' });
-  }
-});
 
 // Privacy Policy
 app.get('/privacy', (req, res) => {
@@ -1351,6 +1024,12 @@ attachGameRoutes(app, {
   publicGames,
   findLongWordsOnGrid,
 });
+attachAuthRoutes(app, {
+  resend,
+  googleClient,
+  googleClientId: GOOGLE_CLIENT_ID,
+});
+attachAccountRoutes(app);
 
 // SPA catch-all: serve index.html for any non-API route
 app.get('*', (req, res) => {
