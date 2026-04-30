@@ -6,6 +6,7 @@ import DEFS_FI from "./defs_fi.js";
 import { menuColors } from "./menuColors.js";
 import { MultiplayerHero } from "./components/MultiplayerHero.jsx";
 import { DailyHeroCard } from "./components/DailyHeroCard.jsx";
+import { computePercentile, tierForPercentile, PERCENTILE_TEXTS } from "./hooks/useDailyPercentile.js";
 import { DayBoxRow } from "./components/DayBoxRow.jsx";
 import { MenuFooter } from "./components/MenuFooter.jsx";
 import { PracticeOptionsModal } from "./components/PracticeOptionsModal.jsx";
@@ -2263,6 +2264,7 @@ function DailyPopup({dateStr,lang,t,S,myResult,onShare,dailyShareMsg,onClose}){
         {myResult&&(
           <div style={{textAlign:"center",marginBottom:"16px",padding:"12px",background:`${S.yellow||"#ffcc00"}11`,borderRadius:"10px",border:`1px solid ${S.yellow||"#ffcc00"}33`}}>
             <div style={{fontSize:"28px",fontWeight:"800",color:S.yellow}}>{myResult.score}<span style={{fontSize:"14px",fontWeight:"400",color:S.textMuted}}>p</span></div>
+            {(()=>{const _pct=computePercentile(myResult.score,leaderboard);const _tier=tierForPercentile(_pct);if(!_tier)return null;const _txt=(PERCENTILE_TEXTS[lang]||PERCENTILE_TEXTS.fi);return(<div style={{fontSize:"13px",color:_tier.color,fontWeight:"700",letterSpacing:"0.5px",marginTop:"4px",animation:_tier.sparkle?"pulse 2s ease-in-out infinite":"none"}}>{_tier.sparkle?"✨ ":""}{_txt[_tier.textKey]}{_tier.sparkle?" ✨":""}</div>);})()}
             <div style={{fontSize:"13px",color:S.green,marginTop:"2px"}}>{myResult.wordsFound}/{myResult.totalWords} {t.dailyWords} ({myResult.totalWords>0?Math.round(myResult.wordsFound/myResult.totalWords*100):0}%)</div>
           </div>
         )}

@@ -1,56 +1,21 @@
 // DailyHeroCard — alkuvalikon "Päivän Piilosana" -hero.
 //
 // Pelin jälkeen näytetään pisteet + percentile-tieri (väri + lyhyt teksti).
-// Ei näytetä pelaajamääriä, vain jakaumaan suhteutettu palaute.
+// Tier-määrittelyt ja käännökset tulevat hooks/useDailyPercentile-moduulista,
+// joka jakaa logiikan myös DailyPopupin kanssa.
 
 import { menuColors } from "../menuColors.js";
-import { useDailyPercentile } from "../hooks/useDailyPercentile.js";
+import {
+  useDailyPercentile,
+  tierForPercentile,
+  PERCENTILE_TEXTS,
+} from "../hooks/useDailyPercentile.js";
 
 const TEXTS = {
-  fi: {
-    theme: "Teema",
-    streak: "päivää putkeen",
-    top10: "Top 10 %",
-    top25: "Top 25 %",
-    aboveAvg: "Yli keskiarvon",
-    nearAvg: "Lähellä keskiarvoa",
-    belowAvg: "Aloituspisteet",
-  },
-  sv: {
-    theme: "Tema",
-    streak: "dagar i rad",
-    top10: "Top 10 %",
-    top25: "Top 25 %",
-    aboveAvg: "Över genomsnittet",
-    nearAvg: "Nära genomsnittet",
-    belowAvg: "Startpoäng",
-  },
-  en: {
-    theme: "Theme",
-    streak: "day streak",
-    top10: "Top 10%",
-    top25: "Top 25%",
-    aboveAvg: "Above average",
-    nearAvg: "Near average",
-    belowAvg: "Starting score",
-  },
+  fi: { theme: "Teema", streak: "päivää putkeen" },
+  sv: { theme: "Tema",  streak: "dagar i rad" },
+  en: { theme: "Theme", streak: "day streak" },
 };
-
-const PERCENTILE_TIERS = [
-  { min: 90, color: "#fff4b8", textKey: "top10", sparkle: true },
-  { min: 75, color: "#d8e8a8", textKey: "top25" },
-  { min: 50, color: menuColors.dailyAccent, textKey: "aboveAvg" },
-  { min: 25, color: "#d9c98c", textKey: "nearAvg" },
-  { min: 0, color: "#e6b48a", textKey: "belowAvg" },
-];
-
-function tierForPercentile(pct) {
-  if (pct == null) return null;
-  for (const tier of PERCENTILE_TIERS) {
-    if (pct >= tier.min) return tier;
-  }
-  return null;
-}
 
 export function DailyHeroCard({
   lang,
@@ -64,6 +29,7 @@ export function DailyHeroCard({
   onClick,
 }) {
   const txt = TEXTS[lang] || TEXTS.fi;
+  const pctTxt = PERCENTILE_TEXTS[lang] || PERCENTILE_TEXTS.fi;
   const isPlayed = result != null;
   const showStreak = streak?.streak > 1;
   const percentile = useDailyPercentile(
@@ -127,7 +93,7 @@ export function DailyHeroCard({
           {tier && (
             <span style={{ fontSize: "13px", color: tier.color, fontWeight: "700", letterSpacing: "0.5px", animation: tier.sparkle ? "pulse 2s ease-in-out infinite" : "none" }}>
               {tier.sparkle ? "✨ " : ""}
-              {txt[tier.textKey]}
+              {pctTxt[tier.textKey]}
               {tier.sparkle ? " ✨" : ""}
             </span>
           )}
