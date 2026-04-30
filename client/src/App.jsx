@@ -15,6 +15,8 @@ import { HelpModal } from "./components/HelpModal.jsx";
 import { InflectionModal } from "./components/InflectionModal.jsx";
 import { WordInfoModal } from "./components/WordInfoModal.jsx";
 import { AchievementsModal } from "./components/AchievementsModal.jsx";
+import { HamburgerMenu } from "./components/HamburgerMenu.jsx";
+import { AuthPanel } from "./components/AuthPanel.jsx";
 
 // ============================================
 // PIILOSANA - Finnish Word Hunt Game
@@ -4475,137 +4477,26 @@ export default function Piilosana(){
 
       {/* AUTH PANEL */}
       {showAuth&&(
-        <div style={{width:"100%",maxWidth:"500px",padding:"18px",border:`2px solid ${S.yellow}`,background:S.dark,
-          boxShadow:`0 0 20px ${S.yellow}33`,animation:"fadeIn 0.3s ease",marginBottom:"8px",zIndex:100,position:"relative"}}>
-          {authUser?(
-            <div style={{textAlign:"center"}}>
-              <div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"12px",display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}>
-                <Icon icon="person" color={S.green} size={2}/>
-                {authUser.nickname}
-              </div>
-              {authUser.email&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"12px"}}>{authUser.email}</div>}
-              {authMode==="changePassword"?(
-                <form onSubmit={async(e)=>{e.preventDefault();const fd=new FormData(e.target);await doChangePassword(fd.get("currentPassword"),fd.get("newPassword"));}} style={{textAlign:"left"}}>
-                  <input name="currentPassword" type="password" autoComplete="current-password" placeholder={lang==="en"?"CURRENT PASSWORD":lang==="sv"?"NUVARANDE LÖSENORD":"NYKYINEN SALASANA"}
-                    style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
-                  <input name="newPassword" type="password" autoComplete="new-password" minLength="4" placeholder={lang==="en"?"NEW PASSWORD":lang==="sv"?"NYTT LÖSENORD":"UUSI SALASANA"}
-                    style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
-                  {authError&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
-                  {authSuccess&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"8px"}}>{authSuccess}</div>}
-                  <button type="submit" disabled={authLoading} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"8px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"100%"}}>
-                    {authLoading?"...":(lang==="en"?"CHANGE PASSWORD":lang==="sv"?"ÄNDRA LÖSENORD":"VAIHDA SALASANA")}
-                  </button>
-                  <button type="button" onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
-                    ← {lang==="en"?"Back":lang==="sv"?"Tillbaka":"Takaisin"}
-                  </button>
-                </form>
-              ):(
-                <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center"}}>
-                  <button onClick={()=>{setAuthMode("changePassword");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,background:"transparent",border:`2px solid ${S.yellow}`,padding:"6px 16px",cursor:"pointer"}}>
-                    {lang==="en"?"CHANGE PASSWORD":lang==="sv"?"ÄNDRA LÖSENORD":"VAIHDA SALASANA"}
-                  </button>
-                  <button onClick={()=>{doLogout();setShowAuth(false);}} style={{fontFamily:S.font,fontSize:"13px",color:S.red||"#ff4444",background:"transparent",border:`2px solid ${S.red||"#ff4444"}`,padding:"6px 16px",cursor:"pointer"}}>
-                    {lang==="en"?"LOG OUT":lang==="sv"?"LOGGA UT":"KIRJAUDU ULOS"}
-                  </button>
-                  <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,padding:"8px 18px",cursor:"pointer",marginTop:"8px",width:"100%"}}>✕</button>
-                </div>
-              )}
-            </div>
-          ):(
-            <div>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
-                <div style={{display:"flex",gap:"8px"}}>
-                  <button onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:authMode==="login"?S.bg:S.yellow,background:authMode==="login"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
-                    {lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"}
-                  </button>
-                  <button onClick={()=>{setAuthMode("register");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:authMode==="register"?S.bg:S.yellow,background:authMode==="register"?S.yellow:"transparent",border:`2px solid ${S.yellow}`,padding:"5px 12px",cursor:"pointer"}}>
-                    {lang==="en"?"REGISTER":lang==="sv"?"REGISTRERA":"LUO TUNNUS"}
-                  </button>
-                </div>
-                <button onClick={()=>setShowAuth(false)} style={{fontFamily:S.font,fontSize:"16px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,padding:"6px 14px",cursor:"pointer"}}>✕</button>
-              </div>
-              {authMode==="forgot"?(
-                <form onSubmit={async(e)=>{e.preventDefault();const fd=new FormData(e.target);await doForgotPassword(fd.get("email"));}}>
-                  <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
-                    {lang==="en"?"Enter your email and we'll send a new password.":lang==="sv"?"Ange din e-post så skickar vi ett nytt lösenord.":"Syötä sähköpostisi niin lähetämme uuden salasanan."}
-                  </div>
-                  <input name="email" type="email" autoComplete="email" placeholder={lang==="en"?"EMAIL":lang==="sv"?"E-POST":"SÄHKÖPOSTI"}
-                    style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
-                  {authError&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
-                  {authSuccess&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.green,marginBottom:"8px"}}>{authSuccess}</div>}
-                  <button type="submit" disabled={authLoading} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"8px 20px",cursor:"pointer",boxShadow:"3px 3px 0 #cc8800",width:"100%"}}>
-                    {authLoading?"...":(lang==="en"?"SEND NEW PASSWORD":lang==="sv"?"SKICKA NYTT LÖSENORD":"LÄHETÄ UUSI SALASANA")}
-                  </button>
-                  <button type="button" onClick={()=>{setAuthMode("login");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
-                    ← {lang==="en"?"Back to login":lang==="sv"?"Tillbaka till inloggning":"Takaisin kirjautumiseen"}
-                  </button>
-                </form>
-              ):(
-              <form autoComplete="on" onSubmit={async(e)=>{
-                e.preventDefault();
-                const fd=new FormData(e.target);
-                const nick=fd.get("nickname"),pw=fd.get("password");
-                if(authMode==="login"){await doLogin(nick,pw);}
-                else{await doRegister(nick,pw,fd.get("email")||"",fd.get("email2")||"");}
-              }}>
-                <input name="nickname" type="text" autoComplete="username" maxLength="12" placeholder={lang==="en"?"NICKNAME":lang==="sv"?"SMEKNAMN":"NIMIMERKKI"}
-                  style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
-                <input name="password" type="password" autoComplete={authMode==="register"?"new-password":"current-password"} minLength="4"
-                  placeholder={lang==="en"?"PASSWORD":lang==="sv"?"LÖSENORD":"SALASANA"}
-                  style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
-                {authMode==="register"&&(
-                  <>
-                    <input name="email" type="email" autoComplete="email" placeholder={`${lang==="en"?"EMAIL":lang==="sv"?"E-POST":"SÄHKÖPOSTI"} (${lang==="en"?"optional":lang==="sv"?"valfritt":"vapaaehtoinen"})`}
-                      style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
-                    <input name="email2" type="email" autoComplete="email" placeholder={lang==="en"?"CONFIRM EMAIL":lang==="sv"?"BEKRÄFTA E-POST":"VAHVISTA SÄHKÖPOSTI"}
-                      style={{fontFamily:S.font,fontSize:"13px",padding:"8px",width:"100%",boxSizing:"border-box",background:S.inputBg||S.dark,color:S.green,border:`2px solid ${S.border}`,marginBottom:"8px"}}/>
-                    <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"8px",lineHeight:"1.6"}}>
-                      {lang==="en"?"Password will be sent to your email for safekeeping":lang==="sv"?"Lösenordet skickas till din e-post":"Salasana lähetetään sähköpostiisi muistiksi"}
-                    </div>
-                  </>
-                )}
-                {authError&&<div style={{fontFamily:S.font,fontSize:"13px",color:S.red||"#ff4444",marginBottom:"8px"}}>{authError}</div>}
-                <button type="submit" disabled={authLoading} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"8px 20px",cursor:"pointer",boxShadow:`3px 3px 0 #cc8800`,width:"100%"}}>
-                  {authLoading?"...":(authMode==="login"?(lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"):(lang==="en"?"CREATE ACCOUNT":lang==="sv"?"SKAPA KONTO":"LUO TUNNUS"))}
-                </button>
-                {authMode==="login"&&(
-                  <button type="button" onClick={()=>{setAuthMode("forgot");setAuthError("");setAuthSuccess("");}} style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,background:"transparent",border:"none",padding:"8px",cursor:"pointer",marginTop:"6px",width:"100%",textAlign:"center"}}>
-                    {lang==="en"?"Forgot password?":lang==="sv"?"Glömt lösenord?":"Unohtuiko salasana?"}
-                  </button>
-                )}
-              </form>
-              )}
-              {/* Google Sign-In */}
-              {googleClientId&&(
-                <div style={{marginTop:"12px",paddingTop:"12px",borderTop:`1px solid ${S.border}`,textAlign:"center"}}>
-                  <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"8px"}}>
-                    {lang==="en"?"or":lang==="sv"?"eller":"tai"}
-                  </div>
-                  <div id="google-signin-btn" ref={(el)=>{
-                    if(el&&window.google?.accounts?.id){
-                      el.innerHTML="";
-                      window.google.accounts.id.initialize({
-                        client_id:googleClientId,
-                        callback:(response)=>doGoogleLogin(response.credential),
-                      });
-                      window.google.accounts.id.renderButton(el,{
-                        theme:"filled_black",size:"large",width:280,text:"signin_with",shape:"rectangular",
-                      });
-                    }
-                  }}/>
-                  <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginTop:"10px",lineHeight:"1.8",maxWidth:"280px",textAlign:"center"}}>
-                    {lang==="en"?"Google only shares your name and email. We never see your password or access your Google account. "
-                    :lang==="sv"?"Google delar bara ditt namn och e-post. Vi ser aldrig ditt lösenord eller kommer åt ditt Google-konto. "
-                    :"Google jakaa vain nimesi ja sähköpostisi. Emme näe salasanaasi emmekä pääse Google-tilillesi. "}
-                    <a href="https://support.google.com/accounts/answer/112802" target="_blank" rel="noopener noreferrer" style={{color:S.green,textDecoration:"underline"}}>
-                      {lang==="en"?"Learn more":lang==="sv"?"Läs mer":"Lue lisää"}
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        <AuthPanel
+          S={S}
+          t={t}
+          lang={lang}
+          Icon={Icon}
+          authUser={authUser}
+          authMode={authMode}
+          authError={authError}
+          authSuccess={authSuccess}
+          authLoading={authLoading}
+          googleClientId={googleClientId}
+          onModeChange={(m)=>{setAuthMode(m);setAuthError("");setAuthSuccess("");}}
+          onLogin={doLogin}
+          onRegister={doRegister}
+          onForgotPassword={doForgotPassword}
+          onChangePassword={doChangePassword}
+          onGoogleLogin={doGoogleLogin}
+          onLogout={doLogout}
+          onClose={()=>setShowAuth(false)}
+        />
       )}
 
       {/* First-time auth prompt */}
@@ -5489,137 +5380,70 @@ export default function Piilosana(){
 
       {/* Universal hamburger menu overlay */}
       {showHamburger&&(
-        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"#00000088",zIndex:200,animation:"fadeIn 0.15s ease"}} onClick={()=>setShowHamburger(false)}>
-          <div style={{position:"absolute",top:0,left:0,bottom:0,width:"260px",background:`${S.dark}f8`,borderRight:`1px solid ${S.border}`,padding:"16px",display:"flex",flexDirection:"column",gap:"6px",animation:"slideInLeft 0.2s ease",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderRadius:"0 12px 12px 0",boxShadow:"4px 0 24px #00000044"}} onClick={e=>e.stopPropagation()}>
-            {/* Menu title */}
-            <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"6px",letterSpacing:"2px",display:"flex",alignItems:"center",gap:"6px"}}>
-              <span style={{fontSize:"16px"}}>&#9776;</span> {t.options||"ASETUKSET"}
-            </div>
-            <div style={{height:"1px",background:S.border,marginBottom:"4px"}}/>
-
-            {/* Sound toggle */}
-            <div onClick={()=>{const next=soundTheme==="modern"?"off":"modern";setSoundTheme(next);localStorage.setItem("piilosana_sound",next);}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-              onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-              <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
-                <span style={{fontSize:"16px"}}>{soundTheme==="modern"?"🔊":"🔇"}</span> {t.menuSound||"SOUNDS"}
-              </span>
-              <span style={{fontSize:"11px",fontFamily:S.font,color:soundTheme==="modern"?S.green:S.textMuted,background:soundTheme==="modern"?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${soundTheme==="modern"?S.green+"44":S.textMuted+"44"}`}}>
-                {soundTheme==="modern"?(t.on||"ON"):(t.off||"OFF")}
-              </span>
-            </div>
-
-            {/* Music toggle */}
-            <div onClick={()=>{const next=!musicOn;setMusicOn(next);localStorage.setItem("piilosana_music",next?"on":"off");if(!next&&music)music.stop();}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-              onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-              <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
-                <Icon icon={musicOn?"musicOn":"musicOff"} color={musicOn?S.green:S.textMuted} size={2}/> {t.menuMusic||"MUSIC"}
-              </span>
-              <span style={{fontSize:"11px",fontFamily:S.font,color:musicOn?S.green:S.textMuted,background:musicOn?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${musicOn?S.green+"44":S.textMuted+"44"}`}}>
-                {musicOn?(t.on||"ON"):(t.off||"OFF")}
-              </span>
-            </div>
-
-            {/* Music track selector */}
-            {musicOn&&<div style={{padding:"4px 8px 8px",display:"flex",gap:"6px",flexWrap:"wrap"}}>
-              {MUSIC_TRACKS.map((tr,i)=>(
-                <div key={tr.id} onClick={()=>{setMusicTrack(i);localStorage.setItem("piilosana_music_track",String(i));}}
-                  style={{fontSize:"10px",fontFamily:S.font,padding:"3px 8px",borderRadius:"6px",cursor:"pointer",
-                    background:musicTrack===i?(S.green+"33"):"transparent",
-                    border:`1px solid ${musicTrack===i?S.green+"66":S.border+"44"}`,
-                    color:musicTrack===i?S.green:(S.textMuted||"#888"),transition:"all 0.15s"}}>
-                  {lang==="fi"?tr.nameFi:tr.name}
-                </div>
-              ))}
-            </div>}
-
-            {/* Theme picker */}
-            <div style={{padding:"8px"}}>
-              <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"8px",letterSpacing:"1px"}}>{t.menuTheme||"THEME"}</div>
-              <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
-                {Object.entries(THEMES).map(([id,th])=>(
-                  <div key={id} onClick={()=>{setThemeId(id);localStorage.setItem("piilosana_theme",id);if(typeof syncSettings==="function")syncSettings({theme:id});}}
-                    style={{width:"28px",height:"28px",borderRadius:"50%",background:th.bg,border:themeId===id?`3px solid ${S.green}`:`2px solid ${th.border||"#555"}`,cursor:"pointer",transition:"all 0.15s",boxShadow:themeId===id?`0 0 8px ${S.green}66`:"0 1px 4px #00000033",display:"flex",alignItems:"center",justifyContent:"center"}}
-                    title={lang==="en"?(th.nameEn||th.name):lang==="sv"?(th.nameSv||th.name):th.name}>
-                    <div style={{width:"14px",height:"14px",borderRadius:"50%",background:th.green||th.cell}}/>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Grid size */}
-            <div style={{padding:"8px"}}>
-              <div style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font,marginBottom:"6px",letterSpacing:"1px"}}>{lang==="en"?"SIZE":lang==="sv"?"STORLEK":"KOKO"}</div>
-              <div style={{display:"flex",gap:"6px"}}>
-                {[["normal",{fi:"NORMAALI",en:"NORMAL",sv:"NORMAL"}],["large",{fi:"ISO",en:"LARGE",sv:"STOR"}]].map(([id,names])=>(
-                  <button key={id} onClick={()=>{setUiSize(id);localStorage.setItem("piilosana_size",id);if(typeof syncSettings==="function")syncSettings({size:id});}}
-                    style={{fontFamily:S.font,fontSize:"11px",color:uiSize===id?S.bg:S.textMuted,background:uiSize===id?S.green:"transparent",
-                      border:`1px solid ${uiSize===id?S.green:S.textMuted+"44"}`,padding:"4px 10px",cursor:"pointer",borderRadius:"8px",transition:"all 0.15s"}}>
-                    {names[lang]||names.en}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Confetti toggle */}
-            <div onClick={()=>{const v=!confettiOn;setConfettiOn(v);localStorage.setItem("piilosana_confetti",v?"on":"off");if(typeof syncSettings==="function")syncSettings({confetti:v});}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-              onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-              <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
-                <span style={{fontSize:"16px"}}>🎊</span> {lang==="en"?"CONFETTI":lang==="sv"?"KONFETTI":"KONFETTI"}
-              </span>
-              <span style={{fontSize:"11px",fontFamily:S.font,color:confettiOn?S.green:S.textMuted,background:confettiOn?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${confettiOn?S.green+"44":S.textMuted+"44"}`}}>
-                {confettiOn?(t.on||"ON"):(t.off||"OFF")}
-              </span>
-            </div>
-
-            {/* Share (multi/public only) */}
-            {(mode==="multi"||mode==="public")&&(
-              <div onClick={()=>{setShowHamburger(false);setShowSharePopup(true);}} style={{display:"flex",alignItems:"center",gap:"8px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-                onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-                onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                <Icon icon="share" color={S.green} size={2}/>
-                <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font}}>{t.menuShare||"INVITE"}</span>
-              </div>
-            )}
-
-            {/* Emoji mute toggle (multiplayer only) */}
-            {(mode==="multi"||mode==="public")&&(
-            <div onClick={()=>{const next=!muteEmojis;setMuteEmojis(next);localStorage.setItem("piilosana_mute_emoji",next?"on":"off");}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-              onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-              <span style={{fontSize:"13px",color:S.textSoft||S.textMuted,fontFamily:S.font,display:"flex",alignItems:"center",gap:"8px"}}>
-                <span style={{fontSize:"16px"}}>💬</span> {t.menuMuteEmoji||"MUTE GESTURES"}
-              </span>
-              <span style={{fontSize:"11px",fontFamily:S.font,color:!muteEmojis?S.green:S.textMuted,background:!muteEmojis?S.green+"22":"transparent",padding:"2px 8px",borderRadius:"4px",border:`1px solid ${!muteEmojis?S.green+"44":S.textMuted+"44"}`}}>
-                {!muteEmojis?(t.on||"ON"):(t.off||"OFF")}
-              </span>
-            </div>
-            )}
-
-            <div style={{height:"1px",background:S.border,margin:"4px 0"}}/>
-
-            {/* Exit game — only shown when in a game or lobby */}
-            {mode!==null&&(
-            <div onClick={()=>{setShowHamburger(false);if(mode==="solo"&&(state==="play"||state==="ending"||state==="scramble")){setShowExitConfirm(true);}else{returnToModeSelect();}}} style={{display:"flex",alignItems:"center",gap:"8px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent"}}
-              onMouseEnter={e=>{e.currentTarget.style.background=S.red+"22";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3L13 13M3 13L13 3" stroke={S.red} strokeWidth="2" strokeLinecap="round"/></svg>
-              <span style={{fontSize:"13px",color:S.red,fontFamily:S.font}}>{(state==="play"||state==="ending"||state==="scramble")?(t.menuExitGame||"EXIT GAME"):(t.menu||"VALIKKO")}</span>
-            </div>
-            )}
-
-            <div style={{flex:1}}/>
-
-            {/* Close menu */}
-            <div onClick={()=>setShowHamburger(false)} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",padding:"10px 8px",cursor:"pointer",borderRadius:"8px",transition:"background 0.15s",background:"transparent",borderTop:`1px solid ${S.border}`,marginTop:"auto"}}
-              onMouseEnter={e=>e.currentTarget.style.background=S.border+"33"}
-              onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-              <span style={{fontSize:"12px",color:S.textMuted,fontFamily:S.font}}>{t.menuClose||"CLOSE MENU"}</span>
-            </div>
-          </div>
-        </div>
+        <HamburgerMenu
+          S={S}
+          t={t}
+          lang={lang}
+          Icon={Icon}
+          sound={soundTheme==="modern"}
+          music={musicOn}
+          musicTrack={musicTrack}
+          musicTracks={MUSIC_TRACKS}
+          theme={themeId}
+          themes={THEMES}
+          size={uiSize}
+          confetti={confettiOn}
+          muteEmojis={muteEmojis}
+          inMultiplayer={mode==="multi"||mode==="public"}
+          inActiveGame={state==="play"||state==="ending"||state==="scramble"}
+          hasMode={mode!==null}
+          onSoundToggle={()=>{
+            const next=soundTheme==="modern"?"off":"modern";
+            setSoundTheme(next);
+            localStorage.setItem("piilosana_sound",next);
+          }}
+          onMusicToggle={()=>{
+            const next=!musicOn;
+            setMusicOn(next);
+            localStorage.setItem("piilosana_music",next?"on":"off");
+            if(!next&&music)music.stop();
+          }}
+          onMusicTrackChange={(i)=>{
+            setMusicTrack(i);
+            localStorage.setItem("piilosana_music_track",String(i));
+          }}
+          onThemeChange={(id)=>{
+            setThemeId(id);
+            localStorage.setItem("piilosana_theme",id);
+            if(typeof syncSettings==="function")syncSettings({theme:id});
+          }}
+          onSizeChange={(id)=>{
+            setUiSize(id);
+            localStorage.setItem("piilosana_size",id);
+            if(typeof syncSettings==="function")syncSettings({size:id});
+          }}
+          onConfettiToggle={()=>{
+            const v=!confettiOn;
+            setConfettiOn(v);
+            localStorage.setItem("piilosana_confetti",v?"on":"off");
+            if(typeof syncSettings==="function")syncSettings({confetti:v});
+          }}
+          onMuteEmojisToggle={()=>{
+            const next=!muteEmojis;
+            setMuteEmojis(next);
+            localStorage.setItem("piilosana_mute_emoji",next?"on":"off");
+          }}
+          onShare={()=>{setShowHamburger(false);setShowSharePopup(true);}}
+          onExit={()=>{
+            setShowHamburger(false);
+            if(mode==="solo"&&(state==="play"||state==="ending"||state==="scramble")){
+              setShowExitConfirm(true);
+            }else{
+              returnToModeSelect();
+            }
+          }}
+          onClose={()=>setShowHamburger(false)}
+        />
       )}
 
       {/* Ivory Light — warm golden shimmer */}
