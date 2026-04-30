@@ -4248,7 +4248,7 @@ export default function Piilosana(){
         />
       </div>
 
-      {/* ===== PIKAOHJE — kompakti, koko leveys ===== */}
+      {/* ===== PIKAOHJE – kompakti, koko leveys ===== */}
       <div style={{marginBottom:"12px"}}>
         <MenuButton
           S={S}
