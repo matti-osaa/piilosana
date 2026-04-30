@@ -18,6 +18,7 @@ import { GRID_SIZE, HEX_ROWS, HEX_COLS, randLetter as randLetterPure, makeGrid a
 import { findWords, findWordsHex, canTraceWord } from "./server/game/validate.js";
 import { initDb, saveDb, getDb, submitScore, submitDailyScore, getHallOfFame, getAllHallOfFame, getDailyLeaderboard, HOF_CATEGORIES } from "./server/db.js";
 import { LANGS, getLang, isLangValid, FULL_WORDS_BUF, hasWordInBuf, bufHasPrefix } from "./server/words.js";
+import { attachScoresRoutes } from "./server/routes/scores.js";
 
 // Adapters: pure modules ottavat letterWeights-objektin, mutta index.js:n
 // sisäiset kutsut käyttävät lang-koodia. getLang() ei vielä ole määritelty
@@ -949,45 +950,10 @@ app.post('/api/validate-word', (req, res) => {
   return res.json({ valid: hasWordInBuf(FULL_WORDS_BUF, w) });
 });
 
-// Hall of Fame: get all categories
-app.get('/api/hall-of-fame', async (req, res) => {
-  const lang = req.query.lang || 'fi';
-  res.json(await getAllHallOfFame(lang));
-});
-
-// Hall of Fame: get specific category
-app.get('/api/hall-of-fame/:gameMode/:gameTime', async (req, res) => {
-  const { gameMode, gameTime } = req.params;
-  const lang = req.query.lang || 'fi';
-  res.json(await getHallOfFame(gameMode, Number(gameTime), lang));
-});
 
 // App version endpoint — clients poll this to detect deploys
 app.get('/api/version', (req, res) => {
   res.json({ version: APP_VERSION });
-});
-
-// Daily leaderboard: get scores for a specific date
-app.get('/api/daily-scores/:dateStr', async (req, res) => {
-  const { dateStr } = req.params;
-  const lang = req.query.lang || 'fi';
-  res.json(await getDailyLeaderboard(dateStr, lang));
-});
-
-// Daily leaderboard: submit score
-app.post('/api/daily-scores', async (req, res) => {
-  const { nickname, score, wordsFound, wordsTotal, dateStr, lang } = req.body;
-  if (!nickname || nickname.length > 12) {
-    return res.status(400).json({ error: 'Virheellinen nimimerkki' });
-  }
-  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-    return res.status(400).json({ error: 'Virheellinen päivämäärä' });
-  }
-  const safeLang = LANGS[lang] ? lang : 'fi';
-  const ok = await submitDailyScore({ nickname, score, wordsFound, wordsTotal, dateStr, lang: safeLang });
-  if (!ok) return res.status(400).json({ error: 'Tulosta ei voitu tallentaa' });
-  const top = await getDailyLeaderboard(dateStr, safeLang);
-  res.json({ ok: true, top });
 });
 
 // Public game status (supports ?lang=fi|en)
@@ -1000,20 +966,6 @@ app.get('/api/public-game', (req, res) => {
     timeLeft: pg.timeLeft,
     roundNumber: pg.roundNumber,
   });
-});
-
-// Hall of Fame: submit score (for solo games)
-app.post('/api/hall-of-fame', async (req, res) => {
-  const { nickname, score, wordsFound, wordsTotal, gameMode, gameTime, lang } = req.body;
-  if (!nickname || nickname.length > 12) {
-    return res.status(400).json({ error: 'Virheellinen nimimerkki' });
-  }
-  const safeLang = LANGS[lang] ? lang : 'fi';
-  const id = await submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti: false, lang: safeLang });
-  if (!id) return res.status(400).json({ error: 'Tulosta ei voitu tallentaa' });
-  // Return updated top 10 for this category
-  const top = await getHallOfFame(gameMode, gameTime, safeLang);
-  res.json({ id, top });
 });
 
 // ============================================================================
@@ -1449,6 +1401,9 @@ a{color:#00ff88;}
 </body>
 </html>`);
 });
+
+// Reittimoduulit (siirretty server/routes/-hakemistoon)
+attachScoresRoutes(app);
 
 // SPA catch-all: serve index.html for any non-API route
 app.get('*', (req, res) => {

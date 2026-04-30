@@ -2382,7 +2382,7 @@ async function submitToHallOfFame({nickname,score,wordsFound,wordsTotal,gameMode
 export default function Piilosana(){
   const SZ=5,HEX_ROWS=7,HEX_COLS=5,COMBO_WINDOW=4000;
   const[lang,setLang]=useState(()=>localStorage.getItem("piilosana_lang")||"fi");
-  const[themeId,setThemeId]=useState(()=>{const saved=localStorage.getItem("piilosana_theme");return saved&&THEMES[saved]?saved:"dark";});
+  const[themeId,setThemeId]=useState(()=>{const saved=localStorage.getItem("piilosana_theme");return saved&&THEMES[saved]?saved:"light";});
   const[uiSize,setUiSize]=useState(()=>localStorage.getItem("piilosana_size")||"normal");
   const[confettiOn,setConfettiOn]=useState(()=>localStorage.getItem("piilosana_confetti")!=="off");
   const[soundTheme,setSoundTheme]=useState(()=>{const s=localStorage.getItem("piilosana_sound");return s==="modern"||s==="off"?s:"modern";});
