@@ -1,0 +1,28 @@
+# Auto-detect text files and normalize line endings on commit.
+# Working-tree line endings are determined by core.autocrlf (Windows = CRLF).
+* text=auto
+
+# Source files
+*.js   text
+*.jsx  text
+*.ts   text
+*.tsx  text
+*.json text
+*.html text
+*.css  text
+*.md   text
+*.txt  text
+*.yml  text
+*.yaml text
+
+# Binary — never touch
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.gz binary
+*.zip binary

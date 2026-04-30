@@ -3,6 +3,8 @@ import * as Tone from "tone";
 import { io } from "socket.io-client";
 import { QRCodeSVG } from "qrcode.react";
 import DEFS_FI from "./defs_fi.js";
+import { menuColors } from "./menuColors.js";
+import { MultiplayerHero } from "./components/MultiplayerHero.jsx";
 
 // ============================================
 // PIILOSANA - Finnish Word Hunt Game
@@ -4086,36 +4088,6 @@ export default function Piilosana(){
 
   // Render multiplayer screens
   const S=theme;
-  const menuColors={
-    dailyBg:"linear-gradient(135deg,#49634d,#3f5744)",
-    dailyBorder:"#7f8a4b",
-    dailyText:"#fff8ec",
-    dailyMuted:"#e8dfcf",
-    dailyAccent:"#f4e7b2",
-
-    pastBg:"linear-gradient(135deg,#dfe7d8,#d2dccb)",
-    pastBorder:"#aeb99b",
-    pastText:"#314733",
-
-    futureBg:"linear-gradient(135deg,#f7f1e7,#efe7d8)",
-    futureBorder:"#c9b99d",
-    futureText:"#8b7a5c",
-
-    practiceBg:"linear-gradient(135deg,#6f9d8d,#558779)",
-    practiceText:"#fff8ec",
-
-    arenaBg:"linear-gradient(135deg,#d98261,#c45b3b)",
-    arenaBorder:"#a94831",
-    arenaText:"#fff8ec",
-
-    customBg:"linear-gradient(135deg,#7fa4b0,#658d9a)",
-    customText:"#fff8ec",
-
-    tutorialBg:"linear-gradient(135deg,#9a829d,#816b86)",
-    tutorialText:"#fff8ec",
-
-    softShadow:"0 10px 26px rgba(57,45,28,0.18)"
-  };
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
@@ -4173,58 +4145,16 @@ export default function Piilosana(){
       </div>
 
       {/* ===== MONINPELI HERO ===== */}
-      <button aria-label={lang==="fi"?"Liity moninpeliin":lang==="sv"?"Gå med i flerspelare":"Join multiplayer"}
-        onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}}
-        style={{fontFamily:S.font,width:"100%",minHeight:"170px",border:`2px solid ${menuColors.arenaBorder}`,borderRadius:S.panelRadius||"16px",padding:"22px 20px",marginBottom:"12px",cursor:"pointer",textAlign:"left",position:"relative",overflow:"hidden",color:menuColors.arenaText,background:menuColors.arenaBg,boxShadow:menuColors.softShadow,transition:"all 0.2s"}}
-        onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 14px 32px rgba(57,45,28,0.28)";}}
-        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}>
-
-        {/* Lämmin highlight oikealla */}
-        <div aria-hidden="true" style={{position:"absolute",inset:0,background:"radial-gradient(circle at 80% 45%, rgba(255,220,150,0.32), transparent 42%)",pointerEvents:"none"}}/>
-
-        {/* Minimalistinen geometrinen koriste — sisäkkäiset ympyrät oikeassa alanurkassa */}
-        <div aria-hidden="true" style={{position:"absolute",right:"-30px",bottom:"-30px",width:"160px",height:"160px",border:"2px solid rgba(255,255,255,0.10)",borderRadius:"50%",pointerEvents:"none"}}/>
-        <div aria-hidden="true" style={{position:"absolute",right:"10px",bottom:"10px",width:"80px",height:"80px",border:"2px solid rgba(255,255,255,0.16)",borderRadius:"50%",pointerEvents:"none"}}/>
-        <div aria-hidden="true" style={{position:"absolute",right:"40px",bottom:"40px",width:"20px",height:"20px",background:"rgba(255,255,255,0.22)",borderRadius:"50%",pointerEvents:"none"}}/>
-
-        <div style={{position:"relative",zIndex:1}}>
-          {/* LIVE-badge — vain kun pelaajia oikeasti on */}
-          {publicOnlineCount>1&&(
-            <div style={{display:"inline-flex",alignItems:"center",gap:"6px",background:"#fff8ec",color:"#d63c2f",borderRadius:"8px",padding:"5px 10px",fontSize:"11px",fontWeight:"800",letterSpacing:"1px",marginBottom:"14px"}}>
-              <span style={{width:"6px",height:"6px",borderRadius:"50%",background:"#d63c2f",animation:"pulse 1.5s infinite"}}/>
-              LIVE
-            </div>
-          )}
-
-          {/* Otsikko */}
-          <div style={{fontSize:"30px",fontWeight:"900",letterSpacing:"1.5px",marginBottom:"6px",lineHeight:1}}>
-            {lang==="fi"?"MONINPELI":lang==="sv"?"FLERSPEL":"MULTIPLAYER"}
-          </div>
-
-          {/* Kuvaus */}
-          <div style={{fontSize:"14px",fontWeight:"600",lineHeight:1.3,maxWidth:"260px",marginBottom:"16px",opacity:0.92}}>
-            {lang==="fi"?"Nopea sanahaaste — pelaa muita vastaan"
-             :lang==="sv"?"Snabb ordutmaning — spela mot andra"
-             :"Quick word challenge — play against others"}
-          </div>
-
-          {/* Pelaajamäärä-badge — vain jos pelaajia on */}
-          {publicOnlineCount>1&&(
-            <div style={{marginBottom:"10px"}}>
-              <span style={{display:"inline-block",background:"rgba(80,20,15,0.32)",borderRadius:"999px",padding:"5px 12px",fontSize:"12px",fontWeight:"700"}}>
-                {publicOnlineCount} {lang==="fi"?"pelaajaa nyt":lang==="sv"?"spelare nu":"players now"}
-              </span>
-            </div>
-          )}
-
-          {/* CTA — teksti vaihtuu sen mukaan onko pelaajia */}
-          <div style={{display:"inline-block",background:"#ffe38a",color:"#3d2c14",borderRadius:"10px",padding:"10px 18px",fontSize:"14px",fontWeight:"900",letterSpacing:"0.5px",boxShadow:"0 3px 0 rgba(100,60,20,0.35)"}}>
-            {publicOnlineCount>1
-              ? (lang==="fi"?"LIITY PELIIN ⚡":lang==="sv"?"GÅ MED ⚡":"JOIN GAME ⚡")
-              : (lang==="fi"?"ALOITA PELI ⚡":lang==="sv"?"STARTA SPEL ⚡":"START GAME ⚡")}
-          </div>
-        </div>
-      </button>
+      <MultiplayerHero
+        lang={lang}
+        S={S}
+        publicOnlineCount={publicOnlineCount}
+        onClick={()=>{
+          sounds.init().catch(()=>{});
+          setMode("public");
+          if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}
+        }}
+      />
 
       {/* ===== HARJOITTELU + OMA MONINPELI -rivi ===== */}
       <div style={{display:"flex",gap:"8px",marginBottom:"8px"}}>
