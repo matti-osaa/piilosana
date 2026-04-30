@@ -6,6 +6,7 @@ import DEFS_FI from "./defs_fi.js";
 import { menuColors } from "./menuColors.js";
 import { MultiplayerHero } from "./components/MultiplayerHero.jsx";
 import { DailyHeroCard } from "./components/DailyHeroCard.jsx";
+import { NextDailyCountdown } from "./components/NextDailyCountdown.jsx";
 import { DailyEndResult } from "./components/DailyEndResult.jsx";
 import { computePercentile, tierForPercentile, PERCENTILE_TEXTS } from "./hooks/useDailyPercentile.js";
 import { DayBoxRow } from "./components/DayBoxRow.jsx";
@@ -4130,6 +4131,13 @@ export default function Piilosana(){
           />
         );
       })()}
+
+      {/* Laskuri seuraavaan Dailyyn — näkyy vain kun pelattu */}
+      <NextDailyCountdown
+        S={S}
+        lang={lang}
+        isPlayed={!!getDailyResult(lang)}
+      />
 
       {/* ===== Eilinen + Huominen -rivi ===== */}
       {(()=>{
