@@ -2920,9 +2920,11 @@ export default function Piilosana(){
   const startDaily=useCallback(async(forDate)=>{
     const playDate=forDate||todayStr();
     if(getDailyResultForDate(playDate))return; // already played this date
-    // Only allow today and past 6 days
-    const dayDiff=Math.floor((Date.now()-new Date(playDate+"T12:00:00").getTime())/(86400000));
+    // Only allow today and past 6 days (compare in Finnish timezone)
+    const today=todayStr();
+    const dayDiff=Math.floor((new Date(today+"T12:00:00Z").getTime()-new Date(playDate+"T12:00:00Z").getTime())/(86400000));
     if(dayDiff<0)return; // can't play future
+    if(dayDiff>6)return; // too old
     if(!LANG_CONFIG[lang].loaded){await loadWords(lang);setWordsLoaded(p=>({...p,[lang]:true}));}
     sounds.init().catch(()=>{});
     // Pick today's theme deterministically
@@ -4129,11 +4131,11 @@ export default function Piilosana(){
         {/* Tomorrow — locked */}
         {(()=>{const d=tomorrowStr();const dl=dateLabel(d,lang);return(
           <button disabled style={{fontFamily:S.font,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2px",
-            padding:"10px 4px",border:`1px dashed ${S.border}`,borderRadius:S.btnRadius,cursor:"default",
+            padding:"10px 4px",border:`1px dashed ${S.yellow||"#ffcc00"}22`,borderRadius:S.btnRadius,cursor:"default",
             background:"transparent",color:"#555",fontSize:"11px",minWidth:0}}>
-            <span style={{fontSize:"11px",color:"#555",textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
-            <span style={{fontSize:"13px",fontWeight:"600",color:"#555"}}>{dl.short}</span>
-            <span style={{fontSize:"13px",color:"#444"}}>🔒</span>
+            <span style={{fontSize:"11px",color:S.textMuted,textTransform:"capitalize"}}>{dl.weekday.slice(0,2)}</span>
+            <span style={{fontSize:"13px",fontWeight:"600",color:(S.yellow||"#ffcc00")+"66"}}>{dl.short}</span>
+            <span style={{fontSize:"13px",color:(S.yellow||"#ffcc00")+"44"}}>🔒</span>
           </button>
         );})()}
       </div>
