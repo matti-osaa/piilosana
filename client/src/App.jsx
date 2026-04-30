@@ -4104,7 +4104,8 @@ export default function Piilosana(){
     practiceBg:"linear-gradient(135deg,#6f9d8d,#558779)",
     practiceText:"#fff8ec",
 
-    arenaBg:"linear-gradient(135deg,#d98261,#c86e51)",
+    arenaBg:"linear-gradient(135deg,#d98261,#c45b3b)",
+    arenaBorder:"#a94831",
     arenaText:"#fff8ec",
 
     customBg:"linear-gradient(135deg,#7fa4b0,#658d9a)",
@@ -4171,10 +4172,61 @@ export default function Piilosana(){
         );})()}
       </div>
 
-      {/* ===== AD SPACE ===== */}
-      <div style={{width:"100%",minHeight:"60px",borderRadius:S.btnRadius,marginBottom:"12px"}}></div>
+      {/* ===== MONINPELI HERO ===== */}
+      <button aria-label={lang==="fi"?"Liity moninpeliin":lang==="sv"?"Gå med i flerspelare":"Join multiplayer"}
+        onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}}
+        style={{fontFamily:S.font,width:"100%",minHeight:"170px",border:`2px solid ${menuColors.arenaBorder}`,borderRadius:S.panelRadius||"16px",padding:"22px 20px",marginBottom:"12px",cursor:"pointer",textAlign:"left",position:"relative",overflow:"hidden",color:menuColors.arenaText,background:menuColors.arenaBg,boxShadow:menuColors.softShadow,transition:"all 0.2s"}}
+        onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 14px 32px rgba(57,45,28,0.28)";}}
+        onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}>
 
-      {/* ===== PRACTICE (CTA1) + NONSTOP (CTA2) row ===== */}
+        {/* Lämmin highlight oikealla */}
+        <div aria-hidden="true" style={{position:"absolute",inset:0,background:"radial-gradient(circle at 80% 45%, rgba(255,220,150,0.32), transparent 42%)",pointerEvents:"none"}}/>
+
+        {/* Minimalistinen geometrinen koriste — sisäkkäiset ympyrät oikeassa alanurkassa */}
+        <div aria-hidden="true" style={{position:"absolute",right:"-30px",bottom:"-30px",width:"160px",height:"160px",border:"2px solid rgba(255,255,255,0.10)",borderRadius:"50%",pointerEvents:"none"}}/>
+        <div aria-hidden="true" style={{position:"absolute",right:"10px",bottom:"10px",width:"80px",height:"80px",border:"2px solid rgba(255,255,255,0.16)",borderRadius:"50%",pointerEvents:"none"}}/>
+        <div aria-hidden="true" style={{position:"absolute",right:"40px",bottom:"40px",width:"20px",height:"20px",background:"rgba(255,255,255,0.22)",borderRadius:"50%",pointerEvents:"none"}}/>
+
+        <div style={{position:"relative",zIndex:1}}>
+          {/* LIVE-badge — vain kun pelaajia oikeasti on */}
+          {publicOnlineCount>1&&(
+            <div style={{display:"inline-flex",alignItems:"center",gap:"6px",background:"#fff8ec",color:"#d63c2f",borderRadius:"8px",padding:"5px 10px",fontSize:"11px",fontWeight:"800",letterSpacing:"1px",marginBottom:"14px"}}>
+              <span style={{width:"6px",height:"6px",borderRadius:"50%",background:"#d63c2f",animation:"pulse 1.5s infinite"}}/>
+              LIVE
+            </div>
+          )}
+
+          {/* Otsikko */}
+          <div style={{fontSize:"30px",fontWeight:"900",letterSpacing:"1.5px",marginBottom:"6px",lineHeight:1}}>
+            {lang==="fi"?"MONINPELI":lang==="sv"?"FLERSPEL":"MULTIPLAYER"}
+          </div>
+
+          {/* Kuvaus */}
+          <div style={{fontSize:"14px",fontWeight:"600",lineHeight:1.3,maxWidth:"260px",marginBottom:"16px",opacity:0.92}}>
+            {lang==="fi"?"Nopea sanahaaste — pelaa muita vastaan"
+             :lang==="sv"?"Snabb ordutmaning — spela mot andra"
+             :"Quick word challenge — play against others"}
+          </div>
+
+          {/* Pelaajamäärä-badge — vain jos pelaajia on */}
+          {publicOnlineCount>1&&(
+            <div style={{marginBottom:"10px"}}>
+              <span style={{display:"inline-block",background:"rgba(80,20,15,0.32)",borderRadius:"999px",padding:"5px 12px",fontSize:"12px",fontWeight:"700"}}>
+                {publicOnlineCount} {lang==="fi"?"pelaajaa nyt":lang==="sv"?"spelare nu":"players now"}
+              </span>
+            </div>
+          )}
+
+          {/* CTA — teksti vaihtuu sen mukaan onko pelaajia */}
+          <div style={{display:"inline-block",background:"#ffe38a",color:"#3d2c14",borderRadius:"10px",padding:"10px 18px",fontSize:"14px",fontWeight:"900",letterSpacing:"0.5px",boxShadow:"0 3px 0 rgba(100,60,20,0.35)"}}>
+            {publicOnlineCount>1
+              ? (lang==="fi"?"LIITY PELIIN ⚡":lang==="sv"?"GÅ MED ⚡":"JOIN GAME ⚡")
+              : (lang==="fi"?"ALOITA PELI ⚡":lang==="sv"?"STARTA SPEL ⚡":"START GAME ⚡")}
+          </div>
+        </div>
+      </button>
+
+      {/* ===== HARJOITTELU + OMA MONINPELI -rivi ===== */}
       <div style={{display:"flex",gap:"8px",marginBottom:"8px"}}>
         <button onClick={()=>setShowMenuOptions(true)} style={{fontFamily:S.font,fontSize:"16px",color:menuColors.practiceText,background:menuColors.practiceBg,border:"1px solid rgba(255,255,255,0.35)",padding:"18px 12px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",transition:"all 0.2s"}}
           onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 14px 30px rgba(57,45,28,0.25)";}}
@@ -4182,27 +4234,27 @@ export default function Piilosana(){
           <span style={{fontWeight:"700"}}>{t.practice}</span>
           <span style={{fontSize:"11px",opacity:0.8}}>{t.practiceDesc}</span>
         </button>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("public");if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}}} style={{fontFamily:S.font,fontSize:"15px",color:menuColors.arenaText,background:menuColors.arenaBg,border:"1px solid rgba(255,255,255,0.35)",padding:"18px 12px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
+        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"16px",color:menuColors.customText,background:menuColors.customBg,border:"1px solid rgba(255,255,255,0.35)",padding:"18px 12px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"4px",transition:"all 0.2s"}}
           onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 14px 30px rgba(57,45,28,0.25)";}}
           onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}>
-          <span style={{fontWeight:"700"}}>{t.arenaCta}</span>
-          {publicOnlineCount>=3?<span style={{fontSize:"11px",opacity:0.85}}>{publicOnlineCount} {t.playersInArena}</span>
-            :<span style={{fontSize:"11px",opacity:0.8}}>{t.arenaDesc}</span>}
+          <span style={{fontWeight:"700"}}>{t.customGame}</span>
+          <span style={{fontSize:"11px",opacity:0.8}}>{lang==="fi"?"kutsu kavereita":lang==="sv"?"bjud in vänner":"invite friends"}</span>
         </button>
       </div>
 
-      {/* Custom game + Tutorial — smaller row */}
-      <div style={{display:"flex",gap:"8px",marginBottom:"0"}}>
-        <button onClick={()=>{sounds.init().catch(()=>{});setMode("multi");if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}}} style={{fontFamily:S.font,fontSize:"13px",color:menuColors.customText,background:menuColors.customBg,border:"1px solid rgba(255,255,255,0.35)",padding:"12px 10px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",transition:"all 0.2s"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
-          <span>{t.customGame}</span>
-        </button>
-        <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"13px",color:menuColors.tutorialText,background:menuColors.tutorialBg,border:"1px solid rgba(255,255,255,0.35)",padding:"12px 10px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",transition:"all 0.2s"}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
+      {/* ===== PIKAOHJE — kompakti, koko leveys ===== */}
+      <div style={{marginBottom:"12px"}}>
+        <button onClick={()=>setShowTutorial(true)} style={{fontFamily:S.font,fontSize:"12px",color:menuColors.tutorialText,background:menuColors.tutorialBg,border:"1px solid rgba(255,255,255,0.35)",padding:"8px 12px",cursor:"pointer",boxShadow:menuColors.softShadow,borderRadius:S.btnRadius,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",transition:"all 0.2s",opacity:0.92}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.opacity="1";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.opacity="0.92";}}>
+          <span style={{fontSize:"14px",lineHeight:1}}>?</span>
           <span>{t.tutorialBtn}</span>
         </button>
+      </div>
+
+      {/* ===== AD SPACE ===== */}
+      <div style={{width:"100%",minHeight:"90px",borderRadius:S.btnRadius,marginBottom:"12px",border:`1px dashed ${S.textMuted}33`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"11px",color:S.textMuted+"66",fontFamily:S.font}}>
+        {/* tila mainokselle */}
       </div>
 
       {/* Daily history popup with leaderboard */}
