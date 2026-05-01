@@ -156,6 +156,18 @@ function countThemeWords(foundWords,theme){
   }
   return seen.size;
 }
+// Check if a single word matches any theme word (stem-based).
+// Returns the matched stem or null.
+function isThemeWord(word,theme){
+  if(!theme||!theme.words)return null;
+  for(const tw of theme.words){
+    const stem=tw.slice(0,Math.min(4,tw.length));
+    if(word.startsWith(stem))return stem;
+  }
+  return null;
+}
+const DAILY_THEME_BONUS=25; // bonus points when finding 2+ theme words
+const DAILY_THEME_THRESHOLD=2; // how many theme words needed for bonus
 function getDailyResult(lang='fi'){try{const d=JSON.parse(localStorage.getItem(`piilosana_daily_${lang}`)||'{}');if(d.date===todayStr())return d;return null;}catch{return null;}}
 function saveDailyResult(score,wordsFound,totalWords,forDate,lang='fi'){
   const d=forDate||todayStr();
@@ -2095,6 +2107,8 @@ export default function Piilosana(){
   const[showTutorial,setShowTutorial]=useState(false);
   const[dailyMode,setDailyMode]=useState(false);
   const[dailyTheme,setDailyTheme]=useState(null);
+  const[dailyThemeFound,setDailyThemeFound]=useState([]); // stems of theme words found in daily
+  const[dailyThemeBonusGiven,setDailyThemeBonusGiven]=useState(false);
   const[dailyResult,setDailyResult]=useState(()=>getDailyResult(lang));
   // Refresh daily result when language changes
   useEffect(()=>{setDailyResult(getDailyResult(lang));},[lang]);
@@ -2626,7 +2640,7 @@ export default function Piilosana(){
     setActiveTheme(null);setThemeFound([]);setBombCell(null);setBombTimer(0);
     setMysteryCell(null);setMysteryRevealed(false);
     setChessPiece(null);setChessPos(null);setChessPath([]);setChessWord("");setChessValidCells([]);setChessInvalid(null);setChessMoves(0);setChessGrid([]);setChessPlacing(false);
-    setDailyMode(true);setDailyDate(playDate);
+    setDailyMode(true);setDailyDate(playDate);setDailyThemeFound([]);setDailyThemeBonusGiven(false);
     setSoloMode("hex");setGameTime(180);
     setMode("solo");setCountdown(3);setState("countdown");
     window.scrollTo(0,0);
@@ -2639,10 +2653,11 @@ export default function Piilosana(){
     const pct=dr.totalWords>0?Math.round(dr.wordsFound/dr.totalWords*100):0;
     const streak=getDailyStreak(lang);
     const themeStr=dailyTheme?` (${dailyTheme.name})`:"";
-    const text=`Sain ${dl.full} päivän piilosanassa${themeStr} ${dr.score} pistettä (${dr.wordsFound}/${dr.totalWords} sanaa)! Pystytkö parempaan?${streak.streak>1?` 🔥 ${streak.streak} päivää putkeen!`:""}\n\nPelaa: https://piilosana.com`;
+    const bonusStr=dailyThemeBonusGiven?` 🎯 Teemabonus +${DAILY_THEME_BONUS}p!`:"";
+    const text=`Sain ${dl.full} päivän piilosanassa${themeStr} ${dr.score} pistettä (${dr.wordsFound}/${dr.totalWords} sanaa)!${bonusStr} Pystytkö parempaan?${streak.streak>1?` 🔥 ${streak.streak} päivää putkeen!`:""}\n\nPelaa: https://piilosana.com`;
     if(navigator.share){navigator.share({title:`Päivän Piilosana – ${dl.full}`,text}).catch(()=>{});}
     else{navigator.clipboard.writeText(text).then(()=>setDailyShareMsg(t.dailyCopied)).catch(()=>{});setTimeout(()=>setDailyShareMsg(null),2000);}
-  },[t,lang,dailyDate,dailyTheme]);
+  },[t,lang,dailyDate,dailyTheme,dailyThemeBonusGiven]);
 
   const start=useCallback(async()=>{
     if(mode==="solo"){
@@ -3257,6 +3272,26 @@ export default function Piilosana(){
           addPopup(`${t.themeBonus} +${bonus}`,`#44bb66`);
         }
       }
+      // Daily mode: check if word is a theme word, give bonus at threshold
+      if(dailyMode&&dailyTheme){
+        const stem=isThemeWord(currentWord,dailyTheme);
+        if(stem&&!dailyThemeFound.includes(stem)){
+          const newFound=[...dailyThemeFound,stem];
+          setDailyThemeFound(newFound);
+          // Show per-word notification
+          const themeLabel=lang==="en"?"Theme word!":lang==="sv"?"Temaord!":"Teemasana!";
+          addPopup(`🎯 ${themeLabel}`,S.yellow||"#ffcc00");
+          // Give bonus when reaching threshold
+          if(newFound.length===DAILY_THEME_THRESHOLD&&!dailyThemeBonusGiven){
+            setDailyThemeBonusGiven(true);
+            setScore(s=>s+DAILY_THEME_BONUS);
+            setTimeout(()=>{
+              const bonusLabel=lang==="en"?"Theme bonus":lang==="sv"?"Temabonus":"Teemabonus";
+              addPopup(`🌟 ${bonusLabel} +${DAILY_THEME_BONUS}!`,S.yellow||"#ffcc00");
+            },600);
+          }
+        }
+      }
       // Bomb mode: check if word uses bomb cell
       if(soloMode==="bomb"&&bombCell){
         const usesBomb=currentSel.some(s=>s.r===bombCell.r&&s.c===bombCell.c);
@@ -3285,7 +3320,7 @@ export default function Piilosana(){
     }else{
       setMsg({t:currentWord,ok:false,m:T[lang]?.notValid||"Ei kelpaa"});setShake(true);setTimeout(()=>setShake(false),400);sounds.playWrong();
     }
-  },[valid,found,lastFoundTime,combo,sounds,addPopup,mode,socket,gameMode,soloMode,grid,trie,letterMult,activeTheme,themeFound,bombCell,mysteryCell,mysteryRevealed,lang]);
+  },[valid,found,lastFoundTime,combo,sounds,addPopup,mode,socket,gameMode,soloMode,grid,trie,letterMult,activeTheme,themeFound,bombCell,mysteryCell,mysteryRevealed,lang,dailyMode,dailyTheme,dailyThemeFound,dailyThemeBonusGiven]);
 
   // Active grid: use currentMultiGrid in multi mode, grid in solo
   const activeGrid=mode==="multi"?currentMultiGrid:grid;
@@ -4589,7 +4624,7 @@ export default function Piilosana(){
             {mode==="solo"&&soloMode==="theme"&&activeTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44bb66",background:"#44bb6611",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>{activeTheme.emoji} {t.themeHint}: {activeTheme.name} — {themeFound.length}/{activeTheme.words.length}</div>}
             {mode==="solo"&&soloMode==="bomb"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff4444",background:"#ff444411",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>💣 {t.bombLabel} — {bombTimer}s</div>}
             {mode==="solo"&&soloMode==="mystery"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#aa66ff",background:"#aa66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>❓ {t.mysteryLabel}</div>}
-            {dailyMode&&dailyTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"12px",color:S.yellow||"#ffcc00",background:`${S.yellow||"#ffcc00"}11`,borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}</div>}
+            {dailyMode&&dailyTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"12px",color:S.yellow||"#ffcc00",background:`${S.yellow||"#ffcc00"}11`,borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name} {dailyThemeFound.length>0?<span style={{fontSize:"11px",fontWeight:"700",color:dailyThemeBonusGiven?(S.green||"#44ddaa"):(S.yellow||"#ffcc00")}}>🎯 {dailyThemeFound.length}{dailyThemeBonusGiven?` ✓ +${DAILY_THEME_BONUS}`:dailyThemeFound.length<DAILY_THEME_THRESHOLD?`/${DAILY_THEME_THRESHOLD}`:""}</span>:<span style={{fontSize:"10px",opacity:0.7}}>🎯 {lang==="en"?`Find ${DAILY_THEME_THRESHOLD} → +${DAILY_THEME_BONUS}p`:lang==="sv"?`Hitta ${DAILY_THEME_THRESHOLD} → +${DAILY_THEME_BONUS}p`:`Löydä ${DAILY_THEME_THRESHOLD} → +${DAILY_THEME_BONUS}p`}</span>}</div>}
             {mode==="solo"&&soloMode==="chess"&&state==="play"&&chessPiece&&(
               <div style={{textAlign:"center",padding:"8px",fontSize:"13px",color:"#ddaa33",background:"#ddaa3311",borderBottom:`1px solid ${S.border}`}}>
                 {chessPlacing?(
@@ -5039,6 +5074,11 @@ export default function Piilosana(){
                   result={dr}
                   onShare={shareDailyResult}
                   shareMsg={dailyShareMsg}
+                  themeFound={dailyThemeFound.length}
+                  themeBonusGiven={dailyThemeBonusGiven}
+                  themeBonus={DAILY_THEME_BONUS}
+                  themeThreshold={DAILY_THEME_THRESHOLD}
+                  themeName={dailyTheme?(lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name):null}
                 />
               );
             })()}
@@ -5053,9 +5093,11 @@ export default function Piilosana(){
             <div style={{padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,marginBottom:"12px",textAlign:"left",animation:"fadeIn 0.8s ease",borderRadius:"12px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
               <div style={{fontSize:"14px",color:S.green,marginBottom:"8px",fontWeight:"600",letterSpacing:"0.5px"}}>{t.foundOf} ({found.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
-                {[...found].sort((a,b)=>b.length-a.length).map((w,i)=>(
-                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"18px",background:S.dark,padding:"2px 4px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
-                ))}
+                {[...found].sort((a,b)=>b.length-a.length).map((w,i)=>{
+                  const isTheme=dailyMode&&dailyTheme&&isThemeWord(w,dailyTheme);
+                  return(
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"18px",background:isTheme?`${S.yellow||"#ffcc00"}22`:S.dark,padding:"2px 4px",border:`1px solid ${isTheme?(S.yellow||"#ffcc00"):wordColor(w.length)}44`,color:isTheme?(S.yellow||"#ffcc00"):wordColor(w.length),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{isTheme?"🎯 ":""}{w.toUpperCase()}</span>
+                  );})}
               </div>
             </div>
           )}

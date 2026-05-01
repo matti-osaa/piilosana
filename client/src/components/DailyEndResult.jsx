@@ -28,6 +28,11 @@ export function DailyEndResult({
   result,
   onShare,
   shareMsg,
+  themeFound = 0,
+  themeBonusGiven = false,
+  themeBonus = 25,
+  themeThreshold = 2,
+  themeName = null,
 }) {
   const pctTxt = PERCENTILE_TEXTS[lang] || PERCENTILE_TEXTS.fi;
   const percentile = useDailyPercentile(result?.score, dateStr, lang);
@@ -89,9 +94,17 @@ export function DailyEndResult({
         </div>
       )}
 
-      <div style={{ fontSize: "14px", color: S.green, marginBottom: "8px" }}>
+      <div style={{ fontSize: "14px", color: S.green, marginBottom: "4px" }}>
         {result.wordsFound}/{result.totalWords} {t.dailyWords} ({wordPct}%)
       </div>
+
+      {themeName && (
+        <div style={{ fontSize: "13px", color: themeBonusGiven ? (S.green || "#44ddaa") : (S.textMuted || "#999"), marginBottom: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+          <span>🎯 {themeFound} {lang === "en" ? "theme words" : lang === "sv" ? "temaord" : "teemasanaa"}</span>
+          {themeBonusGiven && <span style={{ fontWeight: "700", color: S.green || "#44ddaa" }}>+{themeBonus}p</span>}
+          {!themeBonusGiven && themeFound < themeThreshold && <span style={{ fontSize: "11px", opacity: 0.6 }}>({themeThreshold} → +{themeBonus}p)</span>}
+        </div>
+      )}
 
       <button
         onClick={onShare}

@@ -12,9 +12,9 @@ import {
 } from "../hooks/useDailyPercentile.js";
 
 const TEXTS = {
-  fi: { theme: "Teema", streak: "päivää putkeen", sameForAll: "Kaikille sama ruudukko · vaihtuu päivittäin", startBtn: "ALOITA HAASTE" },
-  sv: { theme: "Tema",  streak: "dagar i rad",     sameForAll: "Samma rutnät för alla · byts dagligen",     startBtn: "STARTA UTMANING" },
-  en: { theme: "Theme", streak: "day streak",      sameForAll: "Same grid for everyone · changes daily",    startBtn: "START CHALLENGE" },
+  fi: { theme: "Teema", streak: "päivää putkeen", sameForAll: "Kaikille sama ruudukko · vaihtuu päivittäin", startBtn: "ALOITA HAASTE", themeBonus: "🎯 Löydä 2 teemasanaa → +25p bonus!" },
+  sv: { theme: "Tema",  streak: "dagar i rad",     sameForAll: "Samma rutnät för alla · byts dagligen",     startBtn: "STARTA UTMANING", themeBonus: "🎯 Hitta 2 temaord → +25p bonus!" },
+  en: { theme: "Theme", streak: "day streak",      sameForAll: "Same grid for everyone · changes daily",    startBtn: "START CHALLENGE", themeBonus: "🎯 Find 2 theme words → +25p bonus!" },
 };
 
 export function DailyHeroCard({
@@ -78,6 +78,12 @@ export function DailyHeroCard({
       <span style={{ fontSize: "12px", color: menuColors.dailyMuted, fontStyle: "italic", fontWeight: "600" }}>
         {txt.theme}: {themeName}
       </span>
+
+      {!isPlayed && (
+        <span style={{ fontSize: "10px", color: menuColors.dailyAccent, fontWeight: "600", opacity: 0.85 }}>
+          {txt.themeBonus}
+        </span>
+      )}
 
       <span style={{ fontSize: "10px", color: menuColors.dailyMuted, opacity: 0.7, fontWeight: "500", letterSpacing: "0.3px" }}>
         {txt.sameForAll}
