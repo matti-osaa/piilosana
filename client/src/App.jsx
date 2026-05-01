@@ -5027,7 +5027,7 @@ export default function Piilosana(){
           sound={soundTheme==="modern"}
           music={musicOn}
           musicTrack={musicTrack}
-          musicTracks={MUSIC_TRACKS}
+          musicTracks={musicTracks}
           theme={themeId}
           themes={THEMES}
           size={uiSize}
