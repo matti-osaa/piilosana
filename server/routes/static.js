@@ -42,6 +42,13 @@ export function attachStaticRoutes(app, ctx) {
   app.get("/privacy", (req, res) => {
     res.send(privacyHtml());
   });
+
+  // Synth-labra (sound design tool) – tarjoillaan tools/synth-lab.html:stä
+  // jotta sitä voi käyttää piilosana.com/synth-lab kautta miltä tahansa laitteelta.
+  app.get("/synth-lab", (req, res) => {
+    const path = join(process.cwd(), "tools", "synth-lab.html");
+    res.sendFile(path);
+  });
 }
 
 // SPA-catch-all: kaikki muut polut tarjoilevat client/dist/index.html:n.
