@@ -14,6 +14,10 @@
 import { useState, useEffect, useRef } from "react";
 
 export function SpeechBubble({ text, onClick, scale = 1 }) {
+  // Koko skaalataan SVG:n width/height kautta, ei container-transform:lla,
+  // jotta pop-animaation lopussa ei tule snap-pienennystä takaisin.
+  const w = 280 * scale;
+  const h = 88 * scale;
   return (
     <div
       onClick={onClick}
@@ -21,16 +25,15 @@ export function SpeechBubble({ text, onClick, scale = 1 }) {
         position: "relative",
         display: "inline-block",
         cursor: onClick ? "pointer" : "default",
-        animation: "bubblePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        animation: "bubblePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both",
         userSelect: "none",
-        transform: `scale(${scale})`,
         transformOrigin: "bottom left",
       }}
     >
       <svg
         viewBox="0 0 320 100"
-        width="280"
-        height="88"
+        width={w}
+        height={h}
         style={{ display: "block", overflow: "visible", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.18))" }}
         preserveAspectRatio="xMidYMid meet"
       >
