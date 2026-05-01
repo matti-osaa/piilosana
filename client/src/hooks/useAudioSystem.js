@@ -45,10 +45,10 @@ export function useAudioSystem() {
   const [musicTrack, _setMusicTrack] = useState(() => {
     const saved = localStorage.getItem("piilosana_music_track");
     if (saved !== null) return parseInt(saved);
-    // Random track on first visit
-    const r = Math.floor(Math.random() * MUSIC_TRACKS.length);
-    localStorage.setItem("piilosana_music_track", String(r));
-    return r;
+    // Default ensimmäisellä käynnillä: Neon Pulse OB-Xa (indeksi 3)
+    const def = Math.min(3, MUSIC_TRACKS.length - 1);
+    localStorage.setItem("piilosana_music_track", String(def));
+    return def;
   });
   const [audioStarted, setAudioStarted] = useState(false);
 
