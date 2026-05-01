@@ -322,7 +322,7 @@ const T={
     startGame:"ALOITA PELI",waitForPlayers:"Odota, että joku liittyy peliisi...",waitForHost:"Odota, että isäntä aloittaa pelin...",
     joinGame:"LIITY PELIIN",roomCode:"HUONEKOODI",noRooms:"Ei avoimia huoneita",orJoinRoom:"tai liity koodilla",
     shareLink:"JAA LINKKI",copied:"Kopioitu!",scanToJoin:"Skannaa liittyäksesi",inviteFriends:"Kutsu kavereita:",arenaLink:"Suora linkki moninpeliin:",invitePlayer:"KUTSU PELAAJA",shareGame:"Jaa linkki peliin",
-    newCustom:"UUSI OMA NETTIPELI",menu:"VALIKKO",newPractice:"UUSI HARJOITUS",backToMenu:"PALAA ALKUVALIKKOON",joinMulti:"LIITY MONINPELIIN",
+    newCustom:"UUSI OMA NETTIPELI",menu:"VALIKKO",newPractice:"UUSI HARJOITUS",backToMenu:"PALAA ALKUVALIKKOON",joinMulti:"LIITY NONSTOP-MONINPELIIN",
     daily:"PÄIVÄN PIILOSANA",dailyDesc:"sama kaikille · yksi yritys · 3 min",dailyDone:"Jo pelattu tänään!",dailyShare:"JAA TULOS",dailyCopied:"Kopioitu leikepöydälle!",dailyStreak:"Putki",dailyBest:"Paras",dailyWords:"sanaa",dailyOf:"yhteensä",dailyChallenge:"Haaste",
     results:"TULOKSET",score:"PISTEET",gameOver:"PELI PÄÄTTYI!",youWon:"VOITIT!",
     found:"LÖYDETYT",foundOf:"LÖYSIT",dragWords:"Vedä kirjaimista sanoja...",
@@ -386,7 +386,7 @@ const T={
     startGame:"START GAME",waitForPlayers:"Wait for someone to join...",waitForHost:"Waiting for host to start...",
     joinGame:"JOIN GAME",roomCode:"ROOM CODE",noRooms:"No open rooms",orJoinRoom:"or join with code",
     shareLink:"SHARE LINK",copied:"Copied!",scanToJoin:"Scan to join",inviteFriends:"Invite friends:",arenaLink:"Direct link to multiplayer:",invitePlayer:"INVITE PLAYER",shareGame:"Share game link",
-    newCustom:"NEW CUSTOM GAME",menu:"MENU",newPractice:"NEW PRACTICE",backToMenu:"BACK TO MENU",joinMulti:"JOIN MULTIPLAYER",
+    newCustom:"NEW CUSTOM GAME",menu:"MENU",newPractice:"NEW PRACTICE",backToMenu:"BACK TO MENU",joinMulti:"JOIN NONSTOP MULTIPLAYER",
     daily:"DAILY CHALLENGE",dailyDesc:"same for everyone · one attempt · 3 min",dailyDone:"Already played today!",dailyShare:"SHARE RESULT",dailyCopied:"Copied to clipboard!",dailyStreak:"Streak",dailyBest:"Best",dailyWords:"words",dailyOf:"total",dailyChallenge:"Challenge",
     results:"RESULTS",score:"SCORE",gameOver:"GAME OVER!",youWon:"YOU WON!",
     found:"FOUND",foundOf:"YOU FOUND",dragWords:"Drag across letters to find words...",
@@ -450,7 +450,7 @@ const T={
     startGame:"STARTA SPEL",waitForPlayers:"Vänta tills någon går med...",waitForHost:"Väntar på att värden startar...",
     joinGame:"GÅ MED I SPEL",roomCode:"RUMSKOD",noRooms:"Inga öppna rum",orJoinRoom:"eller gå med via kod",
     shareLink:"DELA LÄNK",copied:"Kopierat!",scanToJoin:"Skanna för att gå med",inviteFriends:"Bjud in vänner:",arenaLink:"Direktlänk till flerspelare:",invitePlayer:"BJUD IN SPELARE",shareGame:"Dela spellänk",
-    newCustom:"NYTT EGET SPEL",menu:"MENY",newPractice:"NY ÖVNING",backToMenu:"TILLBAKA TILL MENYN",joinMulti:"GÅ MED I FLERSPEL",
+    newCustom:"NYTT EGET SPEL",menu:"MENY",newPractice:"NY ÖVNING",backToMenu:"TILLBAKA TILL MENYN",joinMulti:"GÅ MED I NONSTOP-FLERSPEL",
     daily:"DAGENS UTMANING",dailyDesc:"samma för alla · ett försök · 3 min",dailyDone:"Redan spelat idag!",dailyShare:"DELA RESULTAT",dailyCopied:"Kopierat till urklipp!",dailyStreak:"Svit",dailyBest:"Bästa",dailyWords:"ord",dailyOf:"totalt",dailyChallenge:"Utmaning",
     results:"RESULTAT",score:"POÄNG",gameOver:"SPELET SLUT!",youWon:"DU VANN!",
     found:"HITTADE",foundOf:"DU HITTADE",dragWords:"Dra över bokstäver för att hitta ord...",
@@ -1967,7 +1967,7 @@ function DailyPopup({dateStr,lang,t,S,myResult,onShare,dailyShareMsg,onClose}){
                     background:isMe?`${S.yellow||"#ffcc00"}22`:"transparent",
                     border:isMe?`1px solid ${S.yellow||"#ffcc00"}44`:"1px solid transparent"}}>
                     <span style={{width:"28px",fontSize:"14px",fontWeight:"700",color:i<3?(S.yellow||"#ffcc00"):S.textMuted}}>{i<3?medals[i]:`${i+1}.`}</span>
-                    <span style={{flex:1,fontSize:"14px",fontWeight:isMe?"700":"400",color:isMe?(S.yellow||"#ffcc00"):"#ddd"}}>{s.nickname}</span>
+                    <span style={{flex:1,fontSize:"14px",fontWeight:isMe?"700":"500",color:isMe?(S.yellow||"#ffcc00"):(S.textSoft||"#444")}}>{s.nickname}</span>
                     <span style={{fontSize:"16px",fontWeight:"700",color:S.green||"#44ddaa"}}>{s.score}<span style={{fontSize:"11px",fontWeight:"400",color:S.textMuted}}>p</span></span>
                     <span style={{fontSize:"11px",color:S.textMuted,marginLeft:"8px",minWidth:"40px",textAlign:"right"}}>{s.words_found}/{s.words_total}</span>
                   </div>
@@ -3784,56 +3784,66 @@ export default function Piilosana(){
         isPlayed={!!getDailyResult(lang)}
       />
 
-      {/* ===== DAILY CHALLENGE — HERO CARD ===== */}
-      {(()=>{
-        const d=todayStr();
-        const dl=dateLabel(d,lang);
-        const res=getDailyResult(lang);
-        const todayTheme=getDailyTheme(d,lang);
-        const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;
-        const streak=getDailyStreak(lang);
-        return(
-          <DailyHeroCard
-            lang={lang}
-            t={t}
-            S={S}
-            dateStr={d}
-            dateLabel={dl}
-            themeName={themeName}
-            result={res}
-            streak={streak}
-            onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}}
-          />
-        );
-      })()}
+      {/* ===== DAILY-RYHMÄ – wrapper, joka kerää Päivän Piilosanan elementit yhteen ===== */}
+      <div style={{
+        background: menuColors.dailyGroupBg,
+        border: `1px solid ${menuColors.dailyGroupBorder}`,
+        borderRadius: "18px",
+        padding: "10px 10px 4px 10px",
+        marginBottom: "12px",
+      }}>
+        {/* Päivän Piilosana – hero */}
+        {(()=>{
+          const d=todayStr();
+          const dl=dateLabel(d,lang);
+          const res=getDailyResult(lang);
+          const todayTheme=getDailyTheme(d,lang);
+          const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;
+          const streak=getDailyStreak(lang);
+          return(
+            <DailyHeroCard
+              lang={lang}
+              t={t}
+              S={S}
+              dateStr={d}
+              dateLabel={dl}
+              themeName={themeName}
+              result={res}
+              streak={streak}
+              onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}}
+            />
+          );
+        })()}
 
-      {/* Laskuri seuraavaan Dailyyn – näkyy vain kun pelattu */}
-      <NextDailyCountdown
-        S={S}
-        lang={lang}
-        isPlayed={!!getDailyResult(lang)}
-      />
+        {/* Laskuri seuraavaan Dailyyn – näkyy vain kun pelattu */}
+        <NextDailyCountdown
+          S={S}
+          lang={lang}
+          isPlayed={!!getDailyResult(lang)}
+        />
 
-      {/* ===== Eilinen + Huominen -rivi ===== */}
-      {(()=>{
-        const pastD=daysAgoStr(1);
-        const pastDl=dateLabel(pastD,lang);
-        const pastRes=getDailyResultForDate(pastD,lang);
-        const pastNum=dailyNumberForDate(pastD);
-        const futureD=tomorrowStr();
-        const futureDl=dateLabel(futureD,lang);
-        return(
-          <DayBoxRow
-            S={S}
-            past={pastNum>=1?{
-              dateLabel:pastDl,
-              result:pastRes,
-              onClick:()=>{if(pastRes){setShowDailyHistory(pastD);}else{startDaily(pastD);}}
-            }:null}
-            future={{dateLabel:futureDl}}
-          />
-        );
-      })()}
+        {/* Eilinen + Huominen -rivi */}
+        {(()=>{
+          const pastD=daysAgoStr(1);
+          const pastDl=dateLabel(pastD,lang);
+          const pastRes=getDailyResultForDate(pastD,lang);
+          const pastNum=dailyNumberForDate(pastD);
+          const futureD=tomorrowStr();
+          const futureDl=dateLabel(futureD,lang);
+          return(
+            <DayBoxRow
+              S={S}
+              lang={lang}
+              past={pastNum>=1?{
+                dateLabel:pastDl,
+                result:pastRes,
+                onClick:()=>{if(pastRes){setShowDailyHistory(pastD);}else{startDaily(pastD);}}
+              }:null}
+              future={{dateLabel:futureDl}}
+            />
+          );
+        })()}
+      </div>
 
       {/* ===== MONINPELI HERO ===== */}
       <MultiplayerHero
@@ -4910,6 +4920,7 @@ export default function Piilosana(){
             {dailyMode?<><div style={{fontSize:"15px",color:S.yellow||"#ffcc00",marginBottom:"4px",fontWeight:"700"}}>{t.daily} {dateLabel(dailyDate,lang).short}</div>
             {dailyTheme&&<div style={{fontSize:"12px",color:S.textMuted,marginBottom:"6px",fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}</div>}</>
             :<div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>}
+            {!dailyMode&&(()=>{const m=gameTime===0?(lang==="en"?"unlimited":lang==="sv"?"obegränsad":"rajaton"):gameTime===402?"6,7 min":`${Math.round(gameTime/60)} min`;return(<div style={{fontSize:"11px",color:S.textMuted,marginBottom:"6px",letterSpacing:"1px",fontWeight:"600",opacity:0.75}}>{m}</div>);})()}
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.score}</div>
             <div style={{fontSize:"36px",color:S.green,marginBottom:"4px",animation:"pop 0.3s ease",fontWeight:"700",letterSpacing:"2px"}}>{score}<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}>p</span>{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}> / {totalPossible}p</span>:null}</div>
             {(soloMode!=="normal"||gameTime===0)?<div style={{fontSize:"13px",color:S.textMuted,marginTop:"6px"}}>{found.length} {t.words}</div>:<>
@@ -5145,4 +5156,4 @@ export default function Piilosana(){
       )}
     </div>
   );
-}
+}

@@ -14,6 +14,10 @@ export const menuColors = {
   dailyMuted: "#e8dfcf",
   dailyAccent: "#f4e7b2",
 
+  // Daily-ryhmän wrapper (yhdistää hero + päivärivi visuaalisesti)
+  dailyGroupBg: "rgba(243, 236, 220, 0.55)",
+  dailyGroupBorder: "rgba(127, 138, 75, 0.25)",
+
   // Eilinen-laatikko (sage green, kevyt)
   pastBg: "linear-gradient(135deg,#dfe7d8,#d2dccb)",
   pastBorder: "#aeb99b",

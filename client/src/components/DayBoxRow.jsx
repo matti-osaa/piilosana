@@ -8,6 +8,7 @@
 //
 // Props:
 //   S       aktiivinen teema-objekti (käytetään S.font, S.btnRadius)
+//   lang    "fi" | "en" | "sv" – otsikkojen kieli
 //   past    { dateLabel, result, onClick } | null
 //             - dateLabel: { weekday, short, ... }
 //             - result: { score, ... } tai null jos ei pelattu
@@ -22,7 +23,14 @@
 
 import { menuColors } from "../menuColors.js";
 
-export function DayBoxRow({ S, past, future }) {
+const TEXTS = {
+  fi: { yesterday: "EILINEN", tomorrow: "HUOMINEN" },
+  en: { yesterday: "YESTERDAY", tomorrow: "TOMORROW" },
+  sv: { yesterday: "IGÅR", tomorrow: "IMORGON" },
+};
+
+export function DayBoxRow({ S, lang = "fi", past, future }) {
+  const txt = TEXTS[lang] || TEXTS.fi;
   return (
     <div
       style={{
@@ -33,15 +41,15 @@ export function DayBoxRow({ S, past, future }) {
       }}
     >
       {/* Eilinen – pelattavissa, jos olemassa */}
-      {past && <PastBox S={S} {...past} />}
+      {past && <PastBox S={S} title={txt.yesterday} {...past} />}
 
       {/* Huominen – aina lukittu */}
-      <FutureBox S={S} dateLabel={future.dateLabel} />
+      <FutureBox S={S} title={txt.tomorrow} dateLabel={future.dateLabel} />
     </div>
   );
 }
 
-function PastBox({ S, dateLabel, result, onClick }) {
+function PastBox({ S, title, dateLabel, result, onClick }) {
   return (
     <button
       onClick={onClick}
@@ -74,19 +82,19 @@ function PastBox({ S, dateLabel, result, onClick }) {
     >
       <span
         style={{
-          fontSize: "15px",
+          fontSize: "12px",
           color: menuColors.pastText,
-          textTransform: "capitalize",
-          fontWeight: "700",
-          opacity: 0.75,
+          fontWeight: "800",
+          letterSpacing: "1px",
+          opacity: 0.85,
         }}
       >
-        {dateLabel.weekday.slice(0, 2)}
+        {title}
       </span>
       <span
         style={{
-          fontSize: "22px",
-          fontWeight: "800",
+          fontSize: "18px",
+          fontWeight: "700",
           color: menuColors.pastText,
         }}
       >
@@ -103,7 +111,7 @@ function PastBox({ S, dateLabel, result, onClick }) {
   );
 }
 
-function FutureBox({ S, dateLabel }) {
+function FutureBox({ S, title, dateLabel }) {
   return (
     <button
       disabled
@@ -127,19 +135,19 @@ function FutureBox({ S, dateLabel }) {
     >
       <span
         style={{
-          fontSize: "15px",
+          fontSize: "12px",
           color: menuColors.futureText,
-          textTransform: "capitalize",
-          fontWeight: "700",
-          opacity: 0.75,
+          fontWeight: "800",
+          letterSpacing: "1px",
+          opacity: 0.85,
         }}
       >
-        {dateLabel.weekday.slice(0, 2)}
+        {title}
       </span>
       <span
         style={{
-          fontSize: "22px",
-          fontWeight: "800",
+          fontSize: "18px",
+          fontWeight: "700",
           color: menuColors.futureText,
         }}
       >
