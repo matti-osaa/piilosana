@@ -139,7 +139,7 @@ export function DailyHeroCard({
               textShadow: "0 1px 0 #ffffff66",
             }}
           >
-            {txt.startBtn} ⚡
+            {txt.startBtn} ⚡ 3 min
           </div>
         </>
       )}
