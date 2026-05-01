@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Piilosana – Melody Demo</title>
+<style>
+  :root {
+    --bg: #1a1a22;
+    --surface: #232330;
+    --border: #3a3a4d;
+    --text: #e8e8f0;
+    --text2: #a0a0b8;
+    --accent: #b39ddb;
+    --green: #66bb6a;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 20px;
+  }
+  .panel {
+    max-width: 520px; width: 100%;
+    background: var(--surface); border-radius: 16px; padding: 28px;
+    box-shadow: 0 8px 32px #00000044;
+  }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
+  .info { font-size: 12px; color: var(--text2); margin-top: 16px; line-height: 1.6; }
+  button {
+    background: var(--accent); color: #1a1a22; border: none;
+    border-radius: 10px; padding: 14px 28px; font-size: 16px;
+    font-weight: 700; cursor: pointer; width: 100%;
+    transition: all 0.15s;
+  }
+  button:hover { transform: translateY(-1px); box-shadow: 0 4px 16px #b39ddb44; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .progress {
+    height: 4px; background: var(--border); border-radius: 2px;
+    margin-top: 16px; overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%; background: var(--accent); border-radius: 2px;
+    width: 0%; transition: width 0.3s;
+  }
+  .tracks {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    margin-top: 12px;
+  }
+  .track {
+    font-size: 11px; padding: 6px 8px; border-radius: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+<div class="panel">
+  <h1>🎵 Piilosana – Melodia</h1>
+  <div class="sub">
+    Sinun sävelmäideasi pohjalta rakennettu biisi.<br>
+    A-molli · 120 BPM · intro → säkeistö → kertsi → bridge → kertsi → outro
+  </div>
+
+  <button id="playBtn" onclick="togglePlay()">▶ Soita</button>
+
+  <div class="progress"><div class="progress-bar" id="prog"></div></div>
+
+  <div class="tracks">
+    <div class="track"><div class="dot" style="background:#b39ddb"></div>Lead synth</div>
+    <div class="track"><div class="dot" style="background:#66bb6a"></div>Pad chords</div>
+    <div class="track"><div class="dot" style="background:#ff8a65"></div>Bass</div>
+    <div class="track"><div class="dot" style="background:#42a5f5"></div>Drums</div>
+    <div class="track"><div class="dot" style="background:#ffca28"></div>Counter-melody</div>
+    <div class="track"><div class="dot" style="background:#ef5350"></div>Arp</div>
+  </div>
+
+  <div class="info">
+    Motiivit sinun melodiastasi: B→C→A -kuvio, E-F-E -koriste, D-E-D -koriste,
+    pitkät kannatukset. Sävellaji: A-molli (luonnollinen).
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+<script>
+// ── Song structure ──
+// Bars 1-4:   Intro (pad + sparse lead)
+// Bars 5-12:  Verse A (lead melody + bass + light drums)
+// Bars 13-16: Pre-chorus (build)
+// Bars 17-24: Chorus (full arrangement)
+// Bars 25-28: Bridge (stripped, counter-melody)
+// Bars 29-36: Chorus 2 (full + arp)
+// Bars 37-40: Outro (fade)
+
+const BPM = 120;
+const BAR = (60 / BPM) * 4; // 2 seconds per bar
+let playing = false;
+let startTime = 0;
+let totalDuration = 40 * BAR; // 40 bars
+let animFrame;
+
+// ── Audio chain ──
+let ready = false;
+let leadSynth, padSynth, bassSynth, counterSynth, arpSynth;
+let kick, hihat, snare;
+let masterRev, masterComp;
+
+async function initAudio() {
+  if (ready) return;
+  await Tone.start();
+  Tone.Transport.bpm.value = BPM;
+
+  masterRev = new Tone.Reverb({ decay: 3.2, wet: 0.25 }).toDestination();
+  masterComp = new Tone.Compressor({ threshold: -18, ratio: 4, attack: 0.01, release: 0.1 }).connect(masterRev);
+  const masterGain = new Tone.Gain(0.7).connect(masterComp);
+
+  // Lead — sawtooth with filter, close to user's preset
+  const leadFilter = new Tone.Filter({ frequency: 2000, type: "lowpass", rolloff: -24, Q: 3 }).connect(masterGain);
+  const leadChorus = new Tone.Chorus({ frequency: 0.5, delayTime: 4, depth: 0.3, wet: 0.3 }).connect(leadFilter).start();
+  leadSynth = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "sawtooth" },
+    envelope: { attack: 0.16, decay: 0.3, sustain: 0.35, release: 0.8 },
+    volume: -14,
+  }).connect(leadChorus);
+
+  // Pad — fat saw, slow attack
+  const padFilter = new Tone.Filter({ frequency: 1200, type: "lowpass", rolloff: -12 }).connect(masterGain);
+  padSynth = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "fatsawtooth", count: 3, spread: 35 },
+    envelope: { attack: 1.5, decay: 1.5, sustain: 0.65, release: 2.5 },
+    volume: -26,
+  }).connect(padFilter);
+
+  // Bass — mono saw
+  const bassFilter = new Tone.Filter({ frequency: 600, type: "lowpass", rolloff: -24, Q: 4 }).connect(masterGain);
+  bassSynth = new Tone.MonoSynth({
+    oscillator: { type: "sawtooth" },
+    envelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.15 },
+    filterEnvelope: { attack: 0.02, decay: 0.3, sustain: 0.3, release: 0.2, baseFrequency: 120, octaves: 2.5 },
+    volume: -18,
+  }).connect(bassFilter);
+
+  // Counter-melody — sine, gentle
+  const counterRev = new Tone.Reverb({ decay: 2.5, wet: 0.4 }).connect(masterGain);
+  counterSynth = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "triangle" },
+    envelope: { attack: 0.3, decay: 0.4, sustain: 0.3, release: 1.2 },
+    volume: -22,
+  }).connect(counterRev);
+
+  // Arp — plucky
+  const arpFilter = new Tone.Filter({ frequency: 3000, type: "lowpass" }).connect(masterGain);
+  const arpDelay = new Tone.PingPongDelay({ delayTime: "8n", feedback: 0.3, wet: 0.25 }).connect(arpFilter);
+  arpSynth = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "triangle" },
+    envelope: { attack: 0.005, decay: 0.15, sustain: 0.05, release: 0.3 },
+    volume: -24,
+  }).connect(arpDelay);
+
+  // Drums
+  kick = new Tone.MembraneSynth({
+    volume: -12, pitchDecay: 0.05, octaves: 5,
+    envelope: { attack: 0.005, decay: 0.25, sustain: 0, release: 0.15 }
+  }).connect(masterComp);
+
+  snare = new Tone.NoiseSynth({
+    noise: { type: "white" },
+    envelope: { attack: 0.002, decay: 0.12, sustain: 0, release: 0.08 },
+    volume: -20,
+  }).connect(masterComp);
+
+  hihat = new Tone.NoiseSynth({
+    noise: { type: "white" },
+    envelope: { attack: 0.001, decay: 0.03, sustain: 0, release: 0.02 },
+    volume: -28,
+  }).connect(masterComp);
+
+  ready = true;
+}
+
+// ── Note scheduling helpers ──
+function b(bar, beat) { return (bar - 1) * BAR + (beat - 1) * (BAR / 4); }
+
+function scheduleLead(t0) {
+  const n = (note, bar, beat, dur) => {
+    const time = t0 + b(bar, beat);
+    leadSynth.triggerAttackRelease(note, dur, time);
+  };
+
+  // ── Intro (bars 1-4): sparse lead hints ──
+  n("B4", 3, 1, "2n");
+  n("C5", 3, 3, "8n");
+  n("A4", 3, 4, "2n");
+
+  // ── Verse A (bars 5-12): main melody from user's idea ──
+  // Phrase 1 (bars 5-6): B→C→A motif
+  n("B4", 5, 1, "2n.");
+  n("C5", 6, 1, "8n");
+  n("A4", 6, 2, "2n");
+
+  // Phrase 2 (bars 7-8): G→F→G ornament + E-F-E
+  n("G4", 7, 1, "8n");
+  n("F4", 7, 1.5, "8n");
+  n("G4", 7, 2, "2n");
+  n("E4", 8, 1, "8n");
+  n("F4", 8, 1.5, "8n");
+  n("E4", 8, 2, "2n.");
+
+  // Phrase 3 (bars 9-10): long C5
+  n("C5", 9, 1, "1n");
+
+  // Phrase 4 (bars 11-12): descent
+  n("B4", 11, 1, "2n");
+  n("A4", 11, 3, "2n");
+  n("C5", 12, 1, "4n.");
+  n("A4", 12, 3, "2n");
+
+  // ── Pre-chorus (bars 13-16): ornament motifs intensified ──
+  n("F4", 13, 1, "8n");
+  n("E4", 13, 1.5, "8n");
+  n("F4", 13, 2, "8n");
+  n("E4", 13, 2.5, "2n");
+  n("D4", 14, 1, "8n");
+  n("E4", 14, 1.5, "8n");
+  n("D4", 14, 2, "8n");
+  n("E4", 14, 2.5, "2n");
+  n("B4", 15, 1, "4n");
+  n("B4", 15, 2, "4n");
+  n("C5", 15, 3, "4n");
+  n("A4", 15, 4, "2n");
+  n("E4", 16, 1, "8n");
+  n("F4", 16, 1.5, "4n.");
+  n("E4", 16, 3, "2n");
+
+  // ── Chorus (bars 17-24): higher energy, fuller melody ──
+  n("E5", 17, 1, "2n.");
+  n("D5", 17, 4, "8n");
+  n("C5", 18, 1, "2n");
+  n("B4", 18, 3, "8n");
+  n("C5", 18, 3.5, "8n");
+  n("A4", 18, 4, "2n");
+
+  n("B4", 19, 3, "8n");
+  n("C5", 19, 3.5, "8n");
+  n("D5", 19, 4, "4n");
+  n("E5", 20, 1, "2n.");
+
+  n("F5", 21, 1, "4n");
+  n("E5", 21, 2, "4n");
+  n("D5", 21, 3, "4n");
+  n("C5", 21, 4, "4n");
+  n("B4", 22, 1, "8n");
+  n("C5", 22, 1.5, "8n");
+  n("A4", 22, 2, "1n");
+
+  n("G4", 23, 1, "8n");
+  n("F4", 23, 1.5, "8n");
+  n("G4", 23, 2, "2n.");
+  n("A4", 24, 1, "1n");
+
+  // ── Bridge (bars 25-28): stripped, reflective ──
+  n("E4", 25, 1, "2n.");
+  n("D4", 26, 1, "2n.");
+  n("C4", 27, 1, "2n.");
+  n("D4", 27, 3, "4n");
+  n("E4", 28, 1, "1n");
+
+  // ── Chorus 2 (bars 29-36): repeat with variation ──
+  n("E5", 29, 1, "2n.");
+  n("D5", 29, 4, "8n");
+  n("C5", 30, 1, "2n");
+  n("B4", 30, 3, "8n");
+  n("C5", 30, 3.5, "8n");
+  n("A4", 30, 4, "2n");
+
+  n("B4", 31, 3, "4n");
+  n("D5", 31, 4, "4n");
+  n("E5", 32, 1, "2n.");
+
+  n("F5", 33, 1, "4n");
+  n("E5", 33, 2, "4n");
+  n("D5", 33, 3, "2n");
+  n("C5", 34, 1, "8n");
+  n("B4", 34, 1.5, "8n");
+  n("A4", 34, 2, "1n");
+
+  n("G4", 35, 1, "8n");
+  n("A4", 35, 1.5, "8n");
+  n("B4", 35, 2, "2n.");
+  n("A4", 36, 1, "1n");
+
+  // ── Outro (bars 37-40) ──
+  n("B4", 37, 1, "2n");
+  n("C5", 37, 3, "8n");
+  n("A4", 37, 4, "1n");
+  n("E4", 39, 1, "1n");
+}
+
+function schedulePad(t0) {
+  const chord = (notes, bar, dur) => {
+    const time = t0 + b(bar, 1);
+    padSynth.triggerAttackRelease(notes, dur, time);
+  };
+
+  // Intro
+  chord(["A3","C4","E4"], 1, "1n");
+  chord(["A3","C4","E4"], 3, "1n");
+
+  // Verse
+  chord(["A3","C4","E4"], 5, "1n");
+  chord(["A3","C4","E4"], 6, "1n");
+  chord(["F3","A3","C4"], 7, "1n");
+  chord(["F3","A3","C4"], 8, "1n");
+  chord(["G3","B3","D4"], 9, "1n");
+  chord(["G3","B3","D4"], 10, "1n");
+  chord(["A3","C4","E4"], 11, "1n");
+  chord(["A3","C4","E4"], 12, "1n");
+
+  // Pre-chorus — more movement
+  chord(["D3","F3","A3"], 13, "1n");
+  chord(["G3","B3","D4"], 14, "1n");
+  chord(["A3","C4","E4"], 15, "1n");
+  chord(["E3","G3","B3"], 16, "1n");
+
+  // Chorus — richer voicings
+  chord(["A3","C4","E4","A4"], 17, "1n");
+  chord(["A3","C4","E4","A4"], 18, "1n");
+  chord(["F3","A3","C4","F4"], 19, "1n");
+  chord(["G3","B3","D4","G4"], 20, "1n");
+  chord(["D3","F3","A3","D4"], 21, "1n");
+  chord(["E3","G#3","B3","E4"], 22, "1n");
+  chord(["F3","A3","C4","F4"], 23, "1n");
+  chord(["A3","C4","E4","A4"], 24, "1n");
+
+  // Bridge — gentler
+  chord(["A3","C4","E4"], 25, "1n");
+  chord(["D3","F3","A3"], 26, "1n");
+  chord(["F3","A3","C4"], 27, "1n");
+  chord(["E3","G3","B3"], 28, "1n");
+
+  // Chorus 2
+  chord(["A3","C4","E4","A4"], 29, "1n");
+  chord(["A3","C4","E4","A4"], 30, "1n");
+  chord(["F3","A3","C4","F4"], 31, "1n");
+  chord(["G3","B3","D4","G4"], 32, "1n");
+  chord(["D3","F3","A3","D4"], 33, "1n");
+  chord(["E3","G#3","B3","E4"], 34, "1n");
+  chord(["F3","A3","C4","F4"], 35, "1n");
+  chord(["A3","C4","E4","A4"], 36, "1n");
+
+  // Outro
+  chord(["A3","C4","E4"], 37, "1n");
+  chord(["A3","C4","E4"], 38, "1n");
+  chord(["A3","C4","E4"], 39, "2n");
+}
+
+function scheduleBass(t0) {
+  const n = (note, bar, beat, dur) => {
+    bassSynth.triggerAttackRelease(note, dur, t0 + b(bar, beat));
+  };
+
+  // Bass enters at verse (bar 5)
+  for (let rep = 0; rep < 2; rep++) {
+    const off = rep * 8;
+    // Am
+    n("A1", 5+off, 1, "8n"); n("A1", 5+off, 2.5, "8n"); n("A1", 5+off, 4, "8n");
+    n("A1", 6+off, 1, "8n"); n("A1", 6+off, 2.5, "8n"); n("A2", 6+off, 4, "8n");
+    // F
+    n("F1", 7+off, 1, "8n"); n("F1", 7+off, 2.5, "8n"); n("F1", 7+off, 4, "8n");
+    n("F1", 8+off, 1, "8n"); n("F1", 8+off, 2.5, "8n"); n("C2", 8+off, 4, "8n");
+    // G (only in first pass for verse, pre-chorus for second)
+    n("G1", 9+off, 1, "8n"); n("G1", 9+off, 2.5, "8n"); n("G1", 9+off, 4, "8n");
+    n("G1", 10+off, 1, "8n"); n("G1", 10+off, 2.5, "8n"); n("D2", 10+off, 4, "8n");
+    // Am
+    n("A1", 11+off, 1, "8n"); n("A1", 11+off, 2.5, "8n"); n("A1", 11+off, 4, "8n");
+    n("A1", 12+off, 1, "8n"); n("E2", 12+off, 3, "8n"); n("A1", 12+off, 4, "8n");
+  }
+
+  // Chorus bass (bars 17-24, 29-36) — more driving
+  for (const base of [17, 29]) {
+    // Am
+    for (let i = 0; i < 2; i++) {
+      n("A1", base+i, 1, "16n"); n("A1", base+i, 1.5, "16n");
+      n("A1", base+i, 2, "16n"); n("A1", base+i, 2.5, "16n");
+      n("A1", base+i, 3, "16n"); n("A1", base+i, 3.5, "16n");
+      n("A1", base+i, 4, "16n"); n("A1", base+i, 4.5, "16n");
+    }
+    // F
+    for (let i = 2; i < 3; i++) {
+      n("F1", base+i, 1, "16n"); n("F1", base+i, 1.5, "16n");
+      n("F1", base+i, 2, "16n"); n("F1", base+i, 2.5, "16n");
+      n("F1", base+i, 3, "16n"); n("F1", base+i, 3.5, "16n");
+      n("F1", base+i, 4, "16n"); n("F1", base+i, 4.5, "16n");
+    }
+    // G
+    n("G1", base+3, 1, "16n"); n("G1", base+3, 1.5, "16n");
+    n("G1", base+3, 2, "16n"); n("G1", base+3, 2.5, "16n");
+    n("G1", base+3, 3, "16n"); n("G1", base+3, 3.5, "16n");
+    n("G1", base+3, 4, "16n"); n("G1", base+3, 4.5, "16n");
+    // Dm
+    n("D1", base+4, 1, "16n"); n("D1", base+4, 1.5, "16n");
+    n("D2", base+4, 2, "16n"); n("D1", base+4, 3, "16n");
+    n("D1", base+4, 4, "16n"); n("D1", base+4, 4.5, "16n");
+    // E
+    n("E1", base+5, 1, "16n"); n("E1", base+5, 1.5, "16n");
+    n("E2", base+5, 2, "16n"); n("E1", base+5, 3, "16n");
+    n("E1", base+5, 4, "16n"); n("E1", base+5, 4.5, "16n");
+    // F
+    n("F1", base+6, 1, "16n"); n("F1", base+6, 1.5, "16n");
+    n("F1", base+6, 2, "16n"); n("F1", base+6, 3, "16n");
+    n("F1", base+6, 4, "16n"); n("A1", base+6, 4.5, "16n");
+    // Am
+    n("A1", base+7, 1, "16n"); n("A1", base+7, 1.5, "16n");
+    n("A1", base+7, 2, "16n"); n("A1", base+7, 3, "16n");
+    n("E2", base+7, 4, "8n");
+  }
+
+  // Bridge (25-28)
+  n("A1", 25, 1, "2n"); n("A1", 25, 3, "4n");
+  n("D2", 26, 1, "2n"); n("D2", 26, 3, "4n");
+  n("F1", 27, 1, "2n"); n("F1", 27, 3, "4n");
+  n("E1", 28, 1, "2n"); n("E1", 28, 3, "4n");
+
+  // Outro
+  n("A1", 37, 1, "2n"); n("A1", 38, 1, "2n");
+  n("A1", 39, 1, "1n");
+}
+
+function scheduleDrums(t0) {
+  const k = (bar, beat) => kick.triggerAttackRelease("C1", "8n", t0 + b(bar, beat));
+  const s = (bar, beat) => snare.triggerAttackRelease("16n", t0 + b(bar, beat));
+  const h = (bar, beat) => hihat.triggerAttackRelease("32n", t0 + b(bar, beat));
+
+  // Drums enter at bar 5 (verse) — light pattern
+  for (let bar = 5; bar <= 12; bar++) {
+    k(bar, 1); k(bar, 3);
+    s(bar, 2); s(bar, 4);
+    for (let beat = 1; beat <= 4; beat += 0.5) h(bar, beat);
+  }
+
+  // Pre-chorus (13-16) — busier
+  for (let bar = 13; bar <= 16; bar++) {
+    k(bar, 1); k(bar, 2.5); k(bar, 3);
+    s(bar, 2); s(bar, 4);
+    for (let beat = 1; beat <= 4; beat += 0.5) h(bar, beat);
+  }
+
+  // Chorus (17-24) — full energy
+  for (let bar = 17; bar <= 24; bar++) {
+    k(bar, 1); k(bar, 1.5); k(bar, 3);
+    s(bar, 2); s(bar, 4);
+    for (let beat = 1; beat <= 4.5; beat += 0.5) h(bar, beat);
+    // extra kick on 4.5 every other bar
+    if (bar % 2 === 0) k(bar, 4.5);
+  }
+
+  // Bridge (25-28) — minimal
+  for (let bar = 25; bar <= 28; bar++) {
+    k(bar, 1);
+    h(bar, 2); h(bar, 3); h(bar, 4);
+  }
+
+  // Chorus 2 (29-36)
+  for (let bar = 29; bar <= 36; bar++) {
+    k(bar, 1); k(bar, 1.5); k(bar, 3);
+    s(bar, 2); s(bar, 4);
+    for (let beat = 1; beat <= 4.5; beat += 0.5) h(bar, beat);
+    if (bar % 2 === 0) k(bar, 4.5);
+  }
+
+  // Outro — sparse
+  k(37, 1); s(37, 2); h(37, 3);
+  k(38, 1);
+}
+
+function scheduleCounter(t0) {
+  const n = (note, bar, beat, dur) => {
+    counterSynth.triggerAttackRelease(note, dur, t0 + b(bar, beat));
+  };
+
+  // Counter-melody in bridge (bars 25-28)
+  n("C5", 25, 3, "4n");
+  n("B4", 25, 4, "4n");
+  n("A4", 26, 1, "2n");
+  n("F4", 26, 3, "4n");
+  n("G4", 26, 4, "4n");
+  n("A4", 27, 1, "4n");
+  n("G4", 27, 2, "4n");
+  n("F4", 27, 3, "4n");
+  n("E4", 27, 4, "4n");
+  n("D4", 28, 1, "2n.");
+  n("E4", 28, 4, "2n");
+
+  // Also some fills in chorus 2
+  n("E5", 33, 3, "8n");
+  n("F5", 33, 3.5, "8n");
+  n("E5", 33, 4, "4n");
+  n("C5", 35, 3, "8n");
+  n("D5", 35, 3.5, "8n");
+  n("E5", 35, 4, "2n");
+
+  // Outro counter
+  n("E4", 38, 1, "2n");
+  n("C4", 39, 1, "1n");
+}
+
+function scheduleArp(t0) {
+  const n = (note, bar, beat, dur) => {
+    arpSynth.triggerAttackRelease(note, dur || "16n", t0 + b(bar, beat));
+  };
+
+  // Arp only in chorus 2 (bars 29-36)
+  const patterns = {
+    Am: ["A4","C5","E5","C5"],
+    F:  ["F4","A4","C5","A4"],
+    G:  ["G4","B4","D5","B4"],
+    Dm: ["D4","F4","A4","F4"],
+    E:  ["E4","G#4","B4","G#4"],
+  };
+
+  const chordSeq = [
+    [29,"Am"],[30,"Am"],[31,"F"],[32,"G"],
+    [33,"Dm"],[34,"E"],[35,"F"],[36,"Am"],
+  ];
+
+  for (const [bar, ch] of chordSeq) {
+    const p = patterns[ch];
+    for (let beat = 1; beat <= 4; beat++) {
+      for (let sub = 0; sub < 2; sub++) {
+        n(p[(beat - 1 + sub * 2) % 4], bar, beat + sub * 0.5);
+      }
+    }
+  }
+}
+
+// ── Playback ──
+async function togglePlay() {
+  const btn = document.getElementById("playBtn");
+  if (playing) {
+    Tone.Transport.cancel();
+    Tone.Transport.stop();
+    playing = false;
+    btn.textContent = "▶ Soita";
+    cancelAnimationFrame(animFrame);
+    document.getElementById("prog").style.width = "0%";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Ladataan…";
+  await initAudio();
+
+  Tone.Transport.cancel();
+  const t0 = Tone.now() + 0.2;
+  startTime = t0;
+
+  scheduleLead(t0);
+  schedulePad(t0);
+  scheduleBass(t0);
+  scheduleDrums(t0);
+  scheduleCounter(t0);
+  scheduleArp(t0);
+
+  playing = true;
+  btn.disabled = false;
+  btn.textContent = "⏸ Pysäytä";
+
+  function updateProgress() {
+    if (!playing) return;
+    const elapsed = Tone.now() - startTime;
+    const pct = Math.min(100, (elapsed / totalDuration) * 100);
+    document.getElementById("prog").style.width = pct + "%";
+    if (elapsed >= totalDuration) {
+      playing = false;
+      btn.textContent = "▶ Soita";
+      document.getElementById("prog").style.width = "0%";
+      return;
+    }
+    animFrame = requestAnimationFrame(updateProgress);
+  }
+  updateProgress();
+}
+</script>
+</body>
+</html>

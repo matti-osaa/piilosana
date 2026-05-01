@@ -49,6 +49,12 @@ export function attachStaticRoutes(app, ctx) {
     const path = join(process.cwd(), "tools", "synth-lab.html");
     res.sendFile(path);
   });
+
+  // Melody demo – biisi-idea kuunneltavana
+  app.get("/melody-demo", (req, res) => {
+    const path = join(process.cwd(), "tools", "melody-demo.html");
+    res.sendFile(path);
+  });
 }
 
 // SPA-catch-all: kaikki muut polut tarjoilevat client/dist/index.html:n.
