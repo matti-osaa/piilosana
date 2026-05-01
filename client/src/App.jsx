@@ -3789,9 +3789,9 @@ export default function Piilosana(){
       <div style={{
         background: menuColors.dailyGroupBg,
         border: `1px solid ${menuColors.dailyGroupBorder}`,
-        borderRadius: "18px",
-        padding: "10px 10px 4px 10px",
-        marginBottom: "12px",
+        borderRadius: "14px",
+        padding: "6px 6px 2px 6px",
+        marginBottom: "8px",
       }}>
         {/* Päivän Piilosana – hero (kupla pulissaa esiin korttin yläpuolelle) */}
         {(()=>{

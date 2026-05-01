@@ -37,7 +37,7 @@ export function DayBoxRow({ S, lang = "fi", past, future }) {
         display: "flex",
         gap: "6px",
         width: "100%",
-        marginBottom: "12px",
+        marginBottom: "6px",
       }}
     >
       {/* Eilinen – pelattavissa, jos olemassa */}
@@ -60,8 +60,8 @@ function PastBox({ S, title, dateLabel, result, onClick }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: "4px",
-        padding: "16px 6px",
+        gap: "3px",
+        padding: "10px 6px",
         border: `2px solid ${menuColors.pastBorder}`,
         borderRadius: S.btnRadius,
         cursor: "pointer",
@@ -82,7 +82,7 @@ function PastBox({ S, title, dateLabel, result, onClick }) {
     >
       <span
         style={{
-          fontSize: "12px",
+          fontSize: "11px",
           color: menuColors.pastText,
           fontWeight: "800",
           letterSpacing: "1px",
@@ -93,7 +93,7 @@ function PastBox({ S, title, dateLabel, result, onClick }) {
       </span>
       <span
         style={{
-          fontSize: "18px",
+          fontSize: "16px",
           fontWeight: "700",
           color: menuColors.pastText,
         }}
@@ -101,7 +101,7 @@ function PastBox({ S, title, dateLabel, result, onClick }) {
         {dateLabel.short}
       </span>
       {result ? (
-        <span style={{ fontSize: "18px", fontWeight: "800", color: "#49634d" }}>
+        <span style={{ fontSize: "15px", fontWeight: "800", color: "#49634d" }}>
           {result.score}p
         </span>
       ) : (
@@ -122,8 +122,8 @@ function FutureBox({ S, title, dateLabel }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: "4px",
-        padding: "16px 6px",
+        gap: "3px",
+        padding: "10px 6px",
         border: `2px dashed ${menuColors.futureBorder}`,
         borderRadius: S.btnRadius,
         cursor: "default",
@@ -135,7 +135,7 @@ function FutureBox({ S, title, dateLabel }) {
     >
       <span
         style={{
-          fontSize: "12px",
+          fontSize: "11px",
           color: menuColors.futureText,
           fontWeight: "800",
           letterSpacing: "1px",
@@ -146,7 +146,7 @@ function FutureBox({ S, title, dateLabel }) {
       </span>
       <span
         style={{
-          fontSize: "18px",
+          fontSize: "16px",
           fontWeight: "700",
           color: menuColors.futureText,
         }}
