@@ -12,9 +12,9 @@ import {
 } from "../hooks/useDailyPercentile.js";
 
 const TEXTS = {
-  fi: { theme: "Teema", streak: "päivää putkeen" },
-  sv: { theme: "Tema",  streak: "dagar i rad" },
-  en: { theme: "Theme", streak: "day streak" },
+  fi: { theme: "Teema", streak: "päivää putkeen", sameForAll: "Kaikille sama ruudukko · vaihtuu päivittäin" },
+  sv: { theme: "Tema",  streak: "dagar i rad",     sameForAll: "Samma rutnät för alla · byts dagligen" },
+  en: { theme: "Theme", streak: "day streak",      sameForAll: "Same grid for everyone · changes daily" },
 };
 
 export function DailyHeroCard({
@@ -79,7 +79,11 @@ export function DailyHeroCard({
         {txt.theme}: {themeName}
       </span>
 
-      <span style={{ fontSize: "19px", color: menuColors.dailyText, textTransform: "capitalize", fontWeight: "700" }}>
+      <span style={{ fontSize: "11px", color: menuColors.dailyMuted, opacity: 0.75, fontWeight: "500", letterSpacing: "0.3px" }}>
+        {txt.sameForAll}
+      </span>
+
+      <span style={{ fontSize: "19px", color: menuColors.dailyText, textTransform: "capitalize", fontWeight: "700", marginTop: "4px" }}>
         {dateLabel.weekday} {dateLabel.short}
       </span>
 

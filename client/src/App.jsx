@@ -6,6 +6,7 @@ import { menuColors } from "./menuColors.js";
 import { useAudioSystem } from "./hooks/useAudioSystem.js";
 import { MultiplayerHero } from "./components/MultiplayerHero.jsx";
 import { DailyHeroCard } from "./components/DailyHeroCard.jsx";
+import { SpeechBubble } from "./components/SpeechBubble.jsx";
 import { NextDailyCountdown } from "./components/NextDailyCountdown.jsx";
 import { StreakWarning } from "./components/StreakWarning.jsx";
 import { FirstTimeWelcome } from "./components/FirstTimeWelcome.jsx";
@@ -2057,6 +2058,7 @@ export default function Piilosana(){
   const { sounds, soundTheme, musicOn, musicTrack, audioStarted,
           setSoundTheme, setMusicOn, setMusicTrack, music, musicTracks } = audio;
   const[updateAvailable,setUpdateAvailable]=useState(false);
+  const[bubbleIdx,setBubbleIdx]=useState(()=>Math.floor(Math.random()*100));
   const[wordsLoaded,setWordsLoaded]=useState(()=>({fi:LANG_CONFIG.fi.loaded,en:LANG_CONFIG.en.loaded,sv:LANG_CONFIG.sv.loaded}));
   useEffect(()=>{
     let mounted=true;
@@ -3784,6 +3786,44 @@ export default function Piilosana(){
         isPlayed={!!getDailyResult(lang)}
       />
 
+      {/* ===== Puhekupla – satunnainen kannustus, klikkaus vaihtaa ===== */}
+      {(()=>{
+        const BUBBLES = {
+          fi: [
+            "Pystytkö parhaaseen kastiin?",
+            "Yli keskiarvon tänään?",
+            "Putki vielä elossa?",
+            "Pitkien sanojen mestari?",
+            "Päivän paras pelaaja sinä?",
+            "Löydätkö 11-kirjaimisen?",
+            "Voitatko eilisen tuloksen?",
+          ],
+          en: [
+            "Can you reach the top tier?",
+            "Above average today?",
+            "Streak still alive?",
+            "Master of long words?",
+            "Best player of the day?",
+            "Find an 11-letter word?",
+            "Can you beat yesterday?",
+          ],
+          sv: [
+            "Når du toppskiktet?",
+            "Över medel idag?",
+            "Sviten kvar i liv?",
+            "Mästare på långa ord?",
+            "Dagens bästa spelare?",
+            "Hittar du ett 11-bokstavsord?",
+            "Slår du gårdagen?",
+          ],
+        };
+        const list = BUBBLES[lang] || BUBBLES.fi;
+        const text = list[bubbleIdx % list.length];
+        return <div style={{textAlign:"center"}}>
+          <SpeechBubble text={text} onClick={()=>setBubbleIdx(i=>i+1+Math.floor(Math.random()*(list.length-1)))} />
+        </div>;
+      })()}
+
       {/* ===== DAILY-RYHMÄ – wrapper, joka kerää Päivän Piilosanan elementit yhteen ===== */}
       <div style={{
         background: menuColors.dailyGroupBg,
@@ -5131,12 +5171,11 @@ export default function Piilosana(){
         </div>
       )}
 
-      {/* Electric Blue — pulsing cyan glow */}
+      {/* Electric Blue – pulsing cyan glow */}
       {themeId==="electric"&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
-          <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",
-            width:"120%",height:"120%",
-            background:"radial-gradient(ellipse at center,rgba(0,229,255,0.06) 0%,transparent 60%)",
+          <div style={{position:"absolute",top:"30%",left:"50%",transform:"translate(-50%,-50%)",width:"60%",height:"40%",
+            background:"radial-gradient(ellipse at center,rgba(0,229,255,0.06) 0%,transparent 70%)",
             animation:"electricPulse 3s ease-in-out infinite"}}/>
           <div style={{position:"absolute",top:"20%",left:"10%",width:"40%",height:"40%",
             background:"radial-gradient(ellipse at center,rgba(118,255,3,0.03) 0%,transparent 60%)",
@@ -5144,7 +5183,7 @@ export default function Piilosana(){
         </div>
       )}
 
-      {/* Retro — scanlines + neon glow */}
+      {/* Retro – scanlines + neon glow */}
       {themeId==="retro"&&(
         <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
           <div style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",
