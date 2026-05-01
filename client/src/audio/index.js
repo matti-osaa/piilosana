@@ -195,7 +195,7 @@ export const MUSIC_TRACKS = [
   { id: "neon-pulse", name: "Neon Pulse", nameFi: "Neonin syke" },
   { id: "word-away", name: "Word Away", nameFi: "Sana pois" },
   { id: "vapor-tail", name: "Vapor Tail", nameFi: "Höyryvanajälki" },
-  { id: "laser-silk", name: "Laser Silk", nameFi: "Lasersilkki" },
+  { id: "neon-obxa", name: "Neon Pulse OB-Xa", nameFi: "Neonin syke (OB-Xa)" },
 ];
 
 function startNeonPulse(rev, del) {
@@ -294,32 +294,88 @@ function startVaporTail(rev, del) {
 }
 
 function startLaserSilk(rev, del) {
-  Tone.Transport.bpm.value = 108;
-  const chorus = new Tone.Chorus({ frequency: 0.6, delayTime: 5, depth: 0.5, wet: 0.25 }).connect(rev).start();
-  const bassF = new Tone.Filter({ frequency: 600, type: "lowpass", rolloff: -24, Q: 3 }).connect(rev);
-  const bass = new Tone.Synth({ oscillator: { type: "sawtooth" }, envelope: { attack: 0.006, decay: 0.18, sustain: 0.1, release: 0.12 }, volume: -12 }).connect(bassF);
-  const arpF = new Tone.Filter({ frequency: 3500, type: "lowpass", rolloff: -12 }).connect(del);
-  const arp = new Tone.Synth({ oscillator: { type: "sawtooth" }, envelope: { attack: 0.004, decay: 0.22, sustain: 0.03, release: 0.3 }, volume: -22 }).connect(arpF);
-  const padF = new Tone.Filter({ frequency: 1400, type: "lowpass", rolloff: -12 }).connect(chorus);
-  const pad = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sawtooth" }, envelope: { attack: 1.5, decay: 2.0, sustain: 0.5, release: 3.0 }, volume: -26 }).connect(padF);
-  const leadF2 = new Tone.Filter({ frequency: 3000, type: "lowpass", rolloff: -12 }).connect(del);
-  const lead = new Tone.Synth({ oscillator: { type: "sawtooth" }, envelope: { attack: 0.08, decay: 0.5, sustain: 0.45, release: 1.2 }, volume: -17 }).connect(leadF2);
-  const kick = new Tone.MembraneSynth({ volume: -9, pitchDecay: 0.05, octaves: 4.5, envelope: { attack: 0.004, decay: 0.3, sustain: 0, release: 0.2 } }).toDestination();
-  const snare = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.002, decay: 0.12, sustain: 0, release: 0.08 }, volume: -17 }).connect(rev);
-  const hihat = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.001, decay: 0.028, sustain: 0, release: 0.018 }, volume: -23 }).toDestination();
-  const bP = [["E1","E1","E2","E1","B1","E1","E2","B1"], ["C1","C1","C2","C1","G1","C1","C2","G1"], ["A0","A0","A1","A0","E1","A0","A1","E1"], ["D1","D1","D2","D1","A1","D1","D2","A1"]];
-  const padCh = [["E2","G2","B2"], ["C2","E2","G2","B2"], ["A1","C2","E2","G2"], ["D2","F#2","A2"]];
-  const arpP = [["E3","G3","B3","E4","B3","G3","E3","B3","G3","E4","B3","G3","E3","G3","B3","E4"], ["C3","E3","G3","B3","G3","E3","C3","G3","E3","B3","G3","E3","C3","E3","G3","B3"], ["A2","C3","E3","G3","E3","C3","A2","E3","C3","G3","E3","C3","A2","C3","E3","G3"], ["D3","F#3","A3","D4","A3","F#3","D3","A3","F#3","D4","A3","F#3","D3","F#3","A3","D4"]];
-  const melA = ["B4",null,"E5",null,"D5",null,"B4",null,null,"G4",null,"A4","B4",null,null,null,"C5",null,null,"E5",null,"D5",null,"C5",null,"B4",null,"A4",null,null,null,null];
-  const melB = ["E5",null,"G5",null,"F#5",null,"E5",null,null,"D5",null,"C5","B4",null,null,null,"A4","B4","C5","D5","E5",null,"D5",null,"B4",null,null,null,null,null,null,null];
-  let bs2 = 0, bsc = 0, as3 = 0, ac2 = 0, pc3 = 0, ls4 = 0, beat = 0, useB = false, bfp = 0, afp = 0;
-  const bassLoop = new Tone.Loop(t => { const n = bP[bsc % 4][bs2 % 8]; bass.triggerAttackRelease(n, "16n", t); bfp += 0.01; bassF.frequency.setValueAtTime(400 + Math.sin(bfp) * 250, t); bs2++; if (bs2 % 8 === 0) bsc++; }, "8n");
-  const padLoop = new Tone.Loop(t => { pad.triggerAttackRelease(padCh[pc3 % 4], "1m", t); pc3++; }, "1m");
-  const arpLoop = new Tone.Loop(t => { const n = arpP[ac2 % 4][as3 % 16]; arp.triggerAttackRelease(n, "32n", t); afp += 0.008; arpF.frequency.setValueAtTime(2500 + Math.sin(afp) * 1500, t); as3++; if (as3 % 16 === 0) ac2++; }, "16n");
-  const leadLoop = new Tone.Loop(t => { const m = useB ? melB : melA; const n = m[ls4 % 32]; if (n) lead.triggerAttackRelease(n, "4n", t); ls4++; if (ls4 % 32 === 0) useB = !useB; }, "4n");
-  const drumLoop = new Tone.Loop(t => { const p = beat % 16; if (p % 4 === 0) kick.triggerAttackRelease("C1", "8n", t); if (p === 4 || p === 12) snare.triggerAttackRelease("16n", t); if (p % 2 === 0) hihat.triggerAttackRelease("32n", t); beat++; }, "16n");
-  bassLoop.start(0); drumLoop.start("2m"); padLoop.start("4m"); arpLoop.start("6m"); leadLoop.start("10m");
-  return { bass, bassF, arp, arpF, pad, padF, lead, leadF: leadF2, kick, snare, hihat, chorus, bassLoop, padLoop, arpLoop, leadLoop, drumLoop };
+  // OB-Xa-tyylinen Neon Pulse: paksut detunatut fatsawtoothit, lowpass-resonance,
+  // brass-tyylinen lead + filter-envelope, warm-string pad ja vibrato leadissä.
+  Tone.Transport.bpm.value = 120;
+
+  const bassF = new Tone.Filter({ frequency: 900, type: "lowpass", rolloff: -24, Q: 6 }).connect(rev);
+  const bass = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "fatsawtooth", count: 2, spread: 18 },
+    envelope: { attack: 0.005, decay: 0.18, sustain: 0.10, release: 0.10 },
+    volume: -10,
+  }).connect(bassF);
+  let bassPhase = 0;
+
+  const leadVib = new Tone.Vibrato({ frequency: 5.4, depth: 0.05, wet: 0.5 }).connect(del);
+  const leadF = new Tone.Filter({ frequency: 1950, type: "lowpass", rolloff: -24, Q: 3 }).connect(leadVib);
+  const lead = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "fatsawtooth", count: 2, spread: 22 },
+    envelope: { attack: 0.18, decay: 0.6, sustain: 0.65, release: 1.0 },
+    volume: -14,
+  }).connect(leadF);
+  const leadEnv = new Tone.FrequencyEnvelope({
+    attack: 0.04, decay: 0.5, sustain: 0.45, release: 0.9,
+    baseFrequency: 600, octaves: 2.4, exponent: 2,
+  }).connect(leadF.frequency);
+
+  const padF = new Tone.Filter({ frequency: 1300, type: "lowpass", rolloff: -12 }).connect(rev);
+  const pad = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "fatsawtooth", count: 3, spread: 28 },
+    envelope: { attack: 1.4, decay: 1.6, sustain: 0.7, release: 3.0 },
+    volume: -22,
+  }).connect(padF);
+
+  const kick = new Tone.MembraneSynth({ volume: -10, pitchDecay: 0.05, octaves: 5,
+    envelope: { attack: 0.005, decay: 0.3, sustain: 0, release: 0.2 } }).toDestination();
+  const snare = new Tone.NoiseSynth({ noise: { type: "white" },
+    envelope: { attack: 0.002, decay: 0.15, sustain: 0, release: 0.1 }, volume: -18 }).connect(rev);
+  const hihat = new Tone.NoiseSynth({ noise: { type: "white" },
+    envelope: { attack: 0.001, decay: 0.025, sustain: 0, release: 0.02 }, volume: -26 }).toDestination();
+
+  // Sama Neon Pulse melodia ja sointukulku kuin startNeonPulse:ssa
+  const seqPats = [
+    ["A1","A1","A2","A1","A1","A2","A1","A2","A1","A1","A2","A1","E2","A1","A2","A1"],
+    ["F1","F1","F2","F1","F1","F2","F1","F2","F1","F1","F2","F1","C2","F1","F2","F1"],
+    ["C2","C2","C3","C2","C2","C3","C2","C3","C2","C2","C3","C2","G2","C2","C3","C2"],
+    ["G1","G1","G2","G1","G1","G2","G1","G2","G1","G1","G2","G1","D2","G1","G2","G1"],
+  ];
+  const padCh = [["A3","C4","E4"], ["F3","A3","C4"], ["C3","E3","G3"], ["G3","B3","D4"]];
+  const melA = ["E5",null,null,"A5",null,"G5",null,"E5",null,"C5",null,"D5","E5",null,null,null,"G5",null,null,"E5",null,"D5",null,"C5",null,"B4",null,"C5","D5",null,null,null];
+  const melB = ["A5",null,null,"C6",null,"B5",null,"A5",null,"G5",null,"A5","B5",null,null,null,"C6",null,"B5","A5",null,"G5",null,"E5",null,"D5",null,"E5",null,null,null,null];
+
+  let ss = 0, sc = 0, pc = 0, ls = 0, beat = 0, useB = false;
+
+  const seqLoop = new Tone.Loop(t => {
+    const n = seqPats[sc % 4][ss % 16];
+    bass.triggerAttackRelease(n, "32n", t);
+    bassPhase += 0.018;
+    bassF.frequency.setValueAtTime(700 + Math.sin(bassPhase) * 350, t);
+    ss++; if (ss % 16 === 0) sc++;
+  }, "16n");
+  const padLoop = new Tone.Loop(t => { pad.triggerAttackRelease(padCh[pc % 4], "1m", t); pc++; }, "1m");
+  const leadLoop = new Tone.Loop(t => {
+    const m = useB ? melB : melA;
+    const n = m[ls % 32];
+    if (n) {
+      lead.triggerAttackRelease(n, "4n", t);
+      leadEnv.triggerAttackRelease("4n", t);
+    }
+    ls++; if (ls % 32 === 0) useB = !useB;
+  }, "4n");
+  const drumLoop = new Tone.Loop(t => {
+    const p = beat % 16;
+    if (p % 4 === 0) kick.triggerAttackRelease("C1", "8n", t);
+    if (p === 4 || p === 12) snare.triggerAttackRelease("16n", t);
+    if (p % 2 === 0) hihat.triggerAttackRelease("32n", t);
+    beat++;
+  }, "16n");
+
+  seqLoop.start(0);
+  drumLoop.start("4m");
+  padLoop.start("4m");
+  leadLoop.start("8m");
+
+  return { bass, bassF, lead, leadF, leadEnv, leadVib, pad, padF, kick, snare, hihat, seqLoop, padLoop, leadLoop, drumLoop };
 }
 
 export function useMusic(trackId) {

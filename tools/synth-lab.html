@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Synth-labra – OB-Xa baseline</title>
+<style>
+  :root {
+    --bg: #1a1a22;
+    --surface: #232330;
+    --surface-2: #2c2c3c;
+    --border: #3a3a4d;
+    --text: #e8e8f0;
+    --text-secondary: #a0a0b8;
+    --text-tertiary: #707080;
+    --accent: #b39ddb;
+    --danger: #ef5350;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  .panel {
+    max-width: 720px; margin: 0 auto;
+    background: var(--surface); border-radius: 12px; padding: 20px;
+  }
+  h1 { font-size: 18px; font-weight: 500; margin: 0 0 4px; }
+  .sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-bottom: 16px; }
+  label { font-size: 11px; color: var(--text-secondary); display: block; margin-bottom: 2px; }
+  input[type=range] { width: 100%; }
+  select, button {
+    background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 10px; font: inherit; font-size: 12px; cursor: pointer;
+  }
+  select { width: 100%; }
+  button:hover { background: var(--border); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .preset { font-size: 12px; padding: 6px 10px; }
+  .bar { padding: 8px 12px; background: var(--surface-2); border-radius: 6px; border: 1px solid var(--border); margin-bottom: 12px; }
+  textarea {
+    width: 100%; height: 100px; box-sizing: border-box;
+    background: var(--bg); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px; font-family: ui-monospace, monospace; font-size: 11px;
+    resize: vertical;
+  }
+  .kb { position: relative; height: 130px; margin-bottom: 12px; user-select: none; }
+  .footer { font-size: 11px; color: var(--text-tertiary); margin-top: 12px; line-height: 1.6; }
+  .danger { color: var(--danger); }
+  #status { font-size: 12px; color: var(--text-tertiary); margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="panel">
+
+  <div class="row">
+    <div>
+      <h1>Synth-labra</h1>
+      <div class="sub">OB-Xa-pohja, kokeile mitä vain</div>
+    </div>
+    <div id="status">odottaa</div>
+  </div>
+
+  <div class="row" style="gap: 6px;">
+    <button class="preset" data-preset="obxa">OB-Xa baseline</button>
+    <button class="preset" data-preset="pulse">Pulse / PWM</button>
+    <button class="preset" data-preset="brass">Brass stab</button>
+    <button class="preset" data-preset="pad">Soft pad</button>
+    <button class="preset" data-preset="bell">FM bell</button>
+    <button class="preset" data-preset="bass">Acid bass</button>
+  </div>
+
+  <div class="grid">
+    <div>
+      <label>Oscillator</label>
+      <select id="oscType">
+        <option value="fatsawtooth">fatsawtooth</option>
+        <option value="sawtooth">sawtooth</option>
+        <option value="fatsquare">fatsquare</option>
+        <option value="square">square</option>
+        <option value="pulse">pulse</option>
+        <option value="triangle">triangle</option>
+        <option value="sine">sine</option>
+        <option value="fmsine">FM sine (bell)</option>
+        <option value="amsawtooth">AM saw</option>
+      </select>
+    </div>
+    <div>
+      <label>Detune / spread <span id="vSpread">45</span></label>
+      <input id="spread" type="range" min="0" max="60" value="45" step="1">
+    </div>
+    <div>
+      <label>Filter cutoff <span id="vCutoff">1950</span> Hz</label>
+      <input id="cutoff" type="range" min="200" max="6000" value="1950" step="20">
+    </div>
+    <div>
+      <label>Filter Q <span id="vQ">3</span></label>
+      <input id="filtQ" type="range" min="0.5" max="18" value="3" step="0.1">
+    </div>
+    <div>
+      <label>Filter env <span id="vFenv">1.5</span> oct</label>
+      <input id="filtEnv" type="range" min="0" max="4" value="1.5" step="0.1">
+    </div>
+    <div>
+      <label>Pulse width <span id="vPW">0.5</span></label>
+      <input id="pulseW" type="range" min="0.1" max="0.9" value="0.5" step="0.01">
+    </div>
+    <div>
+      <label>Attack <span id="vA">0.05</span> s</label>
+      <input id="attack" type="range" min="0.001" max="2" value="0.05" step="0.01">
+    </div>
+    <div>
+      <label>Decay <span id="vD">0.3</span> s</label>
+      <input id="decay" type="range" min="0.01" max="2" value="0.3" step="0.01">
+    </div>
+    <div>
+      <label>Sustain <span id="vS">0.5</span></label>
+      <input id="sustain" type="range" min="0" max="1" value="0.5" step="0.01">
+    </div>
+    <div>
+      <label>Release <span id="vR">0.5</span> s</label>
+      <input id="release" type="range" min="0.05" max="3" value="0.5" step="0.01">
+    </div>
+    <div>
+      <label>Reverb <span id="vRev">20</span>%</label>
+      <input id="rev" type="range" min="0" max="80" value="20" step="1">
+    </div>
+    <div>
+      <label>Chorus <span id="vCho">30</span>%</label>
+      <input id="cho" type="range" min="0" max="80" value="30" step="1">
+    </div>
+  </div>
+
+  <div class="bar row">
+    <button id="bkBtn">▶ Backing</button>
+    <span style="font-size: 12px; color: var(--text-secondary);">Neon Pulse pohjapatterni 120 BPM</span>
+    <span style="margin-left: auto; font-size: 11px; color: var(--text-tertiary);">Oktaavi <span id="octLabel">4</span></span>
+    <button id="octDown" style="font-size: 11px; padding: 2px 8px;">−</button>
+    <button id="octUp" style="font-size: 11px; padding: 2px 8px;">+</button>
+  </div>
+
+  <div id="kb" class="kb"></div>
+
+  <div class="bar row">
+    <button id="recBtn" class="danger">● Nauhoita</button>
+    <button id="playRec">▶ Toista</button>
+    <button id="clearRec">Tyhjennä</button>
+    <span id="recInfo" style="font-size: 11px; color: var(--text-tertiary); margin-left: auto;">0 nuottia</span>
+    <button id="exportRec">Kopioi JSON</button>
+  </div>
+  <textarea id="exportArea" readonly placeholder="Tähän tulee melodia + asetukset JSONina kun painat 'Kopioi JSON'. Voit liittää sen Claude-chattiin niin Claude voi soittaa sen takaisin."></textarea>
+
+  <div class="footer">
+    Vinkki: QWERTY-näppäimistö soittaa myös. Valkoiset = A S D F G H J K, mustat = W E T Y U.<br>
+    Jos selaimessa kuuluu pelkkä napsahdus, paina jotakin nappia ensin (selaimet vaativat käyttäjän eleen ennen audion käynnistystä).
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const status = $('status');
+
+const PRESETS = {
+  obxa:  { oscType:'fatsawtooth', spread:45, cutoff:1950, filtQ:3, filtEnv:1.5, pulseW:0.5,
+           attack:0.05, decay:0.3, sustain:0.5, release:0.5, rev:20, cho:30 },
+  pulse: { oscType:'pulse', spread:0, cutoff:2200, filtQ:6, filtEnv:2.5, pulseW:0.3,
+           attack:0.02, decay:0.25, sustain:0.4, release:0.4, rev:25, cho:40 },
+  brass: { oscType:'fatsawtooth', spread:18, cutoff:1100, filtQ:2.5, filtEnv:2.8, pulseW:0.5,
+           attack:0.08, decay:0.35, sustain:0.55, release:0.4, rev:25, cho:15 },
+  pad:   { oscType:'fatsawtooth', spread:38, cutoff:1300, filtQ:1, filtEnv:0.4, pulseW:0.5,
+           attack:1.2, decay:1.5, sustain:0.7, release:2.5, rev:55, cho:50 },
+  bell:  { oscType:'fmsine', spread:0, cutoff:5000, filtQ:1, filtEnv:0, pulseW:0.5,
+           attack:0.005, decay:1.2, sustain:0.0, release:1.5, rev:40, cho:20 },
+  bass:  { oscType:'sawtooth', spread:0, cutoff:700, filtQ:10, filtEnv:3, pulseW:0.5,
+           attack:0.005, decay:0.2, sustain:0.1, release:0.15, rev:10, cho:0 },
+};
+
+function applyPreset(p) {
+  Object.entries(p).forEach(([k,v]) => {
+    const el = $(k); if (!el) return;
+    el.value = v;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+}
+document.querySelectorAll('.preset').forEach(b =>
+  b.addEventListener('click', () => applyPreset(PRESETS[b.dataset.preset])));
+
+let synth, filter, filtEnvNode, reverb, chorus;
+let audioReady = false;
+
+async function ensureAudio() {
+  if (audioReady) return;
+  await Tone.start();
+  reverb = new Tone.Reverb({ decay: 2.4, wet: 0.20 }).toDestination();
+  chorus = new Tone.Chorus({ frequency: 0.4, delayTime: 4, depth: 0.4, wet: 0.3 }).connect(reverb).start();
+  filter = new Tone.Filter({ frequency: 1950, type: 'lowpass', rolloff: -24, Q: 3 }).connect(chorus);
+  filtEnvNode = new Tone.FrequencyEnvelope({ attack:0.04, decay:0.4, sustain:0.45, release:0.6,
+    baseFrequency:600, octaves:1.5, exponent:2 }).connect(filter.frequency);
+  buildSynth();
+  audioReady = true;
+  status.textContent = 'valmis';
+}
+
+function buildSynth() {
+  const oscType = $('oscType').value;
+  const spread  = +$('spread').value;
+  const pulseW  = +$('pulseW').value;
+  const attack  = +$('attack').value;
+  const decay   = +$('decay').value;
+  const sustain = +$('sustain').value;
+  const release = +$('release').value;
+
+  let oscOpts;
+  if (oscType === 'pulse') oscOpts = { type: 'pulse', width: pulseW };
+  else if (oscType === 'fmsine') oscOpts = { type: 'fmsine', modulationType:'sine', harmonicity:3.5, modulationIndex:8 };
+  else if (oscType.startsWith('fat')) oscOpts = { type: oscType, count: 2, spread };
+  else if (oscType.startsWith('am')) oscOpts = { type: oscType, harmonicity: 2.5 };
+  else oscOpts = { type: oscType };
+
+  const newSynth = new Tone.PolySynth(Tone.Synth, {
+    oscillator: oscOpts,
+    envelope: { attack, decay, sustain, release },
+    volume: -12,
+  }).connect(filter);
+
+  if (synth) { try { synth.releaseAll(); synth.dispose(); } catch {} }
+  synth = newSynth;
+}
+
+const sliderMap = [['spread','vSpread'],['cutoff','vCutoff'],['filtQ','vQ'],['filtEnv','vFenv'],
+  ['pulseW','vPW'],['attack','vA'],['decay','vD'],['sustain','vS'],['release','vR'],['rev','vRev'],['cho','vCho']];
+sliderMap.forEach(([id, vId]) => {
+  const el = $(id), v = $(vId); if (!el) return;
+  el.addEventListener('input', () => { v.textContent = el.value; applyParam(id, +el.value); });
+});
+$('oscType').addEventListener('change', () => { if (audioReady) buildSynth(); });
+
+function applyParam(name, val) {
+  if (!audioReady) return;
+  switch (name) {
+    case 'cutoff':  filter.frequency.rampTo(val, 0.05); break;
+    case 'filtQ':   filter.Q.rampTo(val, 0.05); break;
+    case 'filtEnv': filtEnvNode.octaves = val; break;
+    case 'rev':     reverb.wet.rampTo(val/100, 0.05); break;
+    case 'cho':     chorus.wet.rampTo(val/100, 0.05); break;
+    case 'spread':  if ($('oscType').value.startsWith('fat')) buildSynth(); break;
+    case 'pulseW':  if ($('oscType').value === 'pulse') buildSynth(); break;
+    case 'attack': case 'decay': case 'sustain': case 'release':
+      if (synth) synth.set({ envelope: {
+        attack:+$('attack').value, decay:+$('decay').value,
+        sustain:+$('sustain').value, release:+$('release').value
+      }});
+      break;
+  }
+}
+
+const NOTES = [
+  { n:'C',  k:'a', black:false },
+  { n:'C#', k:'w', black:true  },
+  { n:'D',  k:'s', black:false },
+  { n:'D#', k:'e', black:true  },
+  { n:'E',  k:'d', black:false },
+  { n:'F',  k:'f', black:false },
+  { n:'F#', k:'t', black:true  },
+  { n:'G',  k:'g', black:false },
+  { n:'G#', k:'y', black:true  },
+  { n:'A',  k:'h', black:false },
+  { n:'A#', k:'u', black:true  },
+  { n:'B',  k:'j', black:false },
+  { n:'C2', k:'k', black:false, oct:1 },
+];
+let octave = 4;
+const kb = $('kb');
+const keyEls = {};
+
+function buildKeyboard() {
+  kb.innerHTML = '';
+  const whites = NOTES.filter(n => !n.black);
+  const w = 100 / whites.length;
+  whites.forEach((n, i) => {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute; left:${i*w}%; width:${w}%; height:100%;
+      background:#f4f4f8; color:#666; border:1px solid var(--border);
+      border-radius:0 0 6px 6px; display:flex; align-items:flex-end; justify-content:center;
+      padding-bottom:8px; font-size:12px; cursor:pointer; box-shadow: inset 0 -3px 6px rgba(0,0,0,0.1);`;
+    el.textContent = n.k.toUpperCase();
+    el.dataset.note = n.n;
+    kb.appendChild(el);
+    keyEls[n.n] = el;
+  });
+  const blacks = NOTES.filter(n => n.black);
+  const blackPos = { 'C#':0.7, 'D#':1.7, 'F#':3.7, 'G#':4.7, 'A#':5.7 };
+  blacks.forEach(n => {
+    const idx = blackPos[n.n];
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute; left:${idx*w}%; width:${w*0.6}%; height:62%;
+      background:#1a1a22; border:1px solid #000; border-radius:0 0 4px 4px;
+      display:flex; align-items:flex-end; justify-content:center;
+      padding-bottom:5px; font-size:11px; color:#999; cursor:pointer; z-index:2;`;
+    el.textContent = n.k.toUpperCase();
+    el.dataset.note = n.n;
+    kb.appendChild(el);
+    keyEls[n.n] = el;
+  });
+}
+buildKeyboard();
+
+function fullNote(noteName, extraOct=0) { return noteName + (octave + extraOct); }
+
+const active = new Map();
+function noteOn(noteName, extraOct=0) {
+  if (!audioReady) { ensureAudio().then(() => noteOn(noteName, extraOct)); return; }
+  const fn = fullNote(noteName, extraOct);
+  if (active.has(fn)) return;
+  synth.triggerAttack(fn);
+  filtEnvNode.triggerAttack();
+  active.set(fn, { startT: performance.now() });
+  const el = keyEls[noteName];
+  if (el) el.style.background = el.dataset.note?.includes('#') ? '#5b4a8a' : '#b39ddb';
+  if (recording) recordingNotes.push({ kind:'on', n:fn, t: (performance.now() - recStart)/1000 });
+}
+function noteOff(noteName, extraOct=0) {
+  const fn = fullNote(noteName, extraOct);
+  if (!active.has(fn)) return;
+  try { synth.triggerRelease(fn); filtEnvNode.triggerRelease(); } catch {}
+  active.delete(fn);
+  const el = keyEls[noteName];
+  if (el) {
+    const isBlack = el.dataset.note?.includes('#');
+    el.style.background = isBlack ? '#1a1a22' : '#f4f4f8';
+  }
+  if (recording) {
+    const onIdx = [...recordingNotes].reverse().findIndex(e => e.kind==='on' && e.n===fn);
+    if (onIdx !== -1) {
+      const e = recordingNotes[recordingNotes.length-1-onIdx];
+      e.d = (performance.now() - recStart)/1000 - e.t;
+    }
+  }
+}
+
+kb.addEventListener('mousedown', e => {
+  const n = e.target.dataset.note; if (n) noteOn(n.replace('2',''), n.endsWith('2')?1:0);
+});
+kb.addEventListener('mouseup', e => {
+  const n = e.target.dataset.note; if (n) noteOff(n.replace('2',''), n.endsWith('2')?1:0);
+});
+kb.addEventListener('mouseleave', () => {
+  [...active.keys()].forEach(fn => {
+    const noteName = fn.replace(/\d/,''); const oct = parseInt(fn.match(/\d/)[0]) - octave;
+    noteOff(noteName, oct);
+  });
+});
+
+const keyToNote = {};
+NOTES.forEach(n => keyToNote[n.k] = n);
+document.addEventListener('keydown', e => {
+  if (e.repeat) return;
+  const n = keyToNote[e.key.toLowerCase()];
+  if (n) { e.preventDefault(); noteOn(n.n.replace('2',''), n.oct||0); }
+});
+document.addEventListener('keyup', e => {
+  const n = keyToNote[e.key.toLowerCase()];
+  if (n) { e.preventDefault(); noteOff(n.n.replace('2',''), n.oct||0); }
+});
+
+$('octUp').addEventListener('click', () => { if (octave<6) octave++; $('octLabel').textContent = octave; });
+$('octDown').addEventListener('click', () => { if (octave>2) octave--; $('octLabel').textContent = octave; });
+
+let backingParts = null, backingPlaying = false;
+function buildBacking() {
+  Tone.Transport.bpm.value = 120;
+  const rev = new Tone.Reverb({ decay: 2.0, wet: 0.15 }).toDestination();
+  const bassF = new Tone.Filter({ frequency: 700, type: 'lowpass', rolloff: -24, Q: 5 }).connect(rev);
+  const bass = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: 'fatsawtooth', count: 2, spread: 18 },
+    envelope: { attack: 0.005, decay: 0.18, sustain: 0.10, release: 0.10 },
+    volume: -16,
+  }).connect(bassF);
+  const padF = new Tone.Filter({ frequency: 1200, type: 'lowpass', rolloff: -12 }).connect(rev);
+  const pad = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: 'fatsawtooth', count: 3, spread: 28 },
+    envelope: { attack: 1.2, decay: 1.4, sustain: 0.6, release: 2.0 },
+    volume: -28,
+  }).connect(padF);
+  const kick = new Tone.MembraneSynth({ volume: -14, pitchDecay: 0.05, octaves: 5,
+    envelope: { attack: 0.005, decay: 0.3, sustain: 0, release: 0.2 } }).toDestination();
+  const hihat = new Tone.NoiseSynth({ noise: { type: 'white' },
+    envelope: { attack: 0.001, decay: 0.025, sustain: 0, release: 0.02 }, volume: -30 }).toDestination();
+  const seqPats = [
+    ['A1','A1','A2','A1','A1','A2','A1','A2','A1','A1','A2','A1','E2','A1','A2','A1'],
+    ['F1','F1','F2','F1','F1','F2','F1','F2','F1','F1','F2','F1','C2','F1','F2','F1'],
+    ['C2','C2','C3','C2','C2','C3','C2','C3','C2','C2','C3','C2','G2','C2','C3','C2'],
+    ['G1','G1','G2','G1','G1','G2','G1','G2','G1','G1','G2','G1','D2','G1','G2','G1'],
+  ];
+  const padCh = [['A3','C4','E4'],['F3','A3','C4'],['C3','E3','G3'],['G3','B3','D4']];
+  let ss=0, sc=0, pc=0, beat=0;
+  const seqLoop = new Tone.Loop(t => { bass.triggerAttackRelease(seqPats[sc%4][ss%16], '32n', t); ss++; if (ss%16===0) sc++; }, '16n');
+  const padLoop = new Tone.Loop(t => { pad.triggerAttackRelease(padCh[pc%4], '1m', t); pc++; }, '1m');
+  const drumLoop = new Tone.Loop(t => {
+    const p = beat%16;
+    if (p%4===0) kick.triggerAttackRelease('C1','8n',t);
+    if (p%2===0) hihat.triggerAttackRelease('32n',t);
+    beat++;
+  }, '16n');
+  seqLoop.start(0); padLoop.start('4m'); drumLoop.start('4m');
+  return { bass, bassF, pad, padF, kick, hihat, rev, seqLoop, padLoop, drumLoop };
+}
+
+$('bkBtn').addEventListener('click', async () => {
+  await ensureAudio();
+  if (!backingPlaying) {
+    if (!backingParts) backingParts = buildBacking();
+    Tone.Transport.start();
+    backingPlaying = true;
+    $('bkBtn').textContent = '⏸ Backing';
+  } else {
+    Tone.Transport.pause();
+    backingPlaying = false;
+    $('bkBtn').textContent = '▶ Backing';
+  }
+});
+
+let recording = false;
+let recordingNotes = [];
+let recStart = 0;
+
+function getCurrentSettings() {
+  const s = { oscType: $('oscType').value };
+  ['spread','cutoff','filtQ','filtEnv','pulseW','attack','decay','sustain','release','rev','cho']
+    .forEach(id => s[id] = +$(id).value);
+  return s;
+}
+
+$('recBtn').addEventListener('click', () => {
+  if (!recording) {
+    recording = true; recordingNotes = []; recStart = performance.now();
+    $('recBtn').textContent = '■ Pysäytä';
+    $('recBtn').classList.remove('danger');
+    $('recInfo').textContent = 'nauhoittaa…';
+  } else {
+    recording = false;
+    $('recBtn').textContent = '● Nauhoita';
+    $('recBtn').classList.add('danger');
+    const noteCount = recordingNotes.filter(e => e.kind==='on').length;
+    $('recInfo').textContent = noteCount + ' nuottia';
+  }
+});
+
+$('clearRec').addEventListener('click', () => {
+  recordingNotes = []; $('recInfo').textContent = '0 nuottia'; $('exportArea').value = '';
+});
+
+$('playRec').addEventListener('click', async () => {
+  await ensureAudio();
+  const ons = recordingNotes.filter(e => e.kind === 'on');
+  if (ons.length === 0) { $('recInfo').textContent = 'ei nuotteja'; return; }
+  const t0 = Tone.now() + 0.1;
+  ons.forEach(e => {
+    const dur = e.d || 0.25;
+    synth.triggerAttackRelease(e.n, dur, t0 + e.t);
+    try { filtEnvNode.triggerAttackRelease(dur, t0 + e.t); } catch {}
+  });
+});
+
+$('exportRec').addEventListener('click', async () => {
+  const data = {
+    preset: getCurrentSettings(),
+    tempo: 120,
+    notes: recordingNotes.filter(e => e.kind === 'on').map(e => ({ n: e.n, t: +e.t.toFixed(3), d: +(e.d || 0.25).toFixed(3) })),
+  };
+  const text = JSON.stringify(data, null, 2);
+  $('exportArea').value = text;
+  try {
+    await navigator.clipboard.writeText(text);
+    $('recInfo').textContent = 'Kopioitu leikepöydälle (' + data.notes.length + ' nuottia)';
+  } catch {
+    $('recInfo').textContent = 'Valitse alta ja kopioi käsin';
+  }
+});
+
+applyPreset(PRESETS.obxa);
+
+kb.addEventListener('touchstart', e => {
+  e.preventDefault();
+  [...e.changedTouches].forEach(t => {
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const n = el?.dataset?.note; if (n) noteOn(n.replace('2',''), n.endsWith('2')?1:0);
+  });
+}, { passive: false });
+kb.addEventListener('touchend', e => {
+  e.preventDefault();
+  [...e.changedTouches].forEach(t => {
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const n = el?.dataset?.note; if (n) noteOff(n.replace('2',''), n.endsWith('2')?1:0);
+  });
+}, { passive: false });
+</script>
+</body>
+</html>
