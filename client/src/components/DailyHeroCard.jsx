@@ -12,9 +12,9 @@ import {
 } from "../hooks/useDailyPercentile.js";
 
 const TEXTS = {
-  fi: { theme: "Teema", streak: "päivää putkeen", sameForAll: "Kaikille sama ruudukko · vaihtuu päivittäin" },
-  sv: { theme: "Tema",  streak: "dagar i rad",     sameForAll: "Samma rutnät för alla · byts dagligen" },
-  en: { theme: "Theme", streak: "day streak",      sameForAll: "Same grid for everyone · changes daily" },
+  fi: { theme: "Teema", streak: "päivää putkeen", sameForAll: "Kaikille sama ruudukko · vaihtuu päivittäin", startBtn: "ALOITA HAASTE" },
+  sv: { theme: "Tema",  streak: "dagar i rad",     sameForAll: "Samma rutnät för alla · byts dagligen",     startBtn: "STARTA UTMANING" },
+  en: { theme: "Theme", streak: "day streak",      sameForAll: "Same grid for everyone · changes daily",    startBtn: "START CHALLENGE" },
 };
 
 export function DailyHeroCard({
@@ -114,12 +114,27 @@ export function DailyHeroCard({
         </>
       ) : (
         <>
-          <span style={{ fontSize: "40px", color: menuColors.dailyAccent, marginTop: "2px", textShadow: "0 2px 4px #00000044" }}>
-            ▶
-          </span>
-          <span style={{ fontSize: "14px", color: menuColors.dailyMuted, fontWeight: "600" }}>
+          <span style={{ fontSize: "13px", color: menuColors.dailyMuted, fontWeight: "600" }}>
             {t.dailyDesc}
           </span>
+          {/* CTA-nappi (näyttää napilta vaikka koko kortti on klikattava) */}
+          <div
+            style={{
+              marginTop: "8px",
+              padding: "10px 22px",
+              background: menuColors.dailyAccent,
+              color: "#3f5744",
+              fontSize: "14px",
+              fontWeight: "800",
+              letterSpacing: "1px",
+              borderRadius: "10px",
+              boxShadow: "0 4px 0 #00000033, 0 6px 12px #00000022",
+              border: `2px solid ${menuColors.dailyAccent}`,
+              textShadow: "0 1px 0 #ffffff66",
+            }}
+          >
+            {txt.startBtn} ⚡
+          </div>
         </>
       )}
     </button>

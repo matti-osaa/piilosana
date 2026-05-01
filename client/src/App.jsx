@@ -6,7 +6,7 @@ import { menuColors } from "./menuColors.js";
 import { useAudioSystem } from "./hooks/useAudioSystem.js";
 import { MultiplayerHero } from "./components/MultiplayerHero.jsx";
 import { DailyHeroCard } from "./components/DailyHeroCard.jsx";
-import { SpeechBubble } from "./components/SpeechBubble.jsx";
+import { HoverBubble } from "./components/SpeechBubble.jsx";
 import { NextDailyCountdown } from "./components/NextDailyCountdown.jsx";
 import { StreakWarning } from "./components/StreakWarning.jsx";
 import { FirstTimeWelcome } from "./components/FirstTimeWelcome.jsx";
@@ -2058,7 +2058,6 @@ export default function Piilosana(){
   const { sounds, soundTheme, musicOn, musicTrack, audioStarted,
           setSoundTheme, setMusicOn, setMusicTrack, music, musicTracks } = audio;
   const[updateAvailable,setUpdateAvailable]=useState(false);
-  const[bubbleIdx,setBubbleIdx]=useState(()=>Math.floor(Math.random()*100));
   const[wordsLoaded,setWordsLoaded]=useState(()=>({fi:LANG_CONFIG.fi.loaded,en:LANG_CONFIG.en.loaded,sv:LANG_CONFIG.sv.loaded}));
   useEffect(()=>{
     let mounted=true;
@@ -3786,44 +3785,6 @@ export default function Piilosana(){
         isPlayed={!!getDailyResult(lang)}
       />
 
-      {/* ===== Puhekupla – satunnainen kannustus, klikkaus vaihtaa ===== */}
-      {(()=>{
-        const BUBBLES = {
-          fi: [
-            "Pystytkö parhaaseen kastiin?",
-            "Yli keskiarvon tänään?",
-            "Putki vielä elossa?",
-            "Pitkien sanojen mestari?",
-            "Päivän paras pelaaja sinä?",
-            "Löydätkö 11-kirjaimisen?",
-            "Voitatko eilisen tuloksen?",
-          ],
-          en: [
-            "Can you reach the top tier?",
-            "Above average today?",
-            "Streak still alive?",
-            "Master of long words?",
-            "Best player of the day?",
-            "Find an 11-letter word?",
-            "Can you beat yesterday?",
-          ],
-          sv: [
-            "Når du toppskiktet?",
-            "Över medel idag?",
-            "Sviten kvar i liv?",
-            "Mästare på långa ord?",
-            "Dagens bästa spelare?",
-            "Hittar du ett 11-bokstavsord?",
-            "Slår du gårdagen?",
-          ],
-        };
-        const list = BUBBLES[lang] || BUBBLES.fi;
-        const text = list[bubbleIdx % list.length];
-        return <div style={{textAlign:"center"}}>
-          <SpeechBubble text={text} onClick={()=>setBubbleIdx(i=>i+1+Math.floor(Math.random()*(list.length-1)))} />
-        </div>;
-      })()}
-
       {/* ===== DAILY-RYHMÄ – wrapper, joka kerää Päivän Piilosanan elementit yhteen ===== */}
       <div style={{
         background: menuColors.dailyGroupBg,
@@ -3832,7 +3793,7 @@ export default function Piilosana(){
         padding: "10px 10px 4px 10px",
         marginBottom: "12px",
       }}>
-        {/* Päivän Piilosana – hero */}
+        {/* Päivän Piilosana – hero (kupla pulissaa esiin korttin yläpuolelle) */}
         {(()=>{
           const d=todayStr();
           const dl=dateLabel(d,lang);
@@ -3840,18 +3801,49 @@ export default function Piilosana(){
           const todayTheme=getDailyTheme(d,lang);
           const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;
           const streak=getDailyStreak(lang);
+          const yesterdayRes=getDailyResultForDate(daysAgoStr(1),lang);
+          // Kontekstuaaliset viestit Daily-kortille
+          const dailyMsgs = [];
+          if (lang === "fi") {
+            if (!res) {
+              dailyMsgs.push("Pystytkö parhaaseen kastiin?","Yli keskiarvon tänään?","Löydätkö 11-kirjaimisen?");
+              if (yesterdayRes?.score) dailyMsgs.push(`Voitatko eilisen ${yesterdayRes.score}p?`);
+              if (streak?.streak > 1) dailyMsgs.push(`🔥 ${streak.streak} päivän putki – jatka!`);
+            } else {
+              dailyMsgs.push("Hieno suoritus!","Katso miten muut pärjäsivät","Huominen tuo uuden ruudukon");
+              if (streak?.streak > 1) dailyMsgs.push(`🔥 Putki: ${streak.streak} päivää`);
+            }
+          } else if (lang === "en") {
+            if (!res) {
+              dailyMsgs.push("Can you reach the top?","Above average today?","Find an 11-letter word?");
+              if (yesterdayRes?.score) dailyMsgs.push(`Beat yesterday's ${yesterdayRes.score}p?`);
+              if (streak?.streak > 1) dailyMsgs.push(`🔥 ${streak.streak} day streak – keep it!`);
+            } else {
+              dailyMsgs.push("Nice play!","See how others did","Tomorrow brings a new grid");
+            }
+          } else {
+            if (!res) {
+              dailyMsgs.push("Når du toppen?","Över medel idag?","Hittar du 11 bokstäver?");
+              if (yesterdayRes?.score) dailyMsgs.push(`Slår du gårdagens ${yesterdayRes.score}p?`);
+            } else {
+              dailyMsgs.push("Snyggt spelat!","Se hur andra klarade sig");
+            }
+          }
           return(
-            <DailyHeroCard
-              lang={lang}
-              t={t}
-              S={S}
-              dateStr={d}
-              dateLabel={dl}
-              themeName={themeName}
-              result={res}
-              streak={streak}
-              onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}}
-            />
+            <div style={{position:"relative"}}>
+              <DailyHeroCard
+                lang={lang}
+                t={t}
+                S={S}
+                dateStr={d}
+                dateLabel={dl}
+                themeName={themeName}
+                result={res}
+                streak={streak}
+                onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}}
+              />
+              <HoverBubble messages={dailyMsgs} position={{top:-22,right:-8}} />
+            </div>
           );
         })()}
 
@@ -3885,17 +3877,38 @@ export default function Piilosana(){
         })()}
       </div>
 
-      {/* ===== MONINPELI HERO ===== */}
-      <MultiplayerHero
-        lang={lang}
-        S={S}
-        publicOnlineCount={publicOnlineCount}
-        onClick={()=>{
-          sounds.init().catch(()=>{});
-          setMode("public");
-          if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}
-        }}
-      />
+      {/* ===== MONINPELI HERO + kontekstuaalinen kupla ===== */}
+      {(()=>{
+        const multiMsgs = [];
+        if (lang === "fi") {
+          multiMsgs.push("Nopeampi kuin muut?","Areena auki 24/7","Voitko viedä koko areenan?");
+          if (publicOnlineCount > 0) multiMsgs.push(`${publicOnlineCount} muuta paikalla nyt!`);
+          else multiMsgs.push("Ole ensimmäinen kierroksella");
+        } else if (lang === "en") {
+          multiMsgs.push("Faster than the others?","Arena open 24/7","Can you take the whole arena?");
+          if (publicOnlineCount > 0) multiMsgs.push(`${publicOnlineCount} others playing now!`);
+          else multiMsgs.push("Be first in this round");
+        } else {
+          multiMsgs.push("Snabbare än andra?","Arenan öppen dygnet runt");
+          if (publicOnlineCount > 0) multiMsgs.push(`${publicOnlineCount} andra spelar nu!`);
+          else multiMsgs.push("Var först i denna runda");
+        }
+        return (
+          <div style={{position:"relative"}}>
+            <MultiplayerHero
+              lang={lang}
+              S={S}
+              publicOnlineCount={publicOnlineCount}
+              onClick={()=>{
+                sounds.init().catch(()=>{});
+                setMode("public");
+                if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}
+              }}
+            />
+            <HoverBubble messages={multiMsgs} position={{top:-22,right:-8}} initialDelayMs={4500} />
+          </div>
+        );
+      })()}
 
       {/* ===== HARJOITTELU + OMA MONINPELI -rivi ===== */}
       <div style={{display:"flex",gap:"8px",marginBottom:"8px"}}>

@@ -1,35 +1,37 @@
-// SpeechBubble – sarjakuvamainen puhekupla joka elävöittää alkuvalikkoa.
+// SpeechBubble + HoverBubble – sarjakuvamaiset puhekuplat alkuvalikkoa varten.
 //
-// Render-tyylin haku: paksu musta reuna, valkoinen tausta, halftone-pisteet
-// kuplan oikeassa alanurkassa varjon tilalla, häntä osoittaa alas-vasemmalle
-// (kohti komponenttia jonka yläpuolella tämä on).
+// SpeechBubble: pelkkä kupla, sopii missä tahansa.
+// HoverBubble: absolute-positioitu wrapper joka pulissaa esiin tietyin
+// väliajoin, näyttää viestin n. 5 s ja katoaa, sitten pop-up uudelleen
+// satunnaisella tauolla. Ei ota layout-tilaa, klikkaukset menevät läpi.
 //
-// Props:
-//   text     näytettävä viesti (max ~60 merkkiä)
-//   color    häntä-osoittavan elementin tausta-color (vapaaehtoinen, default vihreä)
-//   onClick  vapaaehtoinen klikkauskäsittelijä (esim. arvotaan uusi viesti)
-//
-// Käyttö esim:
-//   <SpeechBubble text="Pystytkö parhaaseen kastiin?" />
+// Käyttö:
+//   <div style={{position:"relative"}}>
+//     <DailyHeroCard ... />
+//     <HoverBubble messages={["Pystytkö parhaaseen kastiin?", ...]} />
+//   </div>
 
-export function SpeechBubble({ text, onClick }) {
+import { useState, useEffect, useRef } from "react";
+
+export function SpeechBubble({ text, onClick, scale = 1 }) {
   return (
     <div
       onClick={onClick}
       style={{
         position: "relative",
         display: "inline-block",
-        margin: "8px auto 16px",
         cursor: onClick ? "pointer" : "default",
-        animation: "bubblePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-        maxWidth: "min(90%, 380px)",
+        animation: "bubblePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
         userSelect: "none",
+        transform: `scale(${scale})`,
+        transformOrigin: "bottom left",
       }}
     >
       <svg
         viewBox="0 0 320 100"
-        width="100%"
-        style={{ display: "block", overflow: "visible" }}
+        width="280"
+        height="88"
+        style={{ display: "block", overflow: "visible", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.18))" }}
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>
@@ -48,12 +50,10 @@ export function SpeechBubble({ text, onClick }) {
           </clipPath>
         </defs>
 
-        {/* Halftone-varjo (näkyy vain kuplan alaoikealla) */}
         <g clipPath="url(#bubbleClip)">
           <rect x="180" y="40" width="140" height="50" fill="url(#halftone)" />
         </g>
 
-        {/* Itse kupla: paksu musta reuna, valkoinen sisus */}
         <path
           d="M 30 12
              Q 8 12 8 38
@@ -71,14 +71,13 @@ export function SpeechBubble({ text, onClick }) {
           strokeLinejoin="round"
         />
 
-        {/* Teksti */}
         <text
           x="160"
           y="48"
           textAnchor="middle"
           fontFamily="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"
           fontWeight="800"
-          fontSize="17"
+          fontSize={text.length > 28 ? "14" : text.length > 20 ? "16" : "17"}
           fill="#1a1a22"
           style={{ pointerEvents: "none" }}
         >
@@ -88,11 +87,81 @@ export function SpeechBubble({ text, onClick }) {
 
       <style>{`
         @keyframes bubblePop {
-          0%   { transform: scale(0.6) rotate(-3deg); opacity: 0; }
-          70%  { transform: scale(1.05) rotate(1deg); }
+          0%   { transform: scale(0.4) rotate(-8deg); opacity: 0; }
+          50%  { transform: scale(1.1) rotate(3deg); opacity: 1; }
+          75%  { transform: scale(0.95) rotate(-2deg); }
           100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
+        @keyframes bubbleOut {
+          0%   { transform: scale(1); opacity: 1; }
+          100% { transform: scale(0.6) translateY(-8px); opacity: 0; }
+        }
       `}</style>
+    </div>
+  );
+}
+
+// HoverBubble – pulissaa esiin, pysyy hetken, katoaa. Toistuu satunnaisin
+// väliajoin. Vaihtaa viestin satunnaisesti listasta joka kerta.
+export function HoverBubble({
+  messages,
+  position = { top: -38, right: 0 },
+  visibleMs = 5000,
+  pauseMinMs = 8000,
+  pauseMaxMs = 18000,
+  initialDelayMs = 1500,
+  scale = 0.85,
+}) {
+  const [visible, setVisible] = useState(false);
+  const [out, setOut] = useState(false);
+  const [idx, setIdx] = useState(() => Math.floor(Math.random() * (messages?.length || 1)));
+  const timersRef = useRef([]);
+
+  useEffect(() => {
+    if (!messages || messages.length === 0) return;
+    const list = messages;
+
+    function clearAll() {
+      timersRef.current.forEach((t) => clearTimeout(t));
+      timersRef.current = [];
+    }
+
+    function show() {
+      setIdx((i) => {
+        if (list.length === 1) return 0;
+        let n = Math.floor(Math.random() * list.length);
+        if (n === i) n = (n + 1) % list.length;
+        return n;
+      });
+      setOut(false);
+      setVisible(true);
+      timersRef.current.push(setTimeout(() => {
+        setOut(true);
+        timersRef.current.push(setTimeout(() => {
+          setVisible(false);
+          const pause = pauseMinMs + Math.random() * (pauseMaxMs - pauseMinMs);
+          timersRef.current.push(setTimeout(show, pause));
+        }, 300));
+      }, visibleMs));
+    }
+
+    timersRef.current.push(setTimeout(show, initialDelayMs));
+    return clearAll;
+  }, [messages, visibleMs, pauseMinMs, pauseMaxMs, initialDelayMs]);
+
+  if (!visible || !messages || messages.length === 0) return null;
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        ...position,
+        pointerEvents: "none",
+        zIndex: 5,
+        animation: out ? "bubbleOut 0.3s ease-in forwards" : undefined,
+      }}
+    >
+      <SpeechBubble text={messages[idx]} scale={scale} />
     </div>
   );
 }
