@@ -71,7 +71,7 @@ export function MultiplayerHero({ lang, S, publicOnlineCount, onClick }) {
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.boxShadow = "0 14px 32px rgba(57,45,28,0.28)";
+        e.currentTarget.style.boxShadow = "0 14px 32px rgba(0,0,0,0.35)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "none";
@@ -211,14 +211,14 @@ export function MultiplayerHero({ lang, S, publicOnlineCount, onClick }) {
         <div
           style={{
             display: "inline-block",
-            background: "#ffe38a",
-            color: "#3d2c14",
+            background: "#ffab40",
+            color: "#bf360c",
             borderRadius: "10px",
             padding: "10px 18px",
             fontSize: "14px",
             fontWeight: "900",
             letterSpacing: "0.5px",
-            boxShadow: "0 3px 0 rgba(100,60,20,0.35)",
+            boxShadow: "0 3px 0 rgba(0,0,0,0.3)",
           }}
         >
           {hasPlayers ? txt.ctaJoin : txt.ctaStart}

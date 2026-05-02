@@ -101,11 +101,11 @@ function PastBox({ S, title, dateLabel, result, onClick }) {
         {dateLabel.short}
       </span>
       {result ? (
-        <span style={{ fontSize: "15px", fontWeight: "800", color: "#49634d" }}>
+        <span style={{ fontSize: "15px", fontWeight: "800", color: menuColors.pastText }}>
           {result.score}p
         </span>
       ) : (
-        <span style={{ fontSize: "22px", color: "#49634d" }}>▶</span>
+        <span style={{ fontSize: "22px", color: menuColors.pastText }}>▶</span>
       )}
     </button>
   );

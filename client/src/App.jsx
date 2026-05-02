@@ -3819,15 +3819,14 @@ export default function Piilosana(){
         isPlayed={!!getDailyResult(lang)}
       />
 
-      {/* ===== DAILY-RYHMÄ – wrapper, joka kerää Päivän Piilosanan elementit yhteen ===== */}
+      {/* ===== DAILY-RYHMÄ ===== */}
       <div style={{
-        background: menuColors.dailyGroupBg,
-        border: `1px solid ${menuColors.dailyGroupBorder}`,
-        borderRadius: "14px",
-        padding: "6px 6px 2px 6px",
-        marginBottom: "8px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        marginBottom: "10px",
       }}>
-        {/* Päivän Piilosana – hero (kupla pulissaa esiin korttin yläpuolelle) */}
+        {/* Päivän Piilosana – ympyränappi */}
         {(()=>{
           const d=todayStr();
           const dl=dateLabel(d,lang);
