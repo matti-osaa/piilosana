@@ -2680,7 +2680,7 @@ export default function Piilosana(){
   // Scramble animation — letters randomize then settle into final grid
   useEffect(()=>{
     if(state!=="scramble")return;
-    const isHex=soloMode==="hex"||publicHex||(mode==="public");
+    const isHex=soloMode==="hex"||mode==="multi"||publicHex||(mode==="public");
     const rows=isHex?HEX_ROWS:soloMode==="chess"?8:SZ;
     const cols=isHex?HEX_COLS:soloMode==="chess"?8:SZ;
     const totalCells=rows*cols;
@@ -2804,7 +2804,7 @@ export default function Piilosana(){
       // Phase 2: start eating cells
       if(progress>0.45){
         const eatProgress=(progress-0.45)/0.55; // 0 to 1
-        const isHex=soloMode==="hex"||(mode==="public"&&publicHex);
+        const isHex=soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex);
         const totalCells=isHex?HEX_ROWS*HEX_COLS:(soloMode==="chess"?8*8:SZ*SZ);
         const cellCount=Math.min(totalCells, Math.floor(eatProgress * totalCells));
         setEatenCells(prev=>{
@@ -3140,7 +3140,7 @@ export default function Piilosana(){
     return best;
   },[]);
 
-  const isHexMode=soloMode==="hex"||(mode==="public"&&publicHex);
+  const isHexMode=soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex);
   const adj=(a,b)=>isHexMode?adjHex(a,b):(Math.abs(a.r-b.r)<=1&&Math.abs(a.c-b.c)<=1&&!(a.r===b.r&&a.c===b.c));
   const isSel=(r,c)=>sel.some(s=>s.r===r&&s.c===c);
 
@@ -4548,7 +4548,7 @@ export default function Piilosana(){
 
       {/* PLAYING + ENDING + SCRAMBLE */}
       {(state==="play"||state==="ending"||state==="scramble")&&(
-        <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:(soloMode==="hex"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
+        <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:(soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD + emoji picker wrapper */}
           <div style={{position:"relative",zIndex:10,marginBottom:isHexMode?"1px":"4px"}}>
           {/* HUD */}
@@ -4692,23 +4692,23 @@ export default function Piilosana(){
 
           {/* GRID */}
           <div style={{position:"relative"}}>
-            {(soloMode==="hex"||(mode==="public"&&publicHex))?(
+            {(soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex))?(
             <div ref={gRef}
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
               style={{padding:isLarge?"4px 0":"2px 0",background:"transparent",
                 touchAction:"none",position:"relative"}}>
-              {(()=>{const isLight=S.flavor==="ivory"||S.flavor==="dream";return grid.map((row,r)=>(
+              {(()=>{const isLight=S.flavor==="ivory"||S.flavor==="dream";const hexGrid=mode==="multi"?currentMultiGrid:grid;return hexGrid.map((row,r)=>(
                 <div key={r} style={{display:"flex",justifyContent:"center",gap:"0px",
                   marginTop:r>0?"-5.254%":"0",
                   transform:r%2===1?"translateX(calc(18.2% / 4))":"translateX(calc(-18.2% / 4))",
-                  position:"relative",zIndex:grid.length-r}}>
+                  position:"relative",zIndex:hexGrid.length-r}}>
                   {row.map((letter,c)=>{
                     const s=isSel(r,c);
                     const last=sel.length>0&&sel[sel.length-1].r===r&&sel[sel.length-1].c===c;
                     const hexCols=row.length;
                     const cellIdx=r*hexCols+c;
                     const eaten=eatenCells.has(cellIdx);
-                    const totalHexCells=grid.length*hexCols;
+                    const totalHexCells=hexGrid.length*hexCols;
                     const endAnim=eaten&&ending?ending.cellAnim(cellIdx,totalHexCells):"none";
                     const endColor=eaten&&ending?ending.cellColor(cellIdx):null;
                     const isScrambling=state==="scramble"||(state==="ending"&&scrambleGrid);
