@@ -3801,7 +3801,27 @@ export default function Piilosana(){
   const S=theme;
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
   const modeSelectJSX=(
-    <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"600px",width:"100%",position:"relative"}}>
+    <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"420px",width:"100%",position:"relative"}}>
+
+      {/* Pikaohje – pieni pyöreä ?-nappi oikeassa yläkulmassa */}
+      <button
+        onClick={()=>setShowTutorial(true)}
+        style={{
+          position:"absolute",top:"-8px",right:"0",
+          width:"36px",height:"36px",borderRadius:"50%",
+          background:"rgba(255,255,255,0.12)",
+          border:"1.5px solid rgba(255,255,255,0.25)",
+          color:"rgba(255,255,255,0.7)",
+          fontSize:"16px",fontWeight:"700",
+          cursor:"pointer",
+          display:"flex",alignItems:"center",justifyContent:"center",
+          transition:"all 0.15s",
+          zIndex:2,
+        }}
+        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.22)";e.currentTarget.style.color="#fff";}}
+        onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.12)";e.currentTarget.style.color="rgba(255,255,255,0.7)";}}
+        aria-label={t.tutorialBtn}
+      >?</button>
 
       {/* Tervetulo­banneri – näkyy vain ensikertalaisille */}
       <FirstTimeWelcome
@@ -3811,7 +3831,7 @@ export default function Piilosana(){
         onTryPractice={()=>setShowMenuOptions(true)}
       />
 
-      {/* Streak-varoitus – näkyy ennen Daily-korttia jos putki vaarassa */}
+      {/* Streak-varoitus */}
       <StreakWarning
         S={S}
         lang={lang}
@@ -3819,14 +3839,49 @@ export default function Piilosana(){
         isPlayed={!!getDailyResult(lang)}
       />
 
-      {/* ===== DAILY-RYHMÄ ===== */}
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        marginBottom: "10px",
-      }}>
-        {/* Päivän Piilosana – ympyränappi */}
+      {/* ===== KOLME PELINAPPIA ===== */}
+      <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
+
+        {/* 1. ONLINE-PELI */}
+        <button
+          onClick={()=>{
+            sounds.init().catch(()=>{});
+            setMode("public");
+            if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}
+          }}
+          style={{
+            fontFamily:S.font,width:"100%",
+            padding:"18px 20px",
+            background:menuColors.arenaBg,
+            border:`2px solid ${menuColors.arenaBorder}`,
+            borderRadius:"14px",
+            color:menuColors.arenaText,
+            cursor:"pointer",
+            boxShadow:menuColors.softShadow,
+            transition:"all 0.2s",
+            textAlign:"left",
+            position:"relative",
+            overflow:"hidden",
+          }}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 12px 30px rgba(0,0,0,0.35)";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}
+        >
+          <div style={{position:"relative",zIndex:1}}>
+            <div style={{fontSize:"20px",fontWeight:"900",letterSpacing:"1px",marginBottom:"2px"}}>
+              {lang==="fi"?"ONLINE-PELI":lang==="sv"?"ONLINE-SPEL":"ONLINE GAME"}
+            </div>
+            <div style={{fontSize:"12px",fontWeight:"600",opacity:0.85}}>
+              {lang==="fi"?"Pelaa muita vastaan · 2 min":lang==="sv"?"Spela mot andra · 2 min":"Play against others · 2 min"}
+            </div>
+            {publicOnlineCount>1&&(
+              <span style={{position:"absolute",top:"2px",right:"0",fontSize:"11px",fontWeight:"700",background:"rgba(255,255,255,0.2)",borderRadius:"8px",padding:"3px 8px"}}>
+                {publicOnlineCount} {lang==="fi"?"online":lang==="sv"?"online":"online"}
+              </span>
+            )}
+          </div>
+        </button>
+
+        {/* 2. PÄIVÄN PIILOSANA */}
         {(()=>{
           const d=todayStr();
           const dl=dateLabel(d,lang);
@@ -3834,106 +3889,75 @@ export default function Piilosana(){
           const todayTheme=getDailyTheme(d,lang);
           const themeName=lang==="en"?(todayTheme.nameEn||todayTheme.name):lang==="sv"?(todayTheme.nameSv||todayTheme.name):todayTheme.name;
           const streak=getDailyStreak(lang);
+          const isPlayed=res!=null;
           return(
-            <div style={{position:"relative"}}>
-              <DailyHeroCard
-                lang={lang}
-                t={t}
-                S={S}
-                dateStr={d}
-                dateLabel={dl}
-                themeName={themeName}
-                result={res}
-                streak={streak}
-                onClick={()=>{if(res){setShowDailyHistory(d);}else{startDaily();}}}
-              />
-            </div>
+            <button
+              onClick={()=>{if(isPlayed){setShowDailyHistory(d);}else{startDaily();}}}
+              style={{
+                fontFamily:S.font,width:"100%",
+                padding:"18px 20px",
+                background:menuColors.dailyBg,
+                border:`2px solid ${menuColors.dailyBorder}`,
+                borderRadius:"14px",
+                color:menuColors.dailyText,
+                cursor:"pointer",
+                boxShadow:menuColors.softShadow,
+                transition:"all 0.2s",
+                textAlign:"left",
+              }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 12px 30px rgba(0,0,0,0.35)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}
+            >
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <div style={{fontSize:"20px",fontWeight:"900",letterSpacing:"1px",marginBottom:"2px"}}>
+                    {t.daily}
+                  </div>
+                  <div style={{fontSize:"12px",fontWeight:"600",opacity:0.85}}>
+                    {themeName} · 3 min
+                  </div>
+                </div>
+                {isPlayed?(
+                  <div style={{textAlign:"right"}}>
+                    <div style={{fontSize:"28px",fontWeight:"800",color:menuColors.dailyAccent,lineHeight:1}}>{res.score}<span style={{fontSize:"14px",fontWeight:"400"}}>p</span></div>
+                    {streak?.streak>1&&<div style={{fontSize:"11px",color:"#ff6644",fontWeight:"700"}}>🔥 {streak.streak}</div>}
+                  </div>
+                ):(
+                  <div style={{fontSize:"12px",fontWeight:"700",color:menuColors.dailyAccent,background:"rgba(255,255,255,0.12)",borderRadius:"8px",padding:"6px 12px"}}>
+                    {lang==="fi"?"PELAA":lang==="sv"?"SPELA":"PLAY"} ▶
+                  </div>
+                )}
+              </div>
+            </button>
           );
         })()}
 
-        {/* Laskuri seuraavaan Dailyyn – näkyy vain kun pelattu */}
-        <NextDailyCountdown
-          S={S}
-          lang={lang}
-          isPlayed={!!getDailyResult(lang)}
-        />
-
-        {/* Eilinen + Huominen -rivi */}
-        {(()=>{
-          const pastD=daysAgoStr(1);
-          const pastDl=dateLabel(pastD,lang);
-          const pastRes=getDailyResultForDate(pastD,lang);
-          const pastNum=dailyNumberForDate(pastD);
-          const futureD=tomorrowStr();
-          const futureDl=dateLabel(futureD,lang);
-          return(
-            <DayBoxRow
-              S={S}
-              lang={lang}
-              past={pastNum>=1?{
-                dateLabel:pastDl,
-                result:pastRes,
-                onClick:()=>{if(pastRes){setShowDailyHistory(pastD);}else{startDaily(pastD);}}
-              }:null}
-              future={{dateLabel:futureDl}}
-            />
-          );
-        })()}
-      </div>
-
-      {/* ===== MONINPELI HERO ===== */}
-      <MultiplayerHero
-        lang={lang}
-        S={S}
-        publicOnlineCount={publicOnlineCount}
-        onClick={()=>{
-          sounds.init().catch(()=>{});
-          setMode("public");
-          if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}
-        }}
-      />
-
-      {/* ===== HARJOITTELU + OMA MONINPELI -rivi ===== */}
-      <div style={{display:"flex",gap:"8px",marginBottom:"8px"}}>
-        <MenuButton
-          S={S}
-          bg={menuColors.practiceBg}
-          text={menuColors.practiceText}
-          label={t.practice}
-          subLabel={t.practiceDesc}
+        {/* 3. HARJOITTELU */}
+        <button
           onClick={()=>setShowMenuOptions(true)}
-        />
-        <MenuButton
-          S={S}
-          bg={menuColors.customBg}
-          text={menuColors.customText}
-          label={t.customGame}
-          subLabel={lang==="fi"?"kutsu kavereita":lang==="sv"?"bjud in vänner":"invite friends"}
-          onClick={()=>{
-            sounds.init().catch(()=>{});
-            setMode("multi");
-            if(authUser){setNickname(authUser.nickname);setLobbyState("choose");}
-            else{setLobbyState("enter_name");setTimeout(()=>{if(nicknameRef.current)nicknameRef.current.focus();},50);}
+          style={{
+            fontFamily:S.font,width:"100%",
+            padding:"18px 20px",
+            background:menuColors.practiceBg,
+            border:`2px solid rgba(255,255,255,0.15)`,
+            borderRadius:"14px",
+            color:menuColors.practiceText,
+            cursor:"pointer",
+            boxShadow:menuColors.softShadow,
+            transition:"all 0.2s",
+            textAlign:"left",
           }}
-        />
-      </div>
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 12px 30px rgba(0,0,0,0.35)";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}
+        >
+          <div style={{fontSize:"20px",fontWeight:"900",letterSpacing:"1px",marginBottom:"2px"}}>
+            {t.practice}
+          </div>
+          <div style={{fontSize:"12px",fontWeight:"600",opacity:0.85}}>
+            {lang==="fi"?"Pelaa yksin omaan tahtiin":lang==="sv"?"Spela ensam i egen takt":"Play solo at your own pace"}
+          </div>
+        </button>
 
-      {/* ===== PIKAOHJE – kompakti, koko leveys ===== */}
-      <div style={{marginBottom:"12px"}}>
-        <MenuButton
-          S={S}
-          bg={menuColors.tutorialBg}
-          text={menuColors.tutorialText}
-          label={t.tutorialBtn}
-          icon="?"
-          compact
-          onClick={()=>setShowTutorial(true)}
-        />
-      </div>
-
-      {/* ===== AD SPACE ===== */}
-      <div style={{width:"100%",minHeight:"90px",borderRadius:S.btnRadius,marginBottom:"12px",border:`1px dashed ${S.textMuted}33`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"11px",color:S.textMuted+"66",fontFamily:S.font}}>
-        {/* tila mainokselle */}
       </div>
 
       {/* Daily history popup with leaderboard */}
