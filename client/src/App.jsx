@@ -3960,6 +3960,11 @@ export default function Piilosana(){
 
       </div>
 
+      {/* ===== AD SPACE ===== */}
+      <div style={{width:"100%",minHeight:"90px",borderRadius:"14px",marginTop:"12px",marginBottom:"12px",border:`1px dashed rgba(255,255,255,0.15)`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"11px",color:"rgba(255,255,255,0.25)",fontFamily:S.font}}>
+        {/* tila mainokselle */}
+      </div>
+
       {/* Daily history popup with leaderboard */}
       {showDailyHistory&&(
         <DailyPopup dateStr={showDailyHistory} lang={lang} t={t} S={S}
