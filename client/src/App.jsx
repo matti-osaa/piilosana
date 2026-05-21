@@ -3271,24 +3271,16 @@ export default function Piilosana(){
           addPopup(`${t.themeBonus} +${bonus}`,`#44bb66`);
         }
       }
-      // Daily mode: check if word is a theme word, give bonus at threshold
+      // Daily mode: check if word is a theme word, give +10p per theme word
       if(dailyMode&&dailyTheme){
         const stem=isThemeWord(currentWord,dailyTheme);
         if(stem&&!dailyThemeFound.includes(stem)){
           const newFound=[...dailyThemeFound,stem];
           setDailyThemeFound(newFound);
-          // Show per-word notification
-          const themeLabel=lang==="en"?"Theme word!":lang==="sv"?"Temaord!":"Teemasana!";
+          const THEME_WORD_BONUS=10;
+          setScore(s=>s+THEME_WORD_BONUS);
+          const themeLabel=lang==="en"?`Theme word! +${THEME_WORD_BONUS}p`:lang==="sv"?`Temaord! +${THEME_WORD_BONUS}p`:`Teemasana! +${THEME_WORD_BONUS}p`;
           addPopup(`🎯 ${themeLabel}`,S.yellow||"#ffcc00");
-          // Give bonus when reaching threshold
-          if(newFound.length===DAILY_THEME_THRESHOLD&&!dailyThemeBonusGiven){
-            setDailyThemeBonusGiven(true);
-            setScore(s=>s+DAILY_THEME_BONUS);
-            setTimeout(()=>{
-              const bonusLabel=lang==="en"?"Theme bonus":lang==="sv"?"Temabonus":"Teemabonus";
-              addPopup(`🌟 ${bonusLabel} +${DAILY_THEME_BONUS}!`,S.yellow||"#ffcc00");
-            },600);
-          }
         }
       }
       // Bomb mode: check if word uses bomb cell
@@ -4605,7 +4597,7 @@ export default function Piilosana(){
             {mode==="solo"&&soloMode==="theme"&&activeTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44bb66",background:"#44bb6611",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>{activeTheme.emoji} {t.themeHint}: {activeTheme.name} — {themeFound.length}/{activeTheme.words.length}</div>}
             {mode==="solo"&&soloMode==="bomb"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#ff4444",background:"#ff444411",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>💣 {t.bombLabel} — {bombTimer}s</div>}
             {mode==="solo"&&soloMode==="mystery"&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#aa66ff",background:"#aa66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>❓ {t.mysteryLabel}</div>}
-            {dailyMode&&dailyTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"12px",color:S.yellow||"#ffcc00",background:`${S.yellow||"#ffcc00"}11`,borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name} {dailyThemeFound.length>0?<span style={{fontSize:"11px",fontWeight:"700",color:dailyThemeBonusGiven?(S.green||"#44ddaa"):(S.yellow||"#ffcc00")}}>🎯 {dailyThemeFound.length}{dailyThemeBonusGiven?` ✓ +${DAILY_THEME_BONUS}`:dailyThemeFound.length<DAILY_THEME_THRESHOLD?`/${DAILY_THEME_THRESHOLD}`:""}</span>:<span style={{fontSize:"10px",opacity:0.7}}>🎯 {lang==="en"?`Find ${DAILY_THEME_THRESHOLD} → +${DAILY_THEME_BONUS}p`:lang==="sv"?`Hitta ${DAILY_THEME_THRESHOLD} → +${DAILY_THEME_BONUS}p`:`Löydä ${DAILY_THEME_THRESHOLD} → +${DAILY_THEME_BONUS}p`}</span>}</div>}
+            {dailyMode&&dailyTheme&&<div style={{textAlign:"center",padding:"3px",fontSize:"12px",color:S.yellow||"#ffcc00",background:`${S.yellow||"#ffcc00"}11`,borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}<span style={{fontSize:"10px",opacity:0.7,marginLeft:"4px"}}>🎯 {dailyThemeFound.length>0?<span style={{fontWeight:"700",opacity:1}}>+{dailyThemeFound.length*10}p</span>:lang==="en"?"+10p/theme word":lang==="sv"?"+10p/temaord":"+10p/teemasana"}</span></div>}
             {mode==="solo"&&soloMode==="chess"&&state==="play"&&chessPiece&&(
               <div style={{textAlign:"center",padding:"8px",fontSize:"13px",color:"#ddaa33",background:"#ddaa3311",borderBottom:`1px solid ${S.border}`}}>
                 {chessPlacing?(
