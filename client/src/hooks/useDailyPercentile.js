@@ -57,11 +57,11 @@ export function useDailyPercentile(score, dateStr, lang) {
 // ===== Tier-määrittely – väri ja teksti per prosenttipaikka =====
 
 export const PERCENTILE_TIERS = [
-  { min: 90, color: "#fff4b8", textKey: "top10", sparkle: true },
-  { min: 75, color: "#d8e8a8", textKey: "top25" },
-  { min: 50, color: "#f4e7b2", textKey: "aboveAvg" },
-  { min: 25, color: "#d9c98c", textKey: "nearAvg" },
-  { min: 0,  color: "#e6b48a", textKey: "belowAvg" },
+  { min: 90, color: "#ffcc00", textKey: "top10", sparkle: true },
+  { min: 75, color: "#66dd55", textKey: "top25" },
+  { min: 50, color: "#ffaa33", textKey: "aboveAvg" },
+  { min: 25, color: "#cc9933", textKey: "nearAvg" },
+  { min: 0,  color: "#aa7744", textKey: "belowAvg" },
 ];
 
 export function tierForPercentile(pct) {

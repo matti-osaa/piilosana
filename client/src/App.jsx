@@ -3961,9 +3961,13 @@ export default function Piilosana(){
       </div>
 
       {/* ===== AD SPACE ===== */}
+<<<<<<< Updated upstream
       <div style={{width:"100%",minHeight:"90px",borderRadius:"14px",marginTop:"12px",marginBottom:"12px",border:`1px dashed rgba(255,255,255,0.15)`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"11px",color:"rgba(255,255,255,0.25)",fontFamily:S.font}}>
         {/* tila mainokselle */}
       </div>
+=======
+      <AdBanner/>
+>>>>>>> Stashed changes
 
       {/* Daily history popup with leaderboard */}
       {showDailyHistory&&(
@@ -5037,6 +5041,8 @@ export default function Piilosana(){
               {t.share}
             </button>
 
+            <AdBanner/>
+
             {dailyMode&&(()=>{
               const dr=dailyResult||getDailyResultForDate(dailyDate,lang);
               const dl=dateLabel(dailyDate,lang);
@@ -5095,10 +5101,6 @@ export default function Piilosana(){
           <HallOfFame gameMode={soloMode} gameTime={gameTime} currentScore={hofSubmitted?score:null} S={S} lang={lang}/>
         </div>
       )}
-
-      {/* Ad banner placeholder */}
-      <div style={{width:"100%",maxWidth:"600px",minHeight:"60px",marginTop:"16px",flexShrink:0}}/>
-
 
       {/* Universal hamburger menu overlay */}
       {showHamburger&&(
@@ -5180,8 +5182,6 @@ export default function Piilosana(){
         </div>
       )}
 
-      {/* AdSense Banner — bottom of page, outside game area */}
-      <AdBanner/>
 
       {/* Dark Velvet — subtle purple mist */}
       {themeId==="dark"&&(
