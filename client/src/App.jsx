@@ -617,7 +617,7 @@ function getTheme(id){
 // ============================================
 const ENDINGS = [
   { name:"LUMIMONSTERI", emoji:"⛄", color:"#6688ff",
-    desc:"Lumimonsteri syö kirjaimet!",
+    desc:{fi:"Lumimonsteri syö kirjaimet ja lauta tyhjenee",sv:"Snömonstret äter bokstäverna och brädet töms",en:"The snow monster eats the letters and the board empties"},
     cellAnim:(i,total)=>`cellShrinkSpin 0.48s ${i*0.05}s ease forwards`,
     cellColor:(i)=>"#6688ff",
     overlay:(progress)=>({
@@ -628,7 +628,7 @@ const ENDINGS = [
     })
   },
   { name:"TULVA", emoji:"🌊", color:"#4488ff",
-    desc:"Vesi nousee ja huuhtoo kirjaimet!",
+    desc:{fi:"Tulva nousee ja huuhtoo laudan tyhjäksi",sv:"Floden stiger och sköljer brädet tomt",en:"The flood rises and washes the board clean"},
     cellAnim:(i,total)=>{const row=Math.floor(i/5);const delay=(4-row)*0.12;return `cellFloat 0.6s ${delay}s ease forwards`;},
     cellColor:(i)=>"#4488ff",
     overlay:(progress)=>({
@@ -638,7 +638,7 @@ const ENDINGS = [
     })
   },
   { name:"RÄJÄHDYS", emoji:"💥", color:"#ff6622",
-    desc:"Ruudukko räjähtää!",
+    desc:{fi:"Pommi räjähtää ja lauta lentää palasiksi",sv:"Bomben exploderar och brädet flyger i bitar",en:"The bomb goes off and the board blows to pieces"},
     cellAnim:(i,total)=>{const r=Math.floor(i/5)-2,c=i%5-2;const dist=Math.sqrt(r*r+c*c);return `cellExplode 0.48s ${dist*0.07}s ease forwards`;},
     cellColor:(i)=>"#ff6622",
     overlay:(progress)=>({
@@ -648,7 +648,7 @@ const ENDINGS = [
     })
   },
   { name:"TULIPALO", emoji:"🔥", color:"#ff4400",
-    desc:"Tuli polttaa ruudukon!",
+    desc:{fi:"Tulipalo leviää ja polttaa laudan tuhkaksi",sv:"Elden sprider sig och bränner brädet till aska",en:"The fire spreads and burns the board to ash"},
     cellAnim:(i,total)=>{const r=Math.floor(i/5),c=i%5;const edge=Math.min(r,c,4-r,4-c);return `cellBurn 0.48s ${edge*0.15}s ease forwards`;},
     cellColor:(i)=>["#ff4400","#ff6600","#ffaa00","#ff8800"][i%4],
     overlay:(progress)=>({
@@ -658,7 +658,7 @@ const ENDINGS = [
     })
   },
   { name:"MUSTA AUKKO", emoji:"🕳️", color:"#8844cc",
-    desc:"Musta aukko imee kirjaimet!",
+    desc:{fi:"Musta aukko imee laudan sisäänsä",sv:"Det svarta hålet suger in hela brädet",en:"The black hole swallows the whole board"},
     cellAnim:(i,total)=>{const r=Math.floor(i/5)-2,c=i%5-2;const dist=Math.sqrt(r*r+c*c);return `cellVortex 0.72s ${(3-dist)*0.12}s ease forwards`;},
     cellColor:(i)=>"#8844cc",
     overlay:(progress)=>({
@@ -668,7 +668,7 @@ const ENDINGS = [
     })
   },
   { name:"UFO", emoji:"🛸", color:"#44ff88",
-    desc:"Avaruusolennot ryöstävät kirjaimet!",
+    desc:{fi:"Ufo imaisee kirjaimet mukaansa ja lauta tyhjenee",sv:"Ufon suger upp bokstäverna och brädet töms",en:"The UFO beams up the letters and the board empties"},
     cellAnim:(i,total)=>`cellBeamUp 0.48s ${i*0.05}s ease forwards`,
     cellColor:(i)=>"#44ff88",
     overlay:(progress)=>({
@@ -678,7 +678,7 @@ const ENDINGS = [
     })
   },
   { name:"TORNADO", emoji:"🌪️", color:"#aabbcc",
-    desc:"Pyörremyrsky pyyhkäisee!",
+    desc:{fi:"Tornado tempaa kirjaimet mukaansa ja lauta tyhjenee",sv:"Tornadon rycker med sig bokstäverna och brädet töms",en:"The tornado sweeps the letters away and the board empties"},
     cellAnim:(i,total)=>`cellTornado 0.6s ${i*0.04}s ease forwards`,
     cellColor:(i)=>"#aabbcc",
     overlay:(progress)=>({
@@ -688,7 +688,7 @@ const ENDINGS = [
     })
   },
   { name:"PAKKANEN", emoji:"❄️", color:"#88ddff",
-    desc:"Pakkanen jäädyttää ja särkee!",
+    desc:{fi:"Pakkanen jäädyttää laudan ja se särkyy palasiksi",sv:"Kylan fryser brädet och det spricker i bitar",en:"The frost freezes the board and it shatters to pieces"},
     cellAnim:(i,total)=>`cellFreeze 0.6s ${Math.random()*0.42}s ease forwards`,
     cellColor:(i)=>"#88ddff",
     overlay:(progress)=>({
@@ -698,7 +698,7 @@ const ENDINGS = [
     })
   },
   { name:"LOHIKÄÄRME", emoji:"🐉", color:"#ff4466",
-    desc:"Lohikäärme puhaltaa tulta!",
+    desc:{fi:"Lohikäärme puhaltaa tulta ja polttaa laudan",sv:"Draken sprutar eld och bränner upp brädet",en:"The dragon breathes fire and burns the board"},
     cellAnim:(i,total)=>{const c=i%5;return `cellDragonFire 0.48s ${c*0.09}s ease forwards`;},
     cellColor:(i)=>["#ff2200","#ff6600","#ffaa00","#ff4400","#ff8800"][i%5],
     overlay:(progress)=>({
@@ -708,7 +708,7 @@ const ENDINGS = [
     })
   },
   { name:"GLITCH", emoji:"👾", color:"#00ff00",
-    desc:"Järjestelmävirhe!",
+    desc:{fi:"Järjestelmävirhe pyyhkii laudan muistista",sv:"Ett systemfel raderar brädet ur minnet",en:"A system error wipes the board from memory"},
     cellAnim:(i,total)=>`cellGlitch 0.36s ${Math.random()*0.48}s steps(4) forwards`,
     cellColor:(i)=>["#ff0000","#00ff00","#0000ff","#ff00ff","#00ffff"][i%5],
     overlay:(progress)=>({
@@ -718,7 +718,7 @@ const ENDINGS = [
     })
   },
   { name:"SULJETTU", emoji:"🚪", color:"#8b6914",
-    desc:"Putiikki menee kiinni!",
+    desc:{fi:"Putiikki menee kiinni ja lauta katoaa luukkujen taakse",sv:"Butiken stänger och brädet försvinner bakom luckorna",en:"The shop closes and the board vanishes behind the shutters"},
     cellAnim:(i,total)=>{const c=i%5;const fromLeft=c;const fromRight=4-c;const delay=Math.min(fromLeft,fromRight)*0.12;return `cellShutterClose 0.5s ${delay}s ease-in forwards`;},
     cellColor:(i)=>"#5c3a0a",
     overlay:(progress)=>({
@@ -736,8 +736,10 @@ const ENDINGS = [
 // ============================================
 // ENDING OVERLAY COMPONENT
 // ============================================
-function EndingOverlay({ending, progress, gridRect}){
+function endingDesc(ending,lang){const d=ending.desc;return typeof d==="string"?d:(d[lang]||d.fi);}
+function EndingOverlay({ending, progress, gridRect, lang}){
   if(!ending||!gridRect)return null;
+  const desc=endingDesc(ending,lang);
   const ov=ending.overlay(progress);
   // Phase 1 (progress<0.35): Show big name + emoji intro
   // Phase 2 (progress>=0.35): Show overlay effects + action text
@@ -757,7 +759,7 @@ function EndingOverlay({ending, progress, gridRect}){
             {ending.name}
           </div>
           <div style={{fontFamily:"inherit",fontSize:"16px",fontWeight:"600",color:"#ffffff",textShadow:`0 0 20px ${ending.color}aa, 2px 2px 0 #000`,animation:"fadeIn 0.8s ease",lineHeight:"1.8",padding:"0 8px"}}>
-            {ending.desc}
+            {desc}
           </div>
         </div>
       )}
@@ -766,7 +768,7 @@ function EndingOverlay({ending, progress, gridRect}){
         <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",textAlign:"center",zIndex:60,width:"90%"}}>
           {ending.emoji&&<div style={{fontSize:"56px",animation:"pop 0.4s ease",marginBottom:"6px"}}>{ending.emoji}</div>}
           <div style={{fontFamily:"inherit",fontSize:"18px",fontWeight:"600",color:"#ffffff",textShadow:`0 0 20px ${ending.color}aa, 2px 2px 0 #000`,lineHeight:"1.8",marginBottom:"8px"}}>
-            {ending.desc}
+            {desc}
           </div>
           {ov.text&&<div style={{fontFamily:"inherit",fontSize:"26px",fontWeight:"700",color:ov.textColor,textShadow:`0 0 20px ${ov.textColor}88, 0 0 40px ${ov.textColor}44`,animation:"pop 0.4s ease"}}>
             {ov.text}
@@ -3164,12 +3166,17 @@ export default function Piilosana(){
       cancelAnimationFrame(raf);
       raf=requestAnimationFrame(()=>{
         const c=playRef.current,g=gRef.current;
-        if(!c||!g)return;
-        const cw=c.getBoundingClientRect().width;
+        if(!c||!g||!c.lastElementChild)return;
+        const cr=c.getBoundingClientRect();
+        const cw=cr.width;
         const gh=g.getBoundingClientRect().height;
         if(cw<=0||gh<=0)return;
-        const other=c.getBoundingClientRect().height-gh; // HUD, palkit, löydetyt sanat
-        const avail=window.innerHeight-16;                // sivun padding
+        // Sisällön todellinen korkeus (ei flex-grow:n venyttämä laatikko): containerin
+        // yläreunasta viimeisen lapsen alareunaan.
+        const contentH=c.lastElementChild.getBoundingClientRect().bottom-cr.top;
+        const other=contentH-gh;                          // HUD, palkit, löydetyt sanat
+        const top=cr.top+window.scrollY;                  // pelialueen etäisyys sivun yläreunasta
+        const avail=window.innerHeight-top-8;             // tilaa alareunan paddingiin asti
         const ratio=gh/cw;                                // ruudukon korkeus suhteessa leveyteen
         const want=Math.round(Math.max(PLAY_MIN_W,Math.min(PLAY_MAX_W,(avail-other)/ratio)));
         setPlayMaxWidth(prev=>Math.abs(prev-want)>2?want:prev);
@@ -4601,7 +4608,7 @@ export default function Piilosana(){
 
       {/* PLAYING + ENDING + SCRAMBLE */}
       {(state==="play"||state==="ending"||state==="scramble")&&(
-        <div ref={playRef} style={{width:"100%",maxWidth:`${playMaxWidth}px`,position:"relative",padding:(soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
+        <div ref={playRef} style={{width:"100%",maxWidth:`${playMaxWidth}px`,containerType:"inline-size",position:"relative",padding:(soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD + emoji picker wrapper */}
           <div style={{position:"relative",zIndex:10,marginBottom:isHexMode?"1px":"4px"}}>
           {/* HUD */}
@@ -4662,7 +4669,7 @@ export default function Piilosana(){
                 onMouseLeave={e=>{e.currentTarget.style.borderColor=S.textMuted+"44";e.currentTarget.style.background="transparent";e.currentTarget.style.color=S.textMuted;}}>
                 &#9776;
               </button>
-              <div style={{fontSize:S.cellGradient?"28px":"18px",minHeight:S.cellGradient?"32px":"20px",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
+              <div style={{fontSize:S.cellGradient?"clamp(14px,7cqw,28px)":"clamp(11px,4.5cqw,18px)",minHeight:"1.15em",fontWeight:S.cellGradient?"700":"normal",letterSpacing:S.cellGradient?"3px":"0",animation:shake?"shake 0.4s":(!word&&msg?.ok?"scoreJump 0.4s ease-out":"none"),color:word?wordColor(word.length):undefined,transition:"all 0.15s ease"}}>
                 {state==="ending"?<span style={{color:ending?.color,fontSize:S.cellGradient?"18px":"16px",animation:"pulse 1s infinite"}}>{ending?.emoji} {ending?.name}</span>:
                  word?word.toUpperCase():
                  (msg?<span style={{color:msg.ok?S.green:S.red,fontSize:msg.ok?(S.cellGradient?"16px":"12px"):(S.cellGradient?"14px":"10px"),fontWeight:msg.ok?"bold":"normal"}}>{msg.ok?`${msg.t?.toUpperCase()} +${msg.p}p${msg.combo>=3?` ${T[lang]?.combo||"COMBO"}!`:""}`:msg.m}</span>:<span style={{color:S.textMuted,fontSize:S.cellGradient?"20px":"18px"}}>···</span>)}
@@ -4860,7 +4867,7 @@ export default function Piilosana(){
                   })}
                 </div>
               ));})()}
-              {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true}/>}
+              {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true} lang={lang}/>}
             </div>
             ):(<>
             <div ref={gRef} className="piilosana-grid"
@@ -4966,7 +4973,7 @@ export default function Piilosana(){
                 );
               }))}
             </div>
-            {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true}/>}
+            {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true} lang={lang}/>}
             {/* Rotate mode: visual overlay when in rotate-active state */}
             {soloMode==="rotate"&&state==="play"&&rotateActive&&(
               <div style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:10,
@@ -5009,7 +5016,7 @@ export default function Piilosana(){
           <div style={{position:"relative",zIndex:1,border:`1px solid ${ending?.color||S.yellow}44`,padding:"24px",marginBottom:"16px",boxShadow:`0 4px 24px ${ending?.color||S.yellow}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
             {dailyMode?<><div style={{fontSize:"15px",color:S.yellow||"#ffcc00",marginBottom:"4px",fontWeight:"700"}}>{t.daily} {dateLabel(dailyDate,lang).short}</div>
             {dailyTheme&&<div style={{fontSize:"12px",color:S.textMuted,marginBottom:"6px",fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}</div>}</>
-            :<div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?.desc||"Peli päättyi!"}</div>}
+            :<div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?endingDesc(ending,lang):(lang==="sv"?"Spelet är slut!":lang==="en"?"Game over!":"Peli päättyi!")}</div>}
             {!dailyMode&&(()=>{const m=gameTime===0?(lang==="en"?"unlimited":lang==="sv"?"obegränsad":"rajaton"):gameTime===402?"6,7 min":`${Math.round(gameTime/60)} min`;return(<div style={{fontSize:"11px",color:S.textMuted,marginBottom:"6px",letterSpacing:"1px",fontWeight:"600",opacity:0.75}}>{m}</div>);})()}
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.score}</div>
             <div style={{fontSize:"36px",color:S.green,marginBottom:"4px",animation:"pop 0.3s ease",fontWeight:"700",letterSpacing:"2px"}}>{score}<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}>p</span>{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}> / {totalPossible}p</span>:null}</div>
