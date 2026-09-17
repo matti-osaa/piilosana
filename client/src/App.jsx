@@ -2514,6 +2514,12 @@ export default function Piilosana(){
   },[mode]);
 
   const gRef=useRef(null);
+  // Peliruudun sovitus näkymän korkeuteen: jos HUD + ruudukko + löydetyt sanat eivät mahdu
+  // ikkunaan (esim. leveä mutta matala auton selain), kavennetaan pelialuetta niin että
+  // kaikki mahtuu ilman vieritystä. Ruudukon korkeus seuraa leveyttä (prosenttipohjaiset solut).
+  const playRef=useRef(null);
+  const PLAY_MAX_W=600,PLAY_MIN_W=200;
+  const[playMaxWidth,setPlayMaxWidth]=useState(PLAY_MAX_W);
   const wordBarRef=useRef(null);
   const tRef=useRef(null);
   const nicknameRef=useRef(null);
@@ -3149,6 +3155,31 @@ export default function Piilosana(){
   },[]);
 
   const isHexMode=soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex);
+
+  const inPlayScreen=state==="play"||state==="ending"||state==="scramble";
+  useEffect(()=>{
+    if(!inPlayScreen){setPlayMaxWidth(PLAY_MAX_W);return;}
+    let raf=0;
+    const fit=()=>{
+      cancelAnimationFrame(raf);
+      raf=requestAnimationFrame(()=>{
+        const c=playRef.current,g=gRef.current;
+        if(!c||!g)return;
+        const cw=c.getBoundingClientRect().width;
+        const gh=g.getBoundingClientRect().height;
+        if(cw<=0||gh<=0)return;
+        const other=c.getBoundingClientRect().height-gh; // HUD, palkit, löydetyt sanat
+        const avail=window.innerHeight-16;                // sivun padding
+        const ratio=gh/cw;                                // ruudukon korkeus suhteessa leveyteen
+        const want=Math.round(Math.max(PLAY_MIN_W,Math.min(PLAY_MAX_W,(avail-other)/ratio)));
+        setPlayMaxWidth(prev=>Math.abs(prev-want)>2?want:prev);
+      });
+    };
+    fit();
+    window.addEventListener("resize",fit);
+    window.addEventListener("orientationchange",fit);
+    return()=>{cancelAnimationFrame(raf);window.removeEventListener("resize",fit);window.removeEventListener("orientationchange",fit);};
+  },[inPlayScreen,isHexMode,found.length,isLarge]);
   const adj=(a,b)=>isHexMode?adjHex(a,b):(Math.abs(a.r-b.r)<=1&&Math.abs(a.c-b.c)<=1&&!(a.r===b.r&&a.c===b.c));
   const isSel=(r,c)=>sel.some(s=>s.r===r&&s.c===c);
 
@@ -3803,25 +3834,6 @@ export default function Piilosana(){
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"420px",width:"100%",position:"relative"}}>
 
-      {/* Pikaohje – pieni pyöreä ?-nappi oikeassa yläkulmassa */}
-      <button
-        onClick={()=>setShowTutorial(true)}
-        style={{
-          position:"absolute",top:"-8px",right:"0",
-          width:"36px",height:"36px",borderRadius:"50%",
-          background:"rgba(255,255,255,0.12)",
-          border:"1.5px solid rgba(255,255,255,0.25)",
-          color:"rgba(255,255,255,0.7)",
-          fontSize:"16px",fontWeight:"700",
-          cursor:"pointer",
-          display:"flex",alignItems:"center",justifyContent:"center",
-          transition:"all 0.15s",
-          zIndex:2,
-        }}
-        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.22)";e.currentTarget.style.color="#fff";}}
-        onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.12)";e.currentTarget.style.color="rgba(255,255,255,0.7)";}}
-        aria-label={t.tutorialBtn}
-      >?</button>
 
       {/* Streak-varoitus (vain kun päiväpeli käytössä) */}
       {DAILY_ENABLED&&(
@@ -3954,8 +3966,26 @@ export default function Piilosana(){
 
       </div>
 
-      {/* ===== AD SPACE ===== */}
-      <AdBanner/>
+      {/* Pikaohje-linkki heti pelinappien alla */}
+      <button
+        onClick={()=>setShowTutorial(true)}
+        aria-label={t.tutorialBtn}
+        style={{
+          fontFamily:S.font,marginTop:"10px",
+          padding:"6px 14px",borderRadius:"999px",
+          background:"rgba(255,255,255,0.08)",
+          border:"1.5px solid rgba(255,255,255,0.22)",
+          color:"rgba(255,255,255,0.75)",
+          fontSize:"12px",fontWeight:"700",letterSpacing:"0.5px",
+          cursor:"pointer",display:"inline-flex",alignItems:"center",gap:"8px",
+          transition:"all 0.15s",
+        }}
+        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.18)";e.currentTarget.style.color="#fff";}}
+        onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="rgba(255,255,255,0.75)";}}
+      >
+        <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:"20px",height:"20px",borderRadius:"50%",border:"1.5px solid currentColor",fontSize:"12px"}}>?</span>
+        {t.tutorialBtn}
+      </button>
 
       {/* Daily history popup with leaderboard */}
       {showDailyHistory&&(
@@ -4003,6 +4033,9 @@ export default function Piilosana(){
         onShowWordInfo={()=>setShowWordInfo(true)}
         onLangChange={(code)=>{setLang(code);localStorage.setItem("piilosana_lang",code);setFlagBubble(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");syncSettings({lang:code});}}
       />
+
+      {/* ===== AD SPACE – footerin alla, ei varaa tilaa ennen kuin mainos oikeasti latautuu ===== */}
+      <AdBanner/>
     </div>
   );
   
@@ -4568,7 +4601,7 @@ export default function Piilosana(){
 
       {/* PLAYING + ENDING + SCRAMBLE */}
       {(state==="play"||state==="ending"||state==="scramble")&&(
-        <div style={{width:"100%",maxWidth:"600px",position:"relative",padding:(soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
+        <div ref={playRef} style={{width:"100%",maxWidth:`${playMaxWidth}px`,position:"relative",padding:(soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD + emoji picker wrapper */}
           <div style={{position:"relative",zIndex:10,marginBottom:isHexMode?"1px":"4px"}}>
           {/* HUD */}
@@ -4710,8 +4743,8 @@ export default function Piilosana(){
           )}
 
 
-          {/* GRID */}
-          <div style={{position:"relative"}}>
+          {/* GRID – containerType antaa cqw-yksiköt kirjainkoolle */}
+          <div style={{position:"relative",containerType:"inline-size"}}>
             {(soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex))?(
             <div ref={gRef}
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
@@ -4782,7 +4815,7 @@ export default function Piilosana(){
                             ?`radial-gradient(ellipse 80% 75% at 48% 45%, #ffffff 0%, #fefefe 25%, #faf8f5 45%, #f2eeea 65%, #e8e4de 85%, #ddd8d0 100%)`
                             :(s?cellBg:`radial-gradient(ellipse at 40% 35%, ${S.cell} 0%, ${S.cell}dd 40%, ${S.dark||S.cell}bb 80%, ${S.dark||S.cell}99 100%)`)),
                           display:"flex",alignItems:"center",justifyContent:"center",
-                          fontSize:isLarge?"clamp(28px,7vw,42px)":"clamp(24px,6.5vw,36px)",
+                          fontSize:isLarge?"clamp(12px,7.5cqw,42px)":"clamp(11px,6.5cqw,36px)",
                           fontFamily:S.letterFont,fontWeight:"500",
                           textTransform:"uppercase",
                           transition:"all 0.2s ease",
@@ -4889,7 +4922,7 @@ export default function Piilosana(){
                     onTouchStart={e=>{if(state==="play"){e.preventDefault();onDragStart(r,c);}}}
                     style={{
                       width:"100%",aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",
-                      fontSize:isChessMode?"clamp(14px,4vw,22px)":(isLarge?"clamp(34px,10vw,56px)":"clamp(28px,8vw,48px)"),fontFamily:S.letterFont,fontWeight:"700",
+                      fontSize:isChessMode?"clamp(10px,4.5cqw,22px)":(isLarge?"clamp(14px,10cqw,56px)":"clamp(12px,8cqw,48px)"),fontFamily:S.letterFont,fontWeight:"700",
                       letterSpacing:S.cellGradient?"1px":"0",
                       color:eaten?endColor||"transparent":scrambleColor||(chessIsPos?"#ddaa33":chessInPath?"#ddaa33":chessIsInvalid?"#ff4444":s?(S.cellTextSel||"#0f1720"):otherSelColor||(letterMult?letterColor(letter,lang):(S.cellText||(S.cellGradient?"#e6eef8":S.green)))),
                       background:eaten?(S.gridBg||"#111133"):chessIsPos?"#ddaa3355":chessInPath?"#ddaa3330":chessIsValid?"#ddaa3320":chessIsInvalid?"#ff444433":(isChessMode&&chessPlacing&&chessBottomRow)?"#ddaa3322":isChessMode?(chessSquareLight?"#2a2a3a":"#1a1a28"):last?S.yellow:s?S.green:otherSelColor?otherSelColor+"33":(soloMode==="bomb"&&bombCell&&r===bombCell.r&&c===bombCell.c)?`linear-gradient(135deg, #ff444433 0%, #ff880033 100%)`:(soloMode==="mystery"&&mysteryCell&&r===mysteryCell.r&&c===mysteryCell.c&&!mysteryRevealed)?`linear-gradient(135deg, #aa66ff33 0%, #6644ff33 100%)`:S.cellGradient?`linear-gradient(160deg, ${S.cell} 0%, ${S.dark} 100%)`:S.cell,
