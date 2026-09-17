@@ -4,13 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#0a0a1a" />
-    <meta name="description" content="Sanapiilo — löydä piilotettuja sanoja ruudukosta! Suomalainen sanapeli verkossa." />
+    <meta name="description" content="Sanapiilo on ilmainen suomalainen sanapeli: etsi sanoja kuusikulmaisesta kirjainruudukosta, kilpaile online-kierroksilla muita vastaan tai harjoittele omaan tahtiin. Pelaa selaimessa ilman asennusta." />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>Sanapiilo — Sanapeli</title>
+    <title>Sanapiilo – Suomalainen sanapeli verkossa | piilosana.com</title>
+    <link rel="canonical" href="https://piilosana.com/" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Sanapiilo",
+      "alternateName": "Piilosana",
+      "url": "https://piilosana.com/",
+      "description": "Suomalainen sanapeli, jossa etsit sanoja kuusikulmaisesta kirjainruudukosta. Pelaa online-kierroksia muita vastaan tai harjoittele omaan tahtiin. Tukee suomea, ruotsia ja englantia.",
+      "applicationCategory": "GameApplication",
+      "genre": "Word game",
+      "operatingSystem": "Web browser, Android",
+      "inLanguage": ["fi", "sv", "en"],
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "author": { "@type": "Person", "name": "Matti Kuokkanen" }
+    }
+    </script>
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Sanapiilo — Sanapeli" />
@@ -32,6 +50,23 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Sisältö hakukoneille ja selaimille, joissa JavaScript ei ole käytössä.
+         Ei näy normaalisti: React korvaa #root-elementin sisällön ja noscript
+         renderöityy vain ilman JavaScriptiä. -->
+    <noscript>
+      <main style="max-width:640px;margin:40px auto;padding:0 16px;font-family:sans-serif;color:#e0e0e0;line-height:1.6">
+        <h1>Sanapiilo – suomalainen sanapeli verkossa</h1>
+        <p>Sanapiilo on ilmainen selaimessa pelattava sanapeli. Pelikenttänä on kuusikulmioista koostuva kennoruudukko, jonka kirjaimista muodostat sanoja vetämällä sormella tai hiirellä vierekkäisten kirjainten yli. Mitä pidempi sana, sitä enemmän pisteitä, ja nopeasti peräkkäin löydetyt sanat kasvattavat komboa.</p>
+        <p>Pelitiloja on kaksi: <strong>online-peli</strong>, jossa kaikki paikalla olevat pelaajat etsivät sanoja samasta ruudukosta kahden minuutin kierroksissa, ja <strong>harjoittelu</strong>, jossa pelaat yksin valitsemallasi ajalla. Peli tukee suomea, ruotsia ja englantia, ja hyväksyy sanojen taivutusmuodot.</p>
+        <p>Pelaaminen vaatii JavaScriptin. Lisätietoa löydät näiltä sivuilta:</p>
+        <ul>
+          <li><a href="/ohjeet.html">Peliohjeet: säännöt, pisteytys ja vinkit</a></li>
+          <li><a href="/tietoja.html">Tietoja Sanapiilosta</a></li>
+          <li><a href="/tietosuoja.html">Tietosuojakäytäntö</a></li>
+          <li><a href="/kayttoehdot.html">Käyttöehdot</a></li>
+        </ul>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
     <script>
       if ('serviceWorker' in navigator) {

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sanapiilo-pelin ohjeet. Opi pelaamaan, pisteytys, pelitilat ja vinkit parempiin tuloksiin.">
+    <meta name="description" content="Sanapiilo-pelin ohjeet: näin muodostat sanoja kennoruudukosta, miten pisteet ja kombo lasketaan, online-peli ja harjoittelu sekä vinkit parempiin tuloksiin.">
+    <link rel="canonical" href="https://piilosana.com/ohjeet.html">
     <title>Peliohjeet — Sanapiilo</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8582386927565062" crossorigin="anonymous"></script>
     <style>
@@ -74,13 +75,13 @@
         <p class="subtitle">Opi pelaamaan Sanapiiloa ja paranna tuloksiasi</p>
 
         <h2>Pelin perusteet</h2>
-        <p>Sanapiilossa tavoitteenasi on löytää mahdollisimman monta sanaa kirjainruudukosta annetun ajan kuluessa. Pelikenttä on ruudukko, joka koostuu satunnaisista kirjaimista. Muodostat sanoja pyyhkäisemällä sormella tai hiirellä vierekkäisten kirjainten yli.</p>
+        <p>Sanapiilossa tavoitteenasi on löytää mahdollisimman monta sanaa kirjainruudukosta annetun ajan kuluessa. Pelikenttä on kuusikulmioista koostuva kennoruudukko (7 riviä, 5 kirjainta rivillä), jonka kirjaimet arvotaan jokaiseen peliin uudestaan niin, että ruudukosta löytyy aina runsaasti suomen kielen sanoja. Muodostat sanoja pyyhkäisemällä sormella tai hiirellä vierekkäisten kirjainten yli.</p>
 
         <h3>Sanan muodostaminen</h3>
         <p>Sanan muodostaminen toimii seuraavasti:</p>
         <ol>
             <li><strong>Aloita pyyhkäisy:</strong> Paina ensimmäistä kirjainta ja pidä pohjassa (mobiililla) tai pidä hiiren painiketta pohjassa (tietokoneella).</li>
-            <li><strong>Vedä vierekkäisiin kirjaimiin:</strong> Liikuta sormea tai hiirtä viereisiin kirjaimiin. Kirjaimet ovat vierekkäisiä vaaka-, pysty- ja vinosuunnassa, eli jokainen kirjain voi yhdistyä kaikkiin kahdeksaan ympäröivään kirjaimeen.</li>
+            <li><strong>Vedä vierekkäisiin kirjaimiin:</strong> Liikuta sormea tai hiirtä viereisiin kirjaimiin. Kennoruudukossa jokaisella kirjaimella on enintään kuusi naapuria: kaksi samalla rivillä sekä kaksi ylä- ja kaksi alapuolella olevalla rivillä.</li>
             <li><strong>Vapauta hyväksyäksesi:</strong> Kun olet muodostanut sanan, vapauta sormi tai hiiren painike. Jos sana on sanalistassa ja vähintään 3 kirjainta pitkä, se hyväksytään ja saat pisteitä.</li>
         </ol>
         <p>Jokaista kirjainruutua voi käyttää vain kerran per sana. Et voi palata saman ruudun kautta kahdesti saman sanan aikana. Kirjainten täytyy muodostaa katkeamaton polku ruudukossa.</p>
@@ -90,139 +91,64 @@
         </div>
 
         <h2>Pisteytys</h2>
-        <p>Sanapiilon pisteytys perustuu kahteen tekijään: kirjainten arvoihin ja sanan pituuteen. Jokaisella kirjaimella on oma pistearvonsa, joka perustuu kirjaimen harvinaisuuteen kyseisessä kielessä, samaan tapaan kuin Scrabblessa.</p>
+        <p>Perustilassa sanan pisteet määräytyvät pelkästään sen pituuden mukaan. Kolmen kirjaimen sana on aina hyväksytty, mutta pitkät sanat ovat moninkertaisesti arvokkaampia, joten ruudukon tarkka tutkiminen kannattaa.</p>
 
-        <h3>Kirjainten arvot (suomi)</h3>
+        <h3>Pisteet sanan pituuden mukaan</h3>
         <table class="letter-table">
-            <thead>
-                <tr>
-                    <th>Pisteet</th>
-                    <th>Kirjaimet</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>A, I, N, T, E, S</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>L, O, U, K</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>M, R, H, P</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>V, J, D, Y</td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td>&Auml;, &Ouml;</td>
-                </tr>
-                <tr>
-                    <td>7</td>
-                    <td>G, B, F, C</td>
-                </tr>
-                <tr>
-                    <td>10</td>
-                    <td>W, X, Z, Q</td>
-                </tr>
-            </tbody>
+                <thead>
+                    <tr><th>Sanan pituus</th><th>Pisteet</th></tr>
+                </thead>
+                <tbody>
+                <tr><td>3 kirjainta</td><td>1</td></tr>
+                <tr><td>4 kirjainta</td><td>2</td></tr>
+                <tr><td>5 kirjainta</td><td>4</td></tr>
+                <tr><td>6 kirjainta</td><td>6</td></tr>
+                <tr><td>7 kirjainta</td><td>10</td></tr>
+                <tr><td>8 kirjainta tai enemmän</td><td>14</td></tr>
+                </tbody>
         </table>
 
-        <h3>Pituusbonus</h3>
-        <p>Pitemmät sanat tuottavat enemmän pisteitä kirjainkohtaisten pisteiden lisäksi. Sanan kokonaispisteet lasketaan kertomalla kirjainten yhteisarvo pituuskertoimella:</p>
-        <table class="letter-table">
-            <thead>
-                <tr>
-                    <th>Sanan pituus</th>
-                    <th>Kerroin</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>3 kirjainta</td><td>1x</td></tr>
-                <tr><td>4 kirjainta</td><td>1.5x</td></tr>
-                <tr><td>5 kirjainta</td><td>2x</td></tr>
-                <tr><td>6 kirjainta</td><td>3x</td></tr>
-                <tr><td>7+ kirjainta</td><td>5x</td></tr>
-            </tbody>
-        </table>
+        <h3>Kombo</h3>
+        <p>Jos löydät seuraavan sanan alle neljän sekunnin kuluessa edellisestä, kombo kasvaa. Kolmannesta peräkkäisestä sanasta alkaen pisteet kerrotaan kahdella ja viidennestä alkaen kolmella. Kombo katkeaa, kun sanojen väliin jää pidempi tauko. Nopea, tasainen löytäminen on siis yhtä tärkeää kuin pitkät sanat.</p>
 
-        <div class="tip-box">
-            <p><strong>Esimerkki:</strong> Sana "KOIRA" (K=2, O=2, I=1, R=3, A=1) saa kirjainpisteet 9. Viiden kirjaimen kerroin on 2x, joten kokonaispisteet ovat 9 &times; 2 = 18 pistettä.</p>
-        </div>
+        <h3>Kirjainten arvot (valinnainen, harjoittelussa)</h3>
+        <p>Harjoittelutilassa voit kytkeä päälle kirjainkertoimet. Silloin sanan pisteet lasketaan kirjainten arvojen summana pituuden sijaan, samaan tapaan kuin lautapeleissä. Harvinaiset kirjaimet ovat arvokkaampia:</p>
+        <table class="letter-table">
+                <thead>
+                    <tr><th>Pisteet</th><th>Kirjaimet</th></tr>
+                </thead>
+                <tbody>
+                <tr><td>1</td><td>A, I, N, S, T, E</td></tr>
+                <tr><td>2</td><td>L, O, K, R, &Auml;</td></tr>
+                <tr><td>3</td><td>M</td></tr>
+                <tr><td>4</td><td>U, V, J, H, Y, P</td></tr>
+                <tr><td>7</td><td>D, &Ouml;</td></tr>
+                </tbody>
+        </table>
+        <p>Esimerkki: sana "KOIRA" (K=2, O=2, I=1, R=2, A=1) on kirjainkertoimilla 8 pisteen arvoinen, ilman niitä viiden kirjaimen sanana 4 pistettä. Kombokerroin lasketaan kummassakin tapauksessa päälle.</p>
 
         <h2>Pelitilat</h2>
-        <p>Sanapiilo tarjoaa viisi eri pelitilaa, joista jokaisella on omat erityispiirteensä. Eri pelitilat tuovat vaihtelua peliin ja haastavat eri tavoin.</p>
+        <p>Sanapiilossa on kaksi pelitilaa: online-peli muita pelaajia vastaan ja harjoittelu omaan tahtiin. Molemmissa pelataan samaa kennoruudukkoa samoilla säännöillä.</p>
 
         <div class="mode-card">
-            <h3>Päivittäinen haaste</h3>
-            <p>Päivittäinen haaste on Sanapiilon suosituin pelitila. Joka päivä kaikki pelaajat saavat täsmälleen saman kirjainruudukon ratkaistavakseen. Tämä tekee tulosten vertailusta reilua ja mielekästä.</p>
+            <h3>Online-peli</h3>
+            <p>Online-pelissä kaikki paikalla olevat pelaajat saavat saman ruudukon ja etsivät siitä sanoja yhtä aikaa kahden minuutin ajan. Kierroksen päätyttyä näet sijoituksesi, kaikkien pelaajien pisteet ja löydetyt sanat. Uusi kierros alkaa automaattisesti puolen minuutin tauon jälkeen, joten peliin voi liittyä milloin tahansa.</p>
             <ul>
-                <li>Uusi haaste julkaistaan joka päivä keskiyöllä Suomen aikaa</li>
-                <li>Jokaisella pelaajalla on yksi yritys päivässä</li>
-                <li>Tuloslistat näyttävät päivän parhaat pelaajat reaaliajassa</li>
-                <li>Voit seurata omaa pistekehitystäsi tilastoista</li>
-                <li>Tuloksesi tallennetaan automaattisesti, jos olet kirjautunut sisään</li>
+                <li>Kierroksen pituus on 2 minuuttia, ja seuraava kierros alkaa 30 sekunnin kuluttua edellisen päättymisestä</li>
+                <li>Pelaamiseen riittää nimimerkki; kirjautuminen tallentaa tulokset ja saavutukset tilillesi</li>
+                <li>Valikossa näkyy, montako pelaajaa on juuri nyt paikalla</li>
+                <li>Voit myös luoda oman huoneen ja kutsua kaverit linkillä tai QR-koodilla pelaamaan keskenänne</li>
             </ul>
         </div>
 
         <div class="mode-card">
-            <h3>Harjoittelutila</h3>
-            <p>Harjoittelutilassa voit kehittää taitojasi omaan tahtiisi ilman kilpailupainetta. Muokkaa pelin asetuksia omien mieltymystesi mukaan ja kokeile erilaisia strategioita.</p>
+            <h3>Harjoittelu</h3>
+            <p>Harjoittelussa pelaat yksin ilman kilpailupainetta ja voit säätää peliä mieleiseksesi. Se on hyvä tapa tutustua kennoruudukkoon ja pisteytykseen ennen online-peliä.</p>
             <ul>
-                <li><strong>Ruudukon koko:</strong> Valitse 4x4, 5x5 tai 6x6 ruudukko. Suuremmat ruudukot tarjoavat enemmän sanamahdollisuuksia mutta ovat myös haastavampia hallita.</li>
-                <li><strong>Aikaraja:</strong> Aseta aikaraja 1-10 minuuttiin tai pelaa ilman aikarajaa.</li>
-                <li><strong>Kirjainkerroin:</strong> Säädä kirjainten pistekerrointa helpommaksi tai vaikeammaksi.</li>
+                <li><strong>Aika:</strong> 2 minuuttia, pidempi 6 min 42 s -erä tai rajaton aika, jolloin voit vaihtaa ruudukon uuteen ja lopettaa itse.</li>
+                <li><strong>Kirjainkertoimet:</strong> kytke päälle, jos haluat harvinaisten kirjainten tuottavan enemmän pisteitä.</li>
+                <li>Harjoittelun tuloksia ei viedä tuloslistoille, mutta saavutukset kertyvät normaalisti.</li>
             </ul>
-            <p>Harjoittelutuloksia ei tallenneta tuloslistoille, joten voit kokeilla rauhassa.</p>
-        </div>
-
-        <div class="mode-card">
-            <h3>Moninpeli (Arena)</h3>
-            <p>Moninpelissä kilpailet reaaliaikaisesti muita pelaajia vastaan. Kaikki pelaavat samaa ruudukkoa samanaikaisesti, ja tulokset päivittyvät reaaliajassa.</p>
-            <ul>
-                <li><strong>Luo peli:</strong> Luo uusi moninpeli ja saat kutsulinkkin sekä QR-koodin, jonka voit jakaa ystävillesi.</li>
-                <li><strong>Liity peliin:</strong> Avaa kutsulinkkki tai skannaa QR-koodi liittyäksesi ystäväsi peliin.</li>
-                <li>Näet muiden pelaajien pisteet reaaliajassa pelin aikana</li>
-                <li>Pelin lopussa näet kaikkien löytämät sanat ja vertailun</li>
-                <li>WebSocket-teknologia takaa viiveettömän pelikokemuksen</li>
-            </ul>
-        </div>
-
-        <h2>Erikoistilat</h2>
-        <p>Erikoistilat tuovat peliin uusia mekaniikkoja ja strategioita. Jokainen erikoistila muuttaa pelin peruslogiikkaa tavalla, joka vaatii erilaista lähestymistapaa.</p>
-
-        <div class="mode-card">
-            <h3>Kierto (Rotation)</h3>
-            <p>Kiertotilassa voit pyörittää ruudukon rivejä ja sarakkeita luodaksesi uusia kirjainyhdistelmiä. Napauta rivin tai sarakkeen reunaa siirtääksesi kirjaimia. Tämä avaa uusia sanamahdollisuuksia, joita alkuperäisessä ruudukossa ei olisi. Strateginen rivien ja sarakkeiden pyörittäminen on avain huipputuloksiin.</p>
-            <p>Kierto vie yhden siirron, joten mieti tarkkaan milloin pyörität. Yhdellä taitavalla kierrolla voit avata useita uusia pitkiä sanoja kerralla.</p>
-        </div>
-
-        <div class="mode-card">
-            <h3>Teemat (Themes)</h3>
-            <p>Teematilassa tiettyyn aihepiiriin kuuluvat sanat antavat bonuspisteitä. Aihepiiri voi olla esimerkiksi eläimet, ruoka, luonto tai ammatit. Teema paljastetaan pelin alussa, ja sinun tehtäväsi on löytää mahdollisimman monta teemaan liittyvää sanaa.</p>
-            <p>Teemaan kuuluvat sanat saavat kaksinkertaiset pisteet, joten niiden löytäminen on erityisen arvokasta. Muutkin sanat kelpaavat normaalein pistein, mutta parhaat tulokset syntyvät teemaan keskittymällä.</p>
-        </div>
-
-        <div class="mode-card">
-            <h3>Pommi (Bomb)</h3>
-            <p>Pommitilassa yksi ruudukon kirjaimista on pommi, joka näkyy hehkuvana. Pommilla on ajastin, ja kun aika loppuu, pommi räjähtää ja peli päättyy. Ainoa tapa purkaa pommi on käyttää pommikirjain osana sanaa.</p>
-            <p>Kun pommi puretaan, uusi pommikirjain ilmestyy ruudukolle. Peli jatkuu niin kauan kuin ehdit purkaa pommit. Mitä pidemmälle pääset, sitä nopeammin pommit räjähtävät, mikä tekee pelistä jatkuvasti haastavamman.</p>
-        </div>
-
-        <div class="mode-card">
-            <h3>Mysteeri (Mystery)</h3>
-            <p>Mysteeritilassa osa ruudukon kirjaimista on piilotettu mysteerimerkein. Et tiedä mitä kirjaimia niiden takana on, ennen kuin käytät ne osana sanaa. Kun muodostat sanan, joka kulkee mysteerikirjaimen kautta, kirjain paljastuu.</p>
-            <p>Tämä tila vaatii päättelykykyä ja rohkeita arvauksia. Selvitä mysteerikirjaimet yhdistelemällä tietoa löytämistäsi sanoista ja ympäröivistä kirjaimista. Jokainen paljastettu kirjain avaa uusia mahdollisuuksia.</p>
-        </div>
-
-        <div class="mode-card">
-            <h3>Shakki (Chess)</h3>
-            <p>Shakkitilassa ruudukon päällä on shakkinappula, jota liikutat vuorotellen. Nappula liikkuu shakkisääntöjen mukaisesti (esimerkiksi ratsu L-kirjaimen muotoisesti, lähetti vinottain). Kerää kirjaimia nappulan reitillä ja muodosta sanoja keräämistäsi kirjaimista.</p>
-            <p>Shakkitila yhdistää strategisen ajattelun ja sananmuodostuksen ainutlaatuisella tavalla. Suunnittele reittisi niin, että keräät oikeat kirjaimet pitkien ja arvokkaiden sanojen muodostamiseksi. Jokainen siirto on tärkeä, sillä liikkeitä on rajoitettu määrä.</p>
         </div>
 
         <h2>Vinkit ja strategiat</h2>
@@ -238,8 +164,8 @@
 
         <h3>Edistyneille pelaajille</h3>
         <ul>
-            <li><strong>Priorisoi pitkät sanat:</strong> Pitkät sanat antavat merkittävästi enemmän pisteitä pituuskertoimen ansiosta. Kuuden kirjaimen sana on kolme kertaa arvokkaampi kuin kolmen kirjaimen sana samasta kirjainmateriaalista.</li>
-            <li><strong>Opettele harvinaiset kirjaimet:</strong> Jos ruudukossa on harvinaisia kirjaimia (kuten G, B tai F), etsi sanoja jotka hyödyntävät niitä. Korkean pistearvon kirjaimet nostavat sanan kokonaispistemäärää merkittävästi.</li>
+            <li><strong>Priorisoi pitkät sanat:</strong> Pitkät sanat antavat merkittävästi enemmän pisteitä pituuskertoimen ansiosta. Kuuden kirjaimen sana on kuusi kertaa arvokkaampi kuin kolmen kirjaimen sana, ja kahdeksan kirjaimen sana tuottaa 14 pistettä.</li>
+            <li><strong>Opettele harvinaiset kirjaimet:</strong> Jos pelaat harjoittelussa kirjainkertoimilla, etsi sanoja joissa on D, Ö, U, V, J, H, Y tai P. Ne nostavat sanan pistemäärää huomattavasti.</li>
             <li><strong>Taivutusmuodot ovat ystäväsi:</strong> Suomen kielen rikas taivutusjärjestelmä on valtava etu. Jos löydät sanan "koti", etsi myös "kodin", "kotia", "kotiin" ja muut taivutusmuodot samasta alueesta.</li>
             <li><strong>Yhdyssanat:</strong> Suomen kielen yhdyssanat voivat olla pitkiä ja erittäin arvokkaita. Yhdistä kaksi lyhyempää sanaa, jos ne sattuvat olemaan vierekkäin ruudukossa.</li>
             <li><strong>Hallitse aikasi:</strong> Älä käytä liikaa aikaa yhden vaikean sanan etsimiseen. Jos et löydä sanaa nopeasti, siirry eteenpäin ja palaa myöhemmin.</li>
@@ -247,13 +173,14 @@
 
         <h3>Moninpelivinkit</h3>
         <ul>
+            <li><strong>Pidä kombo yllä:</strong> Alle neljän sekunnin välein löydetyt sanat kasvattavat komboa, ja kolmannesta sanasta alkaen pisteet tuplaantuvat. Lyhyet sanat nopeasti peräkkäin voivat tuottaa enemmän kuin yksi pitkä.</li>
             <li><strong>Nopeus ratkaisee:</strong> Moninpelissä nopeus on tärkeää, mutta pitkät sanat ovat silti arvokkaampia. Löydä tasapaino nopeuden ja sanan pituuden välillä.</li>
             <li><strong>Seuraa vastustajia:</strong> Näet muiden pisteet reaaliajassa. Jos olet jäljessä, keskity pitkiin sanoihin saadaksesi kiinni.</li>
             <li><strong>Aloita tutuista kulmista:</strong> Aloita ruudukon alueelta, jossa näet heti selkeitä sanoja, ja laajenna siitä.</li>
         </ul>
 
         <div class="tip-box">
-            <p><strong>Paras vinkki:</strong> Pelaa joka päivä! Sanapelit ovat taitolaji, ja säännöllinen harjoittelu parantaa hahmontunnistustasi, sanavarastoasi ja nopeuttasi. Päivittäinen haaste on erinomainen tapa pitää taidot terässä.</p>
+            <p><strong>Paras vinkki:</strong> Pelaa joka päivä! Sanapelit ovat taitolaji, ja säännöllinen harjoittelu parantaa hahmontunnistustasi, sanavarastoasi ja nopeuttasi. Online-pelin kierrokset pyörivät jatkuvasti, joten pari nopeaa erää päivässä pitää taidot terässä.</p>
         </div>
 
         <h2>Usein kysytyt kysymykset</h2>
@@ -262,10 +189,10 @@
         <p>Sana ei hyväksytä, jos sitä ei löydy sanalistasta, se on alle 3 kirjainta pitkä, olet jo löytänyt sen aiemmin samassa pelissä tai kirjainpolku ei ole yhtenäinen (kirjaimet eivät ole vierekkäisiä).</p>
 
         <h3>Voiko peliä pelata ilman rekisteröitymistä?</h3>
-        <p>Kyllä! Voit pelata harjoittelutilaa ja päivittäistä haastetta ilman rekisteröitymistä. Rekisteröityminen mahdollistaa tulosten tallentamisen, tuloslistoilla näkymisen ja moninpeliin osallistumisen.</p>
+        <p>Kyllä! Sekä harjoittelua että online-peliä voi pelata ilman rekisteröitymistä pelkällä nimimerkillä. Rekisteröityminen tallentaa tulokset, saavutukset ja asetukset tilillesi, jolloin ne seuraavat mukana laitteelta toiselle.</p>
 
         <h3>Miten moninpeli toimii?</h3>
-        <p>Luo moninpeli ja jaa kutsulinkkki tai QR-koodi ystävillesi. Kun kaikki pelaajat ovat liittyneet, peli alkaa ja kaikki pelaavat samaa ruudukkoa samanaikaisesti. Tulokset näkyvät reaaliajassa.</p>
+        <p>Valitse valikosta Online-peli ja anna nimimerkki. Pääset mukaan seuraavalle kahden minuutin kierrokselle, jossa kaikki pelaavat samaa ruudukkoa yhtä aikaa. Jos haluat pelata vain kavereiden kesken, luo oma huone ja jaa kutsulinkki tai QR-koodi.</p>
 
         <h3>Onko peli ilmainen?</h3>
         <p>Kyllä, Sanapiilo on täysin ilmainen. Palvelua rahoitetaan mainoksilla. Voit tukea peliä sallimalla mainokset selaimessasi.</p>

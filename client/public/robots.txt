@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /synth-lab
+Disallow: /melody-demo
+
+Sitemap: https://piilosana.com/sitemap.xml
