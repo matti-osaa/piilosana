@@ -1033,6 +1033,11 @@ function QuickTutorial({lang,theme,onClose}){
       <div style={{background:S.bg,border:`3px solid ${S.green}`,borderRadius:S.panelRadius,padding:"16px",maxWidth:"340px",width:"100%",boxShadow:S.panelShadow,position:"relative",maxHeight:"90vh",overflow:"auto"}} onClick={e=>e.stopPropagation()}>
         <button onClick={onClose} style={{position:"absolute",top:"6px",right:"6px",fontFamily:S.font,fontSize:"14px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,width:"28px",height:"28px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:S.btnRadius,zIndex:10}}>✕</button>
 
+        {/* Otsikko */}
+        <div style={{textAlign:"center",fontFamily:S.font,fontSize:"16px",fontWeight:"800",letterSpacing:"2px",textTransform:"uppercase",color:S.green,marginBottom:"6px",paddingRight:"28px"}}>
+          {(T[lang]||T.fi).howToPlay}
+        </div>
+
         {/* Formed word display */}
         <div style={{textAlign:"center",marginBottom:"8px",minHeight:"28px"}}>
           {formedWord&&!completedWords.includes(step)&&(
@@ -1110,30 +1115,27 @@ function QuickTutorial({lang,theme,onClose}){
               const px=p1.x+(p2.x-p1.x)*segProgress;
               const py=p1.y+(p2.y-p1.y)*segProgress;
               return(
-                <div style={{position:"absolute",left:`${px}px`,top:`${py}px`,transform:"translate(-10px, -2px)",
+                <div style={{position:"absolute",left:`${px}px`,top:`${py}px`,transform:"translate(-14px, -2px)",
                   pointerEvents:"none",zIndex:50,transition:"none",filter:"drop-shadow(0 3px 6px #00000077)"}}>
-                  <svg width="40" height="48" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* White glove pointing hand — index finger up, others curled */}
-                    {/* Index finger */}
-                    <path d="M42 8 C42 3, 48 0, 52 0 C56 0, 62 3, 62 8 L62 42 L42 42 Z" fill="white" stroke="#222" strokeWidth="3" strokeLinejoin="round"/>
-                    <ellipse cx="52" cy="8" rx="7" ry="4" fill="#e8e8e8" opacity="0.5"/>
-                    {/* Palm */}
-                    <rect x="28" y="42" width="48" height="36" rx="10" fill="white" stroke="#222" strokeWidth="3"/>
-                    {/* Thumb */}
-                    <path d="M28 52 C20 50, 14 56, 16 64 C18 70, 26 72, 30 68" fill="white" stroke="#222" strokeWidth="3" strokeLinejoin="round"/>
-                    {/* Curled fingers (bottom of palm) */}
-                    <path d="M36 78 C36 88, 40 92, 44 92 C48 92, 50 88, 50 82" fill="white" stroke="#222" strokeWidth="2.5" strokeLinecap="round"/>
-                    <path d="M50 78 C50 90, 54 94, 58 94 C62 94, 64 90, 64 82" fill="white" stroke="#222" strokeWidth="2.5" strokeLinecap="round"/>
-                    <path d="M64 78 C64 86, 66 90, 70 88 C74 86, 74 80, 72 76" fill="white" stroke="#222" strokeWidth="2.5" strokeLinecap="round"/>
-                    {/* Knuckle lines on index finger */}
-                    <line x1="44" y1="22" x2="60" y2="22" stroke="#ccc" strokeWidth="1.5" strokeLinecap="round"/>
-                    <line x1="44" y1="32" x2="60" y2="32" stroke="#ccc" strokeWidth="1.5" strokeLinecap="round"/>
-                    {/* Cuff */}
-                    <rect x="24" y="76" width="52" height="10" rx="3" fill="white" stroke="#222" strokeWidth="2.5"/>
-                    {/* Touch ripple at fingertip */}
-                    <circle cx="52" cy="4" r="8" fill="none" stroke="#44ffaa" strokeWidth="2" opacity="0.6">
-                      <animate attributeName="r" values="6;16;6" dur="1.5s" repeatCount="indefinite"/>
-                      <animate attributeName="opacity" values="0.7;0;0.7" dur="1.5s" repeatCount="indefinite"/>
+                  {/* Sormenpää (ihonvärinen etusormi, hieman kallellaan) – kärki osuu solun keskelle */}
+                  <svg width="40" height="48" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" style={{overflow:"visible"}}>
+                    <defs>
+                      <linearGradient id="tutSkin" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0" stopColor="#ffd8b5"/><stop offset="1" stopColor="#f0b388"/>
+                      </linearGradient>
+                    </defs>
+                    <g transform="rotate(-18 50 60)">
+                      {/* Pelkkä etusormi, alareuna pyöristetty */}
+                      <path d="M40 96 L40 18 C40 8, 48 2, 54 2 C60 2, 68 8, 68 18 L68 96 C68 104, 40 104, 40 96 Z" fill="url(#tutSkin)" stroke="#b3785a" strokeWidth="3" strokeLinejoin="round"/>
+                      <path d="M45 16 C45 8, 63 8, 63 16 C63 22, 45 22, 45 16 Z" fill="#ffe6d6" stroke="#d9a58a" strokeWidth="1.5"/>
+                      <path d="M44 36 Q54 40 64 36" fill="none" stroke="#d29a7a" strokeWidth="1.8" strokeLinecap="round"/>
+                      <path d="M44 54 Q54 58 64 54" fill="none" stroke="#d29a7a" strokeWidth="1.8" strokeLinecap="round"/>
+                      <path d="M44 74 Q54 78 64 74" fill="none" stroke="#d29a7a" strokeWidth="1.8" strokeLinecap="round"/>
+                    </g>
+                    {/* Kosketusrengas sormenpäässä */}
+                    <circle cx="36" cy="4" r="9" fill="none" stroke="#44ffaa" strokeWidth="2.5" opacity="0.7">
+                      <animate attributeName="r" values="6;18;6" dur="1.5s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0.8;0;0.8" dur="1.5s" repeatCount="indefinite"/>
                     </circle>
                   </svg>
                 </div>
