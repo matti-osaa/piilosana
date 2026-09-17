@@ -1035,7 +1035,7 @@ function QuickTutorial({lang,theme,onClose}){
 
         {/* Otsikko */}
         <div style={{textAlign:"center",fontFamily:S.font,fontSize:"16px",fontWeight:"800",letterSpacing:"2px",textTransform:"uppercase",color:S.green,marginBottom:"6px",paddingRight:"28px"}}>
-          {(T[lang]||T.fi).howToPlay}
+          {lang==="sv"?"Så spelar du: hitta ord":lang==="en"?"How to play: find words":"Näin pelaat: etsi sanoja"}
         </div>
 
         {/* Formed word display */}
