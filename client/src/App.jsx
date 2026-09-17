@@ -14,6 +14,7 @@ import { DayBoxRow } from "./components/DayBoxRow.jsx";
 import { MenuFooter } from "./components/MenuFooter.jsx";
 import { PracticeOptionsModal } from "./components/PracticeOptionsModal.jsx";
 import { MenuButton } from "./components/MenuButton.jsx";
+import { GlossyButton, GLOSSY } from "./components/GlossyButton.jsx";
 import { ResultsScreen as ResultsScreenView } from "./components/ResultsScreen.jsx";
 import { HelpModal } from "./components/HelpModal.jsx";
 import { InflectionModal } from "./components/InflectionModal.jsx";
@@ -529,7 +530,7 @@ function getLetterValues(lang){return getLangConf(lang).letterValues;}
 function ptsLetters(word,lang='fi'){const lv=getLetterValues(lang);let s=0;for(const ch of word)s+=(lv[ch]||1);return s;}
 function letterColor(ch,lang='fi'){const lv=getLetterValues(lang);return LETTER_VALUE_COLORS[lv[ch]||1]||"#88bbcc";}
 
-const fontCSS=`@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Inter:wght@400;500;600;700&display=swap');`;
+const fontCSS=`@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800&display=swap');`;
 
 // ============================================
 // THEMES
@@ -3853,46 +3854,21 @@ export default function Piilosana(){
       )}
 
       {/* ===== PELINAPIT: online-peli ja harjoittelu ===== */}
-      <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
+      <div style={{display:"flex",flexDirection:"column",gap:"14px"}}>
 
         {/* 1. ONLINE-PELI */}
-        <button
+        <GlossyButton
+          S={S}
+          color={GLOSSY.blue}
+          label={lang==="fi"?"ONLINE-PELI":lang==="sv"?"ONLINE-SPEL":"ONLINE GAME"}
+          subLabel={lang==="fi"?"Pelaa muita vastaan · 2 min":lang==="sv"?"Spela mot andra · 2 min":"Play against others · 2 min"}
+          badge={publicOnlineCount>1?`${publicOnlineCount} online`:null}
           onClick={()=>{
             sounds.init().catch(()=>{});
             setMode("public");
             if(authUser){setPublicState("waiting");}else{setPublicState("nickname");}
           }}
-          style={{
-            fontFamily:S.font,width:"100%",
-            padding:"18px 20px",
-            background:menuColors.arenaBg,
-            border:`2px solid ${menuColors.arenaBorder}`,
-            borderRadius:"14px",
-            color:menuColors.arenaText,
-            cursor:"pointer",
-            boxShadow:menuColors.softShadow,
-            transition:"all 0.2s",
-            textAlign:"left",
-            position:"relative",
-            overflow:"hidden",
-          }}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 12px 30px rgba(0,0,0,0.35)";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}
-        >
-          <div style={{position:"relative",zIndex:1}}>
-            <div style={{fontSize:"20px",fontWeight:"900",letterSpacing:"1px",marginBottom:"2px"}}>
-              {lang==="fi"?"ONLINE-PELI":lang==="sv"?"ONLINE-SPEL":"ONLINE GAME"}
-            </div>
-            <div style={{fontSize:"12px",fontWeight:"600",opacity:0.85}}>
-              {lang==="fi"?"Pelaa muita vastaan · 2 min":lang==="sv"?"Spela mot andra · 2 min":"Play against others · 2 min"}
-            </div>
-            {publicOnlineCount>1&&(
-              <span style={{position:"absolute",top:"2px",right:"0",fontSize:"11px",fontWeight:"700",background:"rgba(255,255,255,0.2)",borderRadius:"8px",padding:"3px 8px"}}>
-                {publicOnlineCount} {lang==="fi"?"online":lang==="sv"?"online":"online"}
-              </span>
-            )}
-          </div>
-        </button>
+        />
 
         {/* 2. PÄIVÄN PIILOSANA (piilotettu kun DAILY_ENABLED=false) */}
         {DAILY_ENABLED&&(()=>{
@@ -3946,52 +3922,41 @@ export default function Piilosana(){
         })()}
 
         {/* 3. HARJOITTELU */}
-        <button
+        <GlossyButton
+          S={S}
+          color={GLOSSY.green}
+          label={t.practice}
+          subLabel={lang==="fi"?"Pelaa yksin omaan tahtiin":lang==="sv"?"Spela ensam i egen takt":"Play solo at your own pace"}
           onClick={()=>setShowMenuOptions(true)}
-          style={{
-            fontFamily:S.font,width:"100%",
-            padding:"18px 20px",
-            background:menuColors.practiceBg,
-            border:`2px solid rgba(255,255,255,0.15)`,
-            borderRadius:"14px",
-            color:menuColors.practiceText,
-            cursor:"pointer",
-            boxShadow:menuColors.softShadow,
-            transition:"all 0.2s",
-            textAlign:"left",
-          }}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 12px 30px rgba(0,0,0,0.35)";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=menuColors.softShadow;}}
-        >
-          <div style={{fontSize:"20px",fontWeight:"900",letterSpacing:"1px",marginBottom:"2px"}}>
-            {t.practice}
-          </div>
-          <div style={{fontSize:"12px",fontWeight:"600",opacity:0.85}}>
-            {lang==="fi"?"Pelaa yksin omaan tahtiin":lang==="sv"?"Spela ensam i egen takt":"Play solo at your own pace"}
-          </div>
-        </button>
+        />
 
       </div>
 
-      {/* Pikaohje-linkki heti pelinappien alla */}
+      {/* Pikaohje-linkki heti pelinappien alla, sama tarratyyli pienenä */}
       <button
         onClick={()=>setShowTutorial(true)}
         aria-label={t.tutorialBtn}
         style={{
-          fontFamily:S.font,marginTop:"10px",
-          padding:"6px 14px",borderRadius:"999px",
-          background:"rgba(255,255,255,0.08)",
-          border:"1.5px solid rgba(255,255,255,0.22)",
-          color:"rgba(255,255,255,0.75)",
-          fontSize:"12px",fontWeight:"700",letterSpacing:"0.5px",
-          cursor:"pointer",display:"inline-flex",alignItems:"center",gap:"8px",
-          transition:"all 0.15s",
+          fontFamily:S.font,marginTop:"12px",padding:"3px",
+          borderRadius:"22px 4px 22px 4px",
+          background:"#ffffff",border:"2px solid #cfd4d8",
+          boxShadow:"0 4px 10px rgba(0,0,0,0.2)",
+          cursor:"pointer",transition:"transform 0.15s",
         }}
-        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.18)";e.currentTarget.style.color="#fff";}}
-        onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="rgba(255,255,255,0.75)";}}
+        onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";}}
+        onMouseLeave={e=>{e.currentTarget.style.transform="none";}}
       >
-        <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:"20px",height:"20px",borderRadius:"50%",border:"1.5px solid currentColor",fontSize:"12px"}}>?</span>
-        {t.tutorialBtn}
+        <span style={{
+          display:"inline-flex",alignItems:"center",gap:"8px",
+          padding:"6px 16px 7px 18px",borderRadius:"22px 4px 22px 4px",
+          background:`linear-gradient(180deg, ${GLOSSY.orange.top}, ${GLOSSY.orange.bottom})`,
+          boxShadow:`inset -3px -3px 0 0 ${GLOSSY.orange.dark}`,
+          color:"#fff",fontFamily:"'Montserrat','Inter',sans-serif",fontSize:"12px",fontWeight:"800",letterSpacing:"2px",textTransform:"uppercase",
+          textShadow:"0 1px 1px rgba(0,0,0,0.25)",
+        }}>
+          <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:"18px",height:"18px",borderRadius:"50%",border:"1.5px solid rgba(255,255,255,0.9)",fontSize:"11px"}}>?</span>
+          {t.tutorialBtn}
+        </span>
       </button>
 
       {/* Daily history popup with leaderboard */}
