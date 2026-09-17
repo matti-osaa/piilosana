@@ -8,7 +8,6 @@ import { MultiplayerHero } from "./components/MultiplayerHero.jsx";
 import { DailyHeroCard } from "./components/DailyHeroCard.jsx";
 import { NextDailyCountdown } from "./components/NextDailyCountdown.jsx";
 import { StreakWarning } from "./components/StreakWarning.jsx";
-import { FirstTimeWelcome } from "./components/FirstTimeWelcome.jsx";
 import { DailyEndResult } from "./components/DailyEndResult.jsx";
 import { computePercentile, tierForPercentile, PERCENTILE_TEXTS } from "./hooks/useDailyPercentile.js";
 import { DayBoxRow } from "./components/DayBoxRow.jsx";
@@ -28,7 +27,9 @@ import { LobbyEnterName, LobbyChoose, LobbyWaiting } from "./components/Multipla
 // SANAPIILO - Finnish Word Hunt Game
 // ============================================
 
-const VERSION = "2.1.0";
+const VERSION = "2.2.0";
+// Päivän piilosana pois valikosta toistaiseksi – vaihda true niin nappi, streak-varoitus ja popupit palaavat.
+const DAILY_ENABLED = false;
 const SERVER_URL = window.location.origin;
 
 // Word lists are loaded lazily for fast initial page load
@@ -2103,7 +2104,14 @@ export default function Piilosana(){
   const[showWordInfo,setShowWordInfo]=useState(false);
   const[showHelp,setShowHelp]=useState(false);
   const[showInflection,setShowInflection]=useState(false);
-  const[showTutorial,setShowTutorial]=useState(false);
+  // Pikaohje näytetään automaattisesti ensimmäisellä käynnillä, sen jälkeen vain ?-napista.
+  const[showTutorial,setShowTutorial]=useState(()=>{
+    try{return !localStorage.getItem("piilosana_tutorial_seen");}catch{return false;}
+  });
+  const closeTutorial=useCallback(()=>{
+    setShowTutorial(false);
+    try{localStorage.setItem("piilosana_tutorial_seen","1");}catch{}
+  },[]);
   const[dailyMode,setDailyMode]=useState(false);
   const[dailyTheme,setDailyTheme]=useState(null);
   const[dailyThemeFound,setDailyThemeFound]=useState([]); // stems of theme words found in daily
@@ -3815,23 +3823,17 @@ export default function Piilosana(){
         aria-label={t.tutorialBtn}
       >?</button>
 
-      {/* Tervetulo­banneri – näkyy vain ensikertalaisille */}
-      <FirstTimeWelcome
-        S={S}
-        lang={lang}
-        isFirstTime={achStats.gamesPlayed===0}
-        onTryPractice={()=>setShowMenuOptions(true)}
-      />
+      {/* Streak-varoitus (vain kun päiväpeli käytössä) */}
+      {DAILY_ENABLED&&(
+        <StreakWarning
+          S={S}
+          lang={lang}
+          streak={getDailyStreak(lang)}
+          isPlayed={!!getDailyResult(lang)}
+        />
+      )}
 
-      {/* Streak-varoitus */}
-      <StreakWarning
-        S={S}
-        lang={lang}
-        streak={getDailyStreak(lang)}
-        isPlayed={!!getDailyResult(lang)}
-      />
-
-      {/* ===== KOLME PELINAPPIA ===== */}
+      {/* ===== PELINAPIT: online-peli ja harjoittelu ===== */}
       <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
 
         {/* 1. ONLINE-PELI */}
@@ -3873,8 +3875,8 @@ export default function Piilosana(){
           </div>
         </button>
 
-        {/* 2. PÄIVÄN PIILOSANA */}
-        {(()=>{
+        {/* 2. PÄIVÄN PIILOSANA (piilotettu kun DAILY_ENABLED=false) */}
+        {DAILY_ENABLED&&(()=>{
           const d=todayStr();
           const dl=dateLabel(d,lang);
           const res=getDailyResult(lang);
@@ -4069,7 +4071,7 @@ export default function Piilosana(){
         <WordInfoModal S={S} t={t} langConfig={LANG_CONFIG} onClose={()=>setShowWordInfo(false)} />
       )}
       {/* Help / How to play modal */}
-      {showTutorial&&<QuickTutorial lang={lang} theme={S} onClose={()=>setShowTutorial(false)}/>}
+      {showTutorial&&<QuickTutorial lang={lang} theme={S} onClose={closeTutorial}/>}
       {showHelp&&(
         <HelpModal S={S} t={t} onClose={()=>setShowHelp(false)} />
       )}
@@ -4253,7 +4255,7 @@ export default function Piilosana(){
       )}
 
       {/* First-time auth prompt */}
-      {mode===null&&showFirstTimeAuth&&!authUser&&!showAuth&&(
+      {mode===null&&showFirstTimeAuth&&!showTutorial&&!authUser&&!showAuth&&(
         <div style={{width:"100%",maxWidth:"500px",padding:"12px",border:`2px solid ${S.yellow}`,background:S.dark,
           boxShadow:`0 0 12px ${S.yellow}22`,animation:"fadeIn 0.5s ease",marginBottom:"8px",textAlign:"center"}}>
           <div style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,marginBottom:"8px",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>
