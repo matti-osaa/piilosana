@@ -4053,7 +4053,7 @@ export default function Piilosana(){
 
       {/* Global hamburger — top-left, always visible */}
       {state!=="play"&&state!=="ending"&&state!=="scramble"&&(
-        <button onClick={()=>setShowHamburger(true)} style={{position:"fixed",left:"10px",top:"14px",zIndex:100,background:`${S.dark}cc`,border:`1px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"10px",transition:"all 0.15s",fontSize:"20px",color:S.textMuted,lineHeight:"1",height:"36px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}
+        <button onClick={()=>setShowHamburger(true)} style={{position:"fixed",left:"max(10px, calc(50% - 210px))",top:"14px",zIndex:100,background:`${S.dark}cc`,border:`1px solid ${S.border}`,padding:"6px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"10px",transition:"all 0.15s",fontSize:"20px",color:S.textMuted,lineHeight:"1",height:"36px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}
           onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.color=S.green;e.currentTarget.style.background=S.green+"15";}}
           onMouseLeave={e=>{e.currentTarget.style.borderColor=S.border;e.currentTarget.style.color=S.textMuted;e.currentTarget.style.background=`${S.dark}cc`;}}>
           &#9776;
