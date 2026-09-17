@@ -1,7 +1,7 @@
 // GlossyButton – alkuvalikon "tarranappi".
 //
 // Muoto: iso pyöristys vasemmassa ylä- ja oikeassa alakulmassa, terävät
-// vastakkaiset kulmat (lehtimäinen). Valkoinen tarrareunus, kiiltävä
+// vastakkaiset kulmat (lehtimäinen). Ei reunusta, kiiltävä
 // väritäyttö ja tummempi sävy oikeassa alareunassa. Teksti keskitetty,
 // leveä kirjainväli (Montserrat 800).
 //
@@ -44,10 +44,7 @@ export function GlossyButton({ S, color = GLOSSY.blue, label, subLabel, badge, o
       {/* Valkoinen tarrareunus */}
       <div
         style={{
-          background: "#ffffff",
-          border: "2px solid #cfd4d8",
           borderRadius: RADIUS,
-          padding: "5px",
           boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
         }}
       >

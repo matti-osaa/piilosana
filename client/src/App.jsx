@@ -3937,9 +3937,9 @@ export default function Piilosana(){
         onClick={()=>setShowTutorial(true)}
         aria-label={t.tutorialBtn}
         style={{
-          fontFamily:S.font,marginTop:"12px",padding:"3px",
+          fontFamily:S.font,marginTop:"12px",padding:0,
           borderRadius:"22px 4px 22px 4px",
-          background:"#ffffff",border:"2px solid #cfd4d8",
+          background:"transparent",border:"none",
           boxShadow:"0 4px 10px rgba(0,0,0,0.2)",
           cursor:"pointer",transition:"transform 0.15s",
         }}
