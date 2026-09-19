@@ -126,6 +126,8 @@ async function initSqliteDb() {
     )
   `);
   try { sqliteDb.run(`ALTER TABLE hall_of_fame ADD COLUMN user_id INTEGER`); } catch (e) {}
+  // Laudan muoto (hex, square, triangle...). NULL = vanha tulos ajalta ennen muotoja (= kuusikulmio).
+  try { sqliteDb.run(`ALTER TABLE hall_of_fame ADD COLUMN shape TEXT`); } catch (e) {}
   try { sqliteDb.run(`ALTER TABLE users ADD COLUMN settings TEXT`); } catch (e) {}
   try { sqliteDb.run(`ALTER TABLE users ADD COLUMN achievements TEXT`); } catch (e) {}
   try { sqliteDb.run(`ALTER TABLE users ADD COLUMN google_id TEXT`); } catch (e) {}
@@ -169,6 +171,7 @@ async function initPgDb() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
+  await pgPool.query(`ALTER TABLE hall_of_fame ADD COLUMN IF NOT EXISTS shape TEXT`);
 
   await pgPool.query(`
     CREATE TABLE IF NOT EXISTS daily_scores (
@@ -217,7 +220,10 @@ async function initPgDb() {
 // Hall of Fame queries (driver-aware)
 // ============================================================================
 
-export async function submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti, lang }) {
+const HOF_SHAPES = ["hex", "square", "triangle", "pentagon", "star", "diamond"];
+
+export async function submitScore({ nickname, score, wordsFound, wordsTotal, gameMode, gameTime, isMulti, lang, shape }) {
+  const safeShape = HOF_SHAPES.includes(shape) ? shape : null;
   if (!nickname || score < 0 || !gameMode || !gameTime) return null;
   if (gameTime === 0) return null;
   const safeLang = isLangValid(lang) ? lang : "fi";
@@ -225,16 +231,16 @@ export async function submitScore({ nickname, score, wordsFound, wordsTotal, gam
 
   if (USE_PG) {
     await pgPool.query(
-      `INSERT INTO hall_of_fame (nickname, score, words_found, words_total, percentage, game_mode, game_time, is_multi, lang)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [nickname, score, wordsFound, wordsTotal, percentage, gameMode, Number(gameTime), isMulti ? 1 : 0, safeLang]
+      `INSERT INTO hall_of_fame (nickname, score, words_found, words_total, percentage, game_mode, game_time, is_multi, lang, shape)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [nickname, score, wordsFound, wordsTotal, percentage, gameMode, Number(gameTime), isMulti ? 1 : 0, safeLang, safeShape]
     );
   } else {
     if (!sqliteDb) return null;
     sqliteDb.run(
-      `INSERT INTO hall_of_fame (nickname, score, words_found, words_total, percentage, game_mode, game_time, is_multi, lang)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [nickname, score, wordsFound, wordsTotal, percentage, gameMode, Number(gameTime), isMulti ? 1 : 0, safeLang]
+      `INSERT INTO hall_of_fame (nickname, score, words_found, words_total, percentage, game_mode, game_time, is_multi, lang, shape)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [nickname, score, wordsFound, wordsTotal, percentage, gameMode, Number(gameTime), isMulti ? 1 : 0, safeLang, safeShape]
     );
     saveDb();
   }
@@ -245,7 +251,7 @@ export async function getHallOfFame(gameMode, gameTime, lang) {
   const safeLang = lang || "fi";
   if (USE_PG) {
     const r = await pgPool.query(
-      `SELECT nickname, score, words_found, words_total, percentage, created_at
+      `SELECT nickname, score, words_found, words_total, percentage, created_at, shape
        FROM hall_of_fame WHERE game_mode = $1 AND game_time = $2 AND lang = $3
        ORDER BY score DESC LIMIT 10`,
       [gameMode, Number(gameTime), safeLang]
@@ -254,7 +260,7 @@ export async function getHallOfFame(gameMode, gameTime, lang) {
   }
   if (!sqliteDb) return [];
   const stmt = sqliteDb.prepare(
-    `SELECT nickname, score, words_found, words_total, percentage, created_at
+    `SELECT nickname, score, words_found, words_total, percentage, created_at, shape
      FROM hall_of_fame WHERE game_mode = ? AND game_time = ? AND lang = ?
      ORDER BY score DESC LIMIT 10`
   );

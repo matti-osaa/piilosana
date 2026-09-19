@@ -259,6 +259,7 @@ export function createRoomManager({ io, getLang = defaultGetLang }) {
                 gameTime: room.timeLeft > 0 ? 120 : (room.originalGameTime || 120),
                 isMulti: true,
                 lang: room.lang || "fi",
+                shape: room.shape || undefined,
               });
             }
           }

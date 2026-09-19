@@ -16,7 +16,7 @@ import { PracticeOptionsModal } from "./components/PracticeOptionsModal.jsx";
 import { MenuButton } from "./components/MenuButton.jsx";
 import { GlossyButton, GLOSSY } from "./components/GlossyButton.jsx";
 import { SHAPES, randomShape, getBoard, makeBoardGrid, findWordsOnBoard, gridFitsBoard } from "./boards.js";
-import { ShapeBoard } from "./components/ShapeBoard.jsx";
+import { ShapeBoard, ShapeIcon, SHAPE_NAMES } from "./components/ShapeBoard.jsx";
 import { heroPanel, sectionPanel, sectionTitle, wordChip } from "./components/panelStyle.js";
 import { ResultsScreen as ResultsScreenView } from "./components/ResultsScreen.jsx";
 import { HelpModal } from "./components/HelpModal.jsx";
@@ -2043,7 +2043,9 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
             </div>
             <div style={{display:"flex",gap:"12px",alignItems:"center"}}>
               <span style={{fontSize:i===0?"14px":"13px",color:(tierForPercentile(computePercentile(s.score,scores))?.color)||S.yellow,fontWeight:i<3?"bold":"normal",transition:"color 0.3s ease"}}>{s.score}p</span>
-              <span style={{fontSize:"13px",color:S.textSoft||"#88ccaa"}}>{s.percentage}%</span>
+              <span style={{fontSize:"13px",color:S.textSoft||"#88ccaa",minWidth:"34px",textAlign:"right"}}>{s.percentage}%</span>
+              {/* Laudan muoto; vanhat tulokset (ei muotoa) pelattiin kuusikulmiolla */}
+              <span title={(SHAPE_NAMES[lang]||SHAPE_NAMES.fi)[s.shape||"hex"]} style={{display:"inline-flex",opacity:s.shape?1:0.55}}><ShapeIcon shape={s.shape||"hex"} color={S.textSoft||S.textMuted} size={16}/></span>
             </div>
           </div>;
         })}
@@ -2053,12 +2055,12 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
 }
 
 // Submit score to hall of fame
-async function submitToHallOfFame({nickname,score,wordsFound,wordsTotal,gameMode,gameTime,lang}){
+async function submitToHallOfFame({nickname,score,wordsFound,wordsTotal,gameMode,gameTime,lang,shape}){
   if(!nickname||score<=0||!gameMode||!gameTime||gameTime===0)return null;
   try{
     const res=await fetch(`${SERVER_URL}/api/hall-of-fame`,{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({nickname,score,wordsFound,wordsTotal,gameMode,gameTime,lang:lang||"fi"})
+      body:JSON.stringify({nickname,score,wordsFound,wordsTotal,gameMode,gameTime,lang:lang||"fi",shape})
     });
     if(!res.ok)return null;
     return await res.json();
@@ -5072,7 +5074,7 @@ export default function Piilosana(){
                 {soloNickname.trim()?(
                   <GlossyButton S={S} size="sm" width="auto" color={GLOSSY.yellow} label={`${t.saveAs} ${soloNickname.trim()}`} onClick={async()=>{
                     await submitToHallOfFame({nickname:soloNickname.trim(),score,wordsFound:found.length,
-                      wordsTotal:valid.size,gameMode:soloMode,gameTime,lang});
+                      wordsTotal:valid.size,gameMode:soloMode,gameTime,lang,shape:boardShape});
                     setHofSubmitted(true);
                   }}/>
                 ):(
@@ -5085,7 +5087,7 @@ export default function Piilosana(){
                       <GlossyButton S={S} size="sm" width="auto" color={GLOSSY.yellow} label={t.save} disabled={!soloNickname.trim()} onClick={async()=>{
                         if(!soloNickname.trim())return;
                         await submitToHallOfFame({nickname:soloNickname.trim(),score,wordsFound:found.length,
-                          wordsTotal:valid.size,gameMode:soloMode,gameTime,lang});
+                          wordsTotal:valid.size,gameMode:soloMode,gameTime,lang,shape:boardShape});
                         setHofSubmitted(true);
                       }}/>
                     </div>

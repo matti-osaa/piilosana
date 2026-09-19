@@ -155,6 +155,7 @@ export function createPublicArenaManager({ io, generateGoodGrid }) {
           gameTime: PUBLIC_GAME_TIME,
           isMulti: true,
           lang,
+          shape: pg.shape || "hex",
         });
       }
     }

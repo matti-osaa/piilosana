@@ -51,14 +51,14 @@ export function attachScoresRoutes(app) {
 
   // Hall of Fame: lähetä tulos (yksinpeli)
   app.post("/api/hall-of-fame", async (req, res) => {
-    const { nickname, score, wordsFound, wordsTotal, gameMode, gameTime, lang } = req.body;
+    const { nickname, score, wordsFound, wordsTotal, gameMode, gameTime, lang, shape } = req.body;
     if (!nickname || nickname.length > 12) {
       return res.status(400).json({ error: "Virheellinen nimimerkki" });
     }
     const safeLang = LANGS[lang] ? lang : "fi";
     const id = await submitScore({
       nickname, score, wordsFound, wordsTotal,
-      gameMode, gameTime, isMulti: false, lang: safeLang,
+      gameMode, gameTime, isMulti: false, lang: safeLang, shape,
     });
     if (!id) return res.status(400).json({ error: "Tulosta ei voitu tallentaa" });
     const top = await getHallOfFame(gameMode, gameTime, safeLang);
