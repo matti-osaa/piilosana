@@ -12,6 +12,7 @@
 import { getScoreForWordLength } from "../game/score.js";
 import { canTraceWord } from "../game/validate.js";
 import { hasWordInBuf, FULL_WORDS_BUF, getLang as defaultGetLang } from "../words.js";
+import { isShape } from "../game/boards.js";
 import { HEX_ROWS, HEX_COLS, randLetter as randLetterPure } from "../game/grid.js";
 import { submitScore } from "../db.js";
 
@@ -194,7 +195,7 @@ export function createRoomManager({ io, getLang = defaultGetLang }) {
     console.log(`${nickname} (${socket.id}) joined room ${roomCode}`);
   }
 
-  function startGame(socket, { grid, validWords, gameMode, gameTime }) {
+  function startGame(socket, { grid, validWords, gameMode, gameTime, shape }) {
     const roomCode = playerRooms.get(socket.id);
     const room = rooms.get(roomCode);
     if (!room) {
@@ -211,6 +212,7 @@ export function createRoomManager({ io, getLang = defaultGetLang }) {
     }
 
     room.grid = grid;
+    room.shape = isShape(shape) ? shape : null; // laudan muoto (null = vanha asiakas)
     room.validWords = validWords;
     room.gameMode = gameMode || "classic";
     room.gameState = "running";
@@ -223,7 +225,7 @@ export function createRoomManager({ io, getLang = defaultGetLang }) {
       s.wordsFound = new Set();
     }
 
-    io.to(roomCode).emit("game_started", { grid, validWords, gameMode: room.gameMode });
+    io.to(roomCode).emit("game_started", { grid, validWords, gameMode: room.gameMode, shape: room.shape });
     broadcastRoomList();
 
     // 5s countdown ennen pelin alkua
@@ -301,7 +303,7 @@ export function createRoomManager({ io, getLang = defaultGetLang }) {
       && (room.lang || "fi") === "fi"
       && normalized.length > 8
       && hasWordInBuf(FULL_WORDS_BUF, normalized)
-      && canTraceWord(room.grid, normalized, isHexGrid)
+      && canTraceWord(room.grid, normalized, room.shape || isHexGrid)
     ) {
       isValid = true;
       room.validWords.push(normalized);

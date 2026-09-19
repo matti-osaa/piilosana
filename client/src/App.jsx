@@ -15,6 +15,8 @@ import { MenuFooter } from "./components/MenuFooter.jsx";
 import { PracticeOptionsModal } from "./components/PracticeOptionsModal.jsx";
 import { MenuButton } from "./components/MenuButton.jsx";
 import { GlossyButton, GLOSSY } from "./components/GlossyButton.jsx";
+import { SHAPES, randomShape, getBoard, makeBoardGrid, findWordsOnBoard, gridFitsBoard } from "./boards.js";
+import { ShapeBoard } from "./components/ShapeBoard.jsx";
 import { heroPanel, sectionPanel, sectionTitle, wordChip } from "./components/panelStyle.js";
 import { ResultsScreen as ResultsScreenView } from "./components/ResultsScreen.jsx";
 import { HelpModal } from "./components/HelpModal.jsx";
@@ -2507,6 +2509,15 @@ export default function Piilosana(){
   const[publicNextCountdown,setPublicNextCountdown]=useState(0);
   const[publicOnlineCount,setPublicOnlineCount]=useState(0);
   const[publicHex,setPublicHex]=useState(false);
+  // Laudan muoto: "hex" = vanha kuusikulmiopiirto, muut piirretään ShapeBoardilla.
+  // Online/moninpeli: palvelin/isäntä arpoo. Harjoittelu: practiceShape ("random" tai muoto). Päivän peli: aina hex.
+  const[boardShape,setBoardShapeState]=useState("hex");
+  const boardShapeRef=useRef("hex");
+  const setBoardShape=useCallback((sh)=>{const v=SHAPES.includes(sh)?sh:"hex";boardShapeRef.current=v;setBoardShapeState(v);},[]);
+  const[practiceShape,setPracticeShape]=useState(()=>{try{return localStorage.getItem("piilosana_shape")||"random";}catch{return "random";}});
+  const shapeBoard=boardShape!=="hex"?getBoard(boardShape):null;
+  // Satunnainen kirjainruudukko nykyiselle laudalle (sekoitusanimaatiot)
+  const randGridForShape=useCallback((sh)=>sh&&sh!=="hex"?makeBoardGrid(sh,()=>randLetterLang(lang)):makeGrid(HEX_ROWS,lang,HEX_COLS),[lang]);
 
   // Poll arena player count from REST API when on main menu
   useEffect(()=>{
@@ -2587,10 +2598,14 @@ export default function Piilosana(){
     const gt=overrideTime!==undefined?overrideTime:gameTime;
     const sm=overrideMode!==undefined?overrideMode:soloMode;
     let bg=null,bw=new Set();
-    for(let i=0;i<50;i++){const g=sm==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=(sm==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(sm==="hex"?25:15))break;}
+    // Harjoittelussa muodon saa valita; "random" arpoo
+    const shape=sm==="hex"?(practiceShape==="random"||!SHAPES.includes(practiceShape)?randomShape():practiceShape):"hex";
+    setBoardShape(shape);
+    const useBoard=sm==="hex"&&shape!=="hex";
+    for(let i=0;i<50;i++){const g=useBoard?makeBoardGrid(shape,()=>randLetterLang(lang)):sm==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=useBoard?findWordsOnBoard(g,trie,shape):(sm==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(sm==="hex"?25:15))break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setTime(gt);setScore(0);setMsg(null);
     // Fetch long words (11-15 chars) from server in background
-    if(lang==="fi"&&bg){fetch(`${SERVER_URL}/api/find-long-words`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({grid:bg,hex:sm==="hex"})}).then(r=>r.json()).then(({words})=>{if(words&&words.length>0)setValid(prev=>{const n=new Set(prev);words.forEach(w=>n.add(w));return n;});}).catch(()=>{});}
+    if(lang==="fi"&&bg){fetch(`${SERVER_URL}/api/find-long-words`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({grid:bg,hex:sm==="hex",shape:sm==="hex"?shape:undefined})}).then(r=>r.json()).then(({words})=>{if(words&&words.length>0)setValid(prev=>{const n=new Set(prev);words.forEach(w=>n.add(w));return n;});}).catch(()=>{});}
     setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);
     setEnding(null);setEndingProgress(0);setDropKey(0);
 
@@ -2625,7 +2640,7 @@ export default function Piilosana(){
     if(overrideMode!==undefined)setSoloMode(overrideMode);
     if(overrideTime!==undefined)setGameTime(overrideTime);
     window.scrollTo(0,0);
-  },[trie,sounds,gameTime,soloMode,lang]);
+  },[trie,sounds,gameTime,soloMode,lang,practiceShape,setBoardShape]);
 
   const[dailyDate,setDailyDate]=useState(todayStr()); // which date's daily we're playing
   const startDaily=useCallback(async(forDate)=>{
@@ -2661,7 +2676,7 @@ export default function Piilosana(){
     setMysteryCell(null);setMysteryRevealed(false);
     setChessPiece(null);setChessPos(null);setChessPath([]);setChessWord("");setChessValidCells([]);setChessInvalid(null);setChessMoves(0);setChessGrid([]);setChessPlacing(false);
     setDailyMode(true);setDailyDate(playDate);setDailyThemeFound([]);setDailyThemeBonusGiven(false);
-    setSoloMode("hex");setGameTime(180);
+    setSoloMode("hex");setBoardShape("hex");setGameTime(180);
     setMode("solo");setCountdown(3);setState("countdown");
     window.scrollTo(0,0);
     if(lang==="fi"&&bg){fetch(`${SERVER_URL}/api/find-long-words`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({grid:bg,hex:true})}).then(r=>r.json()).then(({words})=>{if(words&&words.length>0)setValid(prev=>{const n=new Set(prev);words.forEach(w=>n.add(w));return n;});}).catch(()=>{});}
@@ -2691,7 +2706,7 @@ export default function Piilosana(){
     if(countdown<=0){
       if(mode==="public"){sounds.playGo();setState("play");return;}
       {const styles=["random","wave","rain","spiral","scatter"];setScrambleStyle(styles[Math.floor(Math.random()*styles.length)]);}
-      setSettledCells(new Set());setState("scramble");setScrambleStep(0);setScrambleGrid(soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(soloMode==="chess"?8:SZ,lang));return;
+      setSettledCells(new Set());setState("scramble");setScrambleStep(0);setScrambleGrid(boardShapeRef.current!=="hex"?randGridForShape(boardShapeRef.current):soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(soloMode==="chess"?8:SZ,lang));return;
     }
     sounds.playCountdown(countdown);
     const t=setTimeout(()=>setCountdown(c=>c-1),1000);
@@ -2702,10 +2717,11 @@ export default function Piilosana(){
   useEffect(()=>{
     if(state!=="scramble")return;
     const isHex=soloMode==="hex"||mode==="multi"||publicHex||(mode==="public");
-    const rows=isHex?HEX_ROWS:soloMode==="chess"?8:SZ;
-    const cols=isHex?HEX_COLS:soloMode==="chess"?8:SZ;
-    const totalCells=rows*cols;
-    const mkRand=()=>isHex?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(rows,lang,cols!==rows?cols:undefined);
+    const sb=boardShapeRef.current!=="hex"?getBoard(boardShapeRef.current):null;
+    const rows=sb?sb.rowLens.length:isHex?HEX_ROWS:soloMode==="chess"?8:SZ;
+    const cols=sb?sb.maxCols:isHex?HEX_COLS:soloMode==="chess"?8:SZ;
+    const totalCells=sb?sb.cells.length:rows*cols;
+    const mkRand=()=>sb?randGridForShape(sb.shape):isHex?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(rows,lang,cols!==rows?cols:undefined);
     const style=scrambleStyle;
 
     if(style==="random"){
@@ -2731,7 +2747,8 @@ export default function Piilosana(){
       const scrambleFrames=6;
       // Build settle order based on style
       const cellOrder=[];
-      for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)cellOrder.push({r,c,idx:r*cols+c});
+      if(sb)for(const cell of sb.cells)cellOrder.push({r:cell.r,c:cell.c,idx:cell.i}); // muotolaudat: lineaarinen indeksi
+      else for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)cellOrder.push({r,c,idx:r*cols+c});
       if(style==="wave"){
         cellOrder.sort((a,b)=>a.c-b.c||(a.c%2===0?a.r-b.r:b.r-a.r));
       }else if(style==="rain"){
@@ -2815,7 +2832,7 @@ export default function Piilosana(){
       // Phase 0: scramble letters rapidly
       if(progress<=0.25){
         scrambleCount++;
-        setScrambleGrid(soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(soloMode==="chess"?8:SZ,lang));
+        setScrambleGrid(boardShapeRef.current!=="hex"?randGridForShape(boardShapeRef.current):soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(soloMode==="chess"?8:SZ,lang));
         setScrambleStep(0);
       }else if(progress>0.25&&scrambleCount>0){
         // End scramble phase — clear it
@@ -2826,7 +2843,7 @@ export default function Piilosana(){
       if(progress>0.45){
         const eatProgress=(progress-0.45)/0.55; // 0 to 1
         const isHex=soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex);
-        const totalCells=isHex?HEX_ROWS*HEX_COLS:(soloMode==="chess"?8*8:SZ*SZ);
+        const totalCells=boardShapeRef.current!=="hex"?getBoard(boardShapeRef.current).cells.length:isHex?HEX_ROWS*HEX_COLS:(soloMode==="chess"?8*8:SZ*SZ);
         const cellCount=Math.min(totalCells, Math.floor(eatProgress * totalCells));
         setEatenCells(prev=>{
           const n=new Set(prev);
@@ -3139,6 +3156,16 @@ export default function Piilosana(){
   // Large diagonal dead zones prevent accidental cross-picks during diagonal swipes.
   const cellAt=useCallback((x,y,lastCell)=>{
     if(!gRef.current)return null;
+    if(boardShapeRef.current!=="hex"){
+      // Muotolaudat: muunnetaan ruutukoordinaatit laudan yksiköihin ja testataan monikulmiot.
+      const b=getBoard(boardShapeRef.current),rect=gRef.current.getBoundingClientRect();
+      if(!rect.width||!rect.height)return null;
+      const px=(x-rect.left)/rect.width*b.W,py=(y-rect.top)/rect.height*b.H;
+      const cell=b.cellAtPoint(px,py);if(!cell)return null;
+      // Vedon aikana vaaditaan osuma ruudun keskiosaan, ettei kulmien ohi vetäminen nappaa vääriä ruutuja
+      if(lastCell){const k=0.7;if(b.cellAtPoint(cell.cx+(px-cell.cx)/k,cell.cy+(py-cell.cy)/k)!==cell)return null;}
+      return{r:cell.r,c:cell.c};
+    }
     let best=null,bestDist=Infinity;
     for(const el of gRef.current.querySelectorAll("[data-c]")){
       const rect=el.getBoundingClientRect();
@@ -3161,7 +3188,7 @@ export default function Piilosana(){
     return best;
   },[]);
 
-  const isHexMode=soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex);
+  const isHexMode=soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex)||!!shapeBoard;
 
   const inPlayScreen=state==="play"||state==="ending"||state==="scramble";
   useEffect(()=>{
@@ -3191,8 +3218,8 @@ export default function Piilosana(){
     window.addEventListener("resize",fit);
     window.addEventListener("orientationchange",fit);
     return()=>{cancelAnimationFrame(raf);window.removeEventListener("resize",fit);window.removeEventListener("orientationchange",fit);};
-  },[inPlayScreen,isHexMode,found.length,isLarge]);
-  const adj=(a,b)=>isHexMode?adjHex(a,b):(Math.abs(a.r-b.r)<=1&&Math.abs(a.c-b.c)<=1&&!(a.r===b.r&&a.c===b.c));
+  },[inPlayScreen,isHexMode,found.length,isLarge,boardShape]);
+  const adj=(a,b)=>shapeBoard?shapeBoard.isAdjacent(a,b):isHexMode?adjHex(a,b):(Math.abs(a.r-b.r)<=1&&Math.abs(a.c-b.c)<=1&&!(a.r===b.r&&a.c===b.c));
   const isSel=(r,c)=>sel.some(s=>s.r===r&&s.c===c);
 
   // Submit word (handles both solo and multiplayer)
@@ -3501,7 +3528,8 @@ export default function Piilosana(){
       if(me&&me.isHost)setIsHost(true);
     });
     
-    newSocket.on("game_started",({grid:g,validWords:vw,gameMode:gm})=>{
+    newSocket.on("game_started",({grid:g,validWords:vw,gameMode:gm,shape})=>{
+      setBoardShape(shape&&gridFitsBoard(g,getBoard(shape))?shape:"hex");
       setCurrentMultiGrid(g);
       setValid(new Set(vw));
       setFound([]);
@@ -3608,16 +3636,18 @@ export default function Piilosana(){
     });
 
     // ---- PUBLIC GAME (PIILOSAUNA) events ----
-    newSocket.on("public_countdown",({grid:g,validWords:vw,roundNumber,hex})=>{
+    newSocket.on("public_countdown",({grid:g,validWords:vw,roundNumber,hex,shape})=>{
+      setBoardShape(shape&&gridFitsBoard(g,getBoard(shape))?shape:"hex");
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
       setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);setEnding(null);setDropKey(0);
       setTime(120);setPublicState("playing");setPublicCountdown(0);setPublicRound(roundNumber);
       setPublicRankings(null);setPublicHex(!!hex);startTimeRef.current=Date.now();
       // Scramble intro
       {const styles=["random","wave","rain","spiral","scatter"];setScrambleStyle(styles[Math.floor(Math.random()*styles.length)]);}
-      setSettledCells(new Set());setScrambleStep(0);setScrambleGrid(makeGrid(HEX_ROWS,lang,HEX_COLS));setState("scramble");
+      setSettledCells(new Set());setScrambleStep(0);setScrambleGrid(randGridForShape(boardShapeRef.current));setState("scramble");
     });
-    newSocket.on("public_join_midgame",({grid:g,validWords:vw,timeLeft:tl,roundNumber,hex})=>{
+    newSocket.on("public_join_midgame",({grid:g,validWords:vw,timeLeft:tl,roundNumber,hex,shape})=>{
+      setBoardShape(shape&&gridFitsBoard(g,getBoard(shape))?shape:"hex");
       setGrid(g);setValid(new Set(vw));setFound([]);setSel([]);setWord("");setScore(0);setMsg(null);
       setEatenCells(new Set());setCombo(0);setLastFoundTime(0);setPopups([]);setWordPopups([]);setEnding(null);setDropKey(0);
       setTime(tl);setPublicState("playing");setPublicRound(roundNumber);setPublicRankings(null);setState("play");setPublicHex(!!hex);
@@ -3734,7 +3764,8 @@ export default function Piilosana(){
   const refreshGrid=useCallback(()=>{
     if(state!=="play"||gameTime!==0)return;
     let bg=null,bw=new Set();
-    for(let i=0;i<50;i++){const g=soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(soloMode==="hex"?25:15))break;}
+    const sh=boardShapeRef.current;
+    for(let i=0;i<50;i++){const g=sh!=="hex"?makeBoardGrid(sh,()=>randLetterLang(lang)):soloMode==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeGrid(SZ,lang);const w=sh!=="hex"?findWordsOnBoard(g,trie,sh):(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(soloMode==="hex"?25:15))break;}
     setGrid(bg);setValid(bw);setFound([]);setSel([]);setWord("");setMsg(null);
     setDropKey(0);
   },[state,gameTime,trie,lang,soloMode]);
@@ -3752,10 +3783,15 @@ export default function Piilosana(){
     if(!socket||!isHost||players.length<2)return;
     const gm=selectedMode||gameMode;
     let bg=null,bw=new Set();
-    for(let i=0;i<50;i++){const g=makeGrid(SZ,lang),w=(soloMode==="hex"?findWordsHex:findWords)(g,trie);if(w.size>bw.size){bg=g;bw=w;}if(w.size>=15)break;}
+    // Klassinen moninpeli: isäntä arpoo laudan muodon. Battle (painovoima) pysyy vanhalla laudalla.
+    const shape=gm==="battle"?null:randomShape();
+    for(let i=0;i<50;i++){
+      const g=!shape?makeGrid(SZ,lang):shape==="hex"?makeGrid(HEX_ROWS,lang,HEX_COLS):makeBoardGrid(shape,()=>randLetterLang(lang));
+      const w=!shape?(soloMode==="hex"?findWordsHex:findWords)(g,trie):shape==="hex"?findWordsHex(g,trie):findWordsOnBoard(g,trie,shape);
+      if(w.size>bw.size){bg=g;bw=w;}if(w.size>=(shape?25:15))break;}
     setCurrentMultiGrid(bg);
     setGameMode(gm);
-    socket.emit("start_game",{grid:bg,validWords:Array.from(bw),gameMode:gm,gameTime});
+    socket.emit("start_game",{grid:bg,validWords:Array.from(bw),gameMode:gm,gameTime,shape:shape||undefined});
   },[socket,isHost,players,trie,gameMode,gameTime,lang]);
   
   const playAgain=useCallback(()=>{
@@ -4036,6 +4072,8 @@ export default function Piilosana(){
           letterMult={letterMult}
           onGameTimeChange={setGameTime}
           onLetterMultToggle={()=>setLetterMult(v=>!v)}
+          shape={practiceShape}
+          onShapeChange={(sh)=>{setPracticeShape(sh);try{localStorage.setItem("piilosana_shape",sh);}catch{}}}
           onStart={()=>{startSolo();setShowMenuOptions(false);}}
           onClose={()=>setShowMenuOptions(false)}
         />
@@ -4229,13 +4267,13 @@ export default function Piilosana(){
           .piilosana-title{font-size:22px!important;margin:4px 0!important;}
           .piilosana-grid{gap:4px!important;padding:5px!important;}
           .piilosana-hud{padding:3px 8px!important;}
-          .piilosana-found{max-height:70px!important;padding:4px!important;}
+          .piilosana-found{height:70px!important;padding:4px!important;}
         }
         @media(max-height:650px){
           .piilosana-title{font-size:18px!important;margin:2px 0!important;}
           .piilosana-grid{gap:3px!important;padding:4px!important;}
           .piilosana-hud{padding:2px 6px!important;}
-          .piilosana-found{max-height:50px!important;padding:3px!important;}
+          .piilosana-found{height:56px!important;padding:3px!important;}
         }
       `}</style>
 
@@ -4725,7 +4763,31 @@ export default function Piilosana(){
 
           {/* GRID – containerType antaa cqw-yksiköt kirjainkoolle */}
           <div style={{position:"relative",containerType:"inline-size"}}>
-            {(soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex))?(
+            {shapeBoard&&gridFitsBoard(mode==="multi"?currentMultiGrid:grid,shapeBoard)?(
+              <>
+              <ShapeBoard
+                board={shapeBoard}
+                grid={mode==="multi"?currentMultiGrid:grid}
+                gRef={gRef}
+                S={S}
+                isLight={S.flavor==="ivory"||S.flavor==="dream"}
+                sel={sel}
+                state={state}
+                eatenCells={eatenCells}
+                ending={ending}
+                scrambleGrid={scrambleGrid}
+                scrambleStep={scrambleStep}
+                settledCells={settledCells}
+                letterMult={letterMult}
+                letterColor={(l)=>letterColor(l,lang)}
+                letterValue={(l)=>getLetterValues(lang)[l]||1}
+                dropKey={dropKey}
+                onPointerDownAt={(x,y)=>{if(state!=="play")return;const cell=cellAt(x,y,null);if(cell)onDragStart(cell.r,cell.c);}}
+                onTouchMoveAt={(x,y)=>onDragMove(x,y)}
+              />
+              {state==="ending"&&<EndingOverlay ending={ending} progress={endingProgress} gridRect={true} lang={lang}/>}
+              </>
+            ):(soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex))?(
             <div ref={gRef}
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
               style={{padding:isLarge?"4px 0":"2px 0",background:"transparent",
@@ -4957,12 +5019,18 @@ export default function Piilosana(){
           </div>
 
           {state==="play"&&(
-            <div className="piilosana-found" style={{marginTop:isHexMode?"2px":"8px",padding:"4px 6px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,maxHeight:"100px",overflowY:"auto",borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022"}}>
-              <div style={{fontSize:"11px",color:S.textMuted,marginBottom:"2px"}}>{(gameMode==="battle"||(mode==="solo"&&(soloMode==="tetris"||soloMode==="rotate"||soloMode==="chess")))?`${t.found} (${found.length})`:`${t.found} (${found.length}/${valid.size}) ${valid.size>0?Math.round(found.length/valid.size*100):0}%`}</div>
+            <div className="piilosana-found" style={{marginTop:isHexMode?"2px":"8px",padding:"4px 6px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,height:"clamp(60px,13vh,104px)",flexShrink:0,boxSizing:"border-box",overflowY:"auto",borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022"}}>
+              <div style={{fontSize:"15px",fontWeight:"700",color:S.textSoft||S.textMuted,marginBottom:"4px",display:"flex",alignItems:"baseline",gap:"6px"}}>
+                <span style={{fontSize:"12px",fontWeight:"600",letterSpacing:"1px",textTransform:"uppercase",color:S.textMuted}}>{t.found}</span>
+                {(gameMode==="battle"||(mode==="solo"&&(soloMode==="tetris"||soloMode==="rotate"||soloMode==="chess")))
+                  ?<span style={{color:S.green,fontVariantNumeric:"tabular-nums"}}>{found.length}</span>
+                  :<><span style={{color:S.green,fontVariantNumeric:"tabular-nums"}}>{found.length}<span style={{color:S.textMuted,fontWeight:"600"}}> / {valid.size}</span></span>
+                    <span style={{fontSize:"12px",color:S.textMuted,fontWeight:"600"}}>{valid.size>0?Math.round(found.length/valid.size*100):0}%</span></>}
+              </div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"2px"}}>
                 {found.length===0?null:
-                  found.map((w,i)=>(
-                    <span key={i} style={{fontSize:"14px",background:S.dark,padding:"1px 3px",border:`1px solid ${wordColor(w.length)}44`,color:wordColor(w.length),animation:i===found.length-1?"pop 0.3s ease":"none"}}>
+                  [...found].reverse().map((w,i)=>(
+                    <span key={w} style={{fontSize:"14px",background:S.dark,padding:"1px 3px",border:`1px solid ${wordColor(w.length)}88`,color:wordColor(w.length),animation:i===0?"pop 0.3s ease":"none"}}>
                       {w.toUpperCase()} +{letterMult?ptsLetters(w,lang):pts(w.length)}
                     </span>
                   ))

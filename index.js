@@ -7,8 +7,9 @@ import { dirname, join } from 'path';
 import { Resend } from 'resend';
 import { OAuth2Client } from 'google-auth-library';
 import { hexNeighbors } from "./server/game/hex.js";
-import { GRID_SIZE, HEX_ROWS, HEX_COLS, makeGrid as makeGridPure } from "./server/game/grid.js";
+import { GRID_SIZE, HEX_ROWS, HEX_COLS, makeGrid as makeGridPure, randLetter as randLetterPure } from "./server/game/grid.js";
 import { findWords, findWordsHex } from "./server/game/validate.js";
+import { getBoard, gridFitsBoard, isShape, makeBoardGrid, findWordsOnBoard } from "./server/game/boards.js";
 import { initDb } from "./server/db.js";
 import { LANGS, getLang, FULL_WORDS_BUF, hasWordInBuf, bufHasPrefix } from "./server/words.js";
 import { attachScoresRoutes } from "./server/routes/scores.js";
@@ -25,6 +26,10 @@ import { requestId, accessLog, errorHandler } from "./server/middleware.js";
 // generateGoodGrid käyttää lang-koodia. Kääritään se siksi tähän adapteriin.
 function makeGrid(lang = 'fi', rows = GRID_SIZE, cols) {
   return makeGridPure(getLang(lang).letterWeights, rows, cols);
+}
+
+function randLetterFor(lang = 'fi') {
+  return randLetterPure(getLang(lang).letterWeights);
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -67,9 +72,15 @@ const PORT = process.env.PORT || 3001;
 
 function findLongWordsOnGrid(grid, buf, hex, minLen = 11, maxLen = 15) {
   if (!buf) return new Set();
-  const rows = grid.length, cols = grid[0].length, found = new Set();
+  const rows = grid.length, cols = Math.max(...grid.map((row) => row.length)), found = new Set();
+  // hex: boolean (vanha) tai laudan muodon nimi
+  const board = isShape(hex) && hex !== "hex" && hex !== "square" ? getBoard(hex) : null;
+  if (board && !gridFitsBoard(grid, board)) return found;
+  if (!board && grid.some((row) => row.length !== cols)) return found;
+  const useHex = hex === true || hex === "hex";
   function getNeighbors(r, c) {
-    if (hex) return hexNeighbors(r, c, rows, cols);
+    if (board) return board.neighborsOf(r, c);
+    if (useHex) return hexNeighbors(r, c, rows, cols);
     const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
     return dirs.map(([dr,dc]) => ({r:r+dr,c:c+dc})).filter(n => n.r>=0 && n.r<rows && n.c>=0 && n.c<cols);
   }
@@ -85,18 +96,21 @@ function findLongWordsOnGrid(grid, buf, hex, minLen = 11, maxLen = 15) {
     vis.delete(r * cols + c);
   }
   for (let r = 0; r < rows; r++)
-    for (let c = 0; c < cols; c++)
+    for (let c = 0; c < grid[r].length; c++)
       dfs(r, c, '', new Set());
   return found;
 }
 
+// hex: true/false (vanha kutsutapa) tai laudan muodon nimi ("hex", "square", "triangle", ...)
 function generateGoodGrid(lang = 'fi', hex = false) {
   const trie = getLang(lang).trie;
-  const wordFinder = hex ? findWordsHex : findWords;
-  const threshold = hex ? 25 : 15;
+  const board = isShape(hex) && hex !== "hex" && hex !== "square" ? getBoard(hex) : null;
+  const useHex = hex === true || hex === "hex";
+  const wordFinder = board ? ((g, t) => findWordsOnBoard(g, t, hex)) : useHex ? findWordsHex : findWords;
+  const threshold = board || useHex ? 25 : 15;
   let bestGrid = null, bestWords = new Set();
   for (let i = 0; i < 30; i++) {
-    const g = hex ? makeGrid(lang, HEX_ROWS, HEX_COLS) : makeGrid(lang, GRID_SIZE);
+    const g = board ? makeBoardGrid(hex, () => randLetterFor(lang)) : useHex ? makeGrid(lang, HEX_ROWS, HEX_COLS) : makeGrid(lang, GRID_SIZE);
     const w = wordFinder(g, trie);
     if (w.size > bestWords.size) { bestGrid = g; bestWords = w; }
     if (w.size >= threshold) break;

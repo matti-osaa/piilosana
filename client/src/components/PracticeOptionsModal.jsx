@@ -20,6 +20,8 @@
 //   onClose()   – sulje overlay
 
 import { GlossyButton, GLOSSY } from "./GlossyButton.jsx";
+import { ShapeIcon, SHAPE_NAMES } from "./ShapeBoard.jsx";
+import { SHAPES } from "../boards.js";
 
 export function PracticeOptionsModal({
   S,
@@ -30,6 +32,8 @@ export function PracticeOptionsModal({
   letterMult,
   onGameTimeChange,
   onLetterMultToggle,
+  shape = "random",
+  onShapeChange,
   onStart,
   onClose,
 }) {
@@ -164,6 +168,43 @@ export function PracticeOptionsModal({
               </button>
             </div>
           </div>
+
+          {/* Laudan muoto */}
+          {onShapeChange && (
+            <div style={{ marginBottom: "12px" }}>
+              <div style={{ fontSize: "13px", color: S.green, marginBottom: "6px" }}>
+                {lang === "en" ? "Board shape" : lang === "sv" ? "Brädets form" : "Laudan muoto"}
+                <span style={{ color: S.textMuted, marginLeft: "6px" }}>
+                  · {(SHAPE_NAMES[lang] || SHAPE_NAMES.fi)[shape]}
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "6px", justifyContent: "center", flexWrap: "wrap" }}>
+                {["random", ...SHAPES].map((sh) => {
+                  const active = shape === sh;
+                  return (
+                    <button
+                      key={sh}
+                      onClick={() => onShapeChange(sh)}
+                      aria-label={(SHAPE_NAMES[lang] || SHAPE_NAMES.fi)[sh]}
+                      title={(SHAPE_NAMES[lang] || SHAPE_NAMES.fi)[sh]}
+                      style={{
+                        background: active ? S.green : "transparent",
+                        border: `2px solid ${S.green}`,
+                        borderRadius: "8px",
+                        padding: "5px 7px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <ShapeIcon shape={sh} color={active ? S.bg : S.green} />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Kirjainkertoimet */}
           <div>

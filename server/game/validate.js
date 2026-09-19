@@ -6,6 +6,7 @@
 // (käytetään pitkien sanojen post-validointiin).
 
 import { hexNeighbors } from "./hex.js";
+import { getBoard, gridFitsBoard, isShape } from "./boards.js";
 
 const SQUARE_DIRS = [
   [-1, 0], [1, 0], [0, -1], [0, 1],
@@ -84,10 +85,15 @@ export function findWordsHex(grid, trie) {
  */
 export function canTraceWord(grid, word, hex = false) {
   const rows = grid.length;
-  const cols = grid[0].length;
+  const cols = Math.max(...grid.map((row) => row.length));
+  // hex voi olla boolean (vanha kutsutapa) tai laudan muodon nimi ("triangle", "star"...)
+  const board = isShape(hex) && hex !== "hex" && hex !== "square" ? getBoard(hex) : null;
+  if (board && !gridFitsBoard(grid, board)) return false;
+  const useHex = hex === true || hex === "hex";
 
   function neighbors(r, c) {
-    return hex ? hexNeighbors(r, c, rows, cols) : squareNeighbors(r, c, rows, cols);
+    if (board) return board.neighborsOf(r, c);
+    return useHex ? hexNeighbors(r, c, rows, cols) : squareNeighbors(r, c, rows, cols);
   }
 
   function dfs(idx, r, c, vis) {

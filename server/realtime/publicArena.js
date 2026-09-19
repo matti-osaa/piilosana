@@ -17,6 +17,7 @@
 
 import { getScoreForWord } from "../game/score.js";
 import { canTraceWord } from "../game/validate.js";
+import { randomShape } from "../game/boards.js";
 import { hasWordInBuf, FULL_WORDS_BUF } from "../words.js";
 import { submitScore } from "../db.js";
 
@@ -81,7 +82,10 @@ export function createPublicArenaManager({ io, generateGoodGrid }) {
       pg.nextRoundInterval = null;
     }
 
-    const { grid, validWords } = generateGoodGrid(lang, true); // hex-grid arenalle
+    // Joka kierrokselle arvotaan laudan muoto (kaikille pelaajille sama)
+    const shape = randomShape();
+    const { grid, validWords } = generateGoodGrid(lang, shape);
+    pg.shape = shape;
     pg.grid = grid;
     pg.validWords = validWords;
     pg.validWordsList = [...validWords];
@@ -98,7 +102,8 @@ export function createPublicArenaManager({ io, generateGoodGrid }) {
       grid,
       validWords: pg.validWordsList,
       roundNumber: pg.roundNumber,
-      hex: true,
+      hex: shape === "hex",
+      shape,
     });
 
     pg.countdownTimer = setTimeout(() => {
@@ -211,14 +216,16 @@ export function createPublicArenaManager({ io, generateGoodGrid }) {
         validWords: pg.validWordsList,
         timeLeft: pg.timeLeft,
         roundNumber: pg.roundNumber,
-        hex: true,
+        hex: (pg.shape || "hex") === "hex",
+        shape: pg.shape || "hex",
       });
     } else if (pg.state === "countdown") {
       socket.emit("public_countdown", {
         grid: pg.grid,
         validWords: pg.validWordsList,
         roundNumber: pg.roundNumber,
-        hex: true,
+        hex: (pg.shape || "hex") === "hex",
+        shape: pg.shape || "hex",
       });
     } else {
       socket.emit("public_waiting", {
@@ -249,7 +256,7 @@ export function createPublicArenaManager({ io, generateGoodGrid }) {
         lang === "fi"
         && normalized.length > 8
         && hasWordInBuf(FULL_WORDS_BUF, normalized)
-        && canTraceWord(pg.grid, normalized, true)
+        && canTraceWord(pg.grid, normalized, pg.shape || "hex")
       ) {
         pg.validWords.add(normalized);
         pg.validWordsList.push(normalized);

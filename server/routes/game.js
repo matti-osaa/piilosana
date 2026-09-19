@@ -20,12 +20,13 @@ export function attachGameRoutes(app, ctx) {
 
   // Etsi pitkät sanat (11+ kirjainta) annetulta hex-gridiltä – solo modea varten
   app.post("/api/find-long-words", (req, res) => {
-    const { grid, hex } = req.body;
+    const { grid, hex, shape } = req.body;
     if (!grid || !Array.isArray(grid) || !FULL_WORDS_BUF) {
       return res.json({ words: [] });
     }
     try {
-      const longWords = findLongWordsOnGrid(grid, FULL_WORDS_BUF, !!hex);
+      // shape (laudan muoto) ohittaa vanhan hex-booleanin
+      const longWords = findLongWordsOnGrid(grid, FULL_WORDS_BUF, typeof shape === "string" ? shape : !!hex);
       return res.json({ words: [...longWords] });
     } catch (e) {
       return res.json({ words: [] });
