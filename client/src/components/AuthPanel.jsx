@@ -124,21 +124,48 @@ export function AuthPanel({
 }) {
   const txt = TEXTS[lang] || TEXTS.fi;
 
+  // Ajatuskupla: pehmeä pilvimäinen laatikko, jonka alareunasta lähtee
+  // pienenevät kuplat kohti footerin kirjautumisnappia.
+  const bubbleBg = S.cell || S.dark;
+  const bubbleShadow = "0 10px 28px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.12)";
+  const dot = (size, left, bottom) => ({
+    position: "absolute",
+    width: size,
+    height: size,
+    left,
+    bottom,
+    borderRadius: "50%",
+    background: bubbleBg,
+    border: `1.5px solid ${S.border}`,
+    boxShadow: "0 3px 8px rgba(0,0,0,0.18)",
+  });
+
   return (
     <div
       style={{
         width: "100%",
         maxWidth: "500px",
-        padding: "18px",
-        border: `2px solid ${S.yellow}`,
-        background: S.dark,
-        boxShadow: `0 0 20px ${S.yellow}33`,
-        animation: "fadeIn 0.3s ease",
-        marginBottom: "8px",
+        margin: "22px auto 34px",
+        animation: "bubbleIn 0.35s ease",
+        transformOrigin: "58% 100%",
         zIndex: 100,
         position: "relative",
+        textAlign: "left",
       }}
     >
+      <span aria-hidden="true" style={dot("20px", "56%", "-16px")} />
+      <span aria-hidden="true" style={dot("12px", "59%", "-30px")} />
+      <span aria-hidden="true" style={dot("7px", "61%", "-40px")} />
+      <div
+        style={{
+          position: "relative",
+          padding: "22px 22px 20px",
+          borderRadius: "38px 44px 40px 46px / 42px 38px 46px 40px",
+          border: `1.5px solid ${S.border}`,
+          background: bubbleBg,
+          boxShadow: bubbleShadow,
+        }}
+      >
       {authUser ? (
         <LoggedInView
           S={S}
@@ -171,6 +198,7 @@ export function AuthPanel({
           onClose={onClose}
         />
       )}
+      </div>
     </div>
   );
 }

@@ -3986,6 +3986,30 @@ export default function Piilosana(){
         />
       )}
 
+      {/* AUTH PANEL – ajatuskupla pelinappien alla, footerin kirjautumisnapin yläpuolella */}
+      {showAuth&&(
+        <AuthPanel
+          S={S}
+          t={t}
+          lang={lang}
+          Icon={Icon}
+          authUser={authUser}
+          authMode={authMode}
+          authError={authError}
+          authSuccess={authSuccess}
+          authLoading={authLoading}
+          googleClientId={googleClientId}
+          onModeChange={(m)=>{setAuthMode(m);setAuthError("");setAuthSuccess("");}}
+          onLogin={doLogin}
+          onRegister={doRegister}
+          onForgotPassword={doForgotPassword}
+          onChangePassword={doChangePassword}
+          onGoogleLogin={doGoogleLogin}
+          onLogout={doLogout}
+          onClose={()=>setShowAuth(false)}
+        />
+      )}
+
       {/* ===== Footer ===== */}
       <MenuFooter
         S={S}
@@ -4236,30 +4260,6 @@ export default function Piilosana(){
         />
       )}
 
-
-      {/* AUTH PANEL */}
-      {showAuth&&(
-        <AuthPanel
-          S={S}
-          t={t}
-          lang={lang}
-          Icon={Icon}
-          authUser={authUser}
-          authMode={authMode}
-          authError={authError}
-          authSuccess={authSuccess}
-          authLoading={authLoading}
-          googleClientId={googleClientId}
-          onModeChange={(m)=>{setAuthMode(m);setAuthError("");setAuthSuccess("");}}
-          onLogin={doLogin}
-          onRegister={doRegister}
-          onForgotPassword={doForgotPassword}
-          onChangePassword={doChangePassword}
-          onGoogleLogin={doGoogleLogin}
-          onLogout={doLogout}
-          onClose={()=>setShowAuth(false)}
-        />
-      )}
 
       {/* First-time auth prompt */}
       {mode===null&&showFirstTimeAuth&&!showTutorial&&!authUser&&!showAuth&&(
