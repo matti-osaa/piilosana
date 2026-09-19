@@ -2143,6 +2143,7 @@ export default function Piilosana(){
     try{const s=localStorage.getItem("piilosana_auth");return s?JSON.parse(s):null;}catch{return null;}
   });
   const[showAuth,setShowAuth]=useState(false);
+  const[firstTimePhase,setFirstTimePhase]=useState("wait"); // "wait" | "in" | "out"
   const[authMode,setAuthMode]=useState("login"); // "login", "register", or "forgot"
   const[authError,setAuthError]=useState("");
   const[authLoading,setAuthLoading]=useState(false);
@@ -3842,6 +3843,59 @@ export default function Piilosana(){
   // Render multiplayer screens
   const S=theme;
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
+  useEffect(()=>{
+    if(!(mode===null&&showFirstTimeAuth&&!showTutorial&&!authUser&&!showAuth)){setFirstTimePhase("wait");return;}
+    const t1=setTimeout(()=>setFirstTimePhase("in"),1500);
+    const t2=setTimeout(()=>setFirstTimePhase("out"),11500);
+    const t3=setTimeout(()=>{setShowFirstTimeAuth(false);sessionStorage.setItem("piilosana_auth_dismissed","1");},12300);
+    return()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);};
+  },[mode,showFirstTimeAuth,showTutorial,authUser,showAuth]);
+  // Kirjautumiskuplat: molemmat ponnahtavat footerin kirjautumiskuvakkeesta.
+  // - showAuth: varsinainen kirjautumislomake ajatuskuplana
+  // - ensikerran vinkki: pieni kupla, joka tulee esiin ja haihtuu itsestään
+  const firstTimeBubbleVisible=mode===null&&showFirstTimeAuth&&!showTutorial&&!authUser&&!showAuth;
+  const authBubbleNode=showAuth?(
+        <AuthPanel
+          S={S}
+          t={t}
+          lang={lang}
+          Icon={Icon}
+          authUser={authUser}
+          authMode={authMode}
+          authError={authError}
+          authSuccess={authSuccess}
+          authLoading={authLoading}
+          googleClientId={googleClientId}
+          onModeChange={(m)=>{setAuthMode(m);setAuthError("");setAuthSuccess("");}}
+          onLogin={doLogin}
+          onRegister={doRegister}
+          onForgotPassword={doForgotPassword}
+          onChangePassword={doChangePassword}
+          onGoogleLogin={doGoogleLogin}
+          onLogout={doLogout}
+          onClose={()=>setShowAuth(false)}
+        />
+  ):(firstTimeBubbleVisible&&firstTimePhase!=="wait")?(
+    <div style={{width:"min(260px,80vw)",padding:"14px 16px 12px",borderRadius:"30px 34px 32px 36px / 34px 30px 36px 32px",
+      border:`2px solid ${S.yellow}`,background:S.cell||S.dark,boxShadow:"0 10px 26px rgba(0,0,0,0.3)",textAlign:"center",
+      animation:firstTimePhase==="out"?"authBubbleOut 0.7s ease forwards":"authBubbleIn 0.45s ease",transformOrigin:"50% 120%",position:"relative"}}>
+      <span aria-hidden="true" style={{position:"absolute",width:"16px",height:"16px",borderRadius:"50%",left:"calc(50% - 8px)",bottom:"-13px",background:S.cell||S.dark,border:`2px solid ${S.yellow}`}}/>
+      <span aria-hidden="true" style={{position:"absolute",width:"9px",height:"9px",borderRadius:"50%",left:"calc(50% - 4px)",bottom:"-25px",background:S.cell||S.dark,border:`2px solid ${S.yellow}`}}/>
+      <button aria-label="close" onClick={()=>{setShowFirstTimeAuth(false);sessionStorage.setItem("piilosana_auth_dismissed","1");}}
+        style={{position:"absolute",top:"6px",right:"12px",background:"transparent",border:"none",color:S.textMuted,fontSize:"14px",cursor:"pointer",padding:"4px"}}>✕</button>
+      <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"700",color:S.yellow,marginBottom:"4px"}}>
+        {lang==="en"?"Save your nickname?":lang==="sv"?"Spara ditt smeknamn?":"Tallenna nimimerkkisi?"}
+      </div>
+      <div style={{fontFamily:S.font,fontSize:"12px",color:S.textSoft||S.textMuted,marginBottom:"10px",lineHeight:"1.5"}}>
+        {lang==="en"?"Create an account to save your progress":lang==="sv"?"Skapa ett konto för att spara dina framsteg":"Luo tunnus – nimimerkkisi ja saavutuksesi tallentuvat"}
+      </div>
+      <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
+        <GlossyButton S={S} size="sm" width="auto" color={GLOSSY.orange} label={lang==="en"?"CREATE":lang==="sv"?"SKAPA":"LUO TUNNUS"} onClick={()=>{setShowAuth(true);setAuthMode("register");setShowFirstTimeAuth(false);}}/>
+        <GlossyButton S={S} size="sm" width="auto" color={GLOSSY.gray} label={lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"} onClick={()=>{setShowAuth(true);setAuthMode("login");setShowFirstTimeAuth(false);}}/>
+      </div>
+    </div>
+  ):null;
+
   const modeSelectJSX=(
     <div style={{textAlign:"center",marginTop:"16px",animation:"fadeIn 0.5s ease",maxWidth:"420px",width:"100%",position:"relative"}}>
 
@@ -3987,30 +4041,6 @@ export default function Piilosana(){
         />
       )}
 
-      {/* AUTH PANEL – ajatuskupla pelinappien alla, footerin kirjautumisnapin yläpuolella */}
-      {showAuth&&(
-        <AuthPanel
-          S={S}
-          t={t}
-          lang={lang}
-          Icon={Icon}
-          authUser={authUser}
-          authMode={authMode}
-          authError={authError}
-          authSuccess={authSuccess}
-          authLoading={authLoading}
-          googleClientId={googleClientId}
-          onModeChange={(m)=>{setAuthMode(m);setAuthError("");setAuthSuccess("");}}
-          onLogin={doLogin}
-          onRegister={doRegister}
-          onForgotPassword={doForgotPassword}
-          onChangePassword={doChangePassword}
-          onGoogleLogin={doGoogleLogin}
-          onLogout={doLogout}
-          onClose={()=>setShowAuth(false)}
-        />
-      )}
-
       {/* ===== Footer ===== */}
       <MenuFooter
         S={S}
@@ -4026,7 +4056,8 @@ export default function Piilosana(){
         wordCount={WORDS_SET.size}
         wordsLoaded={currentLangLoaded}
         onShowAchievements={()=>setShowAchievements(true)}
-        onShowAuth={()=>{setShowAuth(true);setShowFirstTimeAuth(false);}}
+        onShowAuth={()=>{setShowAuth(v=>!v);setShowFirstTimeAuth(false);}}
+        authBubble={authBubbleNode}
         onShowInflection={()=>setShowInflection(true)}
         onShowHelp={()=>setShowHelp(true)}
         onShowWordInfo={()=>setShowWordInfo(true)}
@@ -4145,6 +4176,7 @@ export default function Piilosana(){
         @keyframes bubbleIn{0%{opacity:0;transform:scale(0.3) translateY(10px)}40%{opacity:1;transform:scale(1.08) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
         @keyframes emojiBubbleIn{0%{opacity:0;transform:translateY(-6px) scale(0.85)}100%{opacity:1;transform:translateY(0) scale(1)}}
         @keyframes emojiBubbleOut{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-14px) scale(0.95)}}
+        @keyframes authBubbleOut{0%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:0;transform:scale(0.6) translateY(18px)}}
         @keyframes authBubbleIn{0%{opacity:0;transform:scale(0.5) translateY(16px)}60%{opacity:1;transform:scale(1.03) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
         @keyframes bubbleOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.6) translateY(-10px)}}
         @keyframes chatSlideIn{0%{opacity:0;transform:translateX(-30px) scale(0.7)}30%{opacity:1;transform:translateX(4px) scale(1.04)}60%{transform:translateX(-2px) scale(0.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
@@ -4264,32 +4296,6 @@ export default function Piilosana(){
         />
       )}
 
-
-      {/* First-time auth prompt */}
-      {mode===null&&showFirstTimeAuth&&!showTutorial&&!authUser&&!showAuth&&(
-        <div style={{width:"100%",maxWidth:"500px",padding:"12px",border:`2px solid ${S.yellow}`,background:S.dark,
-          boxShadow:`0 0 12px ${S.yellow}22`,animation:"fadeIn 0.5s ease",marginBottom:"8px",textAlign:"center"}}>
-          <div style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,marginBottom:"8px",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>
-            <Icon icon="person" color={S.yellow} size={2}/>
-            {lang==="en"?"Save your nickname?":lang==="sv"?"Spara ditt smeknamn?":"Tallenna nimimerkkisi?"}
-          </div>
-          <div style={{fontFamily:S.font,fontSize:"13px",color:S.textMuted,marginBottom:"10px",lineHeight:"1.6"}}>
-            {lang==="en"?"Create an account to save your progress":lang==="sv"?"Skapa ett konto för att spara dina framsteg":"Luo tunnus – nimimerkkisi ja saavutuksesi tallentuvat"}
-          </div>
-          <div style={{display:"flex",gap:"8px",justifyContent:"center"}}>
-            <button onClick={()=>{setShowAuth(true);setAuthMode("register");setShowFirstTimeAuth(false);}}
-              style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"6px 16px",cursor:"pointer",boxShadow:"2px 2px 0 #cc8800"}}>
-              {lang==="en"?"CREATE ACCOUNT":lang==="sv"?"SKAPA KONTO":"LUO TUNNUS"}
-            </button>
-            <button onClick={()=>{setShowAuth(true);setAuthMode("login");setShowFirstTimeAuth(false);}}
-              style={{fontFamily:S.font,fontSize:"13px",color:S.yellow,background:"transparent",border:`1px solid ${S.yellow}`,padding:"6px 16px",cursor:"pointer"}}>
-              {lang==="en"?"LOG IN":lang==="sv"?"LOGGA IN":"KIRJAUDU"}
-            </button>
-            <button onClick={()=>{setShowFirstTimeAuth(false);sessionStorage.setItem("piilosana_auth_dismissed","1");}}
-              style={{fontFamily:S.font,fontSize:"14px",color:S.textMuted,background:"transparent",border:`2px solid ${S.border}`,padding:"4px 12px",cursor:"pointer"}}>✕</button>
-          </div>
-        </div>
-      )}
 
       {/* MENU */}
       {/* MODE SELECT */}

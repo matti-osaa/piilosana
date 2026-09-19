@@ -145,19 +145,18 @@ export function AuthPanel({
   return (
     <div
       style={{
-        width: "100%",
-        maxWidth: "500px",
-        margin: "22px auto 34px",
+        width: "min(340px, 90vw)",
+        margin: 0,
         animation: "authBubbleIn 0.35s ease",
-        transformOrigin: "58% 100%",
+        transformOrigin: "58% 115%",
         zIndex: 100,
         position: "relative",
         textAlign: "left",
       }}
     >
-      <span aria-hidden="true" style={dot("20px", "56%", "-16px")} />
-      <span aria-hidden="true" style={dot("12px", "59%", "-30px")} />
-      <span aria-hidden="true" style={dot("7px", "61%", "-40px")} />
+      <span aria-hidden="true" style={dot("18px", "calc(58% - 9px)", "-14px")} />
+      <span aria-hidden="true" style={dot("11px", "calc(58% - 5px)", "-25px")} />
+      <span aria-hidden="true" style={dot("6px", "calc(58% - 3px)", "-33px")} />
       <div
         style={{
           position: "relative",

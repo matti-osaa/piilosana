@@ -70,6 +70,7 @@ export function MenuFooter({
   wordsLoaded,
   onShowAchievements,
   onShowAuth,
+  authBubble,
   onShowInflection,
   onShowHelp,
   onShowWordInfo,
@@ -115,6 +116,21 @@ export function MenuFooter({
           )}
         </button>
 
+        {/* Kirjautumisnappi + siitä ponnahtava ajatuskupla */}
+        <div style={{ position: "relative", display: "flex" }}>
+          {authBubble && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: "calc(100% + 30px)",
+                left: "50%",
+                transform: "translateX(-58%)",
+                zIndex: 120,
+              }}
+            >
+              {authBubble}
+            </div>
+          )}
         <button
           onClick={onShowAuth}
           style={{
@@ -136,6 +152,7 @@ export function MenuFooter({
           <Icon icon="person" color={authUser ? S.green : S.textMuted} size={2} />
           {authUser && <span style={{ fontSize: "12px" }}>{authUser.nickname}</span>}
         </button>
+        </div>
       </div>
 
       {/* Sanamäärä-info */}
