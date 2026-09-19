@@ -13,6 +13,7 @@
 //   onShare        klikkaus jaa-napille
 //   shareMsg       "Kopioitu!"-tyyppinen status tai tyhjä → näyttää default
 
+import { GlossyButton, GLOSSY } from "./GlossyButton.jsx";
 import {
   useDailyPercentile,
   tierForPercentile,
@@ -106,23 +107,9 @@ export function DailyEndResult({
         </div>
       )}
 
-      <button
-        onClick={onShare}
-        style={{
-          fontFamily: S.font,
-          fontSize: "15px",
-          color: "#2a2000",
-          background: `linear-gradient(135deg,${yellow},#E6B800)`,
-          border: "none",
-          padding: "10px 24px",
-          cursor: "pointer",
-          borderRadius: "10px",
-          fontWeight: "700",
-          boxShadow: `0 4px 12px ${yellow}44`,
-        }}
-      >
-        {shareMsg || t.dailyShare}
-      </button>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <GlossyButton S={S} size="md" width="auto" color={GLOSSY.yellow} label={shareMsg || t.dailyShare} onClick={onShare} />
+      </div>
     </div>
   );
 }

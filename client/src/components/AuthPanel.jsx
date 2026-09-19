@@ -102,6 +102,8 @@ const TEXTS = {
   },
 };
 
+import { GlossyButton, GLOSSY } from "./GlossyButton.jsx";
+
 export function AuthPanel({
   S,
   t,
@@ -146,7 +148,7 @@ export function AuthPanel({
         width: "100%",
         maxWidth: "500px",
         margin: "22px auto 34px",
-        animation: "bubbleIn 0.35s ease",
+        animation: "authBubbleIn 0.35s ease",
         transformOrigin: "58% 100%",
         zIndex: 100,
         position: "relative",
@@ -605,23 +607,14 @@ function ModeButton({ S, active, onClick, children }) {
 
 function SubmitButton({ S, loading, children }) {
   return (
-    <button
+    <GlossyButton
+      S={S}
       type="submit"
+      size="md"
+      color={GLOSSY.orange}
       disabled={loading}
-      style={{
-        fontFamily: S.font,
-        fontSize: "13px",
-        color: S.bg,
-        background: S.yellow,
-        border: "none",
-        padding: "8px 20px",
-        cursor: "pointer",
-        boxShadow: "3px 3px 0 #cc8800",
-        width: "100%",
-      }}
-    >
-      {loading ? "..." : children}
-    </button>
+      label={loading ? "..." : children}
+    />
   );
 }
 

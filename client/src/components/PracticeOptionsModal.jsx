@@ -19,6 +19,8 @@
 //   onStart()   – käynnistää pelin (App.jsx hoitaa start + sulje)
 //   onClose()   – sulje overlay
 
+import { GlossyButton, GLOSSY } from "./GlossyButton.jsx";
+
 export function PracticeOptionsModal({
   S,
   t,
@@ -191,40 +193,7 @@ export function PracticeOptionsModal({
             flexShrink: 0,
           }}
         >
-          <button
-            onClick={onStart}
-            style={{
-              fontFamily: S.font,
-              fontSize: "16px",
-              color: S.bg,
-              background: S.green,
-              border: "none",
-              padding: "14px 32px",
-              cursor: "pointer",
-              boxShadow:
-                S.btnShadow !== "none" ? S.btnShadow : "3px 3px 0 #008844",
-              borderRadius: S.btnRadius,
-              width: "100%",
-              letterSpacing: "2px",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform =
-                S.btnShadow !== "none"
-                  ? "translateY(-2px)"
-                  : "translate(-2px,-2px)";
-              e.currentTarget.style.boxShadow =
-                S.btnShadow !== "none"
-                  ? "0 6px 20px #00000044"
-                  : "5px 5px 0 #008844";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "none";
-              e.currentTarget.style.boxShadow =
-                S.btnShadow !== "none" ? S.btnShadow : "3px 3px 0 #008844";
-            }}
-          >
-            ▶ {t.startGame || "ALOITA"}
-          </button>
+          <GlossyButton S={S} size="md" color={GLOSSY.green} label={`▶ ${t.startGame || "ALOITA"}`} onClick={onStart} />
         </div>
       </div>
     </div>

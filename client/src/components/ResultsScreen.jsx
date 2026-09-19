@@ -28,6 +28,9 @@
 //   onSwitchToSolo
 //   onReturnToMenu
 
+import { GlossyButton, GLOSSY } from "./GlossyButton.jsx";
+import { heroPanel, sectionPanel, wordChip, alpha } from "./panelStyle.js";
+
 export function ResultsScreen({
   S,
   t,
@@ -64,14 +67,8 @@ export function ResultsScreen({
         style={{
           position: "relative",
           zIndex: 1,
-          border: `1px solid ${isWinner ? S.yellow : S.green}44`,
-          padding: "24px",
-          boxShadow: `0 4px 24px ${isWinner ? S.yellow : S.green}22, 0 8px 32px #00000022`,
-          background: `${S.dark}f0`,
+          ...heroPanel(S, isWinner ? S.yellow : S.green),
           maxWidth: "600px",
-          borderRadius: "16px",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
         }}
       >
         {/* Mitali isolle 1.-3. sijalle */}
@@ -119,16 +116,16 @@ export function ResultsScreen({
                     ? S.yellow
                     : S.green,
                   padding: i === 0 ? "10px 12px" : "8px 12px",
-                  borderBottom: `1px solid ${S.border}33`,
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
                   background:
                     i === 0
-                      ? `${S.yellow}15`
+                      ? `${S.yellow}2a`
                       : isMe
-                      ? `${S.yellow}10`
+                      ? `${S.green}26`
                       : "transparent",
+                  border: i === 0 ? `1.5px solid ${S.yellow}` : isMe ? `1.5px solid ${S.green}` : "1.5px solid transparent",
                   animation: isMe || i === 0 ? "pop 0.4s ease" : "none",
                   borderRadius: "8px",
                   marginBottom: "2px",
@@ -178,8 +175,9 @@ export function ResultsScreen({
                   style={{
                     marginTop: "16px",
                     padding: "12px",
-                    border: `1px solid ${S.border}`,
-                    background: `${S.dark}ee`,
+                    border: `2px solid ${S.purple}`,
+                    background: S.dark,
+                    boxShadow: `4px 4px 0 ${alpha(S.purple, "55")}`,
                     textAlign: "left",
                     animation: "fadeIn 0.8s ease",
                     borderRadius: "12px",
@@ -210,10 +208,7 @@ export function ResultsScreen({
                           onClick={(e) => showDef(w, e)}
                           style={{
                             fontSize: "14px",
-                            background: S.dark,
-                            padding: "2px 4px",
-                            border: `1px solid ${wordColor(w.length)}44`,
-                            color: wordColor(w.length),
+                            ...wordChip(wordColor(w.length)),
                             cursor: DEFS && DEFS[w.toLowerCase()] ? "pointer" : "default",
                             textDecoration: DEFS && DEFS[w.toLowerCase()] ? "underline dotted" : "none",
                             textUnderlineOffset: "3px",
@@ -249,8 +244,9 @@ export function ResultsScreen({
                     style={{
                       marginTop: "16px",
                       padding: "12px",
-                      border: `1px solid ${S.border}`,
-                      background: `${S.dark}ee`,
+                      border: `2px solid ${S.green}`,
+                      background: S.dark,
+                      boxShadow: `4px 4px 0 ${alpha(S.green, "55")}`,
                       textAlign: "left",
                       animation: "fadeIn 0.8s ease",
                       borderRadius: "12px",
@@ -277,10 +273,7 @@ export function ResultsScreen({
                             onClick={(e) => showDef(w, e)}
                             style={{
                               fontSize: "14px",
-                              background: S.dark,
-                              padding: "2px 4px",
-                              border: `1px solid ${wordColor(w.length)}44`,
-                              color: wordColor(w.length),
+                              ...wordChip(wordColor(w.length)),
                               cursor: DEFS && DEFS[w.toLowerCase()] ? "pointer" : "default",
                               textDecoration: DEFS && DEFS[w.toLowerCase()] ? "underline dotted" : "none",
                               textUnderlineOffset: "3px",
@@ -300,8 +293,9 @@ export function ResultsScreen({
                     style={{
                       marginTop: "10px",
                       padding: "12px",
-                      border: `1px solid ${S.border}`,
-                      background: `${S.dark}ee`,
+                      border: `2px solid ${"#ff5a5a"}`,
+                      background: S.dark,
+                      boxShadow: `4px 4px 0 ${alpha("#ff5a5a", "55")}`,
                       textAlign: "left",
                       maxHeight: "180px",
                       overflowY: "auto",
@@ -326,10 +320,7 @@ export function ResultsScreen({
                           onClick={(e) => showDef(w, e)}
                           style={{
                             fontSize: "14px",
-                            background: S.dark,
-                            padding: "2px 4px",
-                            border: "1px solid #ff444444",
-                            color: "#ff6666",
+                            ...wordChip("#ff5a5a"),
                             cursor: DEFS && DEFS[w.toLowerCase()] ? "pointer" : "default",
                             textDecoration: DEFS && DEFS[w.toLowerCase()] ? "underline dotted" : "none",
                             textUnderlineOffset: "3px",
@@ -363,64 +354,15 @@ export function ResultsScreen({
             marginTop: "16px",
             display: "flex",
             flexDirection: "column",
-            gap: "8px",
+            gap: "10px",
             alignItems: "center",
           }}
         >
           {isHost && (
-            <button
-              onClick={onPlayAgain}
-              style={{
-                fontFamily: S.font,
-                fontSize: "15px",
-                color: S.bg,
-                background: S.green,
-                border: "none",
-                padding: "12px 20px",
-                cursor: "pointer",
-                width: "280px",
-                borderRadius: "12px",
-                boxShadow: `0 4px 12px ${S.green}33`,
-                fontWeight: "600",
-              }}
-            >
-              {t.newCustom}
-            </button>
+            <GlossyButton S={S} size="md" width="280px" color={GLOSSY.green} label={t.newCustom} onClick={onPlayAgain} />
           )}
-          <button
-            onClick={onSwitchToSolo}
-            style={{
-              fontFamily: S.font,
-              fontSize: "15px",
-              color: S.bg,
-              background: S.yellow,
-              border: "none",
-              padding: "12px 20px",
-              cursor: "pointer",
-              width: "280px",
-              borderRadius: "12px",
-              boxShadow: `0 4px 12px ${S.yellow}33`,
-              fontWeight: "600",
-            }}
-          >
-            {t.practice}
-          </button>
-          <button
-            onClick={onReturnToMenu}
-            style={{
-              fontFamily: S.font,
-              fontSize: "13px",
-              color: S.green,
-              border: `1px solid ${S.green}44`,
-              background: "transparent",
-              padding: "10px 20px",
-              cursor: "pointer",
-              width: "280px",
-              borderRadius: "10px",
-            }}
-          >
-            {t.menu}
-          </button>
+          <GlossyButton S={S} size="md" width="280px" color={GLOSSY.blue} label={t.practice} onClick={onSwitchToSolo} />
+          <GlossyButton S={S} size="sm" width="280px" color={GLOSSY.gray} label={t.menu} onClick={onReturnToMenu} />
         </div>
       </div>
     </div>

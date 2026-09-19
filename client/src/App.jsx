@@ -15,6 +15,7 @@ import { MenuFooter } from "./components/MenuFooter.jsx";
 import { PracticeOptionsModal } from "./components/PracticeOptionsModal.jsx";
 import { MenuButton } from "./components/MenuButton.jsx";
 import { GlossyButton, GLOSSY } from "./components/GlossyButton.jsx";
+import { heroPanel, sectionPanel, sectionTitle, wordChip } from "./components/panelStyle.js";
 import { ResultsScreen as ResultsScreenView } from "./components/ResultsScreen.jsx";
 import { HelpModal } from "./components/HelpModal.jsx";
 import { InflectionModal } from "./components/InflectionModal.jsx";
@@ -2022,8 +2023,8 @@ function HallOfFame({gameMode,gameTime,currentScore,S,lang}){
   const hofLoading=lang==="en"?"Loading...":lang==="sv"?"Laddar...":"Ladataan...";
   const hofEmpty=lang==="en"?"No results yet":lang==="sv"?"Inga resultat ännu":"Ei tuloksia vielä";
   return(
-    <div style={{border:`1px solid ${S.border}`,padding:"14px",background:`${S.dark}ee`,marginTop:"12px",animation:"fadeIn 0.8s ease",borderRadius:"12px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
-      <div style={{fontSize:"14px",color:S.yellow,marginBottom:"8px",fontWeight:"bold",letterSpacing:"0.5px",display:"flex",alignItems:"center",gap:"6px"}}><PixelFlag lang={lang||"fi"} size={2}/>{hofTitle} <span style={{fontWeight:"normal",fontSize:"12px",color:S.textMuted}}>({label} {timeLabel})</span></div>
+    <div style={{...sectionPanel(S,S.yellow),marginTop:"14px",textAlign:"left",animation:"fadeIn 0.8s ease"}}>
+      <div style={{...sectionTitle(S.yellow),display:"flex",alignItems:"center",gap:"6px"}}><PixelFlag lang={lang||"fi"} size={2}/>{hofTitle} <span style={{fontWeight:"normal",fontSize:"12px",color:S.textMuted}}>({label} {timeLabel})</span></div>
       {loading?<div style={{fontSize:"13px",color:S.textMuted,textAlign:"center"}}>{hofLoading}</div>:
       !scores||scores.length===0?<div style={{fontSize:"13px",color:S.textMuted,textAlign:"center"}}>{hofEmpty}</div>:
       <div style={{display:"flex",flexDirection:"column",gap:"2px"}}>
@@ -4142,6 +4143,9 @@ export default function Piilosana(){
         @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         @keyframes slideInLeft{0%{transform:translateX(-100%);opacity:0}100%{transform:translateX(0);opacity:1}}
         @keyframes bubbleIn{0%{opacity:0;transform:scale(0.3) translateY(10px)}40%{opacity:1;transform:scale(1.08) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+        @keyframes emojiBubbleIn{0%{opacity:0;transform:translateY(-6px) scale(0.85)}100%{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes emojiBubbleOut{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-14px) scale(0.95)}}
+        @keyframes authBubbleIn{0%{opacity:0;transform:scale(0.5) translateY(16px)}60%{opacity:1;transform:scale(1.03) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
         @keyframes bubbleOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.6) translateY(-10px)}}
         @keyframes chatSlideIn{0%{opacity:0;transform:translateX(-30px) scale(0.7)}30%{opacity:1;transform:translateX(4px) scale(1.04)}60%{transform:translateX(-2px) scale(0.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
         @keyframes chatFadeOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.92);max-height:0;margin:0;padding:0}}
@@ -4209,12 +4213,12 @@ export default function Piilosana(){
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
         <TitleDemo active={true} lang={lang} onGearClick={()=>setShowHamburger(true)} showBubble={mode!==null&&settingsBubble} bubbleFading={bubbleFading} hideGear={mode===null} theme={S}/>
       ):(
-        <div style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%",maxWidth:"600px",margin:"6px 0",position:"relative"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%",maxWidth:(state==="play"||state==="ending"||state==="scramble")?`${playMaxWidth}px`:"600px",margin:"6px 0",position:"relative",boxSizing:"border-box"}}>
           {(state==="play"||state==="ending"||state==="scramble")&&gameTime!==0&&(
-            <span style={{position:"absolute",left:"4px",fontSize:"18px",fontWeight:"700",color:time<=15?S.red:time<=30?S.yellow:S.green,fontVariantNumeric:"tabular-nums",fontFamily:S.font}}>{fmt(time)}</span>
+            <span style={{position:"absolute",left:"2px",fontSize:"18px",fontWeight:"700",color:time<=15?S.red:time<=30?S.yellow:S.green,fontVariantNumeric:"tabular-nums",fontFamily:S.font}}>{fmt(time)}</span>
           )}
           {(state==="play"||state==="ending"||state==="scramble")&&gameTime===0&&(
-            <span style={{position:"absolute",left:"4px",fontSize:"14px",fontWeight:"700",color:"#44ddff",fontFamily:S.font}}>{found.length} {t.words}</span>
+            <span style={{position:"absolute",left:"2px",fontSize:"14px",fontWeight:"700",color:"#44ddff",fontFamily:S.font}}>{found.length} {t.words}</span>
           )}
           <h1 className="piilosana-title" style={{fontSize:"28px",letterSpacing:"4px",margin:0,display:"flex",justifyContent:"center",alignItems:"center",gap:"2px",
             animation:state==="play"&&time<=15&&gameTime!==0?"pulse 0.5s infinite":"none"}}>
@@ -4225,7 +4229,7 @@ export default function Piilosana(){
             {!currentLangLoaded&&<span style={{fontSize:"10px",color:S.green,marginLeft:"6px",animation:"pulse 1s ease-in-out infinite",display:"inline-flex",alignItems:"center",gap:"2px"}}><span style={{width:"6px",height:"6px",borderRadius:"50%",border:`2px solid ${S.green}`,borderTopColor:"transparent",display:"inline-block",animation:"spin 0.8s linear infinite"}}></span></span>}
           </h1>
           {(state==="play"||state==="ending"||state==="scramble")&&(
-            <span style={{position:"absolute",right:"4px",fontSize:"18px",fontWeight:"700",color:S.yellow,fontVariantNumeric:"tabular-nums",fontFamily:S.font}}>{score}p.</span>
+            <span style={{position:"absolute",right:"2px",fontSize:"18px",fontWeight:"700",color:S.yellow,fontVariantNumeric:"tabular-nums",fontFamily:S.font}}>{score}p.</span>
           )}
         </div>
       )}
@@ -4436,35 +4440,35 @@ export default function Piilosana(){
         const MEDALS=["🥇","🥈","🥉"];
         const publicMissed=valid.size>0?[...valid].filter(w=>!publicAllFound.includes(w)).sort((a,b)=>b.length-a.length):[];
         const publicFoundSorted=[...publicAllFound].sort((a,b)=>b.length-a.length);
-        const secStyle={border:`1px solid ${S.border}`,padding:"14px",background:`${S.dark}ee`,marginBottom:"12px",textAlign:"left",borderRadius:"12px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"};
-        const secTitle={fontSize:"14px",fontWeight:"bold",marginBottom:"8px",letterSpacing:"0.5px"};
+        const RED="#ff5a5a";
+        const sec=(accent)=>({...sectionPanel(S,accent),marginBottom:"14px",textAlign:"left"});
         return(
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease"}}>
           {/* Your score */}
-          <div style={{border:`1px solid ${S.green}44`,padding:"24px",marginBottom:"16px",boxShadow:`0 4px 24px ${S.green}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
-            <div style={{fontSize:"13px",color:S.green,marginBottom:"4px",letterSpacing:"1px"}}>{t.roundOver}</div>
-            <div style={{fontSize:"28px",color:S.green,marginBottom:"2px",marginTop:"8px",animation:"pop 0.3s ease"}}>{score}<span style={{fontSize:"14px",color:S.textSoft,marginLeft:"4px"}}>/ {[...valid].reduce((s,w)=>s+pts(w.length),0)}p</span></div>
+          <div style={{...heroPanel(S,S.green),marginBottom:"18px"}}>
+            <div style={{fontSize:"13px",color:S.green,marginBottom:"4px",letterSpacing:"2px",fontWeight:"800",textTransform:"uppercase"}}>{t.roundOver}</div>
+            <div style={{fontSize:"36px",fontWeight:"800",color:S.green,marginBottom:"2px",marginTop:"8px",animation:"pop 0.3s ease"}}>{score}<span style={{fontSize:"14px",color:S.textSoft,marginLeft:"4px"}}>/ {[...valid].reduce((s,w)=>s+pts(w.length),0)}p</span></div>
             <div style={{fontSize:"13px",color:S.textSoft,marginTop:"6px"}}>{found.length} / {valid.size} {t.words} ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>
             <div style={{fontSize:"13px",color:publicNextCountdown<=10?"#ffaa33":S.textSoft,marginTop:"12px",fontWeight:publicNextCountdown<=10?"bold":"normal"}}>
               {t.nextRoundIn}: {publicNextCountdown>0?`${publicNextCountdown}s`:t.starts}
             </div>
-            <div style={{display:"flex",gap:"8px",justifyContent:"center",marginTop:"10px"}}>
-              <button onClick={()=>setShowSharePopup(true)} style={{fontFamily:S.font,fontSize:"13px",color:S.yellow||"#ffcc00",border:`2px solid ${S.yellow||"#ffcc00"}`,background:"transparent",padding:"8px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px"}}><Icon icon="share" color={S.yellow||"#ffcc00"} size={1.5}/>{t.invitePlayer}</button>
-              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"13px",color:S.green,border:`2px solid ${S.green}`,background:"transparent",padding:"8px 20px",cursor:"pointer"}}>{t.exit}</button>
+            <div style={{display:"flex",gap:"10px",justifyContent:"center",marginTop:"14px",flexWrap:"wrap"}}>
+              <GlossyButton S={S} size="sm" width="auto" color={GLOSSY.orange} icon={<Icon icon="share" color="#ffffff" size={1.5}/>} label={t.invitePlayer} onClick={()=>setShowSharePopup(true)}/>
+              <GlossyButton S={S} size="sm" width="auto" color={GLOSSY.gray} label={t.exit} onClick={returnToModeSelect}/>
             </div>
           </div>
 
           {/* Rankings with medals */}
           {publicRankings&&publicRankings.length>0&&(
-            <div style={{...secStyle,animation:"fadeIn 0.8s ease"}}>
-              <div style={{...secTitle,color:S.textSoft}}>{t.roundResults}</div>
+            <div style={{...sec(S.yellow),animation:"fadeIn 0.8s ease"}}>
+              <div style={sectionTitle(S.yellow)}>{t.roundResults}</div>
               <div style={{display:"flex",flexDirection:"column",gap:"2px"}}>
                 {publicRankings.slice(0,10).map((r,i)=>{
                   const isMe=r.nickname===soloNickname;
                   return(
                   <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:i===0?"7px 8px":"5px 8px",
-                    background:isMe?`${S.green}15`:i<3?["#ffcc0015","#cccccc10","#cc884410"][i]:"transparent",
-                    border:isMe?`1px solid ${S.green}33`:i<3?`1px solid ${["#ffcc0033","#cccccc33","#cc884433"][i]}`:"1px solid transparent",
+                    background:isMe?`${S.green}2a`:i<3?["#ffcc0026","#cccccc1c","#cc88441f"][i]:"transparent",
+                    border:isMe?`2px solid ${S.green}`:i<3?`1.5px solid ${["#ffcc0099","#cccccc77","#cc884488"][i]}`:"1.5px solid transparent",
                     borderRadius:"8px",marginBottom:"1px"}}>
                     <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
                       <span style={{fontSize:"16px",minWidth:"24px"}}>{i<3?MEDALS[i]:<span style={{fontSize:"13px",color:S.textMuted}}>{i+1}.</span>}</span>
@@ -4483,13 +4487,11 @@ export default function Piilosana(){
 
           {/* All found words (collective) */}
           {publicFoundSorted.length>0&&(
-            <div style={{...secStyle,animation:"fadeIn 0.8s ease"}}>
-              <div style={{...secTitle,color:S.green}}>{t.foundWords} ({publicFoundSorted.length})</div>
+            <div style={{...sec(S.green),animation:"fadeIn 0.8s ease"}}>
+              <div style={sectionTitle(S.green)}>{t.foundWords} ({publicFoundSorted.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
                 {publicFoundSorted.map((w,i)=>(
-                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:found.includes(w)?S.dark:S.gridBg,padding:"2px 5px",
-                    border:`1px solid ${found.includes(w)?wordColor(w.length)+"44":"#33333366"}`,
-                    color:found.includes(w)?wordColor(w.length):"#667",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",...(found.includes(w)?wordChip(wordColor(w.length)):wordChip(S.textMuted,true)),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
               <div style={{fontSize:"12px",color:S.textMuted,marginTop:"6px"}}>{t.ownHighlighted}{DEFS?" · "+t.defHint:""}</div>
@@ -4498,11 +4500,11 @@ export default function Piilosana(){
 
           {/* Missed words */}
           {publicMissed.length>0&&(
-            <div style={{...secStyle,maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
-              <div style={{...secTitle,color:"#ff8877"}}>{t.missed} ({publicMissed.length})</div>
+            <div style={{...sec(RED),maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
+              <div style={sectionTitle(RED)}>{t.missed} ({publicMissed.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
                 {publicMissed.map((w,i)=>(
-                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 5px",border:"1px solid #ff444444",color:"#ff8877",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",...wordChip(RED),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
               {lang==="fi"&&<div style={{fontSize:"12px",color:S.textMuted,marginTop:"8px",fontStyle:"italic"}}>{t.missedLong||"Laudalta löytyi myös pidempiä sanoja"}</div>}
@@ -4667,25 +4669,23 @@ export default function Piilosana(){
               </div>
             </div>
           )}
-          </div>{/* end HUD + emoji picker wrapper */}
-
-          {/* Emoji feed - shows reactions briefly — absolute so it doesn't push grid */}
+          {/* Hymiöt: pienet puhekuplat HUDin alla oikeassa yläkulmassa – feidaavat esiin ja haihtuvat */}
           {(mode==="multi"||mode==="public")&&emojiFeed.length>0&&state==="play"&&(
-            <div style={{position:"absolute",top:"100%",left:0,right:0,zIndex:40,display:"flex",flexWrap:"wrap",gap:"4px",justifyContent:"center",padding:"4px 0",pointerEvents:"none",animation:"fadeIn 0.2s ease"}}>
-              {emojiFeed.map(e=>(
-                <span key={e.id} style={{
-                  display:"inline-flex",alignItems:"center",gap:"4px",
-                  padding:"2px 8px",
-                  background:`${S.dark}cc`,border:`1px solid ${S.border}`,
-                  borderRadius:"16px",fontSize:"12px",
-                  backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",
-                  animation:e.fading?"chatFadeOut 0.8s ease forwards":"pop 0.3s ease-out"}}>
-                  <span style={{fontSize:"10px",color:S.green,fontFamily:S.font,fontWeight:"600"}}>{e.nickname}</span>
-                  <span style={{fontSize:"16px",lineHeight:1}}>{e.emoji}</span>
-                </span>
+            <div style={{position:"absolute",top:"100%",right:"4px",zIndex:40,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:"6px",paddingTop:"8px",pointerEvents:"none"}}>
+              {emojiFeed.slice(-3).map(e=>(
+                <div key={e.id} style={{position:"relative",display:"flex",flexDirection:"column",alignItems:"center",
+                  padding:"5px 10px 4px",minWidth:"44px",
+                  background:S.cell||S.dark,border:`2px solid ${S.green}`,
+                  borderRadius:"16px 4px 16px 16px",
+                  boxShadow:"0 4px 12px rgba(0,0,0,0.3)",
+                  animation:e.fading?"emojiBubbleOut 0.8s ease forwards":"emojiBubbleIn 0.35s ease-out"}}>
+                  <span style={{fontSize:"24px",lineHeight:1.1}}>{e.emoji}</span>
+                  <span style={{fontSize:"9px",color:S.textSoft||S.textMuted,fontFamily:S.font,fontWeight:"700",letterSpacing:"0.5px",maxWidth:"80px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",marginTop:"1px"}}>{e.nickname}</span>
+                </div>
               ))}
             </div>
           )}
+          </div>{/* end HUD + emoji picker wrapper */}
 
           {/* Battle mode: flash when someone finds a word */}
           {gameMode==="battle"&&battleMsg&&state==="play"&&(
@@ -4702,8 +4702,8 @@ export default function Piilosana(){
               <div style={{background:S.dark,border:`2px solid ${S.red}`,borderRadius:S.panelRadius,padding:"24px 28px",textAlign:"center",boxShadow:`0 0 30px ${S.red}33`}} onClick={e=>e.stopPropagation()}>
                 <div style={{fontSize:"16px",color:S.red,fontFamily:S.font,fontWeight:"700",marginBottom:"16px"}}>{t.exitConfirm}</div>
                 <div style={{display:"flex",gap:"12px",justifyContent:"center"}}>
-                  <button onClick={()=>{setShowExitConfirm(false);returnToModeSelect();}} style={{fontFamily:S.font,fontSize:"14px",color:"#fff",background:S.red,border:"none",padding:"10px 24px",cursor:"pointer",borderRadius:S.btnRadius}}>{t.exitYes}</button>
-                  <button onClick={()=>setShowExitConfirm(false)} style={{fontFamily:S.font,fontSize:"14px",color:S.green,background:"transparent",border:`2px solid ${S.green}`,padding:"10px 24px",cursor:"pointer",borderRadius:S.btnRadius}}>{t.exitNo}</button>
+                  <GlossyButton S={S} size="sm" width="auto" color={GLOSSY.red} label={t.exitYes} onClick={()=>{setShowExitConfirm(false);returnToModeSelect();}}/>
+                  <GlossyButton S={S} size="sm" width="auto" color={GLOSSY.green} label={t.exitNo} onClick={()=>setShowExitConfirm(false)}/>
                 </div>
               </div>
             </div>
@@ -4980,28 +4980,26 @@ export default function Piilosana(){
       {mode==="solo"&&state==="end"&&(
         <div style={{width:"100%",maxWidth:"600px",textAlign:"center",animation:"fadeIn 1s ease",position:"relative"}}>
           {confettiOn&&<ConfettiCelebration isWinner={true}/>}
-          <div style={{position:"relative",zIndex:1,border:`1px solid ${ending?.color||S.yellow}44`,padding:"24px",marginBottom:"16px",boxShadow:`0 4px 24px ${ending?.color||S.yellow}22, 0 8px 32px #00000022`,background:`${S.dark}f0`,borderRadius:"16px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)"}}>
+          <div style={{position:"relative",zIndex:1,...heroPanel(S,dailyMode?S.yellow:S.green),marginBottom:"18px"}}>
             {dailyMode?<><div style={{fontSize:"15px",color:S.yellow||"#ffcc00",marginBottom:"4px",fontWeight:"700"}}>{t.daily} {dateLabel(dailyDate,lang).short}</div>
             {dailyTheme&&<div style={{fontSize:"12px",color:S.textMuted,marginBottom:"6px",fontStyle:"italic"}}>{lang==="en"?"Theme":lang==="sv"?"Tema":"Teema"}: {lang==="en"?dailyTheme.nameEn||dailyTheme.name:lang==="sv"?dailyTheme.nameSv||dailyTheme.name:dailyTheme.name}</div>}</>
             :<div style={{fontSize:"13px",color:ending?.color||S.yellow,marginBottom:"4px"}}>{ending?.emoji} {ending?endingDesc(ending,lang):(lang==="sv"?"Spelet är slut!":lang==="en"?"Game over!":"Peli päättyi!")}</div>}
             {!dailyMode&&(()=>{const m=gameTime===0?(lang==="en"?"unlimited":lang==="sv"?"obegränsad":"rajaton"):gameTime===402?"6,7 min":`${Math.round(gameTime/60)} min`;return(<div style={{fontSize:"11px",color:S.textMuted,marginBottom:"6px",letterSpacing:"1px",fontWeight:"600",opacity:0.75}}>{m}</div>);})()}
             <div style={{fontSize:"13px",color:S.textMuted,marginBottom:"10px"}}>{t.score}</div>
-            <div style={{fontSize:"36px",color:S.green,marginBottom:"4px",animation:"pop 0.3s ease",fontWeight:"700",letterSpacing:"2px"}}>{score}<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}>p</span>{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}> / {totalPossible}p</span>:null}</div>
+            <div style={{fontSize:"40px",color:S.green,marginBottom:"4px",animation:"pop 0.3s ease",fontWeight:"800",letterSpacing:"2px"}}>{score}<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}>p</span>{(soloMode==="normal"&&gameTime!==0)?<span style={{fontSize:"16px",color:S.textMuted,fontWeight:"400"}}> / {totalPossible}p</span>:null}</div>
             {(soloMode!=="normal"||gameTime===0)?<div style={{fontSize:"13px",color:S.textMuted,marginTop:"6px"}}>{found.length} {t.words}</div>:<>
             <div style={{fontSize:"13px",color:S.textSoft,marginTop:"6px"}}>{found.length} / {valid.size} {t.words} ({valid.size>0?Math.round(found.length/valid.size*100):0}%)</div>
             </>}
 
             {/* Hall of Fame submit — skip for daily mode (auto-saved) */}
             {!dailyMode&&gameTime!==0&&score>0&&!hofSubmitted&&(
-              <div style={{marginTop:"16px",padding:"14px",border:`1px solid ${S.yellow}33`,background:`${S.yellow}08`,borderRadius:"12px"}}>
+              <div style={{marginTop:"16px",padding:"14px",border:`2px solid ${S.yellow}`,background:`${S.yellow}1a`,borderRadius:"12px"}}>
                 {soloNickname.trim()?(
-                  <button onClick={async()=>{
+                  <GlossyButton S={S} size="sm" width="auto" color={GLOSSY.yellow} label={`${t.saveAs} ${soloNickname.trim()}`} onClick={async()=>{
                     await submitToHallOfFame({nickname:soloNickname.trim(),score,wordsFound:found.length,
                       wordsTotal:valid.size,gameMode:soloMode,gameTime,lang});
                     setHofSubmitted(true);
-                  }} style={{fontFamily:S.font,fontSize:"13px",color:S.bg,background:S.yellow,border:"none",padding:"8px 16px",cursor:"pointer"}}>
-                    {t.saveAs} {soloNickname.trim()}
-                  </button>
+                  }}/>
                 ):(
                   <>
                     <div style={{fontSize:"13px",color:S.yellow,marginBottom:"6px"}}>{t.saveToHof}</div>
@@ -5009,16 +5007,12 @@ export default function Piilosana(){
                       <input type="text" maxLength="12" value={soloNickname} onChange={e=>{setSoloNickname(e.target.value.toUpperCase());localStorage.setItem("piilosana_nick",e.target.value.toUpperCase());}}
                         placeholder={t.nickname} style={{fontFamily:S.font,fontSize:"13px",color:S.green,background:S.dark,
                         border:`2px solid ${S.green}`,padding:"8px",width:"140px",textAlign:"center",outline:"none"}}/>
-                      <button onClick={async()=>{
+                      <GlossyButton S={S} size="sm" width="auto" color={GLOSSY.yellow} label={t.save} disabled={!soloNickname.trim()} onClick={async()=>{
                         if(!soloNickname.trim())return;
                         await submitToHallOfFame({nickname:soloNickname.trim(),score,wordsFound:found.length,
                           wordsTotal:valid.size,gameMode:soloMode,gameTime,lang});
                         setHofSubmitted(true);
-                      }} disabled={!soloNickname.trim()}
-                        style={{fontFamily:S.font,fontSize:"13px",color:soloNickname.trim()?S.bg:S.textMuted,
-                        background:soloNickname.trim()?S.yellow:S.border,border:"none",padding:"8px 12px",cursor:soloNickname.trim()?"pointer":"default"}}>
-                        {t.save}
-                      </button>
+                      }}/>
                     </div>
                   </>
                 )}
@@ -5027,14 +5021,13 @@ export default function Piilosana(){
             {!dailyMode&&hofSubmitted&&<div style={{fontSize:"13px",color:S.green,marginTop:"8px"}}>{t.saved}</div>}
 
             {/* Share result */}
-            <button onClick={async()=>{
+            <div style={{display:"flex",justifyContent:"center",marginTop:"14px"}}>
+            <GlossyButton S={S} size="sm" width="280px" color={GLOSSY.orange} label={t.share} onClick={async()=>{
               const text=t.shareText.replace("{words}",found.length).replace("{score}",score)+"\nhttps://piilosana.up.railway.app";
               if(navigator.share){try{await navigator.share({text});return;}catch{}}
               try{await navigator.clipboard.writeText(text);addPopup(t.shareCopied,S.green);}catch{}
-            }} style={{fontFamily:S.font,fontSize:"13px",color:"#44ddff",border:`1px solid #44ddff66`,background:"#44ddff08",
-              padding:"10px 16px",cursor:"pointer",marginTop:"12px",width:"280px",borderRadius:"10px",transition:"all 0.15s"}}>
-              {t.share}
-            </button>
+            }}/>
+            </div>
 
             <AdBanner/>
 
@@ -5061,31 +5054,31 @@ export default function Piilosana(){
               );
             })()}
 
-            <div style={{display:"flex",flexDirection:"column",gap:"8px",alignItems:"center",marginTop:"10px"}}>
-              <button onClick={returnToModeSelect} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.green,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.green}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.backToMenu}</button>
-              <button onClick={switchToMulti} style={{fontFamily:S.font,fontSize:"16px",color:S.bg,background:S.yellow,border:"none",padding:"12px 20px",cursor:"pointer",width:"280px",borderRadius:"12px",boxShadow:`0 4px 12px ${S.yellow}33`,transition:"all 0.15s",fontWeight:"600"}}>{t.joinMulti}</button>
+            <div style={{display:"flex",flexDirection:"column",gap:"10px",alignItems:"center",marginTop:"14px"}}>
+              <GlossyButton S={S} size="md" width="280px" color={GLOSSY.green} label={t.backToMenu} onClick={returnToModeSelect}/>
+              <GlossyButton S={S} size="md" width="280px" color={GLOSSY.blue} label={t.joinMulti} onClick={switchToMulti}/>
             </div>
           </div>
 
           {found.length>0&&(
-            <div style={{padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,marginBottom:"12px",textAlign:"left",animation:"fadeIn 0.8s ease",borderRadius:"12px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
-              <div style={{fontSize:"14px",color:S.green,marginBottom:"8px",fontWeight:"600",letterSpacing:"0.5px"}}>{t.foundOf} ({found.length})</div>
+            <div style={{...sectionPanel(S,S.green),marginBottom:"14px",textAlign:"left",animation:"fadeIn 0.8s ease"}}>
+              <div style={sectionTitle(S.green)}>{t.foundOf} ({found.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {[...found].sort((a,b)=>b.length-a.length).map((w,i)=>{
                   const isTheme=dailyMode&&dailyTheme&&isThemeWord(w,dailyTheme);
                   return(
-                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"18px",background:isTheme?`${S.yellow||"#ffcc00"}22`:S.dark,padding:"2px 4px",border:`1px solid ${isTheme?(S.yellow||"#ffcc00"):wordColor(w.length)}44`,color:isTheme?(S.yellow||"#ffcc00"):wordColor(w.length),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{isTheme?"🎯 ":""}{w.toUpperCase()}</span>
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"18px",...wordChip(isTheme?(S.yellow||"#ffcc00"):wordColor(w.length)),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{isTheme?"🎯 ":""}{w.toUpperCase()}</span>
                   );})}
               </div>
             </div>
           )}
 
           {soloMode==="normal"&&gameTime!==0&&missed.length>0&&(
-            <div style={{padding:"12px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease",borderRadius:"12px",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
-              <div style={{fontSize:"14px",color:"#ff6666",marginBottom:"8px",fontWeight:"600",letterSpacing:"0.5px"}}>{t.missed} ({missed.length})</div>
+            <div style={{...sectionPanel(S,"#ff5a5a"),textAlign:"left",maxHeight:"180px",overflowY:"auto",animation:"fadeIn 1s ease"}}>
+              <div style={sectionTitle("#ff5a5a")}>{t.missed} ({missed.length})</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
                 {missed.map((w,i)=>(
-                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",background:S.dark,padding:"2px 4px",border:"1px solid #ff444444",color:"#ff6666",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
+                  <span key={i} onClick={e=>showDef(w,e)} style={{fontSize:"14px",...wordChip("#ff5a5a"),cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>{w.toUpperCase()}</span>
                 ))}
               </div>
               {lang==="fi"&&<div style={{fontSize:"12px",color:S.textMuted,marginTop:"8px",fontStyle:"italic"}}>{t.missedLong||"Laudalta löytyi myös pidempiä sanoja"}</div>}
