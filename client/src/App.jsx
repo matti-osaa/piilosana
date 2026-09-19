@@ -5018,7 +5018,8 @@ export default function Piilosana(){
             </>)}
           </div>
 
-          {state==="play"&&(
+          {/* Löydetyt: kiinteä korkeus ja mukana jo sekoitus-/lopetusvaiheessa, ettei lauta liikahda */}
+          {(state==="play"||state==="scramble"||state==="ending")&&(
             <div className="piilosana-found" style={{marginTop:isHexMode?"2px":"8px",padding:"4px 6px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,height:"clamp(60px,13vh,104px)",flexShrink:0,boxSizing:"border-box",overflowY:"auto",borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022"}}>
               <div style={{fontSize:"15px",fontWeight:"700",color:S.textSoft||S.textMuted,marginBottom:"4px",display:"flex",alignItems:"baseline",gap:"6px"}}>
                 <span style={{fontSize:"12px",fontWeight:"600",letterSpacing:"1px",textTransform:"uppercase",color:S.textMuted}}>{t.found}</span>
