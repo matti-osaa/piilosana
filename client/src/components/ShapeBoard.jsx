@@ -72,7 +72,7 @@ export function ShapeBoard({
         rimClip: toClip(insetPoly(cell.poly, gap)),
         faceClip: toClip(insetPoly(cell.poly, gap + rim)),
         lx: ((cell.cx - cell.x0) / w) * 100, ly: ((cell.cy - cell.y0) / h) * 100,
-        font: (inradius(cell) / board.W) * 100 * 0.82,
+        font: (inradius(cell) / board.W) * 100 * 0.82 * (board.fontBoost || 1),
       };
     });
   }, [board]);

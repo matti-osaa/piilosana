@@ -37,24 +37,30 @@ describe("boards", () => {
     }
   });
 
-  it("naapurimäärät: neliö 8, vinoneliö 8, kolmio 12, viisikulmio 7, tähti 8", () => {
+  it("naapurimäärät: neliö 8, vinoneliö 8, kolmio 12, viisikulmio 7, tähti 6", () => {
     const max = (s) => Math.max(...getBoard(s).cells.map((c) => getBoard(s).neighborsOf(c.r, c.c).length));
     expect(max("square")).toBe(8);
     expect(max("diamond")).toBe(8);
     expect(max("triangle")).toBe(12);
     expect(max("pentagon")).toBe(7);
-    expect(max("star")).toBe(8);
+    expect(max("star")).toBe(6);
     expect(max("hex")).toBe(6);
   });
 
-  it("sanahaku ja canTraceWord toimivat eripituisilla riveillä", () => {
+  it("sanahaku ja canTraceWord toimivat muotolaudalla", () => {
     const grid = makeBoardGrid("star", () => "x");
     expect(gridFitsBoard(grid, getBoard("star"))).toBe(true);
-    // tähti (0,0) – kahdeksankulmio (1,0) – tähti (2,1) koskettavat ketjuna
-    grid[0][0] = "k"; grid[1][0] = "o"; grid[2][1] = "e";
+    // tähdet (0,0) – (0,1) – (1,1) koskettavat ketjuna; (0,0) ja (1,1) eivät kosketa
+    grid[0][0] = "k"; grid[0][1] = "o"; grid[1][1] = "e";
     const trie = { c: { k: { c: { o: { c: { e: { c: {}, w: true } } } } } } };
     expect([...findWordsOnBoard(grid, trie, "star")]).toEqual(["koe"]);
     expect(canTraceWord(grid, "koe", "star")).toBe(true);
     expect(canTraceWord(grid, "keo", "star")).toBe(false);
+  });
+
+  it("eripituiset rivit (viisikulmio) kelpaavat sanahakuun", () => {
+    const grid = makeBoardGrid("pentagon", () => "x");
+    expect(grid.map((r) => r.length)).toEqual(getBoard("pentagon").rowLens);
+    expect(findWordsOnBoard(grid, { c: {} }, "pentagon").size).toBe(0);
   });
 });

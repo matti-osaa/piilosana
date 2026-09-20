@@ -11,11 +11,10 @@
 //
 // NAAPURISÄÄNTÖ on kaikilla laudoilla sama: kaksi ruutua ovat naapureita,
 // jos ne koskettavat toisiaan – sivulla TAI kulmalla (= jakavat kärkipisteen).
-//   neliö 8 · vinoneliö 8 · kuusikulmio 6 · kolmio 12 · viisikulmio 7 · tähti 8
+//   neliö 8 · vinoneliö 8 · kuusikulmio 6 · kolmio 12 · viisikulmio 7 · tähti 6
 //
 // Viisikulmio = Kairon laatoitus (viisikulmiot täyttävät tason aukottomasti).
-// Tähti = nelisakaraiset tähdet, joiden väliin jäävät kahdeksankulmiot ovat
-// myös kirjainruutuja.
+// Tähti = kuusisakaraiset, samankokoiset tähdet, jotka koskettavat toisiaan sakaroiden kärjistä.
 
 export const SHAPES = ["hex", "square", "triangle", "pentagon", "star", "diamond"];
 
@@ -140,27 +139,29 @@ function pentagonRows() {
 }
 
 function starRows() {
-  const NX = 4, NY = 5, b = 0.42, rows = [];
-  for (let j = 0; j < NY; j++) {
-    const srow = [];
-    for (let i = 0; i < NX; i++) {
-      const cx = 2 * i + 1, cy = 2 * j + 1;
-      srow.push([[cx, cy - 1], [cx + b, cy - b], [cx + 1, cy], [cx + b, cy + b],
-        [cx, cy + 1], [cx - b, cy + b], [cx - 1, cy], [cx - b, cy - b]]);
-    }
-    rows.push(srow);
-    if (j < NY - 1) {
-      const orow = [];
-      for (let i = 0; i < NX - 1; i++) {
-        const ox = 2 * i + 2, oy = 2 * j + 2, d = 1 - b;
-        orow.push([[ox, oy - 1], [ox + d, oy - d], [ox + 1, oy], [ox + d, oy + d],
-          [ox, oy + 1], [ox - d, oy + d], [ox - 1, oy], [ox - d, oy - d]]);
+  // Kuusisakaraiset tähdet kolmiohilassa (odd-r offset kuten kuusikulmiolaudassa).
+  // Sakarat osoittavat suoraan naapureihin ja koskettavat niitä kärjistään,
+  // joten sääntö on: tähdet ovat naapureita, jos niiden sakarat koskettavat (6 naapuria).
+  // Kaikki ruudut ovat samankokoisia; sakaroiden väliin jäävät aukot ovat tyhjää.
+  const R = 6, C = 5, rad = 1, inner = rad * 0.72, rows = []; // paksu runko: kirjaimelle tilaa, sakarat lyhyet
+  for (let r = 0; r < R; r++) {
+    const row = [];
+    for (let c = 0; c < C; c++) {
+      const cx = rad + 2 * rad * c + (r % 2 === 1 ? rad : 0), cy = rad + r * rad * Math.sqrt(3);
+      const poly = [];
+      for (let k = 0; k < 12; k++) {
+        const ang = (k * Math.PI) / 6, d = k % 2 === 0 ? rad : inner;
+        poly.push([cx + d * Math.cos(ang), cy + d * Math.sin(ang)]);
       }
-      rows.push(orow);
+      row.push(poly);
     }
+    rows.push(row);
   }
   return rows;
 }
+
+// Kirjaimen koon kerroin: tähden runko on leveämpi kuin sen sisäympyrä antaa ymmärtää.
+const FONT_BOOST = { star: 1.15 };
 
 const BUILDERS = {
   hex: hexRows, square: squareRows, diamond: diamondRows,
@@ -199,7 +200,7 @@ export function getBoard(shape) {
   for (const list of vmap.values()) for (const a of list) for (const b of list) if (a !== b) nsets[a].add(b);
   const neighbors = nsets.map((s) => [...s].sort((a, b) => a - b).map((i) => ({ r: cells[i].r, c: cells[i].c })));
   const board = {
-    shape, W: maxX - minX, H: maxY - minY, cells, byRC,
+    shape, W: maxX - minX, H: maxY - minY, cells, byRC, fontBoost: FONT_BOOST[shape] || 1,
     rowLens: polyRows.map((row) => row.length),
     maxCols: Math.max(...polyRows.map((row) => row.length)),
     neighborsOf: (r, c) => (byRC[r] && byRC[r][c] ? neighbors[byRC[r][c].i] : []),
