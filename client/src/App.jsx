@@ -1750,7 +1750,7 @@ function PixelIcon({icon,color="currentColor",size=2,style={},badge=false}){
   );
 }
 
-function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,theme:titleTheme}){
+function TitleDemo({active,lang,theme:titleTheme}){
   const tc=TITLE_CONFIG[lang]||TITLE_CONFIG.fi;
   const titleChars=tc.title.split("");
   const demoWords=tc.demos;
@@ -1764,8 +1764,6 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
   const charStepRef=useRef(charStep);
   charStepRef.current=charStep;
   const prevLangRef=useRef(lang);
-  const[gearBlend,setGearBlend]=useState(false);
-  useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
 
   // Scramble animation on language change
   useEffect(()=>{
@@ -1827,7 +1825,6 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
     <h1 style={{fontSize:"28px",letterSpacing:"4px",margin:"0 0 10px 0",display:"flex",justifyContent:"center",alignItems:"center",gap:"2px"}}>
       {displayChars.map((ch,i)=>{
         const isLit=lit.has(i);
-        const isGear=!scramble&&i===tc.gearIdx;
         const tColor=titleColor(i,displayChars.length);
         const baseStyle={
           color:scramble?tColor+"88":tColor,
@@ -1841,14 +1838,6 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
           fontFamily:titleTheme?.titleFont||"'Press Start 2P',monospace",
           lineHeight:1,
         };
-        if(isGear&&!hideGear){
-          return <span key={i} onClick={onGearClick} style={{...baseStyle,
-            textShadow:"none",
-            cursor:"pointer",
-            display:"inline-flex",alignItems:"center",justifyContent:"center",
-            marginRight:"4px",
-          }}><PixelIcon icon="gear" color={isLit?dw.color:gearBlend?(titleTheme?.yellow||"#ffcc00"):(titleTheme?.textSoft||"#556677")} size={1.7} style={{transition:"filter 2s ease"}}/></span>;
-        }
         return <span key={i} style={baseStyle}>{ch}</span>;
       })}
     </h1>
@@ -1927,23 +1916,6 @@ function TitleDemo({active,lang,onGearClick,showBubble,bubbleFading,hideGear,the
         </>}
       </svg>
     </div>
-    {/* Speech bubble below title pointing up */}
-    {showBubble&&!scramble&&(
-      <div style={{position:"absolute",bottom:"-52px",left:"50%",transform:"translateX(-50%)",
-        animation:bubbleFading?"bubbleOut 0.6s ease-in forwards":`bubbleIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards`,
-        whiteSpace:"nowrap",zIndex:50}}>
-        <div style={{background:"#ffffff",color:"#000000",fontFamily:"'Press Start 2P',monospace",
-          fontSize:"13px",padding:"8px 14px",borderRadius:"0px",position:"relative",lineHeight:"1.6",
-          border:"3px solid #000000",boxShadow:"4px 4px 0 #00000044",
-          imageRendering:"pixelated"}}>
-          <div style={{position:"absolute",top:"-9px",left:"50%",transform:"translateX(-50%)",
-            width:0,height:0,borderLeft:"8px solid transparent",borderRight:"8px solid transparent",borderBottom:"8px solid #000000"}}/>
-          <div style={{position:"absolute",top:"-5px",left:"50%",transform:"translateX(-50%)",
-            width:0,height:0,borderLeft:"6px solid transparent",borderRight:"6px solid transparent",borderBottom:"6px solid #ffffff"}}/>
-          {lang==="en"?"Change settings like color theme!":lang==="sv"?"Ändra inställningar, som färgtema!":"Vaihda asetuksia, kuten väriteemaa!"}
-        </div>
-      </div>
-    )}
     </div>
   );
 }
@@ -2107,8 +2079,6 @@ export default function Piilosana(){
   const currentLangLoaded=wordsLoaded[lang]||false;
   const[showSettings,setShowSettings]=useState(false);
   const[showMenuOptions,setShowMenuOptions]=useState(false);
-  const[settingsBubble,setSettingsBubble]=useState(false);
-  const[bubbleFading,setBubbleFading]=useState(false);
   const[flagBubble,setFlagBubble]=useState(false);
   const[flagBubbleFading,setFlagBubbleFading]=useState(false);
   const[showWordInfo,setShowWordInfo]=useState(false);
@@ -2136,8 +2106,6 @@ export default function Piilosana(){
   const[muteEmojis,setMuteEmojis]=useState(()=>localStorage.getItem("piilosana_mute_emoji")==="on");
   const muteEmojisRef=useRef(muteEmojis);
   useEffect(()=>{muteEmojisRef.current=muteEmojis;},[muteEmojis]);
-  const[gearBlend,setGearBlend]=useState(false);
-  useEffect(()=>{const t=setTimeout(()=>setGearBlend(true),10000);return()=>clearTimeout(t);},[]);
   const[themeTransition,setThemeTransition]=useState(false);
   const themeInitRef=useRef(true);
   useEffect(()=>{if(themeInitRef.current){themeInitRef.current=false;return;}setThemeTransition(true);const t=setTimeout(()=>setThemeTransition(false),700);return()=>clearTimeout(t);},[themeId]);
@@ -2550,19 +2518,14 @@ export default function Piilosana(){
   // Keep foundRef in sync with found state (avoids stale closure in socket handlers)
   useEffect(()=>{foundRef.current=found;},[found]);
 
-  // Show settings bubble briefly on main menu
+  // Kielilippuvinkki näytetään hetken alkuvalikossa
   useEffect(()=>{
-    if(mode!==null){setSettingsBubble(false);setBubbleFading(false);setFlagBubble(false);setFlagBubbleFading(false);return;}
-    const shown=sessionStorage.getItem("piilosana_bubble_shown");
-    if(shown)return;
-    const t1=setTimeout(()=>setSettingsBubble(true),2000);
-    const t2=setTimeout(()=>setBubbleFading(true),6000);
-    const t3=setTimeout(()=>{setSettingsBubble(false);setBubbleFading(false);sessionStorage.setItem("piilosana_bubble_shown","1");},7000);
-    const flagShown=sessionStorage.getItem("piilosana_flag_bubble_shown");
-    const t4=flagShown?null:setTimeout(()=>setFlagBubble(true),8500);
-    const t5=flagShown?null:setTimeout(()=>setFlagBubbleFading(true),12500);
-    const t6=flagShown?null:setTimeout(()=>{setFlagBubble(false);setFlagBubbleFading(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");},13500);
-    return()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);if(t4)clearTimeout(t4);if(t5)clearTimeout(t5);if(t6)clearTimeout(t6);};
+    if(mode!==null){setFlagBubble(false);setFlagBubbleFading(false);return;}
+    if(sessionStorage.getItem("piilosana_flag_bubble_shown"))return;
+    const t4=setTimeout(()=>setFlagBubble(true),8500);
+    const t5=setTimeout(()=>setFlagBubbleFading(true),12500);
+    const t6=setTimeout(()=>{setFlagBubble(false);setFlagBubbleFading(false);sessionStorage.setItem("piilosana_flag_bubble_shown","1");},13500);
+    return()=>{clearTimeout(t4);clearTimeout(t5);clearTimeout(t6);};
   },[mode]);
 
   // (arena count polling handled above via /api/arena-count)
@@ -3916,9 +3879,9 @@ export default function Piilosana(){
   ):(firstTimeBubbleVisible&&firstTimePhase!=="wait")?(
     <div style={{width:"min(260px,80vw)",padding:"14px 16px 12px",borderRadius:"30px 34px 32px 36px / 34px 30px 36px 32px",
       border:`2px solid ${S.yellow}`,background:S.cell||S.dark,boxShadow:"0 10px 26px rgba(0,0,0,0.3)",textAlign:"center",
-      animation:firstTimePhase==="out"?"authBubbleOut 0.7s ease forwards":"authBubbleIn 0.45s ease",transformOrigin:"50% 120%",position:"relative"}}>
-      <span aria-hidden="true" style={{position:"absolute",width:"16px",height:"16px",borderRadius:"50%",left:"calc(50% - 8px)",bottom:"-13px",background:S.cell||S.dark,border:`2px solid ${S.yellow}`}}/>
-      <span aria-hidden="true" style={{position:"absolute",width:"9px",height:"9px",borderRadius:"50%",left:"calc(50% - 4px)",bottom:"-25px",background:S.cell||S.dark,border:`2px solid ${S.yellow}`}}/>
+      animation:firstTimePhase==="out"?"authBubbleDownOut 0.7s ease forwards":"authBubbleDownIn 0.45s ease",transformOrigin:"58% -20%",position:"relative"}}>
+      <span aria-hidden="true" style={{position:"absolute",width:"16px",height:"16px",borderRadius:"50%",left:"calc(58% - 8px)",top:"-13px",background:S.cell||S.dark,border:`2px solid ${S.yellow}`}}/>
+      <span aria-hidden="true" style={{position:"absolute",width:"9px",height:"9px",borderRadius:"50%",left:"calc(58% - 4px)",top:"-25px",background:S.cell||S.dark,border:`2px solid ${S.yellow}`}}/>
       <button aria-label="close" onClick={()=>{setShowFirstTimeAuth(false);sessionStorage.setItem("piilosana_auth_dismissed","1");}}
         style={{position:"absolute",top:"6px",right:"12px",background:"transparent",border:"none",color:S.textMuted,fontSize:"14px",cursor:"pointer",padding:"4px"}}>✕</button>
       <div style={{fontFamily:S.font,fontSize:"13px",fontWeight:"700",color:S.yellow,marginBottom:"4px"}}>
@@ -4218,6 +4181,8 @@ export default function Piilosana(){
         @keyframes emojiBubbleOut{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-14px) scale(0.95)}}
         @keyframes authBubbleOut{0%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:0;transform:scale(0.6) translateY(18px)}}
         @keyframes authBubbleIn{0%{opacity:0;transform:scale(0.5) translateY(16px)}60%{opacity:1;transform:scale(1.03) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+        @keyframes authBubbleDownIn{0%{opacity:0;transform:scale(0.5) translateY(-16px)}60%{opacity:1;transform:scale(1.03) translateY(2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+        @keyframes authBubbleDownOut{0%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:0;transform:scale(0.6) translateY(-18px)}}
         @keyframes bubbleOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.6) translateY(-10px)}}
         @keyframes chatSlideIn{0%{opacity:0;transform:translateX(-30px) scale(0.7)}30%{opacity:1;transform:translateX(4px) scale(1.04)}60%{transform:translateX(-2px) scale(0.98)}100%{opacity:1;transform:translateX(0) scale(1)}}
         @keyframes chatFadeOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0.92);max-height:0;margin:0;padding:0}}
@@ -4283,7 +4248,7 @@ export default function Piilosana(){
       {wordPopups.map(p=><WordPopup key={p.id}{...p} font={S.font}/>)}
 
       {(mode===null||(mode==="solo"&&state==="menu")||(mode==="public"&&publicState==="nickname")||(mode==="multi"&&(lobbyState==="enter_name"||lobbyState==="choose")))?(
-        <TitleDemo active={true} lang={lang} onGearClick={()=>setShowHamburger(true)} showBubble={mode!==null&&settingsBubble} bubbleFading={bubbleFading} hideGear={mode===null} theme={S}/>
+        <TitleDemo active={true} lang={lang} theme={S}/>
       ):(
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",width:"100%",maxWidth:(state==="play"||state==="ending"||state==="scramble")?`${playMaxWidth}px`:"600px",margin:"6px 0",position:"relative",boxSizing:"border-box"}}>
           {(state==="play"||state==="ending"||state==="scramble")&&gameTime!==0&&(

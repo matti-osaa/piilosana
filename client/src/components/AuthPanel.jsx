@@ -126,16 +126,16 @@ export function AuthPanel({
 }) {
   const txt = TEXTS[lang] || TEXTS.fi;
 
-  // Ajatuskupla: pehmeä pilvimäinen laatikko, jonka alareunasta lähtee
-  // pienenevät kuplat kohti footerin kirjautumisnappia.
+  // Ajatuskupla: pehmeä pilvimäinen laatikko, jonka yläreunasta lähtee
+  // pienenevät kuplat ylöspäin kohti footerin kirjautumisnappia.
   const bubbleBg = S.cell || S.dark;
   const bubbleShadow = "0 10px 28px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.12)";
-  const dot = (size, left, bottom) => ({
+  const dot = (size, left, top) => ({
     position: "absolute",
     width: size,
     height: size,
     left,
-    bottom,
+    top,
     borderRadius: "50%",
     background: bubbleBg,
     border: `1.5px solid ${S.border}`,
@@ -147,8 +147,8 @@ export function AuthPanel({
       style={{
         width: "min(340px, 90vw)",
         margin: 0,
-        animation: "authBubbleIn 0.35s ease",
-        transformOrigin: "58% 115%",
+        animation: "authBubbleDownIn 0.35s ease",
+        transformOrigin: "58% -15%",
         zIndex: 100,
         position: "relative",
         textAlign: "left",

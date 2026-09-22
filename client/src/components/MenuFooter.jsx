@@ -27,6 +27,8 @@
 //   onShowWordInfo
 //   onLangChange(code)  – vaihtaa kielen ja persistoi
 
+import { useEffect, useRef } from "react";
+
 const TEXTS = {
   fi: {
     inflectionsLink: "(katso taivutusmuodot)",
@@ -77,6 +79,16 @@ export function MenuFooter({
   onLangChange,
 }) {
   const txt = TEXTS[lang] || TEXTS.fi;
+  const bubbleRef = useRef(null);
+  const hasBubble = !!authBubble;
+  // Kun kupla aukeaa, vieritä se näkyviin (se on sivun alaosassa)
+  useEffect(() => {
+    if (!hasBubble || !bubbleRef.current) return;
+    const t = setTimeout(() => {
+      bubbleRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 60);
+    return () => clearTimeout(t);
+  }, [hasBubble]);
 
   return (
     <div style={{ marginTop: "20px", width: "100%", maxWidth: "600px" }}>
@@ -116,21 +128,8 @@ export function MenuFooter({
           )}
         </button>
 
-        {/* Kirjautumisnappi + siitä ponnahtava ajatuskupla */}
+        {/* Kirjautumisnappi – ajatuskupla aukeaa napin alapuolelle */}
         <div style={{ position: "relative", display: "flex" }}>
-          {authBubble && (
-            <div
-              style={{
-                position: "absolute",
-                bottom: "calc(100% + 30px)",
-                left: "50%",
-                transform: "translateX(-58%)",
-                zIndex: 120,
-              }}
-            >
-              {authBubble}
-            </div>
-          )}
         <button
           onClick={onShowAuth}
           style={{
@@ -154,6 +153,24 @@ export function MenuFooter({
         </button>
         </div>
       </div>
+
+      {/* Kirjautumisen ajatuskupla: omana rivinään napin ALAPUOLELLA,
+          jotta se ei koskaan peitä valikon painikkeita. */}
+      {authBubble && (
+        <div
+          ref={bubbleRef}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "30px",
+            marginBottom: "14px",
+            position: "relative",
+            zIndex: 120,
+          }}
+        >
+          {authBubble}
+        </div>
+      )}
 
       {/* Sanamäärä-info */}
       <div style={{ fontSize: "12px", color: S.textMuted, marginBottom: "4px" }}>
