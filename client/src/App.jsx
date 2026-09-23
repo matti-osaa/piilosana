@@ -3693,8 +3693,6 @@ export default function Piilosana(){
     const id=setTimeout(()=>setDefPopup(null),4000);
     return()=>clearTimeout(id);
   },[defPopup,state]);
-  // Pelinäkymän paneelien korostusväri (sama kuin loppuruudun pääpaneelissa)
-  const playAccent=dailyMode?(S.yellow||"#ffcc00"):S.green;
 
 
   // Multiplayer helper functions
@@ -3851,6 +3849,8 @@ export default function Piilosana(){
 
   // Render multiplayer screens
   const S=theme;
+  // Pelinäkymän paneelien korostusväri (sama kuin loppuruudun pääpaneelissa)
+  const playAccent=dailyMode?(S.yellow||"#ffcc00"):S.green;
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
   useEffect(()=>{
     if(!(mode===null&&showFirstTimeAuth&&!showTutorial&&!authUser&&!showAuth)){setFirstTimePhase("wait");return;}
