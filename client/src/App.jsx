@@ -17,7 +17,7 @@ import { MenuButton } from "./components/MenuButton.jsx";
 import { GlossyButton, GLOSSY } from "./components/GlossyButton.jsx";
 import { SHAPES, randomShape, getBoard, makeBoardGrid, findWordsOnBoard, gridFitsBoard } from "./boards.js";
 import { ShapeBoard, ShapeIcon, SHAPE_NAMES } from "./components/ShapeBoard.jsx";
-import { heroPanel, sectionPanel, sectionTitle, wordChip } from "./components/panelStyle.js";
+import { heroPanel, sectionPanel, sectionTitle, wordChip, alpha } from "./components/panelStyle.js";
 import { ResultsScreen as ResultsScreenView } from "./components/ResultsScreen.jsx";
 import { HelpModal } from "./components/HelpModal.jsx";
 import { InflectionModal } from "./components/InflectionModal.jsx";
@@ -3849,8 +3849,9 @@ export default function Piilosana(){
 
   // Render multiplayer screens
   const S=theme;
-  // Pelinäkymän paneelien korostusväri (sama kuin loppuruudun pääpaneelissa)
-  const playAccent=dailyMode?(S.yellow||"#ffcc00"):S.green;
+  // Pelinäkymän paneelien reuna ja varjo: teeman harmaa (sama sävy kuin laudan tummemmat kohdat)
+  const playAccent=S.border;
+  const playShadow=`4px 4px 0 ${S.border}`;
   const Icon=S.cellGradient?ModernIcon:PixelIcon;
   useEffect(()=>{
     if(!(mode===null&&showFirstTimeAuth&&!showTutorial&&!authUser&&!showAuth)){setFirstTimePhase("wait");return;}
@@ -4598,9 +4599,16 @@ export default function Piilosana(){
       {(state==="play"||state==="ending"||state==="scramble")&&(
         <div ref={playRef} style={{width:"100%",maxWidth:`${playMaxWidth}px`,containerType:"inline-size",position:"relative",padding:(soloMode==="hex"||mode==="multi"||(mode==="public"&&publicHex))?"0":"0 2px",display:"flex",flexDirection:"column",flex:"1 1 auto",minHeight:0}}>
           {/* HUD + emoji picker wrapper */}
-          <div style={{position:"relative",zIndex:10,marginBottom:isHexMode?"1px":"4px"}}>
+          <div style={{position:"relative",zIndex:10,marginBottom:isHexMode?"6px":"8px"}}>
           {/* HUD */}
-          <div style={{...sectionPanel(S,playAccent),padding:0,overflow:"hidden"}}>
+          <div style={{...sectionPanel(S,playAccent),boxShadow:playShadow,padding:0,overflow:"hidden",position:"relative",isolation:"isolate"}}>
+            {/* Aikajana palkin sisällä: tummempi täyttö kutistuu oikealta vasemmalle; pyöristetty reuna leikkaa sen siististi */}
+            {gameTime!==0&&(
+              <div aria-hidden="true" style={{position:"absolute",left:0,top:0,bottom:0,zIndex:-1,pointerEvents:"none",
+                width:`${Math.max(0,Math.min(1,time/gameTime))*100}%`,
+                background:time<=15?alpha(S.red,"40"):alpha(S.border,"a0"),
+                transition:"width 0.3s linear, background 0.5s"}}/>
+            )}
 
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
@@ -4650,7 +4658,7 @@ export default function Piilosana(){
             )}
             {mode==="solo"&&gameTime===0&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:"#44ddff",background:"#44ddff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}><Icon icon="infinity" color="#44ddff" size={1}/>{t.unlimitedLabel}</div>}
             {letterMult&&<div style={{textAlign:"center",padding:"3px",fontSize:"13px",color:S.yellow,background:"#ffcc0011",borderBottom:`1px solid ${S.border}`}}>{t.letterMultLabel}</div>}
-            <div ref={wordBarRef} key={flashKey} style={{padding:S.cellGradient?"4px 10px":"2px 8px",textAlign:"center",position:"relative",animation:"none",background:S.cellGradient?S.dark:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
+            <div ref={wordBarRef} key={flashKey} style={{padding:S.cellGradient?"4px 10px":"2px 8px",textAlign:"center",position:"relative",animation:"none",background:"transparent",borderRadius:S.cellGradient?"0 0 12px 12px":"0"}}>
               {/* Hamburger menu button */}
               <button onClick={()=>setShowHamburger(true)} style={{position:"absolute",left:"6px",top:"50%",transform:"translateY(-50%)",background:"transparent",border:`1px solid ${S.textMuted}44`,padding:"4px 10px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:"8px",transition:"all 0.15s",zIndex:2,fontSize:"20px",color:S.textMuted,lineHeight:1}}
                 onMouseEnter={e=>{e.currentTarget.style.borderColor=S.green;e.currentTarget.style.background=S.green+"15";e.currentTarget.style.color=S.green;}}
@@ -4729,15 +4737,11 @@ export default function Piilosana(){
           )}
 
 
-          {gameTime!==0&&(
-          <div style={{height:"3px",background:S.dark,marginBottom:isHexMode?"1px":"6px",border:`1px solid ${S.border}`}}>
-            <div style={{height:"100%",width:`${(time/gameTime)*100}%`,background:time<=15?S.red:time<=30?S.yellow:S.green,transition:"width 0.3s linear"}}/>
-          </div>
-          )}
+
 
 
           {/* GRID – containerType antaa cqw-yksiköt kirjainkoolle; kehys samaa tyyliä kuin loppuruudun paneelit */}
-          <div style={{position:"relative",containerType:"inline-size",...sectionPanel(S,combo>=3&&state==="play"?S.yellow:ending?ending.color:playAccent),padding:isHexMode?"4px":"6px",transition:"border-color 0.3s, box-shadow 0.3s"}}>
+          <div style={{position:"relative",containerType:"inline-size",...sectionPanel(S,combo>=3&&state==="play"?S.yellow:ending?ending.color:playAccent),boxShadow:playShadow,padding:isHexMode?"4px":"6px",transition:"border-color 0.3s, box-shadow 0.3s"}}>
             {shapeBoard&&gridFitsBoard(mode==="multi"?currentMultiGrid:grid,shapeBoard)?(
               <>
               <ShapeBoard
@@ -4995,7 +4999,7 @@ export default function Piilosana(){
 
           {/* Löydetyt: kiinteä korkeus ja mukana jo sekoitus-/lopetusvaiheessa, ettei lauta liikahda */}
           {(state==="play"||state==="scramble"||state==="ending")&&(
-            <div className="piilosana-found" style={{...sectionPanel(S,playAccent),marginTop:isHexMode?"6px":"10px",padding:"6px 8px",height:"clamp(60px,13vh,104px)",flexShrink:0,boxSizing:"border-box",overflowY:"auto"}}>
+            <div className="piilosana-found" style={{...sectionPanel(S,playAccent),boxShadow:playShadow,marginTop:isHexMode?"6px":"10px",padding:"6px 8px",height:"clamp(60px,13vh,104px)",flexShrink:0,boxSizing:"border-box",overflowY:"auto"}}>
               <div style={{fontSize:"15px",fontWeight:"700",color:S.textSoft||S.textMuted,marginBottom:"4px",display:"flex",alignItems:"baseline",gap:"6px"}}>
                 <span style={{fontSize:"12px",fontWeight:"600",letterSpacing:"1px",textTransform:"uppercase",color:S.textMuted}}>{t.found}</span>
                 {(gameMode==="battle"||(mode==="solo"&&(soloMode==="tetris"||soloMode==="rotate"||soloMode==="chess")))
