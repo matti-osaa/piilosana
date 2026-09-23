@@ -3687,6 +3687,14 @@ export default function Piilosana(){
     const r=e.currentTarget.getBoundingClientRect();
     setDefPopup({word:w,def:d,x:r.left+r.width/2,y:r.top});
   },[DEFS]);
+  // Pelin aikana selitys sulkeutuu itsestään, ettei se jää peittämään lautaa
+  useEffect(()=>{
+    if(!defPopup||state!=="play")return;
+    const id=setTimeout(()=>setDefPopup(null),4000);
+    return()=>clearTimeout(id);
+  },[defPopup,state]);
+  // Pelinäkymän paneelien korostusväri (sama kuin loppuruudun pääpaneelissa)
+  const playAccent=dailyMode?(S.yellow||"#ffcc00"):S.green;
 
 
   // Multiplayer helper functions
@@ -4592,7 +4600,7 @@ export default function Piilosana(){
           {/* HUD + emoji picker wrapper */}
           <div style={{position:"relative",zIndex:10,marginBottom:isHexMode?"1px":"4px"}}>
           {/* HUD */}
-          <div style={{border:`1px solid ${S.border}`,background:`${S.dark}ee`,borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022",overflow:"hidden"}}>
+          <div style={{...sectionPanel(S,playAccent),padding:0,overflow:"hidden"}}>
 
             {mode==="multi"&&gameMode==="battle"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="swords" color={S.purple} size={1}/>{t.battleLabel}</div>}
             {mode==="solo"&&soloMode==="tetris"&&<div style={{textAlign:"center",padding:"1px",fontSize:"11px",color:S.purple,background:"#ff66ff11",borderBottom:`1px solid ${S.border}`,display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}><Icon icon="arrow" color={S.purple} size={1}/>{t.tetrisLabel}</div>}
@@ -4728,8 +4736,8 @@ export default function Piilosana(){
           )}
 
 
-          {/* GRID – containerType antaa cqw-yksiköt kirjainkoolle */}
-          <div style={{position:"relative",containerType:"inline-size"}}>
+          {/* GRID – containerType antaa cqw-yksiköt kirjainkoolle; kehys samaa tyyliä kuin loppuruudun paneelit */}
+          <div style={{position:"relative",containerType:"inline-size",...sectionPanel(S,combo>=3&&state==="play"?S.yellow:ending?ending.color:playAccent),padding:isHexMode?"4px":"6px",transition:"border-color 0.3s, box-shadow 0.3s"}}>
             {shapeBoard&&gridFitsBoard(mode==="multi"?currentMultiGrid:grid,shapeBoard)?(
               <>
               <ShapeBoard
@@ -4875,8 +4883,8 @@ export default function Piilosana(){
             <div ref={gRef} className="piilosana-grid"
               onTouchMove={e=>{e.preventDefault();onDragMove(e.touches[0].clientX,e.touches[0].clientY);}}
               style={{display:"grid",gridTemplateColumns:`repeat(${soloMode==="chess"?CHESS_SZ:SZ},1fr)`,gap:soloMode==="chess"?"2px":(S.gridGap!=="0px"?S.gridGap:isLarge?"6px":"4px"),padding:soloMode==="chess"?"4px":(isLarge?"8px":"6px"),background:S.gridBg||"#111133",
-                border:`3px solid ${combo>=3&&state==="play"?S.yellow:ending?ending.color+"88":S.border}`,
-                boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:`0 0 30px ${S.green}22`,
+                border:"none",
+                boxShadow:combo>=5?`0 0 30px ${S.purple}66`:combo>=3?`0 0 20px ${S.yellow}44`:"none",
                 touchAction:"none",
                 position:"relative",
                 borderRadius:S.cellRadius!=="0px"?"16px":"0px"}}>
@@ -4987,7 +4995,7 @@ export default function Piilosana(){
 
           {/* Löydetyt: kiinteä korkeus ja mukana jo sekoitus-/lopetusvaiheessa, ettei lauta liikahda */}
           {(state==="play"||state==="scramble"||state==="ending")&&(
-            <div className="piilosana-found" style={{marginTop:isHexMode?"2px":"8px",padding:"4px 6px",border:`1px solid ${S.border}`,background:`${S.dark}ee`,height:"clamp(60px,13vh,104px)",flexShrink:0,boxSizing:"border-box",overflowY:"auto",borderRadius:"12px",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",boxShadow:"0 2px 12px #00000022"}}>
+            <div className="piilosana-found" style={{...sectionPanel(S,playAccent),marginTop:isHexMode?"6px":"10px",padding:"6px 8px",height:"clamp(60px,13vh,104px)",flexShrink:0,boxSizing:"border-box",overflowY:"auto"}}>
               <div style={{fontSize:"15px",fontWeight:"700",color:S.textSoft||S.textMuted,marginBottom:"4px",display:"flex",alignItems:"baseline",gap:"6px"}}>
                 <span style={{fontSize:"12px",fontWeight:"600",letterSpacing:"1px",textTransform:"uppercase",color:S.textMuted}}>{t.found}</span>
                 {(gameMode==="battle"||(mode==="solo"&&(soloMode==="tetris"||soloMode==="rotate"||soloMode==="chess")))
@@ -4995,10 +5003,10 @@ export default function Piilosana(){
                   :<><span style={{color:S.green,fontVariantNumeric:"tabular-nums"}}>{found.length}<span style={{color:S.textMuted,fontWeight:"600"}}> / {valid.size}</span></span>
                     <span style={{fontSize:"12px",color:S.textMuted,fontWeight:"600"}}>{valid.size>0?Math.round(found.length/valid.size*100):0}%</span></>}
               </div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:"2px"}}>
+              <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
                 {found.length===0?null:
                   [...found].reverse().map((w,i)=>(
-                    <span key={w} style={{fontSize:"14px",background:S.dark,padding:"1px 3px",border:`1px solid ${wordColor(w.length)}88`,color:wordColor(w.length),animation:i===0?"pop 0.3s ease":"none"}}>
+                    <span key={w} onClick={e=>showDef(w,e)} style={{fontSize:"14px",...wordChip(wordColor(w.length)),padding:"1px 5px",animation:i===0?"pop 0.3s ease":"none",cursor:DEFS&&DEFS[w.toLowerCase()]?"pointer":"default",textDecoration:DEFS&&DEFS[w.toLowerCase()]?"underline dotted":"none",textUnderlineOffset:"3px"}}>
                       {w.toUpperCase()} +{letterMult?ptsLetters(w,lang):pts(w.length)}
                     </span>
                   ))
