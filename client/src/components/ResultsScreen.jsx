@@ -107,7 +107,7 @@ export function ResultsScreen({
               <div
                 key={i}
                 style={{
-                  fontSize: i === 0 ? "15px" : "13px",
+                  fontSize: "14px",
                   color: isMe
                     ? S.yellow
                     : i === 0

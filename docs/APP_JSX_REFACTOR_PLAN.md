@@ -151,3 +151,19 @@ Jos uusia features on kiireellisempiä kuin koodikuntoa, App.jsx voi pyöriä
 vielä kuukausia — se ei kaadu, vain hidastaa kehitystä uusien feature:ien
 kohdalla. Server-puoli on nyt niin hyvällä mallilla että uudet feature:t
 on usein backend-painotteisia ja App.jsx:ää ei tarvitse koskea.
+
+## Tila (päivitetty 26.9.2026)
+
+- ✅ `useAudioSystem` tehty aiemmin.
+- ✅ **Vaihe 1a – moduulitason koodi pois App.jsx:stä** (5278 → 3280 riviä, ei toiminnallisia muutoksia).
+  Kaikki `Piilosana`-funktion ulkopuolinen koodi siirretty:
+  - `lib/config.js` – VERSION, DAILY_ENABLED, SERVER_URL
+  - `lib/wordEngine.js` – sanalistojen lataus, trie, ruudukko, sanahaku, pisteytys
+  - `lib/daily.js` – päivän peli: siemenet, teemat, tulokset, putki, päivämäärät
+  - `lib/gridMechanics.js` – painovoima, rotaatio, shakki, pommi/mysteeri
+  - `lib/i18n.js` (T), `lib/themes.js`, `lib/achievements.js`
+  - `components/`: EndingOverlay, AdBanner, GameEffects, QuickTutorial, TitleDemo,
+    PixelArt, DailyPopup, HallOfFame
+  Tarkistettu: vite build, ei uusia sitomattomia tunnisteita, savutesti (valikko,
+  pikaohje, harjoittelupeli loppuun asti + tulosnäkymä).
+- ⏭ Seuraavaksi: `useDailyChallenge` (datafunktiot ovat nyt valmiina `lib/daily.js`:ssä).
